@@ -1,0 +1,489 @@
+"""
+PRV3 Scoring Engine — Section VII
+Engine Output Contract
+
+VII.1  Engine Output Data Structure (immutable JSON schema)
+VII.2  Phase 1 Test Suite Interface Contract
+
+Key names, data types, and field presence are immutable per spec VII.1.
+This module is the interface boundary between the scoring engine and all
+downstream systems (renderer, test suite, future integrations).
+
+Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section VII
+"""
+
+from __future__ import annotations
+
+import uuid
+from dataclasses import dataclass, field
+from typing import Optional
+
+from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
+from engine.data.jurisdiction import resolve_jurisdiction_flags
+from engine.accumulation import IntakeData, StateRanking
+from engine.checkpoint import CheckpointResult
+from engine.narrative import NarrativeExtractionResult
+from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
+from engine.output import OutputPackage, OutputRouting
+
+
+# ── Engine version ─────────────────────────────────────────────────────────────
+
+ENGINE_VERSION: str = "0.1.0"  # Incremented at each build milestone
+
+
+# ── VII.1  Session data container ──────────────────────────────────────────────
+
+@dataclass
+class SessionData:
+    """
+    Complete state from one scoring session. Passed to assemble_output().
+
+    All fields required for VII.1 contract assembly. Narrative and checkpoint
+    fields are Optional because they may not fire in every session.
+
+    Spec reference: Section VII.1 (input side of the output assembler)
+    """
+    session_id:          str
+    intake:              IntakeData
+    final_rankings:      list              # list[StateRanking], post-modulation
+    accumulated_vector:  dict              # final accumulated vector
+    output_package:      OutputPackage
+    severity_result:     SeverityResult
+
+    narrative_result:    Optional[NarrativeExtractionResult] = None
+    narrative_trigger:   Optional[str]     = None   # "Q27" | "Q34" | None
+    pre_narrative_rankings: Optional[list] = None   # for state_delta calculation
+
+    checkpoint_q11:      Optional[CheckpointResult] = None
+    checkpoint_q19:      Optional[CheckpointResult] = None
+    checkpoint_q27:      Optional[CheckpointResult] = None
+
+    @staticmethod
+    def new_session_id() -> str:
+        return str(uuid.uuid4())
+
+
+# ── Asset score derivation ─────────────────────────────────────────────────────
+
+def _compute_asset_score(
+    accumulated_vector: dict,
+    lead_state_id: Optional[str],
+) -> dict:
+    """
+    Derive asset score from the accumulated vector and the leading state's profile.
+
+    score: ratio of asset-axis signal to total signal in the accumulated vector.
+      Range 0.0–1.0. CALIBRATION TARGET methodology — this proxy will be
+      refined once question-library asset contributions are established.
+
+    primary_asset_domain: first asset_axes entry from the leading state's profile.
+    resolution_anchor_text: LLM-generated at application layer (empty here).
+
+    Spec reference: Section VII.1 — asset_score field
+    """
+    asset_fields = [f for f in DIMENSIONAL_FIELDS if f.endswith("_asset")]
+    total_all = sum(accumulated_vector.get(f, 0.0) for f in DIMENSIONAL_FIELDS)
+    total_asset = sum(accumulated_vector.get(f, 0.0) for f in asset_fields)
+
+    score = round(min(total_asset / total_all, 1.0), 4) if total_all > 0.0 else 0.0
+
+    primary_domain = ""
+    if lead_state_id and lead_state_id in STATE_PROFILES:
+        axes = STATE_PROFILES[lead_state_id].asset_axes
+        primary_domain = axes[0] if axes else ""
+
+    return {
+        "score": score,
+        "primary_asset_domain": primary_domain,
+        "resolution_anchor_text": "",  # LLM-generated at application layer
+    }
+
+
+# ── Jurisdiction flags assembly ────────────────────────────────────────────────
+
+def _assemble_jurisdiction_flags(intake: IntakeData) -> dict:
+    """
+    Assemble the jurisdiction_flags output object from intake data.
+
+    applied_multipliers: axis modifiers that fired based on intake conditions.
+    Currently empty until axis modifier logging is wired end-to-end.
+
+    Spec reference: Section VII.1 — jurisdiction_flags field
+    """
+    flags = resolve_jurisdiction_flags(intake.jurisdictions)
+    return {
+        "transparency": flags.get("transparency", False),
+        "retaliation": flags.get("retaliation"),
+        "procedural": flags.get("procedural"),
+        "applied_multipliers": [],  # populated when axis modifier logging added
+    }
+
+
+# ── Checkpoint log assembly ────────────────────────────────────────────────────
+
+def _checkpoint_entry(result: Optional[CheckpointResult]) -> dict:
+    """Single checkpoint entry for checkpoint_log."""
+    if result is None:
+        return {
+            "entropy": None,
+            "threshold": None,
+            "threshold_exceeded": None,
+            "distinguisher_fired": None,
+        }
+    return {
+        "entropy": round(result.entropy, 6),
+        "threshold": result.threshold,
+        "threshold_exceeded": result.fires,
+        "distinguisher_fired": len(result.distinguishers) > 0,
+    }
+
+
+# ── VII.1  Output Assembly ─────────────────────────────────────────────────────
+
+def assemble_output(session: SessionData) -> dict:
+    """
+    Assemble the complete VII.1 engine output object from session data.
+
+    Returns a dict that serializes directly to the contract-compliant JSON.
+    Key names, data types, and field presence are immutable per spec VII.1.
+
+    LLM-generated text fields (private_output.liability_block, etc.) are
+    empty strings in the assembled output. The application layer populates
+    them before final delivery.
+
+    Spec reference: Section VII.1
+    """
+    routing = session.output_package.routing
+    sev = session.severity_result
+
+    # ── state_distribution — all states, sorted by score descending ──
+    state_distribution = [
+        {
+            "state_id":   r.state_id,
+            "state_name": STATE_PROFILES[r.state_id].state_name
+                          if r.state_id in STATE_PROFILES else r.state_id,
+            "score":      round(r.score, 6),
+            "rank":       r.rank,
+            "above_floor": any(
+                qs.state_id == r.state_id and qs.cleared_floor
+                for qs in routing.all_evaluated
+            ),
+        }
+        for r in sorted(session.final_rankings, key=lambda r: -r.score)
+    ]
+
+    # ── output_type ──
+    output_type_map = {
+        "single":             "single_state",
+        "multi":              "multi_state",
+        "insufficient_signal": "no_signal",
+    }
+    output_type = output_type_map.get(routing.mode, "no_signal")
+
+    # ── identified_states ──
+    identified_states = []
+    if routing.mode == "single" and routing.lead_state:
+        identified_states = [{
+            "state_id":              routing.lead_state.state_id,
+            "state_name":            routing.lead_state.state_name,
+            "score":                 round(routing.lead_state.score, 6),
+            "distinguishing_language": None,  # null for single-state per spec
+        }]
+    elif routing.mode == "multi":
+        identified_states = [
+            {
+                "state_id":              qs.state_id,
+                "state_name":            qs.state_name,
+                "score":                 round(qs.score, 6),
+                "distinguishing_language": "",  # LLM-generated at application layer
+            }
+            for qs in routing.qualified_states
+        ]
+
+    # ── severity ──
+    sev_inputs: dict = {}
+    if sev.input_count > 0 and session.output_package.severity_result:
+        # Input details are in the SeverityEngine — pulled from first input if present
+        pass  # populated when full session pipeline wires SeverityAccumulator
+    severity_obj = {
+        "tier":        sev.tier,
+        "score":       round(sev.score_0_100_with_narrative, 2),
+        "anchor_text": sev.tier_description,
+        "inputs": {
+            "duration_band":               None,  # from SeverityInput
+            "population_band":             None,  # from SeverityInput
+            "prior_attempts":              None,  # from SeverityInput
+            "financial_indicators_present": None,  # from SeverityInput
+            "named_condition":             None,  # from SeverityInput
+        },
+    }
+
+    # ── asset_score ──
+    lead_id = routing.lead_state.state_id if routing.lead_state else (
+        routing.qualified_states[0].state_id if routing.qualified_states else None
+    )
+    asset_obj = _compute_asset_score(session.accumulated_vector, lead_id)
+
+    # ── narrative_modulation ──
+    narr = session.narrative_result
+    pre_rankings = session.pre_narrative_rankings or session.final_rankings
+    state_delta = 0.0
+    if narr and routing.lead_state and pre_rankings:
+        pre_score = next(
+            (r.score for r in pre_rankings if r.state_id == routing.lead_state.state_id),
+            0.0,
+        )
+        state_delta = round(
+            routing.lead_state.score - pre_score, 6
+        )
+
+    narrative_obj = {
+        "fired":             narr is not None,
+        "trigger_point":     session.narrative_trigger,
+        "overall_confidence": round(narr.overall_confidence, 4) if narr else 0.0,
+        "signals_extracted": len(narr.identified_signals) if narr else 0,
+        "state_delta":       state_delta,
+        "severity_delta":    round(sev.narrative_contribution_0_100, 4),
+    }
+
+    # ── checkpoint_log ──
+    checkpoint_log = {
+        "q11": _checkpoint_entry(session.checkpoint_q11),
+        "q19": _checkpoint_entry(session.checkpoint_q19),
+        "q27": _checkpoint_entry(session.checkpoint_q27),
+    }
+
+    # ── jurisdiction_flags ──
+    jurisdiction_flags = _assemble_jurisdiction_flags(session.intake)
+
+    # ── private_output ──
+    priv = session.output_package.private
+    private_output = {
+        "opening_text":        priv.state_name if priv else "",
+        "liability_block":     priv.liability_condition_text if priv else "",
+        "asset_anchor_text":   priv.asset_resolution_anchor_text if priv else "",
+        "resolution_routing":  priv.resolution_family if priv else "",
+        "friction_tax_estimate": priv.friction_tax_estimate if priv else None,
+    }
+
+    # ── shareable_output ──
+    sha = session.output_package.shareable
+    shareable_output = {
+        "framing_text":        sha.framing_text if sha else "",
+        "observable_indicators": sha.observable_indicators if sha else [],
+        "resolution_framing":  sha.resolution_framing_text if sha else "",
+        "attribution_text":    sha.attribution if sha else
+                               "Identified using the PRV3 diagnostic instrument.",
+    }
+
+    # ── intake echo ──
+    intake_obj = {
+        "headcount":          session.intake.headcount,
+        "industry":           session.intake.industry,
+        "org_type":           session.intake.org_type,
+        "jurisdictions":      list(session.intake.jurisdictions),
+        "significant_events": list(session.intake.significant_events),
+        "principal_role":     session.intake.principal_role,
+    }
+
+    return {
+        "session_id":          session.session_id,
+        "intake":              intake_obj,
+        "state_distribution":  state_distribution,
+        "output_type":         output_type,
+        "identified_states":   identified_states,
+        "severity":            severity_obj,
+        "asset_score":         asset_obj,
+        "narrative_modulation": narrative_obj,
+        "checkpoint_log":      checkpoint_log,
+        "jurisdiction_flags":  jurisdiction_flags,
+        "private_output":      private_output,
+        "shareable_output":    shareable_output,
+        "engine_version":      ENGINE_VERSION,
+    }
+
+
+# ── VII.1  Schema Validation ───────────────────────────────────────────────────
+
+# Required top-level fields and their expected Python types
+_TOP_LEVEL_SCHEMA: dict[str, type] = {
+    "session_id":          str,
+    "intake":              dict,
+    "state_distribution":  list,
+    "output_type":         str,
+    "identified_states":   list,
+    "severity":            dict,
+    "asset_score":         dict,
+    "narrative_modulation": dict,
+    "checkpoint_log":      dict,
+    "jurisdiction_flags":  dict,
+    "private_output":      dict,
+    "shareable_output":    dict,
+    "engine_version":      str,
+}
+
+_OUTPUT_TYPE_VALUES = {"single_state", "multi_state", "no_signal"}
+
+_SEVERITY_TIER_VALUES = {"Emerging", "Entrenched", "Endemic"}
+
+_STATE_DISTRIBUTION_ENTRY_FIELDS = {
+    "state_id": str, "state_name": str, "score": float,
+    "rank": int, "above_floor": bool,
+}
+
+_IDENTIFIED_STATE_FIELDS = {
+    "state_id": str, "state_name": str, "score": float,
+    # distinguishing_language: str or None — validated separately
+}
+
+_SEVERITY_FIELDS = {"tier", "score", "anchor_text", "inputs"}
+_ASSET_SCORE_FIELDS = {"score", "primary_asset_domain", "resolution_anchor_text"}
+_NARRATIVE_FIELDS = {
+    "fired", "trigger_point", "overall_confidence",
+    "signals_extracted", "state_delta", "severity_delta",
+}
+_CHECKPOINT_LOG_KEYS = {"q11", "q19", "q27"}
+_CHECKPOINT_ENTRY_FIELDS = {
+    "entropy", "threshold", "threshold_exceeded", "distinguisher_fired",
+}
+_JURISDICTION_FLAGS_FIELDS = {
+    "transparency", "retaliation", "procedural", "applied_multipliers",
+}
+_PRIVATE_OUTPUT_FIELDS = {
+    "opening_text", "liability_block", "asset_anchor_text",
+    "resolution_routing", "friction_tax_estimate",
+}
+_SHAREABLE_OUTPUT_FIELDS = {
+    "framing_text", "observable_indicators",
+    "resolution_framing", "attribution_text",
+}
+_INTAKE_FIELDS = {
+    "headcount", "industry", "org_type",
+    "jurisdictions", "significant_events", "principal_role",
+}
+
+
+def validate_schema(output: dict) -> list:
+    """
+    Validate an engine output dict against the VII.1 contract.
+
+    Returns a list of violation strings. Empty list = fully contract-compliant.
+
+    Checks:
+      - All 13 top-level fields present with correct types
+      - output_type value in allowed enum
+      - state_distribution entries have required fields and types
+      - identified_states entries have required fields
+      - severity tier value in allowed enum; required sub-fields present
+      - asset_score, narrative_modulation, checkpoint_log sub-fields present
+      - jurisdiction_flags, private_output, shareable_output sub-fields present
+      - intake echo has all six fields
+
+    Spec reference: Section VII.1 — "key names, data types, field presence
+    are immutable"
+    """
+    violations = []
+
+    # Top-level fields
+    for fname, ftype in _TOP_LEVEL_SCHEMA.items():
+        if fname not in output:
+            violations.append(f"MISSING top-level field: {fname!r}")
+        elif not isinstance(output[fname], ftype):
+            violations.append(
+                f"WRONG TYPE for {fname!r}: "
+                f"expected {ftype.__name__}, got {type(output[fname]).__name__}"
+            )
+
+    if violations:
+        return violations  # can't safely check sub-fields if top-level broken
+
+    # output_type enum
+    if output["output_type"] not in _OUTPUT_TYPE_VALUES:
+        violations.append(
+            f"INVALID output_type: {output['output_type']!r}. "
+            f"Must be one of {_OUTPUT_TYPE_VALUES}"
+        )
+
+    # state_distribution entries
+    for i, entry in enumerate(output["state_distribution"]):
+        for fname, ftype in _STATE_DISTRIBUTION_ENTRY_FIELDS.items():
+            if fname not in entry:
+                violations.append(
+                    f"state_distribution[{i}] MISSING field {fname!r}"
+                )
+            elif not isinstance(entry[fname], ftype):
+                violations.append(
+                    f"state_distribution[{i}].{fname}: "
+                    f"expected {ftype.__name__}, got {type(entry[fname]).__name__}"
+                )
+
+    # identified_states entries
+    for i, entry in enumerate(output["identified_states"]):
+        for fname, ftype in _IDENTIFIED_STATE_FIELDS.items():
+            if fname not in entry:
+                violations.append(
+                    f"identified_states[{i}] MISSING field {fname!r}"
+                )
+            elif not isinstance(entry[fname], ftype):
+                violations.append(
+                    f"identified_states[{i}].{fname}: "
+                    f"expected {ftype.__name__}, got {type(entry[fname]).__name__}"
+                )
+        if "distinguishing_language" not in entry:
+            violations.append(
+                f"identified_states[{i}] MISSING field 'distinguishing_language'"
+            )
+
+    # severity sub-fields
+    sev = output["severity"]
+    for f in _SEVERITY_FIELDS:
+        if f not in sev:
+            violations.append(f"severity MISSING field {f!r}")
+    if "tier" in sev and sev["tier"] not in _SEVERITY_TIER_VALUES:
+        violations.append(
+            f"INVALID severity.tier: {sev['tier']!r}. "
+            f"Must be one of {_SEVERITY_TIER_VALUES}"
+        )
+
+    # asset_score sub-fields
+    for f in _ASSET_SCORE_FIELDS:
+        if f not in output["asset_score"]:
+            violations.append(f"asset_score MISSING field {f!r}")
+
+    # narrative_modulation sub-fields
+    for f in _NARRATIVE_FIELDS:
+        if f not in output["narrative_modulation"]:
+            violations.append(f"narrative_modulation MISSING field {f!r}")
+
+    # checkpoint_log structure
+    cl = output["checkpoint_log"]
+    for ck in _CHECKPOINT_LOG_KEYS:
+        if ck not in cl:
+            violations.append(f"checkpoint_log MISSING key {ck!r}")
+        else:
+            for f in _CHECKPOINT_ENTRY_FIELDS:
+                if f not in cl[ck]:
+                    violations.append(f"checkpoint_log.{ck} MISSING field {f!r}")
+
+    # jurisdiction_flags sub-fields
+    for f in _JURISDICTION_FLAGS_FIELDS:
+        if f not in output["jurisdiction_flags"]:
+            violations.append(f"jurisdiction_flags MISSING field {f!r}")
+
+    # private_output sub-fields
+    for f in _PRIVATE_OUTPUT_FIELDS:
+        if f not in output["private_output"]:
+            violations.append(f"private_output MISSING field {f!r}")
+
+    # shareable_output sub-fields
+    for f in _SHAREABLE_OUTPUT_FIELDS:
+        if f not in output["shareable_output"]:
+            violations.append(f"shareable_output MISSING field {f!r}")
+
+    # intake echo fields
+    for f in _INTAKE_FIELDS:
+        if f not in output["intake"]:
+            violations.append(f"intake MISSING field {f!r}")
+
+    return violations
