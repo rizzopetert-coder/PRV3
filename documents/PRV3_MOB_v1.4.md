@@ -320,7 +320,7 @@ Signal weight summary:
 
 | **PRV3 Principal Brief v1.1** | Governing document. Bumped to v1.1 Session 5. Read at session start. Available in Drive and project knowledge. |
 | --- | --- |
-| **PRV3_MOB** | This document. Google Doc. ID: 1mqSPki5p7U2yH6ho8ULMxER-WhsnUAc_Aa02CPOgssE. Write target for closeout protocol. |
+| **PRV3_MOB** | This document. Google Doc. ID: see CLAUDE.md. Write target for closeout protocol. |
 | **PRV3_Scoring_Architecture_Spec_v1.docx** | Seven-section build document. Produced Session 4. Gemini audited. Engine built from it. Session 5: corrected to 47 states in six locations, entropy 5.55 bits, 141 profiles minimum. |
 | **PRV3_State_Matrix_192_v2.xlsx** | 192-condition architectural grid. v2 built Session 5 — includes 47-state index sheet and back-annotations on all dimension sheets. |
 | **PRV3_State_Taxonomy_Profiles.docx** | All 47 confirmed states. Proper Word docx — rebuilt Session 5. Header corrected to "All 47 States." Transitional — retire once engine state profiles fully populated and synced. |
@@ -351,3 +351,4 @@ Transitional (sync now, retire when engine data complete): PRV3_Signal_Map.docx,
 | **May 2026 — Session 4** | Scoring architecture specification document produced and Gemini audited. Confidence coefficient gap resolved. Engine built by Claude Code — all 7 sections, 363 tests, 0 failures. Taxonomy count corrected to 47. Paper Tiger rename propagated. MemPalace PRV3 wing established. CLAUDE.md session protocol created. MOB updated to v1.3. |
 | **May 2026 — Session 5** | Full project knowledge integrity audit. Six documents corrected (45→47 states, Paper Tiger propagation, checkpoint numbers Q11/Q19/Q27, entropy 5.55 bits, 141 test profiles). All reference documents rebuilt as proper Word docx files. State Matrix v2 built with 47-state index sheet. Principal Brief bumped to v1.1. MOB migrated to Google Drive Google Doc. PRV3 GitHub repo created. CLAUDE.md rewritten for PRV3. Return-to-design checklist produced. MOB updated to v1.4. |
 | **May 2026 — Session 6** | B-checklist executed. Engine state registry confirmed at 47 states. CLAUDE.md confirmed as PRV3 version. MOB updated to v1.4 (this entry). Initial commit: engine/ and CLAUDE.md. Phase 1 test suite design is next open deliverable. |
+| **May 2026 — Session 7** | MemPalace MCP diagnostic. Python 3.12.10 confirmed at configured path. mempalace package confirmed installed. Server not loading at Claude Code session start — root cause unresolved. No code changes. No decisions locked. Next session: fresh Claude Code session to test MCP auto-start. |
