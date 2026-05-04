@@ -44,7 +44,7 @@ The five service offerings the diagnostic routes to: Roadmap, Stability Support,
 | **Claude Code** | Filesystem execution. Python patch scripts with dry-run verification before any write. Has MemPalace connected via MCP. Executes startup and closing protocol per CLAUDE.md. |
 | **Gemini** | Architecture audits and proposals before Claude Code executes. Proposes options, does not execute. All architectural decisions route through Gemini before Claude Code touches anything. Non-negotiable. |
 | **Pete** | Decides everything. No recommendation from either AI is a decision until Pete confirms it. |
-| **MemPalace** | Local vector retrieval. ChromaDB, ONNX embeddings. Runs on Pete's machine. No external API calls. PRV3 wing: 5 rooms (documents, engine, prompts, scripts, general). 38 files, 735 drawers filed at Session 4 close. |
+| **MemPalace** | Local vector retrieval. ChromaDB, ONNX embeddings. Runs on Pete's machine. No external API calls. PRV3 wing: 5 rooms (documents, engine, prompts, scripts, general). 771 drawers in prv3 wing. MCP fixed Session 8 — registered in ~/.claude.json. |
 
 ---
 
@@ -286,7 +286,15 @@ Signal weight summary:
 - B-3: MOB updated to v1.4 — this document
 - B-4: Initial commit — engine/ and CLAUDE.md staged and committed (pending)
 
+**Completed Sessions 7–8 (MCP fix)**
+- Diagnosed MemPalace MCP failure — root cause: ~/.claude/settings.json is Claude Desktop format, not Claude Code CLI format
+- Fixed by registering mempalace in ~/.claude.json under PRV3 project entry (args as array, Python 3.12 full path)
+- claude mcp get mempalace now shows Connected
+- Palace confirmed: 14,969 drawers total, 771 in prv3 wing
+- MCP diary write skipped Sessions 7 and 8 — tools unavailable at session start during diagnostic
+
 **Next session opens with**
+- MemPalace tools available — startup protocol Steps 1–3 will run fully
 - Phase 1 test suite design — 3 profiles per state × 47 states = 141 profiles minimum
   - Profile types: high_confidence (single-state signal), moderate (noise present), weak (near-floor signal)
   - Schema defined in engine/test_suite.py
@@ -352,3 +360,4 @@ Transitional (sync now, retire when engine data complete): PRV3_Signal_Map.docx,
 | **May 2026 — Session 5** | Full project knowledge integrity audit. Six documents corrected (45→47 states, Paper Tiger propagation, checkpoint numbers Q11/Q19/Q27, entropy 5.55 bits, 141 test profiles). All reference documents rebuilt as proper Word docx files. State Matrix v2 built with 47-state index sheet. Principal Brief bumped to v1.1. MOB migrated to Google Drive Google Doc. PRV3 GitHub repo created. CLAUDE.md rewritten for PRV3. Return-to-design checklist produced. MOB updated to v1.4. |
 | **May 2026 — Session 6** | B-checklist executed. Engine state registry confirmed at 47 states. CLAUDE.md confirmed as PRV3 version. MOB updated to v1.4 (this entry). Initial commit: engine/ and CLAUDE.md. Phase 1 test suite design is next open deliverable. |
 | **May 2026 — Session 7** | MemPalace MCP diagnostic. Python 3.12.10 confirmed at configured path. mempalace package confirmed installed. Server not loading at Claude Code session start — root cause unresolved. No code changes. No decisions locked. Next session: fresh Claude Code session to test MCP auto-start. |
+| **May 2026 — Session 8** | MemPalace MCP root cause found and fixed. Root cause: ~/.claude/settings.json is Claude Desktop format — Claude Code CLI reads ~/.claude.json. mempalace added to ~/.claude.json under PRV3 project entry with correct format (args array, Python 3.12 full path). claude mcp get mempalace shows Connected. Palace: 14,969 drawers total, 771 in prv3 wing. No code changes. No locked decisions. Next session: mempalace tools available at startup. |
