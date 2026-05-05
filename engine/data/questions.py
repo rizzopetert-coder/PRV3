@@ -10,9 +10,9 @@ Severity follow-ons: SEVER-01 through SEVER-13.
   Note: spec originally specified 12 follow-ons; Q32a adds a 13th distinct follow-on.
   Q28a and Q31a share SEVER-11 (same content, different adaptive parent question).
 
-All dimensional_contributions: 0.25 baseline across all 8 fields.
-Calibration target - weights differentiated after Phase 1 calibration.
-Do not set speculative weights.
+dimensional_contributions: seeded from Signal Map tier assignments (Session 11).
+HIGH->0.60, MEDIUM->0.40, LOW/Cluster->0.25 baseline. Asset fields at 0.25.
+Phase 1 calibration will refine these values against test suite results.
 
 Spec reference: Section I.2
 """
@@ -28,8 +28,8 @@ class AnswerOption:
     """
     One selectable option within a question.
 
-    dimensional_contributions: all 8 fields initialized at 0.25 (baseline).
-    Calibration target - do not set speculative weights.
+    dimensional_contributions: seeded per Signal Map tier (Session 11).
+    HIGH->0.60, MEDIUM->0.40, LOW/Cluster->0.25. Asset fields at 0.25.
 
     Spec reference: Section I.2 answer_vectors
     """
@@ -803,13 +803,67 @@ _QDATA = [
 
 def _build_library():
     lib = {}
-    _base = {
-        "aptitude_liability": 0.25, "aptitude_asset": 0.25,
+    _uniform = {
+        "aptitude_liability":  0.25, "aptitude_asset":  0.25,
         "authority_liability": 0.25, "authority_asset": 0.25,
-        "alliance_liability": 0.25, "alliance_asset": 0.25,
-        "attitude_liability": 0.25, "attitude_asset": 0.25,
+        "alliance_liability":  0.25, "alliance_asset":  0.25,
+        "attitude_liability":  0.25, "attitude_asset":  0.25,
+    }
+    # Signal Map tier seedings (Session 11 pre-calibration pass).
+    # Source: PRV3_Signal_Map (Drive 1LMx13dWDvAMWwxYHG7ikd9moZLndphNZw66hbejfLqI)
+    # Rule: highest-weight non-cluster state in state_targets; primary dim(s) seeded.
+    # HIGH->0.60, MEDIUM->0.40. LOW/Cluster questions absent (remain at 0.25).
+    # Asset fields not seeded — liability-only pass.
+    _seed = {
+        "Q01":           {"authority_liability": 0.60},
+        "Q02":           {"authority_liability": 0.60, "aptitude_liability": 0.60},
+        "Q03A":          {"authority_liability": 0.60, "attitude_liability": 0.60},
+        "Q03A-D-FOLLOW": {"authority_liability": 0.60, "alliance_liability": 0.60},
+        "Q04":           {"authority_liability": 0.60, "attitude_liability": 0.60},
+        "Q05":           {"attitude_liability": 0.60},
+        "Q06":           {"authority_liability": 0.60, "attitude_liability": 0.60},
+        "Q07":           {"authority_liability": 0.60, "alliance_liability": 0.60},
+        "Q09":           {"authority_liability": 0.60, "alliance_liability": 0.60},
+        "Q10":           {"authority_liability": 0.60, "aptitude_liability": 0.60},
+        "Q11":           {"authority_liability": 0.40, "attitude_liability": 0.40},
+        "Q12":           {"attitude_liability": 0.60},
+        "Q13":           {"authority_liability": 0.40, "alliance_liability": 0.40},
+        "Q14":           {"authority_liability": 0.40, "aptitude_liability": 0.40},
+        "Q15":           {"attitude_liability": 0.40, "authority_liability": 0.40},
+        "Q16":           {"attitude_liability": 0.40, "authority_liability": 0.40},
+        "Q17":           {"attitude_liability": 0.40, "alliance_liability": 0.40},
+        "Q19":           {"authority_liability": 0.40, "attitude_liability": 0.40},
+        "Q20":           {"authority_liability": 0.60, "aptitude_liability": 0.60},
+        "Q21":           {"authority_liability": 0.40, "alliance_liability": 0.40},
+        "Q22":           {"authority_liability": 0.40, "aptitude_liability": 0.40},
+        "Q23":           {"authority_liability": 0.40, "aptitude_liability": 0.40},
+        "Q24":           {"attitude_liability": 0.40, "alliance_liability": 0.40},
+        "Q25":           {"authority_liability": 0.40, "aptitude_liability": 0.40},
+        "Q26":           {"authority_liability": 0.60, "alliance_liability": 0.60},
+        "Q27A":          {"alliance_liability": 0.40},
+        "Q28":           {"authority_liability": 0.60, "attitude_liability": 0.60},
+        "Q29":           {"attitude_liability": 0.40, "authority_liability": 0.40},
+        "Q30":           {"authority_liability": 0.40, "alliance_liability": 0.40},
+        "Q31":           {"authority_liability": 0.60, "attitude_liability": 0.60},
+        "Q32":           {"authority_liability": 0.40, "alliance_liability": 0.40},
+        "Q33":           {"authority_liability": 0.40, "aptitude_liability": 0.40},
+        "Q34":           {"attitude_liability": 0.40, "alliance_liability": 0.40},
+        "SEVER-01":      {"attitude_liability": 0.40, "authority_liability": 0.40},
+        "SEVER-02":      {"authority_liability": 0.60, "aptitude_liability": 0.60},
+        "SEVER-03":      {"authority_liability": 0.40, "alliance_liability": 0.40},
+        "SEVER-04":      {"authority_liability": 0.40, "aptitude_liability": 0.40},
+        "SEVER-05":      {"authority_liability": 0.40, "aptitude_liability": 0.40},
+        "SEVER-06":      {"attitude_liability": 0.40, "alliance_liability": 0.40},
+        "SEVER-07":      {"authority_liability": 0.40, "aptitude_liability": 0.40},
+        "SEVER-08":      {"authority_liability": 0.60, "alliance_liability": 0.60},
+        "SEVER-09":      {"alliance_liability": 0.40},
+        "SEVER-11":      {"authority_liability": 0.60, "attitude_liability": 0.60},
+        "SEVER-12":      {"attitude_liability": 0.40, "authority_liability": 0.40},
+        "SEVER-13":      {"attitude_liability": 0.40, "alliance_liability": 0.40},
     }
     for (qid, text, fmt, pos, seg, opts, targets, sev) in _QDATA:
+        base = dict(_uniform)
+        base.update(_seed.get(qid, {}))
         lib[qid] = QuestionDefinition(
             question_id=qid,
             question_text=text,
@@ -820,7 +874,7 @@ def _build_library():
                 AnswerOption(
                     option_id=o[0],
                     option_text=o[1],
-                    dimensional_contributions=dict(_base),
+                    dimensional_contributions=dict(base),
                     severity_trigger=o[2],
                     severity_follow_on_id=o[3],
                 )

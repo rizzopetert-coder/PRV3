@@ -29,7 +29,7 @@ from engine.output import OutputPackage, OutputRouting
 
 # ── Engine version ─────────────────────────────────────────────────────────────
 
-ENGINE_VERSION: str = "0.1.0"  # Incremented at each build milestone
+ENGINE_VERSION: str = "0.2.0"  # Incremented at each build milestone
 
 
 # ── VII.1  Session data container ──────────────────────────────────────────────
@@ -58,6 +58,8 @@ class SessionData:
     checkpoint_q11:      Optional[CheckpointResult] = None
     checkpoint_q19:      Optional[CheckpointResult] = None
     checkpoint_q27:      Optional[CheckpointResult] = None
+
+    q_signal_decision_blindness: bool = False
 
     @staticmethod
     def new_session_id() -> str:
@@ -140,6 +142,93 @@ def _checkpoint_entry(result: Optional[CheckpointResult]) -> dict:
 
 
 # ── VII.1  Output Assembly ─────────────────────────────────────────────────────
+
+# ── monitoring_metadata constants ─────────────────────────────────────────────
+
+_PROTECTED_ACTIVITY_INTAKE_EVENTS = frozenset(["external_legal_matter"])
+
+_DB_FLAG_ID = "decision_blindness_protected_activity"
+_DB_SEVERITY_FLOOR = "entrenched"
+_DB_RECOMMENDED_ROUTES = ["executive_counsel", "intervention"]
+_DB_INTERNAL_NOTE = (
+    "Decision Blindness signal present with confirmed protected activity context. "
+    "Prioritize engagement review before diagnostic output is shared."
+)
+
+
+def _assemble_monitoring_metadata(session: SessionData) -> dict:
+    """
+    Assemble monitoring_metadata for one scoring session.
+
+    Always present in engine output. Excluded from shareable output package.
+
+    Decision Blindness protected-activity flag (decision_blindness_protected_activity)
+    fires when both conditions are met:
+      (1) decision_blindness score >= noise_baseline for that state
+      (2) protected activity confirmed from at least one source:
+            intake_significant_events: significant_events contains a protected
+                                       activity event (e.g. external_legal_matter)
+            q_signal:                  session.q_signal_decision_blindness is True
+                                       (set by session orchestrator from Q06 answers)
+
+    Flag is always present in the flags list. triggered=True only when both
+    conditions are met. priority is always "high" for this flag type.
+    any_high_priority reflects whether any triggered flag carries high priority.
+
+    Spec reference: Section VII.1 -- monitoring_metadata
+    """
+    db_entry = next(
+        (qs for qs in session.output_package.routing.all_evaluated
+         if qs.state_id == "decision_blindness"),
+        None,
+    )
+    db_score = db_entry.score if db_entry else 0.0
+    db_noise = db_entry.noise_baseline if db_entry else 0.0
+    db_above_baseline = db_score >= db_noise
+
+    pa_sources = []
+    if any(e in _PROTECTED_ACTIVITY_INTAKE_EVENTS
+           for e in session.intake.significant_events):
+        pa_sources.append("intake_significant_events")
+    if session.q_signal_decision_blindness:
+        pa_sources.append("q_signal")
+
+    protected_activity_confirmed = len(pa_sources) > 0
+    flag_triggered = db_above_baseline and protected_activity_confirmed
+
+    db_flag = {
+        "flag_id":   _DB_FLAG_ID,
+        "triggered": flag_triggered,
+        "trigger_conditions": {
+            "state_id":                    "decision_blindness",
+            "score_at_trigger":            round(db_score, 6),
+            "score_threshold":             "noise_baseline",
+            "protected_activity_confirmed": protected_activity_confirmed,
+            "protected_activity_sources":   pa_sources,
+        },
+        "severity_context": {
+            "decision_blindness_severity_floor": _DB_SEVERITY_FLOOR,
+            "current_severity_reading": (
+                session.severity_result.tier.lower()
+                if session.severity_result.tier else ""
+            ),
+        },
+        "recommended_routes":           list(_DB_RECOMMENDED_ROUTES),
+        "priority":                     "high",
+        "internal_note":                _DB_INTERNAL_NOTE,
+        "visible_to_principal":         False,
+        "visible_to_resolution_specialist": True,
+    }
+
+    flags = [db_flag]
+    return {
+        "flags":            flags,
+        "flag_count":       len(flags),
+        "any_high_priority": any(
+            f["triggered"] and f["priority"] == "high" for f in flags
+        ),
+    }
+
 
 def assemble_output(session: SessionData) -> dict:
     """
@@ -301,6 +390,7 @@ def assemble_output(session: SessionData) -> dict:
         "private_output":      private_output,
         "shareable_output":    shareable_output,
         "engine_version":      ENGINE_VERSION,
+        "monitoring_metadata": _assemble_monitoring_metadata(session),
     }
 
 
@@ -321,6 +411,7 @@ _TOP_LEVEL_SCHEMA: dict[str, type] = {
     "private_output":      dict,
     "shareable_output":    dict,
     "engine_version":      str,
+    "monitoring_metadata": dict,
 }
 
 _OUTPUT_TYPE_VALUES = {"single_state", "multi_state", "no_signal"}
@@ -363,6 +454,14 @@ _INTAKE_FIELDS = {
     "jurisdictions", "significant_events", "principal_role",
 }
 
+_MONITORING_METADATA_FIELDS = {"flags", "flag_count", "any_high_priority"}
+
+_FLAG_REQUIRED_FIELDS = {
+    "flag_id", "triggered", "trigger_conditions", "severity_context",
+    "recommended_routes", "priority", "internal_note",
+    "visible_to_principal", "visible_to_resolution_specialist",
+}
+
 
 def validate_schema(output: dict) -> list:
     """
@@ -371,7 +470,7 @@ def validate_schema(output: dict) -> list:
     Returns a list of violation strings. Empty list = fully contract-compliant.
 
     Checks:
-      - All 13 top-level fields present with correct types
+      - All 14 top-level fields present with correct types
       - output_type value in allowed enum
       - state_distribution entries have required fields and types
       - identified_states entries have required fields
@@ -485,5 +584,17 @@ def validate_schema(output: dict) -> list:
     for f in _INTAKE_FIELDS:
         if f not in output["intake"]:
             violations.append(f"intake MISSING field {f!r}")
+
+    # monitoring_metadata
+    mm = output["monitoring_metadata"]
+    for f in _MONITORING_METADATA_FIELDS:
+        if f not in mm:
+            violations.append(f"monitoring_metadata MISSING field {f!r}")
+    for i, flag in enumerate(mm.get("flags", [])):
+        for f in _FLAG_REQUIRED_FIELDS:
+            if f not in flag:
+                violations.append(
+                    f"monitoring_metadata.flags[{i}] MISSING field {f!r}"
+                )
 
     return violations
