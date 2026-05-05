@@ -10,9 +10,16 @@ Phase 1 minimum: 3 profiles per state × 47 states = 141 test profiles.
 (Spec references 45 states × 3 = 135; confirmed count is 47.)
 
 Profile types per state:
-  high_confidence: clear single-state signal → expected output_type = single_state
-  moderate:        signal with noise → correct state in top 3, correct output_type
-  weak:            signal near floor → correct state above floor, or correct no_signal
+  high_confidence:        clear single-state signal → output_type = single_state
+  extreme_high_confidence: high_confidence + severity_escalation_flag required in output
+  moderate:               signal with noise → correct state in top 3, correct output_type
+  weak:                   signal near floor → correct state above floor, or correct no_signal
+
+pass_criterion on ExpectedOutput (optional override):
+  rank_1                     — target must be rank 1 (default for high_confidence)
+  top_3                      — target must appear in top 3 (default for moderate)
+  top_3_with_escalation_flag — top 3 AND severity.escalation_flag must be True
+  None                       — profile-implied default applies
 
 Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section VII.2
 """
@@ -46,17 +53,22 @@ class ExpectedOutput:
     """
     Expected output values for a test profile.
 
-    output_type:       "single_state" | "multi_state" | "no_signal"
-    identified_states: list of state_ids expected to appear in identified_states
-    severity_tier:     expected severity tier (or None if not specified)
-    asset_domain:      expected primary_asset_domain (or None if not specified)
+    output_type:              "single_state" | "multi_state" | "no_signal"
+    identified_states:        list of state_ids expected to appear in identified_states
+    severity_tier:            expected severity tier (or None if not specified)
+    asset_domain:             expected primary_asset_domain (or None if not specified)
+    pass_criterion:           override pass criterion (or None for profile-implied default)
+                              Values: "rank_1" | "top_3" | "top_3_with_escalation_flag"
+    severity_escalation_flag: True if the engine output must carry severity.escalation_flag
 
     Spec reference: Section VII.2 — expected_output schema
     """
-    output_type:       str
-    identified_states: list   # list of state_ids
-    severity_tier:     Optional[str] = None
-    asset_domain:      Optional[str] = None
+    output_type:              str
+    identified_states:        list   # list of state_ids
+    severity_tier:            Optional[str]  = None
+    asset_domain:             Optional[str]  = None
+    pass_criterion:           Optional[str]  = None
+    severity_escalation_flag: bool           = False
 
 
 @dataclass
@@ -64,7 +76,7 @@ class TestCase:
     """
     One Phase 1 test profile.
 
-    profile_type: "high_confidence" | "moderate" | "weak"
+    profile_type: "high_confidence" | "extreme_high_confidence" | "moderate" | "weak"
     target_state: the state this profile is designed to elicit
     intake:        intake field values (dict matching IntakeData fields)
     answers:       simulated question answers
@@ -75,7 +87,7 @@ class TestCase:
     """
     test_id:       str
     description:   str
-    profile_type:  str    # "high_confidence" | "moderate" | "weak"
+    profile_type:  str    # "high_confidence" | "extreme_high_confidence" | "moderate" | "weak"
     target_state:  str    # state_id this profile targets
     intake:        dict   # six intake fields
     answers:       list   # list[TestAnswer]
@@ -84,7 +96,7 @@ class TestCase:
 
 # ── VII.2  Pass criteria ───────────────────────────────────────────────────────
 
-PROFILE_TYPES = ("high_confidence", "moderate", "weak")
+PROFILE_TYPES = ("high_confidence", "extreme_high_confidence", "moderate", "weak")
 
 # Severity tier ordering for boundary tolerance checks
 _TIER_ORDER = {"Emerging": 0, "Entrenched": 1, "Endemic": 2}
@@ -119,18 +131,24 @@ def evaluate_pass_criteria(
 
     Pass criteria by profile_type (Section VII.2, LOCKED):
 
-    high_confidence:
-      - Correct state is rank 1 in state_distribution
+    high_confidence / extreme_high_confidence:
+      - Correct state is rank 1 in state_distribution (default)
       - output_type == single_state
+      - expected.pass_criterion overrides rank check if set
 
     moderate:
-      - Correct state appears in top 3 of state_distribution
-      - output_type matches expected (single_state or multi_state)
+      - Correct state appears in top 3 of state_distribution (default)
+      - output_type matches expected
+      - expected.pass_criterion overrides rank check if set
 
     weak:
       - Correct state is above_floor == True in state_distribution, OR
       - output_type == no_signal and expected is no_signal
-        (correct rejection of below-floor signal)
+      - expected.pass_criterion overrides to top_3 or top_3_with_escalation_flag if set
+
+    severity_escalation_flag (all profile_types):
+      - When expected.severity_escalation_flag is True:
+        engine output severity.escalation_flag must be True
 
     Severity (all profile_types):
       - tier matches expected (if expected.severity_tier is specified)
@@ -146,6 +164,16 @@ def evaluate_pass_criteria(
     profile = test_case.profile_type
     target = test_case.target_state
 
+    # Resolve effective pass criterion
+    if expected.pass_criterion is not None:
+        criterion = expected.pass_criterion
+    elif profile in ("high_confidence", "extreme_high_confidence"):
+        criterion = "rank_1"
+    elif profile == "moderate":
+        criterion = "top_3"
+    else:
+        criterion = None  # weak: uses its own logic
+
     dist = engine_output.get("state_distribution", [])
     output_type = engine_output.get("output_type", "")
 
@@ -154,28 +182,45 @@ def evaluate_pass_criteria(
     target_rank = target_entry["rank"] if target_entry else None
     target_above_floor = target_entry.get("above_floor", False) if target_entry else False
 
-    if profile == "high_confidence":
-        if target_rank != 1:
-            failures.append(
-                f"high_confidence: {target!r} is rank {target_rank}, expected rank 1"
-            )
+    if profile in ("high_confidence", "extreme_high_confidence"):
+        if criterion in ("top_3", "top_3_with_escalation_flag"):
+            if target_rank is None or target_rank > 3:
+                failures.append(
+                    f"{profile}: {target!r} is rank {target_rank}, expected top 3"
+                )
+        else:  # rank_1 (default)
+            if target_rank != 1:
+                failures.append(
+                    f"{profile}: {target!r} is rank {target_rank}, expected rank 1"
+                )
         if output_type != "single_state":
             failures.append(
-                f"high_confidence: output_type={output_type!r}, expected 'single_state'"
+                f"{profile}: output_type={output_type!r}, expected 'single_state'"
             )
 
     elif profile == "moderate":
-        if target_rank is None or target_rank > 3:
-            failures.append(
-                f"moderate: {target!r} is rank {target_rank}, expected top 3"
-            )
+        if criterion == "rank_1":
+            if target_rank != 1:
+                failures.append(
+                    f"moderate: {target!r} is rank {target_rank}, expected rank 1"
+                )
+        else:  # top_3 or top_3_with_escalation_flag (default for moderate)
+            if target_rank is None or target_rank > 3:
+                failures.append(
+                    f"moderate: {target!r} is rank {target_rank}, expected top 3"
+                )
         if output_type != expected.output_type:
             failures.append(
                 f"moderate: output_type={output_type!r}, expected {expected.output_type!r}"
             )
 
     elif profile == "weak":
-        if expected.output_type == "no_signal":
+        if criterion in ("top_3", "top_3_with_escalation_flag"):
+            if target_rank is None or target_rank > 3:
+                failures.append(
+                    f"weak: {target!r} is rank {target_rank}, expected top 3"
+                )
+        elif expected.output_type == "no_signal":
             if output_type != "no_signal":
                 failures.append(
                     f"weak: output_type={output_type!r}, expected 'no_signal'"
@@ -189,6 +234,14 @@ def evaluate_pass_criteria(
 
     else:
         failures.append(f"Unknown profile_type: {profile!r}")
+
+    # Severity escalation flag check
+    if expected.severity_escalation_flag:
+        actual_flag = engine_output.get("severity", {}).get("escalation_flag", False)
+        if not actual_flag:
+            failures.append(
+                "severity_escalation_flag: expected True in output, got False"
+            )
 
     # Severity tier check
     if expected.severity_tier is not None:
@@ -315,7 +368,8 @@ def run_suite(
         "passed": int,
         "failed": int,
         "results": list[TestResult],
-        "by_profile_type": {"high_confidence": ..., "moderate": ..., "weak": ...},
+        "by_profile_type": {"high_confidence": ..., "extreme_high_confidence": ...,
+                            "moderate": ..., "weak": ...},
         "by_state": {state_id: {"total": int, "passed": int}},
       }
     """
