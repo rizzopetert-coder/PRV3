@@ -2,10 +2,10 @@
 PRV3 Scoring Engine — Section I.1
 State Profile Schema and Registry
 
-All 47 confirmed states. Dimensional vectors initialize at equal-weight 0.25
-baseline across all eight fields. This is the calibration starting point per
-spec Section I.1. Do not set speculative weights — Phase 1 Confusion Matrix
-data drives any deviation from 0.25.
+All 47 confirmed states. Dimensional vectors seeded from Signal Map tier
+assignments (Session 12): primary liability field -> high=0.60, medium=0.40,
+low/cluster=0.25 (baseline). Asset fields at 0.25. Salience weights for
+residual collisions derived from Phase 1 Confusion Matrix analysis.
 
 Source documents:
   - State names and signal architecture: PRV3_Question_Signal_Map.docx (May 2026)
@@ -154,6 +154,21 @@ class StateProfile:
 
 # ── Helper ─────────────────────────────────────────────────────────────────────
 
+_DIM_LIABILITY_FIELD: dict = {
+    "Aptitude":  "aptitude_liability",
+    "Authority": "authority_liability",
+    "Alliance":  "alliance_liability",
+    "Attitude":  "attitude_liability",
+}
+
+_SIGNAL_WEIGHT_TO_VALUE: dict = {
+    "high":    0.60,
+    "medium":  0.40,
+    "low":     BASELINE_VALUE,
+    "cluster": BASELINE_VALUE,
+}
+
+
 def _profile(
     state_id, state_name, primary_dimension,
     signal_weight, cluster_id,
@@ -161,12 +176,29 @@ def _profile(
     sev_min, sev_max,
     resolution_family,
 ):
-    """Construct a StateProfile with baseline dimensional vector."""
+    """Construct a StateProfile with seeded dimensional vector.
+
+    Primary liability field seeded from Signal Map tier assignment:
+      high -> 0.60 | medium -> 0.40 | low/cluster -> 0.25 (BASELINE_VALUE)
+    All other fields remain at BASELINE_VALUE (0.25).
+    Asset fields unchanged -- Phase 1 calibration target.
+
+    Source: Signal Map tier assignments (Session 12).
+    Spec reference: Section I.1
+    """
+    seed_val  = _SIGNAL_WEIGHT_TO_VALUE.get(signal_weight, BASELINE_VALUE)
+    lib_field = _DIM_LIABILITY_FIELD.get(primary_dimension, "")
+    vec_kwargs = (
+        {lib_field: seed_val}
+        if lib_field and seed_val != BASELINE_VALUE
+        else {}
+    )
+
     return StateProfile(
         state_id=state_id,
         state_name=state_name,
         primary_dimension=primary_dimension,
-        dimensional_vector=DimensionalVector(),   # all fields = 0.25
+        dimensional_vector=DimensionalVector(**vec_kwargs),
         signal_weight=signal_weight,
         cluster_id=cluster_id,
         liability_axes=liability_axes,

@@ -796,6 +796,85 @@ _QDATA = [
         ["narrative_lock", "the_broken_compass"],
         False,
     ),
+    (
+        "Q35",
+        "When someone in a key role isn't performing,"
+        " what does the conversation usually sound like?",
+        "forced_choice", 35, "mid",
+        [
+            ("A", "We talk about what the person needs to do differently.", False, None),
+            ("B", "We talk about whether the role itself is set up to let them succeed.", False, None),
+            ("C", "We talk about whether this is the right role for this person.", False, None),
+            ("D", "We don't usually have that conversation until something forces it.", False, None),
+        ],
+        ["built_to_fail", "the_undefined_role", "the_overloaded_manager"],
+        False,
+    ),
+    (
+        "Q36",
+        "When someone is underperforming, how does it usually come to a resolution?",
+        "forced_choice", 36, "mid",
+        [
+            ("A", "A direct conversation happens early. Most situations resolve from there.", False, None),
+            ("B", "There are conversations, but they tend to drag."
+             " The situation usually outlasts the patience for it.", False, None),
+            ("C", "The person eventually leaves — resignation, transfer, or mutual agreement"
+             " — without a formal process.", False, None),
+            ("D", "It depends on who the person is. Some situations get addressed. Others don't.", False, None),
+            ("E", "The manager flags it but isn't sure what they're authorized to do about it.", False, None),
+        ],
+        ["the_paper_tiger", "built_to_fail", "the_undefined_role"],
+        False,
+    ),
+    (
+        "Q37",
+        "When a policy, process, or tool is no longer working the way it should,"
+        " how does that typically surface?",
+        "forced_choice", 37, "mid",
+        [
+            ("A", "Someone with ownership over it flags it and brings a recommendation.", False, None),
+            ("B", "People working around it start talking about it"
+             " and it eventually reaches leadership.", False, None),
+            ("C", "Something breaks — a complaint, a miss, an incident"
+             " — and that's when it gets attention.", False, None),
+            ("D", "It doesn't always surface. Some things just quietly stop being followed.", False, None),
+        ],
+        ["the_unexamined_algorithm", "the_policy_lag", "the_undefined_role"],
+        False,
+    ),
+    (
+        "Q38",
+        "If a senior leader — someone who runs a function or a team — left unexpectedly,"
+        " what would happen to what they were carrying?",
+        "forced_choice", 38, "mid",
+        [
+            ("A", "We have someone ready. Coverage would be managed.", False, None),
+            ("B", "We'd cover it, but there would be a real gap"
+             " while we figured out the transition.", False, None),
+            ("C", "A significant amount of what they know and who they know"
+             " leaves with them.", False, None),
+            ("D", "We'd be in a difficult position."
+             " That role holds more than most people realize.", False, None),
+        ],
+        ["leadership_continuity_risk", "the_unformed_leader", "the_overloaded_manager"],
+        False,
+    ),
+    (
+        "Q39",
+        "How does your organization typically handle a situation"
+        " where someone is clearly not right for a role?",
+        "forced_choice", 39, "mid",
+        [
+            ("A", "We address it directly. The conversation happens and the decision follows.", False, None),
+            ("B", "We try to move them into a better fit somewhere else"
+             " before making a harder call.", False, None),
+            ("C", "We give it more time. Most situations work themselves out.", False, None),
+            ("D", "It usually becomes clear the role wasn't set up correctly,"
+             " not that the person was wrong for it.", False, None),
+        ],
+        ["the_paper_tiger", "the_unformed_leader", "built_to_fail"],
+        False,
+    ),
 ]
 
 
@@ -861,6 +940,59 @@ def _build_library():
         "SEVER-12":      {"attitude_liability": 0.40, "authority_liability": 0.40},
         "SEVER-13":      {"attitude_liability": 0.40, "alliance_liability": 0.40},
     }
+    # Phase 3 Pass 1 (Session 13): per-option aptitude_liability overrides.
+    # Authority-overlap questions with documented Aptitude crossover.
+    # Problem options: apt = 0.25 (explicit secondary signal, enables discrimination).
+    # Neutral/positive options: apt = 0.0 (removes uniform noise).
+    # Primary Authority signal unchanged.
+    _opt_apt = {
+        "Q03A": {"A": 0.0,  "B": 0.25, "C": 0.25, "D": 0.25},
+        "Q06":  {"A": 0.25, "B": 0.25, "C": 0.25, "D": 0.25, "E": 0.0},
+        "Q19":  {"A": 0.0,  "B": 0.0,  "C": 0.25, "D": 0.25},
+    }
+    # Session 14: per-option full contribution overrides for Aptitude additive questions.
+    # Q35-Q39 bypass _uniform / _seed — each option carries explicit per-field values.
+    # "all others: 0.0" means every unspecified field is 0.0.
+    _z = {
+        "aptitude_liability":  0.0, "aptitude_asset":  0.0,
+        "authority_liability": 0.0, "authority_asset": 0.0,
+        "alliance_liability":  0.0, "alliance_asset":  0.0,
+        "attitude_liability":  0.0, "attitude_asset":  0.0,
+    }
+    _opt_contrib = {
+        "Q35": {
+            "A": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.25},
+            "B": {**_z, "aptitude_liability": 0.25, "authority_liability": 0.60},
+            "C": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.40},
+            "D": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40},
+        },
+        "Q36": {
+            "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.40},
+            "B": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40},
+            "C": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40},
+            "D": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40,
+                        "attitude_liability": 0.40},
+            "E": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.60},
+        },
+        "Q37": {
+            "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.40},
+            "B": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.25},
+            "C": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40},
+            "D": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40},
+        },
+        "Q38": {
+            "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.40},
+            "B": {**_z, "aptitude_liability": 0.25, "authority_liability": 0.40},
+            "C": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.60},
+            "D": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.60},
+        },
+        "Q39": {
+            "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.25},
+            "B": {**_z, "aptitude_liability": 0.25, "authority_liability": 0.25},
+            "C": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40},
+            "D": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.60},
+        },
+    }
     for (qid, text, fmt, pos, seg, opts, targets, sev) in _QDATA:
         base = dict(_uniform)
         base.update(_seed.get(qid, {}))
@@ -874,7 +1006,16 @@ def _build_library():
                 AnswerOption(
                     option_id=o[0],
                     option_text=o[1],
-                    dimensional_contributions=dict(base),
+                    dimensional_contributions=(
+                        dict(_opt_contrib[qid][o[0]])
+                        if qid in _opt_contrib
+                        else {
+                            **base,
+                            "aptitude_liability": _opt_apt.get(qid, {}).get(
+                                o[0], base["aptitude_liability"]
+                            ),
+                        }
+                    ),
                     severity_trigger=o[2],
                     severity_follow_on_id=o[3],
                 )

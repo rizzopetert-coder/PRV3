@@ -26,7 +26,7 @@ If any query returns empty or clearly wrong results, retry once with broader ter
 
 ### Step 4 — MOB
 Read the PRV3 MOB from Google Drive.
-**MOB Google Doc ID:** `1KP3iZl4CTOyqpNiLkqB5NC0EcKSmGdqZ`
+**MOB Google Doc ID:** `17PYw8L3ZxmzM0CSNGfowJgA-6lu5d27uL2ur5kpFdCo`
 
 Use the Drive MCP tool to fetch it. The MOB is the irreducible core — palace retrieval extends it, does not replace it.
 
@@ -67,7 +67,7 @@ Skip only if zero files were touched.
 
 ### Step 3 — Update MOB
 Write the updated MOB to the Google Drive document.
-**MOB Google Doc ID:** `1KP3iZl4CTOyqpNiLkqB5NC0EcKSmGdqZ`
+**MOB Google Doc ID:** `17PYw8L3ZxmzM0CSNGfowJgA-6lu5d27uL2ur5kpFdCo`
 
 Update:
 - Current workstream status
@@ -76,6 +76,9 @@ Update:
 - Version number: increment when locked decisions are added, rules change, or workstream status changes materially. Leave unchanged for session log entries only.
 
 Use the Drive MCP tool to write. Overwrite the full document with the updated content.
+
+### Step 3b — Confirm and update MOB Doc ID in CLAUDE.md
+After writing the MOB to Drive, confirm the Doc ID of the document just written. If it differs from the Doc ID currently in CLAUDE.md, update CLAUDE.md with the new ID before proceeding. This step fires every session without exception.
 
 ### Step 4 — Commit
 Run `git status`. Identify every file touched this session.
@@ -142,7 +145,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 
 | Item | Value |
 |---|---|
-| MOB Google Doc ID | `1KP3iZl4CTOyqpNiLkqB5NC0EcKSmGdqZ` |
+| MOB Google Doc ID | `17PYw8L3ZxmzM0CSNGfowJgA-6lu5d27uL2ur5kpFdCo` |
 | PRV3 Drive folder ID | `19CdQS2VTY_m1l4_0XPr-S1SKKDBstG_R` |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |

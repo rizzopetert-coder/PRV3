@@ -1,0 +1,477 @@
+"""
+PRV3 Phase 1 Calibration Runner
+
+Runs all 142 test profiles through the full engine pipeline and generates
+a Confusion Matrix. Designed to be re-run as answer population progresses.
+
+With answers=[], every profile produces intake-only output (prior priors only).
+This is the baseline Confusion Matrix before answer population.
+
+Modes:
+  Default (--answers):  answers=[] → zero accumulated vector (zero-signal baseline)
+  Synthetic (--synthetic): Option A — inject dimensional vector directly before
+                            rank_states(), bypassing question routing layer.
+                            high_confidence → primary_liability = 0.60
+                            moderate        → primary_liability = 0.40
+                            weak            → primary_liability = 0.25
+
+Usage:
+    python tools/calibration_runner.py
+    python tools/calibration_runner.py --synthetic
+    python tools/calibration_runner.py --synthetic --verbose
+    python tools/calibration_runner.py --synthetic --state the_founders_grip
+    python tools/calibration_runner.py --synthetic --dim
+"""
+
+import sys
+import argparse
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parents[1]))
+
+from engine.accumulation import IntakeData, AccumulationEngine, rank_states
+from engine.severity import SeverityEngine
+from engine.output import OutputEngine, compute_noise_baseline
+from engine.contract import SessionData, assemble_output
+from engine.test_suite import run_test_case, run_suite, PROFILE_TYPES
+from engine.data.questions import QUESTION_LIBRARY
+from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
+
+from engine.test_profiles import APTITUDE_PROFILES
+from engine.test_profiles_authority_b1 import AUTHORITY_B1_PROFILES
+from engine.test_profiles_authority_b2 import AUTHORITY_B2_PROFILES
+from engine.test_profiles_authority_b3 import AUTHORITY_B3_PROFILES
+from engine.test_profiles_alliance import ALLIANCE_PROFILES
+from engine.test_profiles_attitude_b1 import ATTITUDE_B1_PROFILES
+from engine.test_profiles_attitude_b2 import ATTITUDE_B2_PROFILES
+from engine.test_profiles_attitude_b3 import ATTITUDE_B3_PROFILES
+
+
+ALL_PROFILES = (
+    APTITUDE_PROFILES
+    + AUTHORITY_B1_PROFILES
+    + AUTHORITY_B2_PROFILES
+    + AUTHORITY_B3_PROFILES
+    + ALLIANCE_PROFILES
+    + ATTITUDE_B1_PROFILES
+    + ATTITUDE_B2_PROFILES
+    + ATTITUDE_B3_PROFILES
+)
+
+# Noise baseline computed once and shared across the full run
+_NOISE_BASELINE: dict = {}
+
+
+def _get_noise_baseline() -> dict:
+    global _NOISE_BASELINE
+    if not _NOISE_BASELINE:
+        _NOISE_BASELINE = compute_noise_baseline(random_seed=42)
+    return _NOISE_BASELINE
+
+
+# ── Synthetic Injection (Option A) ────────────────────────────────────────────
+
+_DIM_TO_LIABILITY_FIELD = {
+    "Aptitude":  "aptitude_liability",
+    "Authority": "authority_liability",
+    "Alliance":  "alliance_liability",
+    "Attitude":  "attitude_liability",
+}
+
+_PROFILE_TYPE_TO_SIGNAL = {
+    "high_confidence":         0.60,
+    "extreme_high_confidence": 0.60,
+    "moderate":                0.40,
+    "weak":                    0.25,
+}
+
+
+def _build_synthetic_vector(target_state: str, profile_type: str) -> dict:
+    """
+    Build a synthetic accumulated vector for Option A injection.
+    Sets the target state's primary liability field to the profile-type signal
+    strength. All other fields remain at 0.0.
+    """
+    vec = {f: 0.0 for f in DIMENSIONAL_FIELDS}
+    profile = STATE_PROFILES.get(target_state)
+    if profile is None:
+        return vec
+    field = _DIM_TO_LIABILITY_FIELD.get(profile.primary_dimension, "")
+    strength = _PROFILE_TYPE_TO_SIGNAL.get(profile_type, 0.25)
+    if field:
+        vec[field] = strength
+    return vec
+
+
+# ── Phase 2 Answer Generation ─────────────────────────────────────────────────
+
+def best_option_for_state(question, target_state_id: str):
+    """Return option with highest contribution on target state's primary liability field."""
+    profile = STATE_PROFILES.get(target_state_id)
+    if not profile:
+        return question.answer_options[0]
+    field = _DIM_TO_LIABILITY_FIELD.get(profile.primary_dimension, "")
+    return max(
+        question.answer_options,
+        key=lambda opt: opt.dimensional_contributions.get(field, 0.0),
+    )
+
+
+def _neutral_option(question):
+    """Return option with minimum total liability contribution."""
+    def _liability_sum(opt):
+        return sum(
+            opt.dimensional_contributions.get(f, 0.0)
+            for f in ("aptitude_liability", "authority_liability",
+                      "alliance_liability", "attitude_liability")
+        )
+    return min(question.answer_options, key=_liability_sum)
+
+
+_CORE_QUESTION_IDS = [
+    qid for qid in QUESTION_LIBRARY
+    if qid.startswith("Q") and "SEVER" not in qid
+    and "DIST" not in qid and "FOLLOW" not in qid
+]
+
+_CONDITIONAL_PAIRS = {"Q03A": "Q03B", "Q27A": "Q27B"}
+
+
+def generate_answers(test_case):
+    """
+    Generate TestAnswer list from test_case.profile_type and target_state.
+
+    high_confidence/extreme: best_option_for_state() for every question.
+    moderate: best_option_for_state() where target in state_targets, neutral elsewhere.
+    weak: neutral option throughout.
+
+    Handles Q03A/Q03B and Q27A/Q27B conditional pairs from intake.
+    """
+    from engine.test_suite import TestAnswer
+    events = test_case.intake.get("significant_events", ["none"])
+    has_acq = "acquisition_or_merger" in events
+    include = {
+        "Q03A" if events != ["none"] else "Q03B",
+        "Q27A" if has_acq else "Q27B",
+    }
+
+    answers = []
+    for qid in sorted(_CORE_QUESTION_IDS):
+        excluded = any(
+            (qid == a and a not in include) or (qid == b and b not in include)
+            for a, b in _CONDITIONAL_PAIRS.items()
+        )
+        if excluded:
+            continue
+        q = QUESTION_LIBRARY.get(qid)
+        if q is None or not q.answer_options:
+            continue
+        strategy = test_case.profile_type
+        if strategy in ("high_confidence", "extreme_high_confidence"):
+            opt = best_option_for_state(q, test_case.target_state)
+        elif strategy == "moderate":
+            opt = (best_option_for_state(q, test_case.target_state)
+                   if test_case.target_state in (q.state_targets or [])
+                   else _neutral_option(q))
+        else:
+            opt = _neutral_option(q)
+        answers.append(TestAnswer(question_id=qid, selected_option_ids=[opt.option_id]))
+    return answers
+
+
+def run_profile_synthetic(test_case) -> dict:
+    """
+    Run one test profile using synthetic dimensional injection (Option A).
+    Bypasses the question routing layer — directly injects a vector before
+    rank_states(). Used for Phase 1 calibration before answer population.
+
+    Returns the assemble_output() dict.
+    """
+    intake = IntakeData(**test_case.intake)
+    synthetic_vector = _build_synthetic_vector(test_case.target_state, test_case.profile_type)
+
+    rankings  = rank_states(synthetic_vector)
+    sev_engine = SeverityEngine()
+    sev_result = sev_engine.score()
+
+    out_engine = OutputEngine()
+    out_engine.set_noise_baseline(baseline=_get_noise_baseline())
+    out_pkg = out_engine.build(rankings, sev_result)
+
+    session = SessionData(
+        session_id=SessionData.new_session_id(),
+        intake=intake,
+        final_rankings=rankings,
+        accumulated_vector=synthetic_vector,
+        output_package=out_pkg,
+        severity_result=sev_result,
+    )
+    return assemble_output(session)
+
+
+def run_profile(test_case) -> dict:
+    """
+    Run one test profile through the full engine pipeline.
+    Returns the assemble_output() dict.
+
+    With test_case.answers=[], generates answers via generate_answers() based
+    on profile_type and target_state (Phase 2 mode).
+    """
+    intake = IntakeData(**test_case.intake)
+
+    # Accumulation
+    acc_engine = AccumulationEngine(intake)
+    sev_engine = SeverityEngine()
+
+    answers_to_use = test_case.answers or generate_answers(test_case)
+    for ans in answers_to_use:
+        q = QUESTION_LIBRARY.get(ans.question_id)
+        if q is None:
+            continue
+        for opt_id in ans.selected_option_ids:
+            opt = next(
+                (o for o in q.answer_options if o.option_id == opt_id),
+                None,
+            )
+            if opt is None:
+                continue
+            acc_engine.apply_answer(opt, ans.question_id)
+
+    rankings = acc_engine.rank()
+    sev_result = sev_engine.score()
+
+    out_engine = OutputEngine()
+    out_engine.set_noise_baseline(baseline=_get_noise_baseline())
+    out_pkg = out_engine.build(rankings, sev_result)
+
+    session = SessionData(
+        session_id=SessionData.new_session_id(),
+        intake=intake,
+        final_rankings=rankings,
+        accumulated_vector=acc_engine.accumulated_vector,
+        output_package=out_pkg,
+        severity_result=sev_result,
+    )
+    return assemble_output(session)
+
+
+# ── Confusion Matrix ───────────────────────────────────────────────────────────
+
+def build_confusion_matrix(run_results: list) -> dict:
+    """
+    Build a Confusion Matrix from calibration run results.
+
+    run_results: list of (TestCase, engine_output_dict)
+
+    Returns matrix[target_state][rank1_state] = count.
+    Diagonal entries are correct classifications.
+    Off-diagonal entries are misclassifications.
+    """
+    matrix: dict = {}
+    for tc, output in run_results:
+        target = tc.target_state
+        dist = output.get("state_distribution", [])
+        rank1 = next(
+            (e["state_id"] for e in dist if e.get("rank") == 1),
+            "insufficient_signal",
+        )
+        if target not in matrix:
+            matrix[target] = {}
+        matrix[target][rank1] = matrix[target].get(rank1, 0) + 1
+    return matrix
+
+
+def _target_rank(output: dict, target_state: str) -> int:
+    """Return the rank of target_state in state_distribution, or 48 if absent."""
+    dist = output.get("state_distribution", [])
+    entry = next((e for e in dist if e.get("state_id") == target_state), None)
+    return entry["rank"] if entry else 48
+
+
+def build_dimensional_error_table(run_results: list) -> list:
+    """
+    For each misclassified profile, return the leading dimensional mismatch.
+
+    Compares the accumulated vector's dominant dimension against the predicted
+    rank-1 state's dominant profile dimension, flagging where they diverge from
+    the target state.
+
+    Returns list of dicts with keys:
+        test_id, target, predicted_rank1, target_rank,
+        dominant_acc_dim, target_dominant_dim, predicted_dominant_dim
+    """
+    rows = []
+    for tc, output in run_results:
+        dist = output.get("state_distribution", [])
+        rank1 = next(
+            (e["state_id"] for e in dist if e.get("rank") == 1),
+            None,
+        )
+        if rank1 == tc.target_state:
+            continue  # correct
+
+        t_rank = _target_rank(output, tc.target_state)
+
+        # Dominant dimension in the accumulated vector (highest absolute value)
+        acc_vec = output.get("state_distribution", [])
+        # The accumulated vector isn't in the output dict directly; pull from first entry
+        # We use state_distribution scores as proxy
+        target_profile = STATE_PROFILES.get(tc.target_state)
+        predicted_profile = STATE_PROFILES.get(rank1)
+
+        def dominant_dim(profile):
+            if profile is None:
+                return "?"
+            vec = profile.dimensional_vector.as_dict()
+            return max(vec, key=lambda f: vec[f])
+
+        rows.append({
+            "test_id":              tc.test_id,
+            "profile_type":         tc.profile_type,
+            "target":               tc.target_state,
+            "predicted_rank1":      rank1 or "insufficient_signal",
+            "target_rank":          t_rank,
+            "target_dominant_dim":  dominant_dim(target_profile),
+            "predicted_dominant_dim": dominant_dim(predicted_profile),
+        })
+    return rows
+
+
+# ── Reporting ─────────────────────────────────────────────────────────────────
+
+def _rank_label(rank: int) -> str:
+    if rank == 1:
+        return "rank-1"
+    if rank <= 3:
+        return f"rank-{rank}"
+    return f"rank-{rank} (miss)"
+
+
+def print_report(
+    suite: dict,
+    matrix: dict,
+    dim_table: list,
+    profiles: list,
+    verbose: bool = False,
+    show_dim: bool = False,
+    synthetic: bool = False,
+) -> None:
+    answered = sum(1 for p in profiles if p.answers)
+    total = len(profiles)
+    mode = "synthetic injection (Option A)" if synthetic else "answers from profiles"
+
+    print("=" * 72)
+    print("PRV3 Phase 1 Calibration Run")
+    print(f"  Profiles:          {total}")
+    print(f"  Mode:              {mode}")
+    if not synthetic:
+        print(f"  Answers populated: {answered}/{total}")
+    print("=" * 72)
+
+    print(f"\nRESULT: {suite['passed']}/{suite['total']} passed "
+          f"({suite['failed']} failed)")
+
+    print("\nBy profile type:")
+    for pt in PROFILE_TYPES:
+        data = suite["by_profile_type"].get(pt, {})
+        t = data.get("total", 0)
+        p = data.get("passed", 0)
+        bar = "OK" if p == t else f"{p}/{t}"
+        print(f"  {pt:<32} {bar}")
+
+    # Per-state summary
+    print("\nBy state:")
+    for sid, data in sorted(suite["by_state"].items()):
+        p = data["passed"]
+        t = data["total"]
+        flag = "" if p == t else " <--"
+        print(f"  {sid:<44} {p}/{t}{flag}")
+
+    # Confusion Matrix — misclassifications only
+    print("\nConfusion Matrix (misclassifications only):")
+    any_miss = False
+    for target in sorted(matrix):
+        preds = matrix[target]
+        for pred, cnt in sorted(preds.items(), key=lambda x: -x[1]):
+            if pred != target:
+                any_miss = True
+                correct = preds.get(target, 0)
+                total_t = sum(preds.values())
+                print(f"  {target:<44} -> {pred:<44} x{cnt}  "
+                      f"(correct {correct}/{total_t})")
+    if not any_miss:
+        print("  All profiles classified correctly at rank-1.")
+
+    # Dimensional error analysis
+    if show_dim and dim_table:
+        print("\nDimensional error analysis (misclassified profiles):")
+        print(f"  {'test_id':<14} {'profile_type':<22} {'target_rank':<12} "
+              f"{'target_dominant':<28} {'predicted_dominant'}")
+        print(f"  {'-'*14} {'-'*22} {'-'*12} {'-'*28} {'-'*28}")
+        for row in sorted(dim_table, key=lambda r: r["target_rank"]):
+            print(f"  {row['test_id']:<14} {row['profile_type']:<22} "
+                  f"{_rank_label(row['target_rank']):<12} "
+                  f"{row['target_dominant_dim']:<28} "
+                  f"{row['predicted_dominant_dim']}")
+
+    # Verbose: per-profile detail on failures
+    if verbose:
+        print("\nFailed profiles:")
+        for r in suite["results"]:
+            if not r.passed:
+                for f in r.criteria_failures:
+                    print(f"  [{r.test_id}] {f}")
+
+    print("=" * 72)
+
+
+# ── Main ───────────────────────────────────────────────────────────────────────
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="PRV3 Phase 1 Calibration Runner"
+    )
+    parser.add_argument("--verbose", action="store_true",
+                        help="Print per-profile failure details")
+    parser.add_argument("--state",
+                        help="Filter run to one target_state")
+    parser.add_argument("--dim", action="store_true",
+                        help="Show dimensional error analysis for misclassified profiles")
+    parser.add_argument("--synthetic", action="store_true",
+                        help="Option A: inject synthetic dimensional vectors (bypasses question layer)")
+    args = parser.parse_args()
+
+    profiles = list(ALL_PROFILES)
+    if args.state:
+        profiles = [p for p in profiles if p.target_state == args.state]
+        if not profiles:
+            print(f"No profiles found for state: {args.state!r}")
+            sys.exit(1)
+
+    runner = run_profile_synthetic if args.synthetic else run_profile
+
+    # Run all profiles
+    run_results = []
+    engine_outputs = {}
+
+    for tc in profiles:
+        output = runner(tc)
+        run_results.append((tc, output))
+        engine_outputs[tc.test_id] = output
+
+    suite = run_suite(profiles, engine_outputs)
+    matrix = build_confusion_matrix(run_results)
+    dim_table = build_dimensional_error_table(run_results)
+
+    print_report(
+        suite, matrix, dim_table, profiles,
+        verbose=args.verbose,
+        show_dim=args.dim,
+        synthetic=args.synthetic,
+    )
+
+    sys.exit(0 if suite["failed"] == 0 else 1)
+
+
+if __name__ == "__main__":
+    main()
