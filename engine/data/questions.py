@@ -1189,6 +1189,13 @@ def _build_library():
             "D": {**_z, "authority_liability": 0.60},                   # P
             "E": {**_z, "authority_liability": 0.60},                   # P
         },
+        "Q02": {  # Authority HIGH + Aptitude (dual).
+            "A": {**_z, "authority_asset":     0.40},                              # F
+            "B": {**_z, "authority_liability": 0.25},                              # A
+            "C": {**_z, "authority_liability": 0.60, "aptitude_liability": 0.30},  # P
+            "D": {**_z, "authority_liability": 0.60, "aptitude_liability": 0.30},  # P
+            "E": {**_z, "authority_liability": 0.30, "authority_asset":    0.20},  # DE
+        },
         "Q03A": {  # Authority HIGH + Attitude (dual). _opt_apt crossover folded.
             "A": {**_z, "authority_asset":     0.40},                   # F
             "B": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30,
@@ -1208,6 +1215,13 @@ def _build_library():
             "B": {**_z, "attitude_liability": 0.25},                    # A
             "C": {**_z, "attitude_liability": 0.60},                    # P
             "D": {**_z, "attitude_liability": 0.60},                    # P
+        },
+        "Q06": {  # Authority HIGH + Attitude (dual) + aptitude crossover.
+            "A": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30, "aptitude_liability": 0.25},  # P
+            "B": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30, "aptitude_liability": 0.25},  # P
+            "C": {**_z, "authority_liability": 0.20, "authority_asset":    0.25},                              # DE
+            "D": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30, "aptitude_liability": 0.25},  # P
+            "E": {**_z, "authority_asset":     0.40},                                                          # F
         },
         "Q07": {  # Alliance HIGH (the_fracture) + Authority (dual).
             "A": {**_z, "alliance_liability": 0.25},                    # A
@@ -1247,6 +1261,13 @@ def _build_library():
             "C": {**_z, "attitude_liability": 0.60},                    # P
             "D": {**_z, "attitude_liability": 0.60},                    # P
             "E": {**_z, "attitude_liability": 0.25},                    # A
+        },
+        "Q13": {  # Authority MED + Alliance (dual).
+            "A": {**_z, "alliance_liability":  0.30, "authority_liability": 0.20, "authority_asset": 0.15},  # DE
+            "B": {**_z, "authority_liability": 0.50, "alliance_liability":  0.25},                           # P
+            "C": {**_z, "authority_liability": 0.50, "alliance_liability":  0.25},                           # P
+            "D": {**_z, "authority_liability": 0.50, "alliance_liability":  0.25},                           # P
+            "E": {**_z, "authority_asset":     0.40},                                                        # F
         },
         "Q14": {  # Authority MED (pay_exposure, pay_fog) + Aptitude (dual).
             "A": {**_z, "authority_asset":     0.40},                   # F
@@ -1312,6 +1333,19 @@ def _build_library():
             "D": {**_z, "authority_liability": 0.50, "alliance_liability": 0.25},  # P
             "E": {**_z, "authority_liability": 0.50, "alliance_liability": 0.25},  # P
         },
+        "Q22": {  # Authority MED + Aptitude (dual).
+            "A": {**_z, "authority_asset":     0.40},                                                       # F
+            "B": {**_z, "authority_liability": 0.25},                                                       # A
+            "C": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},                           # P
+            "D": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},                           # P
+            "E": {**_z, "authority_liability": 0.45, "aptitude_liability": 0.25, "authority_asset": 0.10},  # DE
+        },
+        "Q23": {  # Authority MED + Aptitude (dual). No F option; A is DE base.
+            "A": {**_z, "authority_asset":     0.40, "authority_liability": 0.15},                          # DE base
+            "B": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},                           # P
+            "C": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},                           # P
+            "D": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},                           # P
+        },
         "Q24": {  # Attitude MED (invisible_burnout) + Alliance (dual).
             "A": {**_z, "attitude_asset":     0.40},                    # F
             "B": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
@@ -1330,6 +1364,12 @@ def _build_library():
             "B": {**_z, "alliance_liability": 0.25},                    # A
             "C": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
             "D": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+        },
+        "Q27A": {  # Alliance MED. Single-seeded.
+            "A": {**_z, "alliance_asset":     0.40},                                                     # F
+            "B": {**_z, "alliance_liability":  0.45, "authority_asset":   0.20, "alliance_asset": 0.10}, # DE
+            "C": {**_z, "alliance_liability":  0.50},                                                    # P
+            "D": {**_z, "alliance_liability":  0.50},                                                    # P
         },
         "Q27B": {  # No seed. Attitude MED (C-Culture cluster). Single-dim.
             "A": {**_z, "attitude_asset":     0.40},                    # F
@@ -1364,6 +1404,12 @@ def _build_library():
             "B": {**_z, "authority_liability": 0.60, "alliance_liability": 0.30},  # P
             "C": {**_z, "authority_liability": 0.60, "alliance_liability": 0.30},  # P
             "D": {**_z, "authority_liability": 0.60, "alliance_liability": 0.30},  # P
+        },
+        "Q32": {  # Attitude MED. Single-seeded.
+            "A": {**_z, "attitude_asset":     0.40},                                # F
+            "B": {**_z, "attitude_liability":  0.35, "attitude_asset":    0.15},    # DE
+            "C": {**_z, "attitude_liability":  0.50},                               # P
+            "D": {**_z, "attitude_liability":  0.50},                               # P
         },
         "Q33": {  # Authority MED + Aptitude (dual).
             "A": {**_z, "authority_asset":     0.40},                   # F
