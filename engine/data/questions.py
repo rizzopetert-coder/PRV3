@@ -1179,6 +1179,191 @@ def _build_library():
     #   0.25 = LOW/baseline   minimal or cluster-level signal
     #   0.0  = absent         field not relevant to this option
     _opt_contrib = {
+        # -- WS1: bulk valence template, Q01–Q34 (Session 15) ------------------
+        # Questions with DE options deferred to WS2: Q02 Q06 Q13 Q18 Q22 Q23 Q27A Q32
+        # Q03B and Q03A-D-FOLLOW excluded (routing questions).
+        "Q01": {  # Authority HIGH (founders_grip). Single-seeded.
+            "A": {**_z, "authority_asset":    0.40},                    # F
+            "B": {**_z, "authority_liability": 0.25},                   # A
+            "C": {**_z, "authority_liability": 0.60},                   # P
+            "D": {**_z, "authority_liability": 0.60},                   # P
+            "E": {**_z, "authority_liability": 0.60},                   # P
+        },
+        "Q03A": {  # Authority HIGH + Attitude (dual). _opt_apt crossover folded.
+            "A": {**_z, "authority_asset":     0.40},                   # F
+            "B": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30,
+                        "aptitude_liability":  0.25},                   # P + crossover
+            "C": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30,
+                        "aptitude_liability":  0.25},                   # P + crossover
+            "D": {**_z, "authority_liability": 0.25},                   # A
+        },
+        "Q04": {  # Authority HIGH + Attitude (dual).
+            "A": {**_z, "authority_asset":     0.40},                   # F
+            "B": {**_z, "authority_liability": 0.25},                   # A
+            "C": {**_z, "authority_liability": 0.25},                   # A
+            "D": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30},  # P
+        },
+        "Q05": {  # Attitude HIGH (the_untouchable). Single-seeded.
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.25},                    # A
+            "C": {**_z, "attitude_liability": 0.60},                    # P
+            "D": {**_z, "attitude_liability": 0.60},                    # P
+        },
+        "Q07": {  # Alliance HIGH (the_fracture) + Authority (dual).
+            "A": {**_z, "alliance_liability": 0.25},                    # A
+            "B": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+            "C": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+            "D": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+        },
+        "Q08": {  # No seed. Attitude MED (leadership_deafness) + Alliance (dual).
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.25},                    # A
+            "C": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+            "D": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+        },
+        "Q09": {  # Alliance HIGH (the_fracture) + Authority (dual).
+            "A": {**_z, "alliance_asset":     0.40},                    # F
+            "B": {**_z, "alliance_liability": 0.25},                    # A
+            "C": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+            "D": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+            "E": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+        },
+        "Q10": {  # Aptitude HIGH (paper_tiger) + Authority (dual).
+            "A": {**_z, "aptitude_asset":     0.40},                    # F
+            "B": {**_z, "aptitude_liability": 0.25},                    # A
+            "C": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.30},  # P
+            "D": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.30},  # P
+        },
+        "Q11": {  # Attitude MED + Authority (dual).
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.25},                    # A
+            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "E": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+        },
+        "Q12": {  # Attitude HIGH (the_untouchable). Single-seeded.
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.25},                    # A
+            "C": {**_z, "attitude_liability": 0.60},                    # P
+            "D": {**_z, "attitude_liability": 0.60},                    # P
+            "E": {**_z, "attitude_liability": 0.25},                    # A
+        },
+        "Q14": {  # Authority MED (pay_exposure, pay_fog) + Aptitude (dual).
+            "A": {**_z, "authority_asset":     0.40},                   # F
+            "B": {**_z, "authority_liability": 0.25},                   # A
+            "C": {**_z, "authority_liability": 0.25},                   # A
+            "D": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},  # P
+            "E": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},  # P
+        },
+        "Q15": {  # Attitude MED (diversity_ceiling) + Authority (dual).
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.25},                    # A
+            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "E": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+        },
+        "Q16": {  # Attitude MED (diversity_ceiling) + Authority (dual).
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "E": {**_z, "attitude_liability": 0.25},                    # A
+        },
+        "Q17": {  # Attitude MED + Alliance (dual). All targets are Attitude.
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+            "C": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+            "D": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+            "E": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+        },
+        "Q19": {  # Authority MED + Attitude (dual). _opt_apt crossover folded.
+            "A": {**_z, "authority_asset":     0.40},                   # F
+            "B": {**_z, "authority_liability": 0.25},                   # A
+            "C": {**_z, "authority_liability": 0.50, "attitude_liability": 0.25,
+                        "aptitude_liability":  0.25},                   # P + crossover
+            "D": {**_z, "authority_liability": 0.50, "attitude_liability": 0.25,
+                        "aptitude_liability":  0.25},                   # P + crossover
+        },
+        "Q20": {  # Aptitude HIGH (built_to_fail) + Authority (dual).
+            "A": {**_z, "aptitude_asset":     0.40},                    # F
+            "B": {**_z, "aptitude_liability": 0.25},                    # A
+            "C": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.30},  # P
+            "D": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.30},  # P
+        },
+        "Q21": {  # Authority MED + Alliance (dual).
+            "A": {**_z, "authority_asset":     0.40},                   # F
+            "B": {**_z, "authority_liability": 0.25},                   # A
+            "C": {**_z, "authority_liability": 0.50, "alliance_liability": 0.25},  # P
+            "D": {**_z, "authority_liability": 0.50, "alliance_liability": 0.25},  # P
+            "E": {**_z, "authority_liability": 0.50, "alliance_liability": 0.25},  # P
+        },
+        "Q24": {  # Attitude MED (invisible_burnout) + Alliance (dual).
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+            "C": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+            "D": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+        },
+        "Q25": {  # Aptitude MED (dormant_talent, unformed_leader) + Authority (dual).
+            "A": {**_z, "aptitude_asset":     0.40},                    # F
+            "B": {**_z, "aptitude_liability": 0.25},                    # A
+            "C": {**_z, "aptitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "D": {**_z, "aptitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "E": {**_z, "aptitude_liability": 0.50, "authority_liability": 0.25},  # P
+        },
+        "Q26": {  # Alliance HIGH (the_fracture) + Authority (dual).
+            "A": {**_z, "alliance_asset":     0.40},                    # F
+            "B": {**_z, "alliance_liability": 0.25},                    # A
+            "C": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+            "D": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+        },
+        "Q27B": {  # No seed. Attitude MED (C-Culture cluster). Single-dim.
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.50},                    # P
+            "C": {**_z, "attitude_liability": 0.50},                    # P
+            "D": {**_z, "attitude_liability": 0.50},                    # P
+            "E": {**_z, "attitude_liability": 0.50},                    # P
+        },
+        "Q28": {  # Authority HIGH (unsolved_problem) + Attitude (dual).
+            "A": {**_z, "authority_asset":     0.40},                   # F
+            "B": {**_z, "authority_liability": 0.25},                   # A
+            "C": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30},  # P
+            "D": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30},  # P
+        },
+        "Q29": {  # Attitude MED (diversity_ceiling) + Authority (dual).
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "E": {**_z, "attitude_liability": 0.25},                    # A
+        },
+        "Q30": {  # Authority MED + Alliance (dual).
+            "A": {**_z, "authority_asset":     0.40},                   # F
+            "B": {**_z, "authority_liability": 0.25},                   # A
+            "C": {**_z, "authority_liability": 0.25},                   # A
+            "D": {**_z, "authority_liability": 0.50, "alliance_liability": 0.25},  # P
+        },
+        "Q31": {  # Authority HIGH (unsolved_problem) + Alliance (dual).
+            # Seed had attitude but targets include decision_blindness (Alliance HIGH).
+            # Corrected to authority+alliance to match actual targets.
+            "A": {**_z, "authority_liability": 0.25},                   # A
+            "B": {**_z, "authority_liability": 0.60, "alliance_liability": 0.30},  # P
+            "C": {**_z, "authority_liability": 0.60, "alliance_liability": 0.30},  # P
+            "D": {**_z, "authority_liability": 0.60, "alliance_liability": 0.30},  # P
+        },
+        "Q33": {  # Authority MED + Aptitude (dual).
+            "A": {**_z, "authority_asset":     0.40},                   # F
+            "B": {**_z, "authority_liability": 0.25},                   # A
+            "C": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},  # P
+            "D": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},  # P
+        },
+        "Q34": {  # Attitude MED + Alliance (dual). All targets are Attitude.
+            "A": {**_z, "attitude_liability": 0.25},                    # A
+            "B": {**_z, "attitude_liability": 0.25},                    # A
+            "C": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+            "D": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+            "E": {**_z, "attitude_liability": 0.25},                    # A
+        },
+        # -- End WS1 entries ----------------------------------------------------
         "Q35": {
             "A": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.25},
             "B": {**_z, "aptitude_liability": 0.25, "authority_liability": 0.60},
