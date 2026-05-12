@@ -1530,6 +1530,12 @@ def _build_library():
             "C": {**_z, "attitude_liability":  0.50, "authority_liability":  0.40},
             "D": {**_z, "attitude_liability":  0.60, "authority_liability":  0.40},
         },
+        "SEVER-05": {  # Q23-A probe. Weak response = retroactive base downgrade.
+            "A": {**_z},                                                           # Strong — tested; Q23-A base stands
+            "B": {**_z},                                                           # Strong — documented; Q23-A base stands
+            "C": {**_z, "authority_asset": -0.30, "authority_liability": 0.30},    # Weak — retroactive downgrade
+            "D": {**_z, "authority_asset": -0.30, "authority_liability": 0.30},    # Weak — retroactive downgrade
+        },
     }
 
     # Axis tags wired to AnswerOption.axis_targets at build time.
