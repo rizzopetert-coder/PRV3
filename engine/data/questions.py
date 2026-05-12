@@ -1276,6 +1276,21 @@ def _build_library():
             "D": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
             "E": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
         },
+        "Q18": {  # Attitude MED (C-Silence) + Alliance. Q18-E conditional.
+            "A": {**_z, "attitude_asset":     0.40},                    # F
+            "B": {**_z, "attitude_liability": 0.25},                    # A
+            "C": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+            "D": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
+            "E": {
+                "_conditional": {
+                    "logic_gate": "is_high_hazard",
+                    "condition_map": {
+                        True:  {"attitude_liability": 0.60, "attitude_asset": 0.00},
+                        False: {"attitude_liability": 0.00, "attitude_asset": 0.30},
+                    }
+                }
+            },  # DE — conditional on intake.is_high_hazard
+        },
         "Q19": {  # Authority MED + Attitude (dual). _opt_apt crossover folded.
             "A": {**_z, "authority_asset":     0.40},                   # F
             "B": {**_z, "authority_liability": 0.25},                   # A
@@ -1470,6 +1485,13 @@ def _build_library():
             "D": {**_z, "attitude_liability":  0.60, "authority_liability":  0.40},
         },
     }
+
+    # Axis tags wired to AnswerOption.axis_targets at build time.
+    # "_DE" suffix: delta overlay resolved at accumulation time via _apply_axis_modifiers().
+    _axis_tags = {
+        "Q18": {"E": ["Safety & Wellbeing_DE"]},
+    }
+
     for (qid, text, fmt, pos, seg, opts, targets, sev) in _QDATA:
         base = dict(_uniform)
         base.update(_seed.get(qid, {}))
@@ -1495,6 +1517,7 @@ def _build_library():
                     ),
                     severity_trigger=o[2],
                     severity_follow_on_id=o[3],
+                    axis_targets=_axis_tags.get(qid, {}).get(o[0], []),
                 )
                 for o in opts
             ],

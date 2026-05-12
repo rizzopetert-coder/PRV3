@@ -43,6 +43,11 @@ class IntakeData:
     significant_events: list  # list of event_ids
     principal_role:     str   # from INTAKE_FIELDS["principal_role"]
 
+    @property
+    def is_high_hazard(self) -> bool:
+        """True when industry triggers the Safety & Wellbeing high-hazard multiplier."""
+        return self.industry in HIGH_HAZARD_INDUSTRIES
+
 
 # ── II.1  Prior Probability Initialization ─────────────────────────────────────
 
@@ -109,6 +114,7 @@ def _apply_axis_modifiers(
     contributions: dict,
     axis_targets: list,
     intake_data: IntakeData,
+    original_contributions: Optional[dict] = None,
 ) -> dict:
     """
     Apply intake-conditioned axis weight modifiers to one answer's
@@ -123,9 +129,25 @@ def _apply_axis_modifiers(
       "authority_liability"   — triggers org_type_founder_led (CALIBRATION TARGET)
       "compensation_authority"— triggers jurisdiction_transparency (CALIBRATION TARGET)
 
+    Tags with "_DE" suffix trigger delta overlay before multiplier checks:
+      Conditional vector resolved from original_contributions["_conditional"]
+      using intake_data, then the tag is normalized (suffix stripped) so
+      downstream multipliers stack normally.
+
     Spec reference: Section I.3.2, applied during Section II.2 accumulation
     """
     result = dict(contributions)
+
+    # _DE delta overlay — resolve conditional vectors before multiplier checks
+    de_tags = [t for t in axis_targets if t.endswith("_DE")]
+    if de_tags and original_contributions is not None:
+        cond = original_contributions.get("_conditional")
+        if cond is not None:
+            gate = cond.get("logic_gate")
+            condition_value = getattr(intake_data, gate, None)
+            resolved = cond.get("condition_map", {}).get(condition_value, {})
+            result.update(resolved)
+        axis_targets = [t[:-3] if t.endswith("_DE") else t for t in axis_targets]
 
     # industry_high_hazard — 1.2x LOCKED on Safety & Wellbeing liability signals
     if intake_data.industry in HIGH_HAZARD_INDUSTRIES and "Safety & Wellbeing" in axis_targets:
@@ -195,7 +217,10 @@ def accumulate_answer(
     contributions = _apply_signal_reliability(contributions, intake_data.principal_role)
 
     # I.3.2 — axis modifiers (intake-conditioned signal scaling)
-    contributions = _apply_axis_modifiers(contributions, axis_targets, intake_data)
+    contributions = _apply_axis_modifiers(
+        contributions, axis_targets, intake_data,
+        original_contributions=answer_option.dimensional_contributions,
+    )
 
     # II.2 — element-wise addition to accumulated vector
     for f in DIMENSIONAL_FIELDS:
