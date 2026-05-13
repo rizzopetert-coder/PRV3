@@ -243,10 +243,9 @@ INTAKE_FIELDS = {
 }
 
 # Industries that trigger the high-hazard Safety & Wellbeing multiplier
-HIGH_HAZARD_INDUSTRIES = {"Manufacturing & Industrial"}
-# Note: spec says "Construction or Manufacturing." Construction is not in the
-# industry list above. Using Manufacturing & Industrial as the closest match.
-# Pete to confirm whether Construction should be added as an industry option.
+HIGH_HAZARD_INDUSTRIES = {"Manufacturing & Industrial", "Healthcare & Life Sciences"}
+# Construction and Logistics are not in the current intake industry list.
+# Pending intake list expansion if those industries are added.
 
 
 # ── Signal reliability coefficient table — Section II.3.1 ─────────────────────
