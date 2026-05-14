@@ -29,9 +29,11 @@ from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
 
 # ── VI.1  Signal Floor Constants ───────────────────────────────────────────────
 
-# Signal floor multiplier: state must score SIGNAL_FLOOR_MULTIPLIER above noise
-# baseline to qualify for output. LOCKED.
-SIGNAL_FLOOR_MULTIPLIER: float = 1.15  # LOCKED — 15% above noise baseline
+# Tiered signal floor multipliers — Session 16
+# Authority states: 1.00x (floor = noise baseline; cosine geometry disadvantage accepted)
+# All other dimensions: 1.15x (standard separation threshold, unchanged)
+SIGNAL_FLOOR_MULTIPLIER_AUTHORITY: float = 1.00   # LOCKED Session 16
+SIGNAL_FLOOR_MULTIPLIER_DEFAULT:   float = 1.15   # LOCKED (unchanged)
 
 # Number of randomized simulations for noise baseline calculation. LOCKED.
 NOISE_SIMULATION_COUNT: int = 1000  # LOCKED
@@ -44,6 +46,60 @@ SEPARATION_THRESHOLD: Optional[float] = None  # CALIBRATION TARGET
 # Conservative starting hypothesis; Phase 1 ROC analysis replaces this.
 _SEPARATION_THRESHOLD_DEFAULT: float = 0.05  # CALIBRATION TARGET default
 
+# Precomputed noise baseline — Monte Carlo (N=1000, seed=42, Q01–Q39, 37 sampled).
+# Cosine similarity metric, tiered floor multipliers (Session 16).
+# Q10, Q25, Q30 reclassified before this run. Date: 2026-05-13.
+# Q03/Q27 skipped (A/B variants handled separately).
+_PRECOMPUTED_NOISE_BASELINE: dict = {
+    "built_to_fail":                        0.7571,
+    "culture_drift":                        0.7979,
+    "decision_blindness":                   0.7260,
+    "decision_paralysis":                   0.8431,
+    "dueling_narratives":                   0.8431,
+    "groundhog_day":                        0.7979,
+    "heard_and_ignored":                    0.8944,
+    "hr_capture":                           0.8944,
+    "identity_erosion":                     0.7979,
+    "invisible_burnout":                    0.7979,
+    "invisible_influence_architecture":     0.7730,
+    "leadership_continuity_risk":           0.8431,
+    "leadership_deafness":                  0.7979,
+    "narrative_lock":                       0.7730,
+    "paper_shield":                         0.7730,
+    "pay_exposure":                         0.8431,
+    "silosolation":                         0.7635,
+    "the_arbitrary_standard":               0.7635,
+    "the_basement_standard":                0.7979,
+    "the_broken_compass":                   0.7979,
+    "the_burned_credibility":               0.7979,
+    "the_culture_that_wasnt":               0.7979,
+    "the_diversity_ceiling":                0.7979,
+    "the_dormant_talent":                   0.7627,
+    "the_exposed":                          0.8944,
+    "the_founders_grip":                    0.8944,
+    "the_fracture":                         0.7260,
+    "the_inside_track":                     0.7979,
+    "the_lost_map":                         0.8431,
+    "the_overloaded_manager":               0.7627,
+    "the_paper_tiger":                      0.7571,
+    "the_pay_fog":                          0.8431,
+    "the_policy_lag":                       0.8431,
+    "the_second_close":                     0.7635,
+    "the_suppression_filter":               0.7341,
+    "the_tolerated_violation":              0.8944,
+    "the_undefined_role":                   0.7789,
+    "the_unexamined_algorithm":             0.7730,
+    "the_unformed_leader":                  0.7627,
+    "the_uninitiated":                      0.8431,
+    "the_unlocked_door":                    0.7979,
+    "the_unreported_hazard":                0.7341,
+    "the_unsolved_problem":                 0.8944,
+    "the_untouchable":                      0.7954,
+    "the_wrong_reward":                     0.7979,
+    "transition_paralysis":                 0.8431,
+    "what_nobody_says":                     0.7341,
+}
+
 
 # ── VI.1  Noise Baseline Simulation ───────────────────────────────────────────
 
@@ -55,7 +111,7 @@ def compute_noise_baseline(
     Compute the noise baseline score for each state by simulating n_simulations
     randomized answer sets through the accumulation and ranking pipeline.
 
-    For each simulation: randomly select one option per core question (Q01–Q34),
+    For each simulation: randomly select one option per core question (Q01–Q39),
     accumulate the contributions with neutral role ("Other"), run rank_states.
     Noise baseline per state = mean similarity score across all simulations.
 
@@ -64,7 +120,8 @@ def compute_noise_baseline(
     same score — the zero-signal baseline. Returns this theoretical baseline
     for each state.
 
-    Signal floor per state = noise_baseline[state_id] * SIGNAL_FLOOR_MULTIPLIER.
+    Signal floor per state = noise_baseline[state_id] × tiered multiplier
+    (1.00 for Authority states, 1.15 for all others — see compute_signal_floors).
 
     Spec reference: Section VI.1 — LOCKED
     """
@@ -104,12 +161,22 @@ def compute_noise_baseline(
 
 def compute_signal_floors(noise_baseline: dict) -> dict:
     """
-    Compute the signal floor for each state.
-    floor[state_id] = noise_baseline[state_id] * SIGNAL_FLOOR_MULTIPLIER
-
+    Compute per-state signal floor using tiered multipliers.
+    Authority states: floor = baseline × 1.00 (cosine geometry; floor = noise mean)
+    All other states: floor = baseline × 1.15 (standard separation threshold)
+    Session 16: tiered multiplier locked. SIGNAL_FLOOR_MULTIPLIER_AUTHORITY and
+    SIGNAL_FLOOR_MULTIPLIER_DEFAULT replace the prior single constant.
     Spec reference: Section VI.1 — LOCKED
     """
-    return {sid: score * SIGNAL_FLOOR_MULTIPLIER for sid, score in noise_baseline.items()}
+    from engine.data.states import STATE_PROFILES
+    floors = {}
+    for state_id, baseline_score in noise_baseline.items():
+        profile = STATE_PROFILES.get(state_id)
+        if profile and profile.primary_dimension == "Authority":
+            floors[state_id] = baseline_score * SIGNAL_FLOOR_MULTIPLIER_AUTHORITY
+        else:
+            floors[state_id] = baseline_score * SIGNAL_FLOOR_MULTIPLIER_DEFAULT
+    return floors
 
 
 # ── Output data structures ─────────────────────────────────────────────────────
@@ -244,8 +311,8 @@ def apply_signal_floor(
     """
     Evaluate all ranked states against the signal floor.
 
-    For each state: floor = noise_baseline[state_id] * SIGNAL_FLOOR_MULTIPLIER.
-    State clears floor if score > floor.
+    For each state: floor = noise_baseline[state_id] × tiered multiplier
+    (1.00 Authority, 1.15 all others). State clears floor if score > floor.
 
     Returns list[QualifiedState] for ALL ranked states (cleared_floor flag
     distinguishes qualifying states). Ordered by rank (ascending).
@@ -413,9 +480,10 @@ class OutputEngine:
     Spec reference: Section VI (all subsections)
     """
 
-    # Class-level cache: noise baseline is expensive to compute and stable until
-    # the question library changes.
-    _cached_baseline: Optional[dict] = None
+    # Class-level cache: pre-filled with the Session 16 precomputed baseline.
+    # Recompute by calling compute_noise_baseline() and passing the result to
+    # set_noise_baseline(baseline=...) only if the question library changes.
+    _cached_baseline: Optional[dict] = _PRECOMPUTED_NOISE_BASELINE
 
     def __init__(self):
         self._baseline: Optional[dict] = None

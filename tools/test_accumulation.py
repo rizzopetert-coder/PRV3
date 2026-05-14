@@ -12,7 +12,7 @@ Verifies:
 """
 
 import sys
-from math import sqrt, isclose
+from math import isclose
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
@@ -122,27 +122,16 @@ print("\n4. rank_states — zero accumulated vector (baseline)")
 zero_vector = {f: 0.0 for f in DIMENSIONAL_FIELDS}
 rankings = rank_states(zero_vector)
 
-# After seeding (Session 12): 32 states have differentiated primary liability fields.
-# Cluster/low states (15) remain at all-0.25 — distance from zero = sqrt(8 * 0.25^2)
-# HIGH states (11) have one liability field at 0.60 — distance from zero > sqrt(0.5)
-# Distances are no longer equal by design.
-cluster_dist    = sqrt(8 * BASELINE_VALUE ** 2)
-cluster_ranking = next(r for r in rankings if r.state_id == "the_unformed_leader")
-high_ranking    = next(r for r in rankings if r.state_id == "the_founders_grip")
+# Zero vector has undefined cosine direction — all states return score 0.0.
+# This confirms the zero-vector guard: no stable direction = no directional signal.
 
 check("Rankings cover all states", len(rankings) == n, f"got {len(rankings)}")
-check("Cluster state at uniform baseline distance",
-      isclose(cluster_ranking.distance, cluster_dist, rel_tol=1e-9),
-      f"expected={cluster_dist:.6f}, got={cluster_ranking.distance:.6f}")
-check("HIGH state further from zero than cluster state (seeded profiles)",
-      high_ranking.distance > cluster_ranking.distance,
-      f"high={high_ranking.distance:.6f}, cluster={cluster_ranking.distance:.6f}")
+check("Zero accumulated vector: all states return cosine similarity 0.0",
+      all(r.score == 0.0 for r in rankings),
+      f"non-zero scores: {[(r.state_id, r.score) for r in rankings if r.score != 0.0][:3]}")
 check("Ranks are 1..n",
       [r.rank for r in rankings] == list(range(1, n + 1)),
       f"ranks: {[r.rank for r in rankings[:5]]}")
-
-print(f"  Cluster state baseline distance: {cluster_dist:.6f}")
-print(f"  HIGH state (founders_grip) distance: {high_ranking.distance:.6f}")
 
 
 # ── 5. Signal reliability coefficient — Owner 1.2x on authority_liability ──────
@@ -226,23 +215,24 @@ print("\n7. rank_states after single answer")
 rankings_after = engine.rank()
 check("Rankings still cover all states", len(rankings_after) == n, f"got {len(rankings_after)}")
 
-# After seeding: states have differentiated profiles — distances are no longer equal.
-# Cluster state (the_unformed_leader, all 0.25):
-#   d = sqrt((0.3-0.25)^2 + 7*(0.0-0.25)^2) = sqrt(0.44)
-# Authority HIGH state (the_founders_grip, authority_liability=0.60):
-#   d = sqrt((0.3-0.60)^2 + 7*(0.0-0.25)^2) > sqrt(0.44) — acc=0.3 undershoots profile=0.60
-cluster_d_after = sqrt((0.3 - BASELINE_VALUE)**2 + 7 * (0.0 - BASELINE_VALUE)**2)
+# Cosine distances after authority_liability=0.3 (acc vector: auth=0.3, all others=0.0):
+# Cluster state (the_unformed_leader): aptitude_liability=0.45, all others=0.20 (v4 vector).
+# Accumulated vector: authority_liability=0.3, all others=0.0.
+# dot = 0.3 * 0.20 = 0.06; mag_acc=0.3; mag_ul=sqrt(0.45^2 + 7*0.20^2)=0.69463
+# cosine = 0.06/(0.3*0.69463) = 0.28793 -> distance = 0.71207
+# Authority HIGH state (the_founders_grip, authority_liability=0.60): strong authority alignment -> 0.328129
 cluster_r_after = next(r for r in rankings_after if r.state_id == "the_unformed_leader")
 high_r_after    = next(r for r in rankings_after if r.state_id == "the_founders_grip")
 
-check("Cluster state has expected distance after authority signal",
-      isclose(cluster_r_after.distance, cluster_d_after, rel_tol=1e-9),
-      f"expected={cluster_d_after:.6f}, got={cluster_r_after.distance:.6f}")
-check("Authority HIGH state further from acc vector than cluster (acc=0.3 < profile=0.60)",
-      high_r_after.distance > cluster_r_after.distance,
+check("Cluster state has expected cosine distance after authority signal",
+      isclose(cluster_r_after.distance, 0.712074, rel_tol=1e-4),
+      f"expected=0.712074, got={cluster_r_after.distance:.6f}")
+check("Cosine sees directional alignment — authority signal in accumulated vector is closer to Authority HIGH state than to cluster state",
+      high_r_after.distance < cluster_r_after.distance,
       f"high={high_r_after.distance:.6f}, cluster={cluster_r_after.distance:.6f}")
 
-print(f"  Distance after authority_liability=0.3: {cluster_d_after:.6f}")
+print(f"  Cosine distance to cluster state after authority signal: {cluster_r_after.distance:.6f}")
+print(f"  Cosine distance to Authority HIGH state: {high_r_after.distance:.6f}")
 
 
 # ── 8. AccumulationEngine with C-suite role — coefficient scaling confirmed ────

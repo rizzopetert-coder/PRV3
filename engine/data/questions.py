@@ -264,7 +264,7 @@ _QDATA = [
             ("C", "There's a gap — we have processes on paper that don't reflect how we actually operate.", False, None),
             ("D", "We're light on formal process — managers run on judgment more than documented systems.", False, None),
         ],
-        ["the_policy_lag", "paper_shield", "the_paper_tiger"],
+        ["the_paper_tiger", "the_policy_lag", "paper_shield"],
         False,
     ),
     (
@@ -481,7 +481,7 @@ _QDATA = [
             ("D", "We've tried to develop people but the investment hasn't produced what we expected.", True, "SEVER-07"),
             ("E", "Honestly, developing people isn't something we've prioritized.", True, "SEVER-07"),
         ],
-        ["leadership_continuity_risk", "the_dormant_talent", "the_unformed_leader"],
+        ["the_dormant_talent", "leadership_continuity_risk", "the_unformed_leader"],
         True,
     ),
     (
@@ -564,7 +564,7 @@ _QDATA = [
             ("C", "It's inconsistent — communication varies a lot by team or manager.", False, None),
             ("D", "There's a real information gap — people often find out about things through informal channels first.", False, None),
         ],
-        ["the_lost_map", "the_suppression_filter"],
+        ["the_suppression_filter", "the_lost_map"],
         False,
     ),
     (
@@ -1115,7 +1115,7 @@ def _build_library():
         "Q06":           {"authority_liability": 0.60, "attitude_liability": 0.60},
         "Q07":           {"authority_liability": 0.60, "alliance_liability": 0.60},
         "Q09":           {"authority_liability": 0.60, "alliance_liability": 0.60},
-        "Q10":           {"authority_liability": 0.60, "aptitude_liability": 0.60},
+        "Q10":           {"aptitude_liability": 0.60},
         "Q11":           {"authority_liability": 0.40, "attitude_liability": 0.40},
         "Q12":           {"attitude_liability": 0.60},
         "Q13":           {"authority_liability": 0.40, "alliance_liability": 0.40},
@@ -1129,12 +1129,12 @@ def _build_library():
         "Q22":           {"authority_liability": 0.40, "aptitude_liability": 0.40},
         "Q23":           {"authority_liability": 0.40, "aptitude_liability": 0.40},
         "Q24":           {"attitude_liability": 0.40, "alliance_liability": 0.40},
-        "Q25":           {"authority_liability": 0.40, "aptitude_liability": 0.40},
+        # Q25: cluster governing (the_dormant_talent) — no seed entry
         "Q26":           {"authority_liability": 0.60, "alliance_liability": 0.60},
         "Q27A":          {"alliance_liability": 0.40},
         "Q28":           {"authority_liability": 0.60, "attitude_liability": 0.60},
         "Q29":           {"attitude_liability": 0.40, "authority_liability": 0.40},
-        "Q30":           {"authority_liability": 0.40, "alliance_liability": 0.40},
+        # Q30: cluster governing (the_suppression_filter) — no seed entry
         "Q31":           {"authority_liability": 0.60, "attitude_liability": 0.60},
         "Q32":           {"authority_liability": 0.40, "alliance_liability": 0.40},
         "Q33":           {"authority_liability": 0.40, "aptitude_liability": 0.40},
@@ -1426,18 +1426,17 @@ def _build_library():
         },
         # -- End WS1 entries ----------------------------------------------------
         "Q35": {
-            "A": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.25},
-            "B": {**_z, "aptitude_liability": 0.25, "authority_liability": 0.60},
-            "C": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.40},
-            "D": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40},
+            "A": {**_z, "aptitude_liability": 0.25},
+            "B": {**_z, "aptitude_liability": 0.60},
+            "C": {**_z, "aptitude_liability": 0.40},
+            "D": {**_z, "aptitude_liability": 0.40},
         },
         "Q36": {
             "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.40},
-            "B": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40},
-            "C": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40},
-            "D": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40,
-                        "attitude_liability": 0.40},
-            "E": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.60},
+            "B": {**_z, "aptitude_liability": 0.40},
+            "C": {**_z, "aptitude_liability": 0.40},
+            "D": {**_z, "aptitude_liability": 0.40, "attitude_liability": 0.40},
+            "E": {**_z, "aptitude_liability": 0.60},
         },
         "Q37": {
             "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.40},
@@ -1453,9 +1452,9 @@ def _build_library():
         },
         "Q39": {
             "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.25},
-            "B": {**_z, "aptitude_liability": 0.25, "authority_liability": 0.25},
-            "C": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.40},
-            "D": {**_z, "aptitude_liability": 0.40, "authority_liability": 0.60},
+            "B": {**_z, "aptitude_liability": 0.25, "alliance_liability": 0.25},
+            "C": {**_z, "aptitude_liability": 0.60, "alliance_liability": 0.40},
+            "D": {**_z, "aptitude_liability": 0.40, "alliance_liability": 0.60},
         },
         # -- Verification probes (Session 14) ----------------------------------------
         "VERIFY-Q16": {
@@ -1586,7 +1585,7 @@ QUESTION_LIBRARY: "dict[str, QuestionDefinition]" = _build_library()
 
 # -- Expected question ID patterns (for validation) ----------------------------
 
-CORE_SEQUENCE_IDS = [f"Q{i:02d}" for i in range(1, 35)]   # Q01-Q34
+CORE_SEQUENCE_IDS = [f"Q{i:02d}" for i in range(1, 40)]   # Q01-Q39
 SEVERITY_FOLLOW_ON_IDS = [f"SEVER-{i:02d}" for i in range(1, 14)]  # SEVER-01 to SEVER-13
 
 DISTINGUISHER_CLUSTER_PREFIXES = {

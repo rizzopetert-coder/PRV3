@@ -10,8 +10,8 @@ II.4  Euclidean Distance Calculation and State Ranking
 Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section II
 """
 
+import math
 from dataclasses import dataclass, field
-from math import sqrt
 from typing import Optional
 
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
@@ -230,16 +230,16 @@ def accumulate_answer(
         session.answers_applied.append(question_id)
 
 
-# ── II.4  Euclidean Distance Calculation and State Ranking ────────────────────
+# ── II.4  Cosine Similarity and State Ranking ─────────────────────────────────
 
 @dataclass
 class StateRanking:
     """
-    One state's distance result against the accumulated answer vector.
+    One state's similarity result against the accumulated answer vector.
 
-    rank:     1 = closest match (ascending by distance)
-    distance: weighted Euclidean distance across all 8 dimensional fields
-    score:    1 / (1 + distance), range 0–1, higher = closer
+    rank:     1 = closest match (ascending by distance = descending by score)
+    distance: 1 - cosine_similarity, range 0–2; 0 = identical direction
+    score:    cosine similarity, range [-1, 1]; higher = stronger directional match
 
     Spec reference: Section II.4
     """
@@ -249,42 +249,58 @@ class StateRanking:
     score:    float
 
 
+def _cosine_similarity(accumulated: dict, profile_vector: dict, fields: list) -> float:
+    """
+    Compute cosine similarity between accumulated session vector and a state
+    profile vector across the 8 dimensional fields.
+
+    Returns float in [-1.0, 1.0]. Returns 0.0 if either vector has zero magnitude
+    (undefined cosine — treated as no directional signal).
+
+    In practice, state profiles are always non-zero (minimum 0.25 per field).
+    Accumulated vectors approach zero only on fully neutral (all-F) sessions.
+    SEVER-05 signed delta (authority_asset: -0.30) can produce negative field
+    values — cosine similarity handles this correctly; scores may be slightly
+    negative for sessions with strong SEVER-05 activation against profile direction.
+    """
+    dot = sum(accumulated.get(f, 0.0) * profile_vector.get(f, 0.0) for f in fields)
+    mag_a = math.sqrt(sum(accumulated.get(f, 0.0) ** 2 for f in fields))
+    mag_b = math.sqrt(sum(profile_vector.get(f, 0.0) ** 2 for f in fields))
+
+    if mag_a < 1e-10 or mag_b < 1e-10:
+        return 0.0  # undefined — no directional signal
+
+    return dot / (mag_a * mag_b)
+
+
+def compute_session_magnitude(accumulated: dict, fields: list) -> float:
+    """L2 norm of the accumulated session vector. Interpretable as session intensity."""
+    return math.sqrt(sum(accumulated.get(f, 0.0) ** 2 for f in fields))
+
+
 def rank_states(
     accumulated_vector: dict,
     salience_weights: Optional[dict] = None,
 ) -> list:
     """
-    Calculate weighted Euclidean distance from accumulated_vector to each
-    state profile vector. Return list of StateRanking sorted ascending by
-    distance (rank 1 = closest match).
+    Compute cosine similarity from accumulated_vector to each state profile vector.
+    Return list of StateRanking sorted ascending by distance (rank 1 = best match).
 
-    salience_weights: {state_id: {field: weight}} or None.
-      At baseline all weights = 1.0 (equal dimensional salience).
-      Post-calibration: per-state per-field weights from Confusion Matrix analysis.
-      CALIBRATION TARGET — do not set values until Phase 1 data drives adjustment.
+    distance = 1 - cosine_similarity, so rank 1 has the smallest distance and
+    the highest cosine similarity score.
 
-    Distance formula (Section II.4):
-      d(state) = sqrt( sum_f( w[state][f] * (acc[f] - profile[f])^2 ) )
-
-    Score conversion (Section II.4):
-      score = 1 / (1 + d)
+    salience_weights: reserved for future per-state per-field weighting.
+      CALIBRATION TARGET — not applied in cosine mode.
 
     Spec reference: Section II.4
     """
+    fields = list(DIMENSIONAL_FIELDS)
     results = []
     for sid, profile in STATE_PROFILES.items():
         profile_vec = profile.dimensional_vector.as_dict()
-        state_weights = (salience_weights or {}).get(sid, {})
-
-        sq_sum = 0.0
-        for f in DIMENSIONAL_FIELDS:
-            w = state_weights.get(f, 1.0)
-            diff = accumulated_vector.get(f, 0.0) - profile_vec[f]
-            sq_sum += w * diff * diff
-
-        d = sqrt(sq_sum)
-        score = 1.0 / (1.0 + d)
-        results.append(StateRanking(rank=0, state_id=sid, distance=d, score=score))
+        sim = _cosine_similarity(accumulated_vector, profile_vec, fields)
+        d = 1.0 - sim
+        results.append(StateRanking(rank=0, state_id=sid, distance=d, score=sim))
 
     results.sort(key=lambda r: r.distance)
     for i, r in enumerate(results):
