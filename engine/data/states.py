@@ -234,10 +234,14 @@ _reg(_profile(
     resolution_family="Development",
 ))
 STATE_PROFILES["the_unformed_leader"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.45, aptitude_asset=0.20,
-    authority_liability=0.20, authority_asset=0.20,
-    attitude_liability=0.20, attitude_asset=0.20,
-    alliance_liability=0.20, alliance_asset=0.20,
+    aptitude_liability=0.35,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.25,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -252,14 +256,14 @@ _reg(_profile(
     resolution_family="Development + Roadmap",
 ))
 STATE_PROFILES["the_overloaded_manager"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.45,
-    aptitude_asset=0.20,
-    authority_liability=0.20,
-    authority_asset=0.20,
-    alliance_liability=0.20,
-    alliance_asset=0.20,
-    attitude_liability=0.20,
-    attitude_asset=0.20,
+    aptitude_liability=0.35,
+    aptitude_asset=0.15,
+    authority_liability=0.25,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -275,14 +279,14 @@ _reg(_profile(
     resolution_family="Executive Counsel + Intervention",
 ))
 STATE_PROFILES["the_dormant_talent"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.45,
-    aptitude_asset=0.20,
-    authority_liability=0.20,
-    authority_asset=0.20,
-    alliance_liability=0.20,
-    alliance_asset=0.20,
-    attitude_liability=0.20,
-    attitude_asset=0.20,
+    aptitude_liability=0.35,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.25,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -297,6 +301,16 @@ _reg(_profile(
     # Inferred from profiles doc: Structural Overload
     resolution_family="Roadmap + Intervention",
 ))
+STATE_PROFILES["built_to_fail"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.60,
+    aptitude_asset=0.10,
+    authority_liability=0.10,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
+)
 
 _reg(_profile(
     state_id="the_undefined_role",
@@ -310,6 +324,16 @@ _reg(_profile(
     # Inferred from profiles doc: Role Clarity Deficit
     resolution_family="Roadmap",
 ))
+STATE_PROFILES["the_undefined_role"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.45,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_paper_tiger",
@@ -323,6 +347,16 @@ _reg(_profile(
     # Renamed from clinical name: Invisible Performance Management (profiles doc #33)
     resolution_family="Development + Roadmap",
 ))
+STATE_PROFILES["the_paper_tiger"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.60,
+    aptitude_asset=0.10,
+    authority_liability=0.10,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
+)
 
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -341,14 +375,14 @@ _reg(_profile(
     resolution_family="Intervention + Executive Counsel",
 ))
 STATE_PROFILES["the_founders_grip"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.15,
-    aptitude_asset=0.15,
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
     authority_liability=0.60,
-    authority_asset=0.15,
-    alliance_liability=0.15,
-    alliance_asset=0.15,
-    attitude_liability=0.15,
-    attitude_asset=0.15,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
 )
 
 _reg(_profile(
@@ -363,14 +397,14 @@ _reg(_profile(
     resolution_family="Intervention + Stability Support",
 ))
 STATE_PROFILES["the_exposed"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.15,
-    aptitude_asset=0.15,
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
     authority_liability=0.60,
-    authority_asset=0.15,
-    alliance_liability=0.15,
-    alliance_asset=0.15,
-    attitude_liability=0.15,
-    attitude_asset=0.15,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
 )
 
 _reg(_profile(
@@ -384,6 +418,16 @@ _reg(_profile(
     sev_min="Emerging", sev_max="Emerging",  # Acute by definition
     resolution_family="Intervention",
 ))
+STATE_PROFILES["the_uninitiated"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="leadership_continuity_risk",
@@ -396,6 +440,16 @@ _reg(_profile(
     sev_min="Emerging", sev_max="Entrenched",
     resolution_family="Roadmap + Development",
 ))
+STATE_PROFILES["leadership_continuity_risk"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="hr_capture",
@@ -409,14 +463,14 @@ _reg(_profile(
     resolution_family="Intervention + Executive Counsel",
 ))
 STATE_PROFILES["hr_capture"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.15,
-    aptitude_asset=0.15,
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
     authority_liability=0.60,
-    authority_asset=0.15,
-    alliance_liability=0.15,
-    alliance_asset=0.15,
-    attitude_liability=0.15,
-    attitude_asset=0.15,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
 )
 
 _reg(_profile(
@@ -430,6 +484,16 @@ _reg(_profile(
     sev_min="Emerging", sev_max="Entrenched",
     resolution_family="Roadmap + Intervention",
 ))
+STATE_PROFILES["decision_paralysis"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_policy_lag",
@@ -443,6 +507,16 @@ _reg(_profile(
     # Inferred from profiles doc: Policy Currency Gap
     resolution_family="Roadmap",
 ))
+STATE_PROFILES["the_policy_lag"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_unexamined_algorithm",
@@ -456,6 +530,16 @@ _reg(_profile(
     # Inferred from profiles doc: AI Governance Failure
     resolution_family="Roadmap + Executive Counsel",
 ))
+STATE_PROFILES["the_unexamined_algorithm"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.25,
+    aptitude_asset=0.15,
+    authority_liability=0.35,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 
 _reg(_profile(
@@ -471,14 +555,14 @@ _reg(_profile(
     resolution_family="Intervention + Executive Counsel",
 ))
 STATE_PROFILES["heard_and_ignored"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.15,
-    aptitude_asset=0.15,
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
     authority_liability=0.60,
-    authority_asset=0.15,
-    alliance_liability=0.15,
-    alliance_asset=0.15,
-    attitude_liability=0.15,
-    attitude_asset=0.15,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
 )
 
 _reg(_profile(
@@ -494,14 +578,14 @@ _reg(_profile(
     resolution_family="Intervention + Executive Counsel",
 ))
 STATE_PROFILES["the_tolerated_violation"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.15,
-    aptitude_asset=0.15,
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
     authority_liability=0.60,
-    authority_asset=0.15,
-    alliance_liability=0.15,
-    alliance_asset=0.15,
-    attitude_liability=0.15,
-    attitude_asset=0.15,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
 )
 
 _reg(_profile(
@@ -516,6 +600,16 @@ _reg(_profile(
     # Inferred from profiles doc: Disclosure Misalignment
     resolution_family="Executive Counsel + Roadmap",
 ))
+STATE_PROFILES["dueling_narratives"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_unsolved_problem",
@@ -530,14 +624,14 @@ _reg(_profile(
     resolution_family="Intervention + Roadmap",
 ))
 STATE_PROFILES["the_unsolved_problem"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.15,
-    aptitude_asset=0.15,
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
     authority_liability=0.60,
-    authority_asset=0.15,
-    alliance_liability=0.15,
-    alliance_asset=0.15,
-    attitude_liability=0.15,
-    attitude_asset=0.15,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
 )
 
 _reg(_profile(
@@ -551,6 +645,16 @@ _reg(_profile(
     sev_min="Emerging", sev_max="Entrenched",
     resolution_family="Intervention + Roadmap",
 ))
+STATE_PROFILES["transition_paralysis"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="paper_shield",
@@ -564,6 +668,16 @@ _reg(_profile(
     # Inferred from profiles doc: Resilience Architecture Gap
     resolution_family="Roadmap",
 ))
+STATE_PROFILES["paper_shield"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.35,
+    authority_asset=0.15,
+    alliance_liability=0.25,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_lost_map",
@@ -577,6 +691,16 @@ _reg(_profile(
     # Inferred from profiles doc: Information Architecture Failure
     resolution_family="Roadmap + Development",
 ))
+STATE_PROFILES["the_lost_map"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="invisible_influence_architecture",
@@ -589,6 +713,16 @@ _reg(_profile(
     sev_min="Emerging", sev_max="Entrenched",
     resolution_family="Roadmap + Executive Counsel",
 ))
+STATE_PROFILES["invisible_influence_architecture"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.35,
+    authority_asset=0.15,
+    alliance_liability=0.25,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="pay_exposure",
@@ -602,6 +736,16 @@ _reg(_profile(
     # Inferred from profiles doc: Market Exposure
     resolution_family="Roadmap",
 ))
+STATE_PROFILES["pay_exposure"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_pay_fog",
@@ -615,6 +759,16 @@ _reg(_profile(
     # Inferred from profiles doc: Compensation Incoherence
     resolution_family="Roadmap",
 ))
+STATE_PROFILES["the_pay_fog"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -632,6 +786,16 @@ _reg(_profile(
     sev_min="Entrenched", sev_max="Endemic",
     resolution_family="Intervention + Executive Counsel",
 ))
+STATE_PROFILES["the_fracture"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
+    authority_liability=0.10,
+    authority_asset=0.10,
+    alliance_liability=0.60,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
+)
 
 _reg(_profile(
     state_id="the_second_close",
@@ -644,6 +808,16 @@ _reg(_profile(
     sev_min="Emerging", sev_max="Entrenched",
     resolution_family="Development + Intervention",
 ))
+STATE_PROFILES["the_second_close"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.45,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="silosolation",
@@ -656,6 +830,16 @@ _reg(_profile(
     sev_min="Entrenched", sev_max="Endemic",
     resolution_family="Development",
 ))
+STATE_PROFILES["silosolation"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.45,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_suppression_filter",
@@ -670,14 +854,14 @@ _reg(_profile(
     resolution_family="Intervention + Executive Counsel",
 ))
 STATE_PROFILES["the_suppression_filter"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.20,
-    aptitude_asset=0.20,
-    authority_liability=0.20,
-    authority_asset=0.20,
-    alliance_liability=0.45,
-    alliance_asset=0.20,
-    attitude_liability=0.20,
-    attitude_asset=0.20,
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.25,
+    authority_asset=0.15,
+    alliance_liability=0.35,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -692,6 +876,16 @@ _reg(_profile(
     # Inferred from profiles doc: Process Justice Failure
     resolution_family="Intervention + Roadmap",
 ))
+STATE_PROFILES["the_arbitrary_standard"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.45,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="decision_blindness",
@@ -705,6 +899,16 @@ _reg(_profile(
     # Inferred from profiles doc: Sequential Decision Blindness
     resolution_family="Intervention + Executive Counsel",
 ))
+STATE_PROFILES["decision_blindness"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
+    authority_liability=0.10,
+    authority_asset=0.10,
+    alliance_liability=0.60,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
+)
 
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -722,6 +926,16 @@ _reg(_profile(
     sev_min="Entrenched", sev_max="Endemic",
     resolution_family="Executive Counsel + Intervention",
 ))
+STATE_PROFILES["the_untouchable"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
+    authority_liability=0.10,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.60,
+    attitude_asset=0.10,
+)
 
 _reg(_profile(
     state_id="what_nobody_says",
@@ -736,14 +950,14 @@ _reg(_profile(
     resolution_family="Intervention",
 ))
 STATE_PROFILES["what_nobody_says"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.20,
-    aptitude_asset=0.20,
-    authority_liability=0.20,
-    authority_asset=0.20,
-    alliance_liability=0.45,
-    alliance_asset=0.20,
-    attitude_liability=0.20,
-    attitude_asset=0.20,
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.25,
+    alliance_asset=0.15,
+    attitude_liability=0.35,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -759,14 +973,14 @@ _reg(_profile(
     resolution_family="Executive Counsel",
 ))
 STATE_PROFILES["leadership_deafness"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.20,
-    aptitude_asset=0.20,
-    authority_liability=0.20,
-    authority_asset=0.20,
-    alliance_liability=0.20,
-    alliance_asset=0.20,
-    attitude_liability=0.45,
-    attitude_asset=0.20,
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.25,
+    alliance_asset=0.15,
+    attitude_liability=0.35,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -781,6 +995,16 @@ _reg(_profile(
     # Inferred from profiles doc: Performative Equity
     resolution_family="Intervention",
 ))
+STATE_PROFILES["the_diversity_ceiling"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="culture_drift",
@@ -794,14 +1018,14 @@ _reg(_profile(
     resolution_family="Intervention",
 ))
 STATE_PROFILES["culture_drift"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.20,
-    aptitude_asset=0.20,
-    authority_liability=0.20,
-    authority_asset=0.20,
-    alliance_liability=0.20,
-    alliance_asset=0.20,
-    attitude_liability=0.45,
-    attitude_asset=0.20,
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.25,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.35,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -816,14 +1040,14 @@ _reg(_profile(
     resolution_family="Intervention",
 ))
 STATE_PROFILES["identity_erosion"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.20,
-    aptitude_asset=0.20,
-    authority_liability=0.20,
-    authority_asset=0.20,
-    alliance_liability=0.20,
-    alliance_asset=0.20,
-    attitude_liability=0.45,
-    attitude_asset=0.20,
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.25,
+    alliance_asset=0.15,
+    attitude_liability=0.35,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -839,14 +1063,14 @@ _reg(_profile(
     resolution_family="Intervention",
 ))
 STATE_PROFILES["the_culture_that_wasnt"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.20,
-    aptitude_asset=0.20,
-    authority_liability=0.20,
-    authority_asset=0.20,
-    alliance_liability=0.20,
-    alliance_asset=0.20,
-    attitude_liability=0.45,
-    attitude_asset=0.20,
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.25,
+    alliance_asset=0.15,
+    attitude_liability=0.35,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -861,6 +1085,16 @@ _reg(_profile(
     # Inferred from profiles doc: Change Absorption Failure
     resolution_family="Intervention",
 ))
+STATE_PROFILES["the_burned_credibility"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="invisible_burnout",
@@ -873,6 +1107,16 @@ _reg(_profile(
     sev_min="Emerging", sev_max="Entrenched",
     resolution_family="Development + Intervention",
 ))
+STATE_PROFILES["invisible_burnout"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_basement_standard",
@@ -886,6 +1130,16 @@ _reg(_profile(
     # Inferred from profiles doc: Unmanaged Underperformance
     resolution_family="Intervention + Roadmap",
 ))
+STATE_PROFILES["the_basement_standard"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_inside_track",
@@ -899,6 +1153,16 @@ _reg(_profile(
     # Inferred from profiles doc: Favoritism Architecture
     resolution_family="Intervention + Roadmap",
 ))
+STATE_PROFILES["the_inside_track"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="narrative_lock",
@@ -911,6 +1175,16 @@ _reg(_profile(
     sev_min="Entrenched", sev_max="Endemic",
     resolution_family="Executive Counsel + Intervention",
 ))
+STATE_PROFILES["narrative_lock"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.25,
+    alliance_asset=0.15,
+    attitude_liability=0.35,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="groundhog_day",
@@ -924,6 +1198,16 @@ _reg(_profile(
     # Inferred from profiles doc: Learning Architecture Failure
     resolution_family="Roadmap + Executive Counsel",
 ))
+STATE_PROFILES["groundhog_day"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_wrong_reward",
@@ -937,6 +1221,16 @@ _reg(_profile(
     # Inferred from profiles doc: Motivational Architecture Failure
     resolution_family="Intervention + Roadmap",
 ))
+STATE_PROFILES["the_wrong_reward"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)
 
 _reg(_profile(
     state_id="the_unreported_hazard",
@@ -951,14 +1245,14 @@ _reg(_profile(
     resolution_family="Intervention",
 ))
 STATE_PROFILES["the_unreported_hazard"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.20,
-    aptitude_asset=0.20,
-    authority_liability=0.20,
-    authority_asset=0.20,
-    alliance_liability=0.45,
-    alliance_asset=0.20,
-    attitude_liability=0.20,
-    attitude_asset=0.20,
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.25,
+    alliance_asset=0.15,
+    attitude_liability=0.35,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -974,14 +1268,14 @@ _reg(_profile(
     resolution_family="Development + Intervention",
 ))
 STATE_PROFILES["the_unlocked_door"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.20,
-    aptitude_asset=0.20,
-    authority_liability=0.20,
-    authority_asset=0.20,
-    alliance_liability=0.20,
-    alliance_asset=0.20,
-    attitude_liability=0.45,
-    attitude_asset=0.20,
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.25,
+    alliance_asset=0.15,
+    attitude_liability=0.35,
+    attitude_asset=0.15,
 )
 
 _reg(_profile(
@@ -996,6 +1290,16 @@ _reg(_profile(
     # Inferred from profiles doc: Implementation Courage Deficit
     resolution_family="Executive Counsel",
 ))
+STATE_PROFILES["the_broken_compass"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)
 
 
 # ── Cluster registries ─────────────────────────────────────────────────────────

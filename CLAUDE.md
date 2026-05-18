@@ -26,7 +26,7 @@ If any query returns empty or clearly wrong results, retry once with broader ter
 
 ### Step 4 — MOB
 Read the PRV3 MOB from Google Drive.
-**MOB Google Doc ID:** `1_eZwzwPo6H1qp__em8vQTZedIeBe2IFrqFW2DNdCTLc`
+**MOB Google Doc ID:** `1CbTpcoVOsoEdevVGbKfxPpSbYNvPazSaC9lT8DPSDPM`
 
 Use the Drive MCP tool to fetch it. The MOB is the irreducible core — palace retrieval extends it, does not replace it.
 
@@ -67,7 +67,7 @@ Skip only if zero files were touched.
 
 ### Step 3 — Update MOB
 Write the updated MOB to the Google Drive document.
-**MOB Google Doc ID:** `1_eZwzwPo6H1qp__em8vQTZedIeBe2IFrqFW2DNdCTLc`
+**MOB Google Doc ID:** `1CbTpcoVOsoEdevVGbKfxPpSbYNvPazSaC9lT8DPSDPM`
 
 Update:
 - Current workstream status
@@ -145,7 +145,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 
 | Item | Value |
 |---|---|
-| MOB Google Doc ID | `1_eZwzwPo6H1qp__em8vQTZedIeBe2IFrqFW2DNdCTLc` |
+| MOB Google Doc ID | `1CbTpcoVOsoEdevVGbKfxPpSbYNvPazSaC9lT8DPSDPM` |
 | PRV3 Drive folder ID | `19CdQS2VTY_m1l4_0XPr-S1SKKDBstG_R` |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |

@@ -216,17 +216,17 @@ rankings_after = engine.rank()
 check("Rankings still cover all states", len(rankings_after) == n, f"got {len(rankings_after)}")
 
 # Cosine distances after authority_liability=0.3 (acc vector: auth=0.3, all others=0.0):
-# Cluster state (the_unformed_leader): aptitude_liability=0.45, all others=0.20 (v4 vector).
+# Cluster state (the_unformed_leader): v10 vector aptitude_l=0.35, attitude_l=0.25, others=0.15.
 # Accumulated vector: authority_liability=0.3, all others=0.0.
-# dot = 0.3 * 0.20 = 0.06; mag_acc=0.3; mag_ul=sqrt(0.45^2 + 7*0.20^2)=0.69463
-# cosine = 0.06/(0.3*0.69463) = 0.28793 -> distance = 0.71207
+# dot = 0.3 * 0.15 = 0.045; mag_acc=0.3; mag_ul=sqrt(0.35^2+0.25^2+6*0.15^2)=sqrt(0.32)=0.56569
+# cosine = 0.045/(0.3*0.56569) = 0.26517 -> distance = 0.73483
 # Authority HIGH state (the_founders_grip, authority_liability=0.60): strong authority alignment -> 0.328129
 cluster_r_after = next(r for r in rankings_after if r.state_id == "the_unformed_leader")
 high_r_after    = next(r for r in rankings_after if r.state_id == "the_founders_grip")
 
 check("Cluster state has expected cosine distance after authority signal",
-      isclose(cluster_r_after.distance, 0.712074, rel_tol=1e-4),
-      f"expected=0.712074, got={cluster_r_after.distance:.6f}")
+      isclose(cluster_r_after.distance, 0.734835, rel_tol=1e-4),
+      f"expected=0.734835, got={cluster_r_after.distance:.6f}")
 check("Cosine sees directional alignment — authority signal in accumulated vector is closer to Authority HIGH state than to cluster state",
       high_r_after.distance < cluster_r_after.distance,
       f"high={high_r_after.distance:.6f}, cluster={cluster_r_after.distance:.6f}")
