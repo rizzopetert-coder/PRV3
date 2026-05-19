@@ -8,7 +8,12 @@ With answers=[], every profile produces intake-only output (prior priors only).
 This is the baseline Confusion Matrix before answer population.
 
 Modes:
-  Default (--answers):  answers=[] → zero accumulated vector (zero-signal baseline)
+  Default (--signal):   generate_answers() — signal-driven per profile type.
+                        high_confidence → best_option_for_state() all questions
+                        moderate        → best_option_for_state() on state_targets questions,
+                                         neutral elsewhere
+                        weak            → neutral throughout
+                        Neutral = option with smallest absolute sum of all dimensional fields.
   Synthetic (--synthetic): Option A — inject dimensional vector directly before
                             rank_states(), bypassing question routing layer.
                             high_confidence → primary_liability = 0.60
@@ -17,10 +22,11 @@ Modes:
 
 Usage:
     python tools/calibration_runner.py
+    python tools/calibration_runner.py --signal
     python tools/calibration_runner.py --synthetic
-    python tools/calibration_runner.py --synthetic --verbose
-    python tools/calibration_runner.py --synthetic --state the_founders_grip
-    python tools/calibration_runner.py --synthetic --dim
+    python tools/calibration_runner.py --verbose
+    python tools/calibration_runner.py --state the_founders_grip
+    python tools/calibration_runner.py --dim
 """
 
 import sys
@@ -118,14 +124,13 @@ def best_option_for_state(question, target_state_id: str):
 
 
 def _neutral_option(question):
-    """Return option with minimum total liability contribution."""
-    def _liability_sum(opt):
+    """Return option with minimum absolute sum of all dimensional contributions."""
+    def _abs_sum(opt):
         return sum(
-            opt.dimensional_contributions.get(f, 0.0)
-            for f in ("aptitude_liability", "authority_liability",
-                      "alliance_liability", "attitude_liability")
+            abs(v) for v in opt.dimensional_contributions.values()
+            if isinstance(v, (int, float))
         )
-    return min(question.answer_options, key=_liability_sum)
+    return min(question.answer_options, key=_abs_sum)
 
 
 _CORE_QUESTION_IDS = [
@@ -358,14 +363,14 @@ def print_report(
 ) -> None:
     answered = sum(1 for p in profiles if p.answers)
     total = len(profiles)
-    mode = "synthetic injection (Option A)" if synthetic else "answers from profiles"
+    mode = "synthetic injection (Option A)" if synthetic else "signal-driven (generate_answers)"
 
     print("=" * 72)
     print("PRV3 Phase 1 Calibration Run")
     print(f"  Profiles:          {total}")
     print(f"  Mode:              {mode}")
     if not synthetic:
-        print(f"  Answers populated: {answered}/{total}")
+        print(f"  Pre-populated answers: {answered}/{total}")
     print("=" * 72)
 
     print(f"\nRESULT: {suite['passed']}/{suite['total']} passed "
@@ -437,6 +442,8 @@ def main() -> None:
                         help="Filter run to one target_state")
     parser.add_argument("--dim", action="store_true",
                         help="Show dimensional error analysis for misclassified profiles")
+    parser.add_argument("--signal", action="store_true",
+                        help="Explicit signal-driven mode (default — generate_answers() per profile type)")
     parser.add_argument("--synthetic", action="store_true",
                         help="Option A: inject synthetic dimensional vectors (bypasses question layer)")
     args = parser.parse_args()
