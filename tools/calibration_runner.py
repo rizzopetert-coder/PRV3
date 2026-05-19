@@ -9,7 +9,7 @@ This is the baseline Confusion Matrix before answer population.
 
 Modes:
   Default (--signal):   generate_answers() — signal-driven per profile type.
-                        high_confidence → best_option_for_state() all questions
+                        high_confidence → best_option_for_state() on state_targets questions, neutral elsewhere
                         moderate        → best_option_for_state() on state_targets questions,
                                          neutral elsewhere
                         weak            → neutral throughout
@@ -146,7 +146,7 @@ def generate_answers(test_case):
     """
     Generate TestAnswer list from test_case.profile_type and target_state.
 
-    high_confidence/extreme: best_option_for_state() for every question.
+    high_confidence/extreme: best_option_for_state() where target in state_targets, neutral elsewhere.
     moderate: best_option_for_state() where target in state_targets, neutral elsewhere.
     weak: neutral option throughout.
 
@@ -173,7 +173,9 @@ def generate_answers(test_case):
             continue
         strategy = test_case.profile_type
         if strategy in ("high_confidence", "extreme_high_confidence"):
-            opt = best_option_for_state(q, test_case.target_state)
+            opt = (best_option_for_state(q, test_case.target_state)
+                   if test_case.target_state in (q.state_targets or [])
+                   else _neutral_option(q))
         elif strategy == "moderate":
             opt = (best_option_for_state(q, test_case.target_state)
                    if test_case.target_state in (q.state_targets or [])

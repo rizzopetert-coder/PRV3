@@ -47,9 +47,9 @@ SEPARATION_THRESHOLD: Optional[float] = None  # CALIBRATION TARGET
 _SEPARATION_THRESHOLD_DEFAULT: float = 0.05  # CALIBRATION TARGET default
 
 # Precomputed noise baseline — Monte Carlo (N=1000, seed=42, Q01–Q39, 39 sampled).
-# Cosine similarity metric, tiered floor multipliers (Session 18).
-# v11 contrast field injection: Q02-B, Q04-D, Q10-C, Q11-C, Q15-C, Q23-C/D.
-# Monte Carlo N=1000, seed=42, Q01-Q39. Date: 2026-05-17.
+# Cosine similarity metric, tiered floor multipliers.
+# v13: the_unexamined_algorithm vector patch (auth_l=0.50, apt_l=0.35, others=0.10). Session 20.
+# Monte Carlo N=1000, seed=42, Q01-Q39. Date: 2026-05-19.
 _PRECOMPUTED_NOISE_BASELINE: dict = {
     "built_to_fail":                        0.6127,
     "culture_drift":                        0.8685,
@@ -88,7 +88,7 @@ _PRECOMPUTED_NOISE_BASELINE: dict = {
     "the_suppression_filter":               0.8047,
     "the_tolerated_violation":              0.8697,
     "the_undefined_role":                   0.7292,
-    "the_unexamined_algorithm":             0.8926,
+    "the_unexamined_algorithm":             0.8996,
     "the_unformed_leader":                  0.7912,
     "the_uninitiated":                      0.8978,
     "the_unlocked_door":                    0.7948,

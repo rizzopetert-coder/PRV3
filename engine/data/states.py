@@ -531,14 +531,14 @@ _reg(_profile(
     resolution_family="Roadmap + Executive Counsel",
 ))
 STATE_PROFILES["the_unexamined_algorithm"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.25,
-    aptitude_asset=0.15,
-    authority_liability=0.35,
-    authority_asset=0.15,
-    alliance_liability=0.15,
-    alliance_asset=0.15,
-    attitude_liability=0.15,
-    attitude_asset=0.15,
+    authority_liability=0.50,
+    aptitude_liability=0.35,
+    authority_asset=0.10,
+    aptitude_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
 )
 
 
