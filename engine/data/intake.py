@@ -97,6 +97,42 @@ PRIOR_ADJUSTERS: list[PriorAdjuster] = [
         multiplier=CALIBRATION_TARGET,
     ),
     PriorAdjuster(
+        event_id="attitude_conduct",
+        event_label="A known performance or conduct issue involving a specific individual remains unresolved.",
+        elevated_states=[
+            "the_untouchable",
+            "the_burned_credibility",
+            "the_unlocked_door",
+            "the_unreported_hazard",
+            "what_nobody_says",
+        ],
+        multiplier=1.10,  # CALIBRATION TARGET — midpoint of 1.08–1.12 range, Session 17
+    ),
+    PriorAdjuster(
+        event_id="attitude_departure",
+        event_label="A termination or unexpected departure in the past 18 months revealed something about how this organization operates that you are still working to address.",
+        elevated_states=[
+            "the_burned_credibility",
+            "the_wrong_reward",
+            "groundhog_day",
+            "culture_drift",
+            "identity_erosion",
+        ],
+        multiplier=1.07,  # CALIBRATION TARGET — midpoint of 1.05–1.08 range rounded, Session 17
+    ),
+    PriorAdjuster(
+        event_id="aptitude_redesign",
+        event_label="A role, team, or function was created, significantly redesigned, or eliminated in the past 18 months.",
+        elevated_states=[
+            "built_to_fail",
+            "the_undefined_role",
+            "the_dormant_talent",
+            "the_overloaded_manager",
+            "the_unformed_leader",
+        ],
+        multiplier=1.12,  # CALIBRATION TARGET — midpoint of 1.10–1.14 range, Session 17
+    ),
+    PriorAdjuster(
         event_id="none",
         event_label="None",
         elevated_states=[],
@@ -230,6 +266,9 @@ INTAKE_FIELDS = {
         "rapid_growth",
         "leadership_departure",
         "external_legal_claim",
+        "attitude_conduct",
+        "attitude_departure",
+        "aptitude_redesign",
         "none",
     ],
     "principal_role": [

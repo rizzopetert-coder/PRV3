@@ -3,7 +3,7 @@ PRV3 Output Engine — Section VI Integration Test
 
 Verifies:
   1. compute_noise_baseline: populated library Monte Carlo baseline — all states equal
-  2. compute_signal_floors: floor = baseline * 1.15
+  2. compute_signal_floors: floor = baseline * 1.08 (non-Auth) / 1.00 (Auth)
   3. apply_signal_floor: filters states correctly, populates QualifiedState fields
   4. route_output: insufficient_signal when nothing clears floor
   5. route_output: single mode when one state clears with separation >= threshold
@@ -103,7 +103,7 @@ check("Baseline values vary by state (seeded profiles)",
 check("Baseline values > 0.0",
       all(v > 0.0 for v in baseline.values()))
 print(f"  Monte Carlo baseline score: {reference:.6f}")
-print(f"  Signal floor (non-Auth 1.15x): {reference * SIGNAL_FLOOR_MULTIPLIER_DEFAULT:.6f}")
+print(f"  Signal floor (non-Auth 1.08x): {reference * SIGNAL_FLOOR_MULTIPLIER_DEFAULT:.6f}")
 
 
 # ── 2. compute_signal_floors ───────────────────────────────────────────────────
@@ -116,7 +116,7 @@ check("Tiered floor: Authority states — floor = baseline x 1.00",
           for sid in baseline
           if STATE_PROFILES[sid].primary_dimension == "Authority"),
       f"Authority sample: {[(sid, floors[sid]) for sid in baseline if STATE_PROFILES[sid].primary_dimension == 'Authority'][:2]}")
-check("Tiered floor: non-Authority states — floor = baseline x 1.15",
+check("Tiered floor: non-Authority states — floor = baseline x 1.08",
       all(isclose(floors[sid], baseline[sid] * SIGNAL_FLOOR_MULTIPLIER_DEFAULT, rel_tol=1e-9)
           for sid in baseline
           if STATE_PROFILES[sid].primary_dimension != "Authority"),
@@ -125,7 +125,7 @@ check("Authority floors equal baseline exactly (1.00x)",
       all(isclose(floors[sid], baseline[sid], rel_tol=1e-9)
           for sid in baseline
           if STATE_PROFILES[sid].primary_dimension == "Authority"))
-check("Non-Authority floors exceed baseline (1.15x, strictly greater)",
+check("Non-Authority floors exceed baseline (1.08x, strictly greater)",
       all(floors[sid] > baseline[sid]
           for sid in baseline
           if STATE_PROFILES[sid].primary_dimension != "Authority"))
@@ -157,7 +157,7 @@ check("resolution_family populated from STATE_PROFILES",
           for qs in evaluated_uniform[:5]))
 
 # States that clear: score must exceed floor. first_sid = the_unformed_leader (Aptitude)
-# Non-Authority state: floor = baseline * SIGNAL_FLOOR_MULTIPLIER_DEFAULT (1.15)
+# Non-Authority state: floor = baseline * SIGNAL_FLOOR_MULTIPLIER_DEFAULT (1.08)
 floor_value = reference * SIGNAL_FLOOR_MULTIPLIER_DEFAULT
 above_floor_score = floor_value + 0.05
 first_sid = list(STATE_PROFILES.keys())[0]
@@ -426,8 +426,8 @@ print("\n15. Constants")
 
 check("SIGNAL_FLOOR_MULTIPLIER_AUTHORITY = 1.00 (LOCKED Session 16)",
       isclose(SIGNAL_FLOOR_MULTIPLIER_AUTHORITY, 1.00))
-check("SIGNAL_FLOOR_MULTIPLIER_DEFAULT = 1.15 (LOCKED)",
-      isclose(SIGNAL_FLOOR_MULTIPLIER_DEFAULT, 1.15))
+check("SIGNAL_FLOOR_MULTIPLIER_DEFAULT = 1.08 (Session 17 cosine-space correction)",
+      isclose(SIGNAL_FLOOR_MULTIPLIER_DEFAULT, 1.08))
 check("NOISE_SIMULATION_COUNT = 1000 (LOCKED)",
       NOISE_SIMULATION_COUNT == 1000)
 check("SEPARATION_THRESHOLD = None (CALIBRATION TARGET)",
