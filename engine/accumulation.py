@@ -5,7 +5,7 @@ Accumulation Engine
 II.1  Prior Probability Initialization
 II.2  Vector Accumulation
 II.3  Signal Reliability Coefficient Application
-II.4  Euclidean Distance Calculation and State Ranking
+II.4  Cosine Similarity and State Ranking
 
 Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section II
 """
@@ -273,6 +273,30 @@ def _cosine_similarity(accumulated: dict, profile_vector: dict, fields: list) ->
     return dot / (mag_a * mag_b)
 
 
+def _weighted_cosine_similarity(
+    accumulated: dict,
+    profile_vector: dict,
+    weights: dict,
+    fields: list,
+) -> float:
+    """
+    Weighted cosine similarity between accumulated session vector and a state
+    profile vector, using per-field salience weights.
+
+    WCS(A, B, W) = sum(W_i * A_i * B_i) / (sqrt(sum(W_i * A_i^2)) * sqrt(sum(W_i * B_i^2)))
+
+    Returns 0.0 if either weighted magnitude is zero (undefined direction).
+    """
+    weighted_dot   = sum(weights.get(f, 1.0) * accumulated.get(f, 0.0) * profile_vector.get(f, 0.0) for f in fields)
+    weighted_mag_a = math.sqrt(sum(weights.get(f, 1.0) * accumulated.get(f, 0.0) ** 2 for f in fields))
+    weighted_mag_b = math.sqrt(sum(weights.get(f, 1.0) * profile_vector.get(f, 0.0) ** 2 for f in fields))
+
+    if weighted_mag_a == 0.0 or weighted_mag_b == 0.0:
+        return 0.0
+
+    return weighted_dot / (weighted_mag_a * weighted_mag_b)
+
+
 def compute_session_magnitude(accumulated: dict, fields: list) -> float:
     """L2 norm of the accumulated session vector. Interpretable as session intensity."""
     return math.sqrt(sum(accumulated.get(f, 0.0) ** 2 for f in fields))
@@ -283,14 +307,17 @@ def rank_states(
     salience_weights: Optional[dict] = None,
 ) -> list:
     """
-    Compute cosine similarity from accumulated_vector to each state profile vector.
+    Compute similarity from accumulated_vector to each state profile vector.
     Return list of StateRanking sorted ascending by distance (rank 1 = best match).
 
-    distance = 1 - cosine_similarity, so rank 1 has the smallest distance and
-    the highest cosine similarity score.
+    distance = 1 - similarity, so rank 1 has the smallest distance and
+    the highest similarity score.
 
-    salience_weights: reserved for future per-state per-field weighting.
-      CALIBRATION TARGET — not applied in cosine mode.
+    salience_weights: optional dict mapping state_id -> {field: weight_value}.
+      When provided, uses weighted cosine similarity per state (WCS). This is
+      the Phase 2+ calibration path. When None, falls back to standard unweighted
+      cosine similarity — backward-compatible with all existing tests.
+      Missing state entries fall back to uniform weights (1.0 per field).
 
     Spec reference: Section II.4
     """
@@ -298,7 +325,11 @@ def rank_states(
     results = []
     for sid, profile in STATE_PROFILES.items():
         profile_vec = profile.dimensional_vector.as_dict()
-        sim = _cosine_similarity(accumulated_vector, profile_vec, fields)
+        if salience_weights is not None:
+            w = salience_weights.get(sid, {f: 1.0 for f in fields})
+            sim = _weighted_cosine_similarity(accumulated_vector, profile_vec, w, fields)
+        else:
+            sim = _cosine_similarity(accumulated_vector, profile_vec, fields)
         d = 1.0 - sim
         results.append(StateRanking(rank=0, state_id=sid, distance=d, score=sim))
 
@@ -339,8 +370,10 @@ class AccumulationEngine:
 
     def rank(self, salience_weights: Optional[dict] = None) -> list:
         """
-        Return full state ranking sorted ascending by Euclidean distance.
+        Return full state ranking sorted ascending by distance (1 - similarity).
         Call after all answers have been applied.
+        salience_weights: pass SALIENCE_PROFILES from engine.data.salience to
+          activate weighted cosine mode. None = unweighted (default).
         """
         return rank_states(self.session.accumulated_vector, salience_weights)
 

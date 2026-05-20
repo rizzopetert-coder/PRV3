@@ -192,7 +192,7 @@ _QDATA = [
             ("D", "Not much. Underperformance tends to get tolerated.", False, None),
         ],
         ["the_basement_standard", "the_untouchable", "the_inside_track",
-         "the_arbitrary_standard", "the_wrong_reward"],
+         "the_arbitrary_standard", "the_wrong_reward", "the_paper_tiger"],
         False,
     ),
     (
@@ -295,7 +295,8 @@ _QDATA = [
             ("E", "I don't have great visibility into how managers are actually performing.", False, None),
         ],
         ["the_unformed_leader", "the_overloaded_manager", "the_dormant_talent",
-         "the_untouchable", "leadership_deafness", "the_suppression_filter"],
+         "the_untouchable", "leadership_deafness", "the_suppression_filter",
+         "the_paper_tiger"],
         False,
     ),
     (

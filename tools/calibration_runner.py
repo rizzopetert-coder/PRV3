@@ -42,6 +42,7 @@ from engine.contract import SessionData, assemble_output
 from engine.test_suite import run_test_case, run_suite, PROFILE_TYPES
 from engine.data.questions import QUESTION_LIBRARY
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
+from engine.data.salience import SALIENCE_PROFILES
 
 from engine.test_profiles import APTITUDE_PROFILES
 from engine.test_profiles_authority_b1 import AUTHORITY_B1_PROFILES
@@ -197,7 +198,7 @@ def run_profile_synthetic(test_case) -> dict:
     intake = IntakeData(**test_case.intake)
     synthetic_vector = _build_synthetic_vector(test_case.target_state, test_case.profile_type)
 
-    rankings  = rank_states(synthetic_vector)
+    rankings  = rank_states(synthetic_vector, SALIENCE_PROFILES)
     sev_engine = SeverityEngine()
     sev_result = sev_engine.score()
 
@@ -244,7 +245,7 @@ def run_profile(test_case) -> dict:
                 continue
             acc_engine.apply_answer(opt, ans.question_id)
 
-    rankings = acc_engine.rank()
+    rankings = acc_engine.rank(SALIENCE_PROFILES)
     sev_result = sev_engine.score()
 
     out_engine = OutputEngine()
