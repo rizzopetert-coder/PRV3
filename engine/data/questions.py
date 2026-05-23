@@ -208,7 +208,7 @@ _QDATA = [
             ("E", "None of the above.", False, None),
         ],
         ["heard_and_ignored", "the_unsolved_problem", "decision_blindness",
-         "the_tolerated_violation", "the_policy_lag"],
+         "the_tolerated_violation", "the_policy_lag", "the_paper_tiger"],
         False,
     ),
     (
@@ -221,9 +221,7 @@ _QDATA = [
             ("C", "It's concentrated in specific roles — the same positions keep turning over.", False, None),
             ("D", "It's concentrated at a specific level — we keep losing people at a certain point in their career here.", False, None),
         ],
-        ["the_fracture", "silosolation", "built_to_fail", "the_untouchable",
-         "the_diversity_ceiling", "the_inside_track", "invisible_burnout",
-         "the_unformed_leader", "the_overloaded_manager", "the_dormant_talent"],
+        ["the_fracture", "silosolation"],
         False,
     ),
     (
@@ -251,7 +249,7 @@ _QDATA = [
             ("D", "There's a dynamic that's broken the surface — the organization below us is aware of it.", False, None),
             ("E", "There's a significant unresolved conflict I'm not sure how to address.", False, None),
         ],
-        ["the_fracture", "silosolation", "decision_paralysis"],
+        ["the_fracture", "silosolation"],
         False,
     ),
     (
@@ -1221,14 +1219,14 @@ def _build_library():
             "A": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30, "aptitude_liability": 0.25},  # P
             "B": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30, "aptitude_liability": 0.25},  # P
             "C": {**_z, "authority_liability": 0.20, "authority_asset":    0.25},                              # DE
-            "D": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30, "aptitude_liability": 0.25},  # P
+            "D": {**_z, "aptitude_liability": 0.60, "attitude_liability": 0.30},  # P — APT-PT fix v15
             "E": {**_z, "authority_asset":     0.40},                                                          # F
         },
-        "Q07": {  # Alliance HIGH (the_fracture) + Authority (dual).
+        "Q07": {  # Alliance HIGH (the_fracture). Authority drain v15.
             "A": {**_z, "alliance_liability": 0.25},                    # A
-            "B": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
-            "C": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
-            "D": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+            "B": {**_z, "alliance_liability": 0.60},                    # P
+            "C": {**_z, "alliance_liability": 0.60},                    # P
+            "D": {**_z, "alliance_liability": 0.60},                    # P
         },
         "Q08": {  # No seed. Attitude MED (leadership_deafness) + Alliance (dual).
             "A": {**_z, "attitude_asset":     0.40},                    # F
@@ -1236,12 +1234,12 @@ def _build_library():
             "C": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
             "D": {**_z, "attitude_liability": 0.50, "alliance_liability": 0.25},   # P
         },
-        "Q09": {  # Alliance HIGH (the_fracture) + Authority (dual).
+        "Q09": {  # Alliance HIGH (the_fracture). Authority drain v15.
             "A": {**_z, "alliance_asset":     0.40},                    # F
             "B": {**_z, "alliance_liability": 0.25},                    # A
-            "C": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
-            "D": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
-            "E": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+            "C": {**_z, "alliance_liability": 0.60},                    # P
+            "D": {**_z, "alliance_liability": 0.60},                    # P
+            "E": {**_z, "alliance_liability": 0.60},                    # P
         },
         "Q10": {  # Aptitude HIGH (paper_tiger) + Authority (dual).
             "A": {**_z, "aptitude_asset":     0.40},                    # F
@@ -1284,11 +1282,11 @@ def _build_library():
             "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
             "E": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
         },
-        "Q16": {  # Attitude MED (diversity_ceiling) + Authority (dual).
+        "Q16": {  # Attitude MED (diversity_ceiling). Authority partial drain v15.
             "A": {**_z, "attitude_asset":     0.40},                    # F
-            "B": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
-            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
-            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "B": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
+            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
+            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
             "E": {**_z, "attitude_liability": 0.25},                    # A
         },
         "Q17": {  # Attitude MED + Alliance (dual). All targets are Attitude.
@@ -1321,11 +1319,11 @@ def _build_library():
             "D": {**_z, "authority_liability": 0.50, "attitude_liability": 0.25,
                         "aptitude_liability":  0.25},                   # P + crossover
         },
-        "Q20": {  # Aptitude HIGH (built_to_fail) + Authority (dual).
+        "Q20": {  # Aptitude HIGH (built_to_fail). Authority drain v15.
             "A": {**_z, "aptitude_asset":     0.40},                    # F
             "B": {**_z, "aptitude_liability": 0.25},                    # A
-            "C": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.30},  # P
-            "D": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.30},  # P
+            "C": {**_z, "aptitude_liability": 0.60},                    # P
+            "D": {**_z, "aptitude_liability": 0.60},                    # P
         },
         "Q21": {  # Authority MED + Alliance (dual).
             "A": {**_z, "authority_asset":     0.40},                   # F
@@ -1360,11 +1358,11 @@ def _build_library():
             "D": {**_z, "aptitude_liability": 0.50, "authority_liability": 0.25},  # P
             "E": {**_z, "aptitude_liability": 0.50, "authority_liability": 0.25},  # P
         },
-        "Q26": {  # Alliance HIGH (the_fracture) + Authority (dual).
+        "Q26": {  # Alliance HIGH (the_fracture). Authority drain v15.
             "A": {**_z, "alliance_asset":     0.40},                    # F
             "B": {**_z, "alliance_liability": 0.25},                    # A
-            "C": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
-            "D": {**_z, "alliance_liability": 0.60, "authority_liability": 0.30},  # P
+            "C": {**_z, "alliance_liability": 0.60},                    # P
+            "D": {**_z, "alliance_liability": 0.60},                    # P
         },
         "Q27A": {  # Alliance MED. Single-seeded.
             "A": {**_z, "alliance_asset":     0.40},                                                     # F
@@ -1385,11 +1383,11 @@ def _build_library():
             "C": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30},  # P
             "D": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30},  # P
         },
-        "Q29": {  # Attitude MED (diversity_ceiling) + Authority (dual).
+        "Q29": {  # Attitude MED (diversity_ceiling). Authority partial drain v15.
             "A": {**_z, "attitude_asset":     0.40},                    # F
-            "B": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
-            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
-            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "B": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
+            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
+            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
             "E": {**_z, "attitude_liability": 0.25},                    # A
         },
         "Q30": {  # Authority MED + Alliance (dual).
