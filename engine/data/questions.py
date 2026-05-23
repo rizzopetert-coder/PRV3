@@ -1268,10 +1268,10 @@ def _build_library():
             "D": {**_z, "authority_liability": 0.50, "alliance_liability":  0.25},                           # P
             "E": {**_z, "authority_asset":     0.40},                                                        # F
         },
-        "Q14": {  # Authority MED (pay_exposure, pay_fog) + Aptitude (dual).
+        "Q14": {  # Authority MED (pay_exposure, pay_fog) + Aptitude (dual). Contrast B/C v16.
             "A": {**_z, "authority_asset":     0.40},                   # F
-            "B": {**_z, "authority_liability": 0.25},                   # A
-            "C": {**_z, "authority_liability": 0.25},                   # A
+            "B": {**_z, "authority_liability": -0.05},                  # A — contrast v16
+            "C": {**_z, "authority_liability": -0.05},                  # A — contrast v16
             "D": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},  # P
             "E": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},  # P
         },
@@ -1282,10 +1282,10 @@ def _build_library():
             "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
             "E": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
         },
-        "Q16": {  # Attitude MED (diversity_ceiling). Authority partial drain v15.
+        "Q16": {  # Attitude MED (diversity_ceiling). Authority partial drain v15; contrast B/C v16.
             "A": {**_z, "attitude_asset":     0.40},                    # F
-            "B": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
-            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
+            "B": {**_z, "attitude_liability": 0.50, "authority_liability": -0.20},  # P — contrast v16
+            "C": {**_z, "attitude_liability": 0.50, "authority_liability": -0.20},  # P — contrast v16
             "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
             "E": {**_z, "attitude_liability": 0.25},                    # A
         },
@@ -1332,9 +1332,9 @@ def _build_library():
             "D": {**_z, "authority_liability": 0.50, "alliance_liability": 0.25},  # P
             "E": {**_z, "authority_liability": 0.50, "alliance_liability": 0.25},  # P
         },
-        "Q22": {  # Authority MED + Aptitude (dual).
+        "Q22": {  # Authority MED + Aptitude (dual). Contrast B v16.
             "A": {**_z, "authority_asset":     0.40},                                                       # F
-            "B": {**_z, "authority_liability": 0.25},                                                       # A
+            "B": {**_z, "authority_liability": -0.10},                                                      # A — contrast v16
             "C": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},                           # P
             "D": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},                           # P
             "E": {**_z, "authority_liability": 0.45, "aptitude_liability": 0.25, "authority_asset": 0.10},  # DE
@@ -1358,10 +1358,10 @@ def _build_library():
             "D": {**_z, "aptitude_liability": 0.50, "authority_liability": 0.25},  # P
             "E": {**_z, "aptitude_liability": 0.50, "authority_liability": 0.25},  # P
         },
-        "Q26": {  # Alliance HIGH (the_fracture). Authority drain v15.
+        "Q26": {  # Alliance HIGH (the_fracture). Authority drain v15; contrast C v16.
             "A": {**_z, "alliance_asset":     0.40},                    # F
             "B": {**_z, "alliance_liability": 0.25},                    # A
-            "C": {**_z, "alliance_liability": 0.60},                    # P
+            "C": {**_z, "alliance_liability": 0.60, "authority_liability": -0.30},  # P — contrast v16
             "D": {**_z, "alliance_liability": 0.60},                    # P
         },
         "Q27A": {  # Alliance MED. Single-seeded.
@@ -1424,18 +1424,18 @@ def _build_library():
             "E": {**_z, "attitude_liability": 0.25},                    # A
         },
         # -- End WS1 entries ----------------------------------------------------
-        "Q35": {
+        "Q35": {  # Contrast B v16.
             "A": {**_z, "aptitude_liability": 0.25},
-            "B": {**_z, "aptitude_liability": 0.60},
+            "B": {**_z, "aptitude_liability": 0.60, "authority_liability": -0.35},  # contrast v16
             "C": {**_z, "aptitude_liability": 0.40},
             "D": {**_z, "aptitude_liability": 0.40},
         },
-        "Q36": {
+        "Q36": {  # Contrast E v16 (APT-PT-00 decoupling).
             "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.40},
             "B": {**_z, "aptitude_liability": 0.40},
             "C": {**_z, "aptitude_liability": 0.40},
             "D": {**_z, "aptitude_liability": 0.40, "attitude_liability": 0.40},
-            "E": {**_z, "aptitude_liability": 0.60},
+            "E": {**_z, "aptitude_liability": 0.60, "authority_liability": -0.40},  # contrast v16
         },
         "Q37": {
             "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.40},
