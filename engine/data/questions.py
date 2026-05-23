@@ -1181,9 +1181,9 @@ def _build_library():
         # -- WS1: bulk valence template, Q01–Q34 (Session 15) ------------------
         # Questions with DE options deferred to WS2: Q02 Q06 Q13 Q18 Q22 Q23 Q27A Q32
         # Q03B and Q03A-D-FOLLOW excluded (routing questions).
-        "Q01": {  # Authority HIGH (founders_grip). Single-seeded.
+        "Q01": {  # Authority HIGH (founders_grip). Single-seeded. Neutral drain B v17.
             "A": {**_z, "authority_asset":    0.40},                    # F
-            "B": {**_z, "authority_liability": 0.25},                   # A
+            "B": {**_z, "authority_liability": -0.15},                  # A — neutral drain v17
             "C": {**_z, "authority_liability": 0.60},                   # P
             "D": {**_z, "authority_liability": 0.60},                   # P
             "E": {**_z, "authority_liability": 0.60},                   # P
@@ -1222,9 +1222,9 @@ def _build_library():
             "D": {**_z, "aptitude_liability": 0.60, "attitude_liability": 0.30},  # P — APT-PT fix v15
             "E": {**_z, "authority_asset":     0.40},                                                          # F
         },
-        "Q07": {  # Alliance HIGH (the_fracture). Authority drain v15.
+        "Q07": {  # Alliance HIGH (the_fracture). Authority drain v15; amplify B v17.
             "A": {**_z, "alliance_liability": 0.25},                    # A
-            "B": {**_z, "alliance_liability": 0.60},                    # P
+            "B": {**_z, "alliance_liability": 0.80},                    # P — amplify v17
             "C": {**_z, "alliance_liability": 0.60},                    # P
             "D": {**_z, "alliance_liability": 0.60},                    # P
         },
@@ -1247,11 +1247,11 @@ def _build_library():
             "C": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.30, "authority_asset": -0.10},  # P
             "D": {**_z, "aptitude_liability": 0.60, "authority_liability": 0.30},  # P
         },
-        "Q11": {  # Attitude MED + Authority (dual).
+        "Q11": {  # Attitude MED + Authority (dual). Amplify D v17 (C locked S18).
             "A": {**_z, "attitude_asset":     0.40},                    # F
             "B": {**_z, "attitude_liability": 0.25},                    # A
-            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.05},  # P
-            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.05},  # P — LOCKED S18
+            "D": {**_z, "attitude_liability": 0.75, "authority_liability": 0.25},  # P — amplify v17
             "E": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
         },
         "Q12": {  # Attitude HIGH (the_untouchable). Single-seeded.
@@ -1261,12 +1261,12 @@ def _build_library():
             "D": {**_z, "attitude_liability": 0.60},                    # P
             "E": {**_z, "attitude_liability": 0.25},                    # A
         },
-        "Q13": {  # Authority MED + Alliance (dual).
+        "Q13": {  # Authority MED + Alliance (dual). Neutral drain E v17.
             "A": {**_z, "alliance_liability":  0.30, "authority_liability": 0.20, "authority_asset": 0.15},  # DE
             "B": {**_z, "authority_liability": 0.50, "alliance_liability":  0.25},                           # P
             "C": {**_z, "authority_liability": 0.50, "alliance_liability":  0.25},                           # P
             "D": {**_z, "authority_liability": 0.50, "alliance_liability":  0.25},                           # P
-            "E": {**_z, "authority_asset":     0.40},                                                        # F
+            "E": {**_z, "authority_asset":     0.40, "authority_liability": -0.15},                          # F — neutral drain v17
         },
         "Q14": {  # Authority MED (pay_exposure, pay_fog) + Aptitude (dual). Contrast B/C v16.
             "A": {**_z, "authority_asset":     0.40},                   # F
@@ -1275,11 +1275,11 @@ def _build_library():
             "D": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},  # P
             "E": {**_z, "authority_liability": 0.50, "aptitude_liability": 0.25},  # P
         },
-        "Q15": {  # Attitude MED (diversity_ceiling) + Authority (dual).
+        "Q15": {  # Attitude MED (diversity_ceiling) + Authority (dual). Amplify D v17 (C locked S18).
             "A": {**_z, "attitude_asset":     0.40},                    # F
             "B": {**_z, "attitude_liability": 0.25},                    # A
-            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25, "alliance_liability": -0.15},  # P
-            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
+            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25, "alliance_liability": -0.15},  # P — LOCKED S18
+            "D": {**_z, "attitude_liability": 0.75, "authority_liability": 0.25},  # P — amplify v17
             "E": {**_z, "attitude_liability": 0.50, "authority_liability": 0.25},  # P
         },
         "Q16": {  # Attitude MED (diversity_ceiling). Authority partial drain v15; contrast B/C v16.
@@ -1358,10 +1358,10 @@ def _build_library():
             "D": {**_z, "aptitude_liability": 0.50, "authority_liability": 0.25},  # P
             "E": {**_z, "aptitude_liability": 0.50, "authority_liability": 0.25},  # P
         },
-        "Q26": {  # Alliance HIGH (the_fracture). Authority drain v15; contrast C v16.
+        "Q26": {  # Alliance HIGH (the_fracture). Authority drain v15; contrast C v16; amplify C v17.
             "A": {**_z, "alliance_asset":     0.40},                    # F
             "B": {**_z, "alliance_liability": 0.25},                    # A
-            "C": {**_z, "alliance_liability": 0.60, "authority_liability": -0.30},  # P — contrast v16
+            "C": {**_z, "alliance_liability": 0.80, "authority_liability": -0.30},  # P — contrast v16, amplify v17
             "D": {**_z, "alliance_liability": 0.60},                    # P
         },
         "Q27A": {  # Alliance MED. Single-seeded.
@@ -1377,9 +1377,9 @@ def _build_library():
             "D": {**_z, "attitude_liability": 0.50},                    # P
             "E": {**_z, "attitude_liability": 0.50},                    # P
         },
-        "Q28": {  # Authority HIGH (unsolved_problem) + Attitude (dual).
+        "Q28": {  # Authority HIGH (unsolved_problem) + Attitude (dual). Neutral drain B v17.
             "A": {**_z, "authority_asset":     0.40},                   # F
-            "B": {**_z, "authority_liability": 0.25},                   # A
+            "B": {**_z, "authority_liability": -0.15},                  # A — neutral drain v17
             "C": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30},  # P
             "D": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30},  # P
         },
@@ -1424,18 +1424,18 @@ def _build_library():
             "E": {**_z, "attitude_liability": 0.25},                    # A
         },
         # -- End WS1 entries ----------------------------------------------------
-        "Q35": {  # Contrast B v16.
+        "Q35": {  # Contrast B v16; amplify B v17.
             "A": {**_z, "aptitude_liability": 0.25},
-            "B": {**_z, "aptitude_liability": 0.60, "authority_liability": -0.35},  # contrast v16
+            "B": {**_z, "aptitude_liability": 0.80, "authority_liability": -0.35},  # contrast v16, amplify v17
             "C": {**_z, "aptitude_liability": 0.40},
             "D": {**_z, "aptitude_liability": 0.40},
         },
-        "Q36": {  # Contrast E v16 (APT-PT-00 decoupling).
+        "Q36": {  # Contrast E v16 (APT-PT-00 decoupling); amplify E v17.
             "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.40},
             "B": {**_z, "aptitude_liability": 0.40},
             "C": {**_z, "aptitude_liability": 0.40},
             "D": {**_z, "aptitude_liability": 0.40, "attitude_liability": 0.40},
-            "E": {**_z, "aptitude_liability": 0.60, "authority_liability": -0.40},  # contrast v16
+            "E": {**_z, "aptitude_liability": 0.80, "authority_liability": -0.40},  # contrast v16, amplify v17
         },
         "Q37": {
             "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.40},
