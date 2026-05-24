@@ -34,6 +34,7 @@ from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
 # All other dimensions: 1.15x (standard separation threshold, unchanged)
 SIGNAL_FLOOR_MULTIPLIER_AUTHORITY: float = 1.00   # LOCKED Session 16
 SIGNAL_FLOOR_MULTIPLIER_DEFAULT:   float = 1.08   # Updated Session 17 — cosine-space correction from 1.15
+SIGNAL_FLOOR_CEILING:              float = 0.9650 # Added Session 23 v18 — caps floor so no state is permanently ungatable
 
 # Number of randomized simulations for noise baseline calculation. LOCKED.
 NOISE_SIMULATION_COUNT: int = 1000  # LOCKED
@@ -48,56 +49,56 @@ _SEPARATION_THRESHOLD_DEFAULT: float = 0.05  # CALIBRATION TARGET default
 
 # Precomputed noise baseline — Monte Carlo (N=1000, seed=42, Q01–Q39, 39 sampled).
 # Weighted cosine similarity metric (SALIENCE_PROFILES), tiered floor multipliers.
-# v17: signal amplification + neutral drain. Session 23.
-# Monte Carlo N=1000, seed=42, Q01-Q39. Date: 2026-05-23.
+# v18: three-tier salience architecture + floor ceiling 0.9650. Session 23.
+# Monte Carlo N=1000, seed=42, Q01-Q39. Date: 2026-05-24.
 _PRECOMPUTED_NOISE_BASELINE: dict = {
     "built_to_fail":                        0.8274,
-    "culture_drift":                        0.9318,
+    "culture_drift":                        0.9323,
     "decision_blindness":                   0.7363,
     "decision_paralysis":                   0.9439,
     "dueling_narratives":                   0.9439,
     "groundhog_day":                        0.9198,
     "heard_and_ignored":                    0.9147,
     "hr_capture":                           0.9147,
-    "identity_erosion":                     0.9020,
+    "identity_erosion":                     0.9137,
     "invisible_burnout":                    0.9198,
-    "invisible_influence_architecture":     0.9163,
+    "invisible_influence_architecture":     0.9338,
     "leadership_continuity_risk":           0.9439,
-    "leadership_deafness":                  0.9020,
-    "narrative_lock":                       0.9020,
-    "paper_shield":                         0.9163,
+    "leadership_deafness":                  0.8965,
+    "narrative_lock":                       0.9137,
+    "paper_shield":                         0.9338,
     "pay_exposure":                         0.9439,
     "silosolation":                         0.7840,
     "the_arbitrary_standard":               0.7840,
     "the_basement_standard":                0.9198,
     "the_broken_compass":                   0.9198,
     "the_burned_credibility":               0.9198,
-    "the_culture_that_wasnt":               0.9020,
+    "the_culture_that_wasnt":               0.9137,
     "the_diversity_ceiling":                0.9198,
-    "the_dormant_talent":                   0.8955,
+    "the_dormant_talent":                   0.8916,
     "the_exposed":                          0.9147,
     "the_founders_grip":                    0.9147,
     "the_fracture":                         0.7363,
     "the_inside_track":                     0.9198,
     "the_lost_map":                         0.9439,
-    "the_overloaded_manager":               0.8988,
+    "the_overloaded_manager":               0.8933,
     "the_paper_tiger":                      0.8274,
     "the_pay_fog":                          0.9439,
     "the_policy_lag":                       0.9439,
     "the_second_close":                     0.7840,
-    "the_suppression_filter":               0.8487,
+    "the_suppression_filter":               0.8288,
     "the_tolerated_violation":              0.9147,
     "the_undefined_role":                   0.8668,
-    "the_unexamined_algorithm":             0.9488,
-    "the_unformed_leader":                  0.8955,
+    "the_unexamined_algorithm":             0.9432,
+    "the_unformed_leader":                  0.8916,
     "the_uninitiated":                      0.9439,
-    "the_unlocked_door":                    0.9020,
-    "the_unreported_hazard":                0.9020,
+    "the_unlocked_door":                    0.9137,
+    "the_unreported_hazard":                0.9137,
     "the_unsolved_problem":                 0.9147,
     "the_untouchable":                      0.8936,
     "the_wrong_reward":                     0.9198,
     "transition_paralysis":                 0.9439,
-    "what_nobody_says":                     0.9020,
+    "what_nobody_says":                     0.8663,
 }
 
 
@@ -163,9 +164,11 @@ def compute_signal_floors(noise_baseline: dict) -> dict:
     """
     Compute per-state signal floor using tiered multipliers.
     Authority states: floor = baseline × 1.00 (cosine geometry; floor = noise mean)
-    All other states: floor = baseline × 1.15 (standard separation threshold)
+    All other states: floor = baseline × 1.08 (standard separation threshold)
     Session 16: tiered multiplier locked. SIGNAL_FLOOR_MULTIPLIER_AUTHORITY and
     SIGNAL_FLOOR_MULTIPLIER_DEFAULT replace the prior single constant.
+    Session 23 v18: floor capped at SIGNAL_FLOOR_CEILING (0.9650) so no state
+    is permanently ungatable (e.g. culture_drift at 1.0063 before this fix).
     Spec reference: Section VI.1 — LOCKED
     """
     from engine.data.states import STATE_PROFILES
@@ -173,9 +176,10 @@ def compute_signal_floors(noise_baseline: dict) -> dict:
     for state_id, baseline_score in noise_baseline.items():
         profile = STATE_PROFILES.get(state_id)
         if profile and profile.primary_dimension == "Authority":
-            floors[state_id] = baseline_score * SIGNAL_FLOOR_MULTIPLIER_AUTHORITY
+            raw = baseline_score * SIGNAL_FLOOR_MULTIPLIER_AUTHORITY
         else:
-            floors[state_id] = baseline_score * SIGNAL_FLOOR_MULTIPLIER_DEFAULT
+            raw = baseline_score * SIGNAL_FLOOR_MULTIPLIER_DEFAULT
+        floors[state_id] = min(raw, SIGNAL_FLOOR_CEILING)
     return floors
 
 

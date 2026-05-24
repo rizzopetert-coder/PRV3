@@ -4,9 +4,10 @@ Per-State Salience Weight Profiles
 
 SALIENCE_PROFILES: dict mapping state_id -> {field: weight}
 
-Seeding rule (Gemini-specified, Session 21):
-  Target fields (primary dimension + secondary dimension, both axes): 2.5
-  Off-axis fields (all other dimensions, both axes): 0.4
+Seeding rule — three-tier architecture (v18, Session 23):
+  HIGH/MEDIUM states: primary fields 2.5; all others 0.4
+  LOW/CLUSTER states: primary fields 2.5; secondary fields 1.0; all others 0.4
+  (Session 21 original: binary seeding — primary 2.5, secondary 2.5, others 0.4)
 
 Used by rank_states() when salience_weights is passed explicitly.
 Import: from engine.data.salience import SALIENCE_PROFILES
@@ -37,23 +38,23 @@ SALIENCE_PROFILES = {
     },
 
     # ── APTITUDE — LOW/CLUSTER (primary=Aptitude, secondary=Attitude) ─────────
-    "the_unformed_leader": {
+    "the_unformed_leader": {  # Tier 2 v18: attitude secondary 2.5->1.0
         "aptitude_liability": 2.5, "aptitude_asset": 2.5,
         "authority_liability": 0.4, "authority_asset": 0.4,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
-        "attitude_liability": 2.5, "attitude_asset": 2.5,
+        "attitude_liability": 1.0, "attitude_asset": 1.0,
     },
-    "the_dormant_talent": {
+    "the_dormant_talent": {  # Tier 2 v18: attitude secondary 2.5->1.0
         "aptitude_liability": 2.5, "aptitude_asset": 2.5,
         "authority_liability": 0.4, "authority_asset": 0.4,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
-        "attitude_liability": 2.5, "attitude_asset": 2.5,
+        "attitude_liability": 1.0, "attitude_asset": 1.0,
     },
 
     # ── APTITUDE — LOW/CLUSTER (primary=Aptitude, secondary=Authority) ────────
-    "the_overloaded_manager": {
+    "the_overloaded_manager": {  # Tier 2 v18: authority secondary 2.5->1.0
         "aptitude_liability": 2.5, "aptitude_asset": 2.5,
-        "authority_liability": 2.5, "authority_asset": 2.5,
+        "authority_liability": 1.0, "authority_asset": 1.0,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
@@ -153,24 +154,24 @@ SALIENCE_PROFILES = {
     },
 
     # ── AUTHORITY — LOW/CLUSTER (primary=Authority, secondary=Aptitude) ───────
-    "the_unexamined_algorithm": {
-        "aptitude_liability": 2.5, "aptitude_asset": 2.5,
+    "the_unexamined_algorithm": {  # Tier 2 v18: aptitude secondary 2.5->1.0
+        "aptitude_liability": 1.0, "aptitude_asset": 1.0,
         "authority_liability": 2.5, "authority_asset": 2.5,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
 
     # ── AUTHORITY — LOW/CLUSTER (primary=Authority, secondary=Alliance) ───────
-    "paper_shield": {
+    "paper_shield": {  # Tier 2 v18: alliance secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 2.5, "authority_asset": 2.5,
-        "alliance_liability": 2.5, "alliance_asset": 2.5,
+        "alliance_liability": 1.0, "alliance_asset": 1.0,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
-    "invisible_influence_architecture": {
+    "invisible_influence_architecture": {  # Tier 2 v18: alliance secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 2.5, "authority_asset": 2.5,
-        "alliance_liability": 2.5, "alliance_asset": 2.5,
+        "alliance_liability": 1.0, "alliance_asset": 1.0,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
 
@@ -209,9 +210,9 @@ SALIENCE_PROFILES = {
     },
 
     # ── ALLIANCE — LOW/CLUSTER (primary=Alliance, secondary=Authority) ────────
-    "the_suppression_filter": {
+    "the_suppression_filter": {  # Tier 2 v18: authority secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
-        "authority_liability": 2.5, "authority_asset": 2.5,
+        "authority_liability": 1.0, "authority_asset": 1.0,
         "alliance_liability": 2.5, "alliance_asset": 2.5,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
@@ -275,53 +276,53 @@ SALIENCE_PROFILES = {
     },
 
     # ── ATTITUDE — LOW/CLUSTER (primary=Attitude, secondary=Alliance) ─────────
-    "narrative_lock": {
+    "narrative_lock": {  # Tier 2 v18: alliance secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 0.4, "authority_asset": 0.4,
-        "alliance_liability": 2.5, "alliance_asset": 2.5,
+        "alliance_liability": 1.0, "alliance_asset": 1.0,
         "attitude_liability": 2.5, "attitude_asset": 2.5,
     },
-    "what_nobody_says": {
+    "what_nobody_says": {  # Tier 2 v18: primary=Alliance(2.5), attitude secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 0.4, "authority_asset": 0.4,
         "alliance_liability": 2.5, "alliance_asset": 2.5,
+        "attitude_liability": 1.0, "attitude_asset": 1.0,
+    },
+    "leadership_deafness": {  # Tier 2 v18: secondary changed Alliance->Authority(1.0)
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 1.0, "authority_asset": 1.0,
+        "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 2.5, "attitude_asset": 2.5,
     },
-    "leadership_deafness": {
+    "identity_erosion": {  # Tier 2 v18: alliance secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 0.4, "authority_asset": 0.4,
-        "alliance_liability": 2.5, "alliance_asset": 2.5,
+        "alliance_liability": 1.0, "alliance_asset": 1.0,
         "attitude_liability": 2.5, "attitude_asset": 2.5,
     },
-    "identity_erosion": {
+    "the_culture_that_wasnt": {  # Tier 2 v18: alliance secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 0.4, "authority_asset": 0.4,
-        "alliance_liability": 2.5, "alliance_asset": 2.5,
+        "alliance_liability": 1.0, "alliance_asset": 1.0,
         "attitude_liability": 2.5, "attitude_asset": 2.5,
     },
-    "the_culture_that_wasnt": {
+    "the_unreported_hazard": {  # Tier 2 v18: alliance secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 0.4, "authority_asset": 0.4,
-        "alliance_liability": 2.5, "alliance_asset": 2.5,
+        "alliance_liability": 1.0, "alliance_asset": 1.0,
         "attitude_liability": 2.5, "attitude_asset": 2.5,
     },
-    "the_unreported_hazard": {
+    "the_unlocked_door": {  # Tier 2 v18: alliance secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 0.4, "authority_asset": 0.4,
-        "alliance_liability": 2.5, "alliance_asset": 2.5,
-        "attitude_liability": 2.5, "attitude_asset": 2.5,
-    },
-    "the_unlocked_door": {
-        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
-        "authority_liability": 0.4, "authority_asset": 0.4,
-        "alliance_liability": 2.5, "alliance_asset": 2.5,
+        "alliance_liability": 1.0, "alliance_asset": 1.0,
         "attitude_liability": 2.5, "attitude_asset": 2.5,
     },
 
     # ── ATTITUDE — LOW/CLUSTER (primary=Attitude, secondary=Authority) ────────
-    "culture_drift": {
+    "culture_drift": {  # Tier 2 v18: authority secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
-        "authority_liability": 2.5, "authority_asset": 2.5,
+        "authority_liability": 1.0, "authority_asset": 1.0,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 2.5, "attitude_asset": 2.5,
     },
