@@ -145,7 +145,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 
 | Item | Value |
 |---|---|
-| MOB Google Doc ID | `1OSC2JsndFd3K8yGHUvbP3WsZeU73pz-ND1NdQFYl-ZU` |
+| MOB Google Doc ID | `10qqzdgROUDpT613agF7c0U8aSXJ9pAB4xrYt5YBgALI` |
 | PRV3 Drive folder ID | `19CdQS2VTY_m1l4_0XPr-S1SKKDBstG_R` |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
