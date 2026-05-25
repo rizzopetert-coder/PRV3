@@ -380,6 +380,7 @@ def apply_narrative_modulation(
     accumulated_vector: dict,
     extraction_result: NarrativeExtractionResult,
     pre_rankings: list,
+    answered_question_count: int,
 ) -> tuple:
     """
     Apply narrative modulation to the accumulated vector and return the
@@ -410,7 +411,7 @@ def apply_narrative_modulation(
     }
 
     # Re-rank on updated vector
-    post_rankings = rank_states(updated_vector)
+    post_rankings = rank_states(updated_vector, answered_question_count)
 
     # Enforce state probability ceiling (IV.3)
     final_rankings = enforce_state_probability_ceiling(pre_rankings, post_rankings)
@@ -460,12 +461,13 @@ class NarrativeModulationEngine:
         accumulated_vector: dict,
         extraction_result: NarrativeExtractionResult,
         pre_rankings: list,
+        answered_question_count: int,
     ) -> tuple:
         """
         Apply modulation and return (updated_vector, ceiling_enforced_rankings).
         """
         return apply_narrative_modulation(
-            accumulated_vector, extraction_result, pre_rankings
+            accumulated_vector, extraction_result, pre_rankings, answered_question_count
         )
 
     @property

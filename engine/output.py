@@ -29,12 +29,17 @@ from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
 
 # ── VI.1  Signal Floor Constants ───────────────────────────────────────────────
 
-# Tiered signal floor multipliers — Session 16
-# Authority states: 1.00x (floor = noise baseline; cosine geometry disadvantage accepted)
-# All other dimensions: 1.15x (standard separation threshold, unchanged)
-SIGNAL_FLOOR_MULTIPLIER_AUTHORITY: float = 1.00   # LOCKED Session 16
-SIGNAL_FLOOR_MULTIPLIER_DEFAULT:   float = 1.08   # Updated Session 17 — cosine-space correction from 1.15
-SIGNAL_FLOOR_CEILING:              float = 0.9650 # Added Session 23 v18 — caps floor so no state is permanently ungatable
+# Tiered signal floor multipliers — RETIRED v21 (absolute threshold replaces multiplicative floor)
+# Kept for backward compatibility with compute_signal_floors() and legacy tests.
+SIGNAL_FLOOR_MULTIPLIER_AUTHORITY: float = 1.00   # RETIRED v21
+SIGNAL_FLOOR_MULTIPLIER_DEFAULT:   float = 1.08   # RETIRED v21
+SIGNAL_FLOOR_CEILING:              float = 0.9650 # RETIRED v21
+
+# SCD-WCS absolute alignment threshold — v21
+# All 47 states use a single geometric threshold: score > 0.25 clears the floor.
+# Geometric interpretation: cosine similarity > 0.25 (~75.5 degrees alignment required).
+# CALIBRATION TARGET -- set via Phase 2 calibration analysis.
+SCD_WCS_ALIGNMENT_THRESHOLD: float = 0.2500
 
 # Number of randomized simulations for noise baseline calculation. LOCKED.
 NOISE_SIMULATION_COUNT: int = 1000  # LOCKED
@@ -47,10 +52,9 @@ SEPARATION_THRESHOLD: Optional[float] = None  # CALIBRATION TARGET
 # Conservative starting hypothesis; Phase 1 ROC analysis replaces this.
 _SEPARATION_THRESHOLD_DEFAULT: float = 0.05  # CALIBRATION TARGET default
 
-# Precomputed noise baseline — Monte Carlo (N=1000, seed=42, Q01–Q39, 39 sampled).
-# Weighted cosine similarity metric (SALIENCE_PROFILES), tiered floor multipliers.
-# v20: states.py/salience.py reverted, Q20 0.80 retained, full 47-state path. Session 23.
-# Monte Carlo N=1000, seed=42, Q01-Q39. Date: 2026-05-24.
+# Precomputed noise baseline — RETIRED v21 (SCD-WCS absolute threshold replaces multiplicative floor).
+# Kept for score_lift_pct computation in apply_signal_floor(). Do not use for floor gating.
+# v20: WCS metric, SALIENCE_PROFILES, full 47-state path. Session 23.
 _PRECOMPUTED_NOISE_BASELINE: dict = {
     "built_to_fail":                        0.8333,
     "culture_drift":                        0.9317,
@@ -153,7 +157,7 @@ def compute_noise_baseline(
             for f in DIMENSIONAL_FIELDS:
                 accumulated[f] += option.dimensional_contributions.get(f, 0.0)
 
-        rankings = rank_states(accumulated)
+        rankings = rank_states(accumulated, len(CORE_SEQUENCE_IDS))
         for r in rankings:
             score_totals[r.state_id] += r.score
 
@@ -181,6 +185,14 @@ def compute_signal_floors(noise_baseline: dict) -> dict:
             raw = baseline_score * SIGNAL_FLOOR_MULTIPLIER_DEFAULT
         floors[state_id] = min(raw, SIGNAL_FLOOR_CEILING)
     return floors
+
+
+def check_signal_gate(state_id: str, session_scores: dict) -> bool:
+    """
+    Return True if the state's session score clears the SCD-WCS alignment threshold.
+    session_scores: dict mapping state_id -> score (from rank_states()).
+    """
+    return session_scores.get(state_id, 0.0) > SCD_WCS_ALIGNMENT_THRESHOLD
 
 
 # ── Output data structures ─────────────────────────────────────────────────────
@@ -310,27 +322,28 @@ class OutputPackage:
 
 def apply_signal_floor(
     rankings: list,
-    noise_baseline: dict,
+    noise_baseline: Optional[dict] = None,
 ) -> list:
     """
-    Evaluate all ranked states against the signal floor.
+    Evaluate all ranked states against the SCD-WCS absolute alignment threshold.
 
-    For each state: floor = noise_baseline[state_id] × tiered multiplier
-    (1.00 Authority, 1.15 all others). State clears floor if score > floor.
+    State clears floor if score > SCD_WCS_ALIGNMENT_THRESHOLD (0.25).
+    noise_baseline: optional dict used only for score_lift_pct computation.
+      If None, uses _PRECOMPUTED_NOISE_BASELINE.
 
     Returns list[QualifiedState] for ALL ranked states (cleared_floor flag
     distinguishes qualifying states). Ordered by rank (ascending).
 
-    Spec reference: Section VI.1 — LOCKED
+    Spec reference: Section VI.1 — v21 absolute threshold
     """
-    floors = compute_signal_floors(noise_baseline)
+    baseline_map = noise_baseline if noise_baseline is not None else _PRECOMPUTED_NOISE_BASELINE
+    session_scores = {r.state_id: r.score for r in rankings}
     result = []
     for r in rankings:
         sid = r.state_id
         profile = STATE_PROFILES.get(sid)
-        baseline = noise_baseline.get(sid, 0.0)
-        floor = floors.get(sid, 0.0)
-        cleared = r.score > floor
+        baseline = baseline_map.get(sid, 0.0)
+        cleared = check_signal_gate(sid, session_scores)
         lift = ((r.score / baseline) - 1.0) * 100.0 if baseline > 0.0 else 0.0
         result.append(QualifiedState(
             rank=r.rank,
@@ -338,7 +351,7 @@ def apply_signal_floor(
             state_name=profile.state_name if profile else sid,
             score=r.score,
             noise_baseline=baseline,
-            signal_floor=floor,
+            signal_floor=SCD_WCS_ALIGNMENT_THRESHOLD,
             cleared_floor=cleared,
             score_lift_pct=lift,
             resolution_family=profile.resolution_family if profile else "",

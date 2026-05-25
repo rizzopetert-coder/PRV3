@@ -11,6 +11,7 @@ Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section II
 """
 
 import math
+import numpy as np
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -21,6 +22,20 @@ from engine.data.intake import (
     AXIS_MODIFIER_INDEX,
     HIGH_HAZARD_INDUSTRIES,
 )
+
+# Empirical noise centroid — per-field mean of accumulated vector across N=1000
+# random simulations, seed=42, Q01-Q39, v20 clean engine state.
+# Derived from tools/diag_v21_accumulated_centroid.py. LOCKED.
+MC_CENTROID_39: dict = {
+    "aptitude_liability":  3.9565,
+    "aptitude_asset":      0.6800,
+    "authority_liability": 5.3601,
+    "authority_asset":     1.6503,
+    "alliance_liability":  2.9859,
+    "alliance_asset":      0.1924,
+    "attitude_liability":  4.8137,
+    "attitude_asset":      0.9795,
+}
 
 
 def _coeff(v: Optional[float]) -> float:
@@ -304,32 +319,67 @@ def compute_session_magnitude(accumulated: dict, fields: list) -> float:
 
 def rank_states(
     accumulated_vector: dict,
+    answered_question_count: int,
     salience_weights: Optional[dict] = None,
 ) -> list:
     """
-    Compute similarity from accumulated_vector to each state profile vector.
+    Compute SCD-WCS similarity from accumulated_vector to each state profile vector.
     Return list of StateRanking sorted ascending by distance (rank 1 = best match).
 
-    distance = 1 - similarity, so rank 1 has the smallest distance and
-    the highest similarity score.
+    SCD-WCS — Session-Centroid-Displaced Weighted Cosine Similarity (v21):
+      Only the session vector is displaced by the empirical noise centroid
+      (scaled to the current question count). Profile vectors remain in their
+      native space. This measures the session's deviation from expected noise
+      in the direction of each state profile.
+
+      mu_N    = MC_CENTROID_39 * (answered_question_count / 39.0)
+      A_d     = accumulated - mu_N     (session: centroid-displaced)
+      B       = profile                 (profile: undisplaced, native space)
+      sim = WCS(A_d, B, W) if salience_weights else cosine(A_d, B)
+
+    Magnitude guard: if displaced session vector magnitude < 1e-5 (zero-signal
+    or exactly-at-centroid session), all states return score 0.0.
 
     salience_weights: optional dict mapping state_id -> {field: weight_value}.
-      When provided, uses weighted cosine similarity per state (WCS). This is
-      the Phase 2+ calibration path. When None, falls back to standard unweighted
-      cosine similarity — backward-compatible with all existing tests.
-      Missing state entries fall back to uniform weights (1.0 per field).
+      When provided, uses weighted cosine similarity per state. When None,
+      falls back to standard unweighted cosine similarity.
 
-    Spec reference: Section II.4
+    Spec reference: Section II.4 (SCD-WCS update, v21)
     """
     fields = list(DIMENSIONAL_FIELDS)
+    N = float(answered_question_count)
+    scale = N / 39.0
+
+    mu_N = np.array([MC_CENTROID_39[f] * scale for f in fields])
+    vec_A = np.array([accumulated_vector.get(f, 0.0) for f in fields])
+    vec_A_displaced = vec_A - mu_N
+
+    # Zero-signal or exactly-at-centroid session: no directional information
+    if np.linalg.norm(vec_A_displaced) < 1e-5:
+        zero_results = [
+            StateRanking(rank=0, state_id=sid, distance=1.0, score=0.0)
+            for sid in STATE_PROFILES
+        ]
+        for i, r in enumerate(zero_results):
+            r.rank = i + 1
+        return zero_results
+
     results = []
     for sid, profile in STATE_PROFILES.items():
-        profile_vec = profile.dimensional_vector.as_dict()
+        profile_dict = profile.dimensional_vector.as_dict()
+        vec_B = np.array([profile_dict.get(f, 0.0) for f in fields])
+
         if salience_weights is not None:
-            w = salience_weights.get(sid, {f: 1.0 for f in fields})
-            sim = _weighted_cosine_similarity(accumulated_vector, profile_vec, w, fields)
+            sw = salience_weights.get(sid, {f: 1.0 for f in fields})
+            w = np.array([sw.get(f, 1.0) for f in fields])
         else:
-            sim = _cosine_similarity(accumulated_vector, profile_vec, fields)
+            w = np.ones(len(fields))
+
+        num = np.sum(w * vec_A_displaced * vec_B)
+        den = (np.sqrt(np.sum(w * vec_A_displaced ** 2)) *
+               np.sqrt(np.sum(w * vec_B ** 2)))
+
+        sim = float(num / den) if den > 1e-5 else 0.0
         d = 1.0 - sim
         results.append(StateRanking(rank=0, state_id=sid, distance=d, score=sim))
 
@@ -375,7 +425,7 @@ class AccumulationEngine:
         salience_weights: pass SALIENCE_PROFILES from engine.data.salience to
           activate weighted cosine mode. None = unweighted (default).
         """
-        return rank_states(self.session.accumulated_vector, salience_weights)
+        return rank_states(self.session.accumulated_vector, len(self.session.answers_applied), salience_weights)
 
     @property
     def accumulated_vector(self) -> dict:

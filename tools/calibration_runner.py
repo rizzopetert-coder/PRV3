@@ -198,7 +198,7 @@ def run_profile_synthetic(test_case) -> dict:
     intake = IntakeData(**test_case.intake)
     synthetic_vector = _build_synthetic_vector(test_case.target_state, test_case.profile_type)
 
-    rankings  = rank_states(synthetic_vector, SALIENCE_PROFILES)
+    rankings  = rank_states(synthetic_vector, 39, SALIENCE_PROFILES)
     sev_engine = SeverityEngine()
     sev_result = sev_engine.score()
 

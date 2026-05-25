@@ -93,7 +93,7 @@ def run_recalibration(question_ids):
             option = random.choice(q.answer_options)
             for f in DIMENSIONAL_FIELDS:
                 accumulated[f] += option.dimensional_contributions.get(f, 0.0)
-        rankings = rank_states(accumulated, SALIENCE_PROFILES)
+        rankings = rank_states(accumulated, len(question_ids), SALIENCE_PROFILES)
         for r in rankings:
             score_totals[r.state_id] += r.score
 

@@ -120,15 +120,17 @@ check("Headcount CALIBRATION_TARGET (1.0) → founders_grip at baseline",
 print("\n4. rank_states — zero accumulated vector (baseline)")
 
 zero_vector = {f: 0.0 for f in DIMENSIONAL_FIELDS}
-rankings = rank_states(zero_vector)
+rankings = rank_states(zero_vector, 39)
 
-# Zero vector has undefined cosine direction — all states return score 0.0.
-# This confirms the zero-vector guard: no stable direction = no directional signal.
+# Under CDWCS, a zero session vector is displaced to -mu_N (negative centroid).
+# Cosine similarity is defined and non-zero — scores reflect similarity between
+# -mu_N and each displaced state profile vector.
 
 check("Rankings cover all states", len(rankings) == n, f"got {len(rankings)}")
-check("Zero accumulated vector: all states return cosine similarity 0.0",
-      all(r.score == 0.0 for r in rankings),
-      f"non-zero scores: {[(r.state_id, r.score) for r in rankings if r.score != 0.0][:3]}")
+check("CDWCS: zero session vector produces finite scores for all states",
+      all(not __import__("math").isnan(r.score) and not __import__("math").isinf(r.score)
+          for r in rankings),
+      f"NaN or Inf scores detected")
 check("Ranks are 1..n",
       [r.rank for r in rankings] == list(range(1, n + 1)),
       f"ranks: {[r.rank for r in rankings[:5]]}")
@@ -215,18 +217,17 @@ print("\n7. rank_states after single answer")
 rankings_after = engine.rank()
 check("Rankings still cover all states", len(rankings_after) == n, f"got {len(rankings_after)}")
 
-# Cosine distances after authority_liability=0.3 (acc vector: auth=0.3, all others=0.0):
-# Cluster state (the_unformed_leader): v10 vector aptitude_l=0.35, attitude_l=0.25, others=0.15.
-# Accumulated vector: authority_liability=0.3, all others=0.0.
-# dot = 0.3 * 0.15 = 0.045; mag_acc=0.3; mag_ul=sqrt(0.35^2+0.25^2+6*0.15^2)=sqrt(0.32)=0.56569
-# cosine = 0.045/(0.3*0.56569) = 0.26517 -> distance = 0.73483
-# Authority HIGH state (the_founders_grip, authority_liability=0.60): strong authority alignment -> 0.328129
+# CDWCS distances after authority_liability=0.3 (acc vector: auth=0.3, all others=0.0), N=1.
+# Centroid is scaled to N=1: mu_N[f] = MC_CENTROID_39[f] * (1/39).
+# Both session vector and profile vector are displaced by mu_N before cosine computation.
+# Old unweighted cosine expected distance 0.734835 is superseded by SCD-WCS value 1.480801.
+# Authority HIGH state (the_founders_grip): SCD-WCS distance 0.638033.
 cluster_r_after = next(r for r in rankings_after if r.state_id == "the_unformed_leader")
 high_r_after    = next(r for r in rankings_after if r.state_id == "the_founders_grip")
 
-check("Cluster state has expected cosine distance after authority signal",
-      isclose(cluster_r_after.distance, 0.734835, rel_tol=1e-4),
-      f"expected=0.734835, got={cluster_r_after.distance:.6f}")
+check("SCD-WCS: cluster state has expected distance after authority signal (N=1)",
+      isclose(cluster_r_after.distance, 1.480801, rel_tol=1e-4),
+      f"expected=1.480801, got={cluster_r_after.distance:.6f}")
 check("Cosine sees directional alignment — authority signal in accumulated vector is closer to Authority HIGH state than to cluster state",
       high_r_after.distance < cluster_r_after.distance,
       f"high={high_r_after.distance:.6f}, cluster={cluster_r_after.distance:.6f}")
