@@ -320,7 +320,7 @@ SALIENCE_PROFILES = {
     },
 
     # ── ATTITUDE — LOW/CLUSTER (primary=Attitude, secondary=Authority) ────────
-    "culture_drift": {  # Tier 2 v18: authority secondary 2.5->1.0
+    "culture_drift": {  # Tier 2 v18: authority secondary 2.5->1.0; v19 revert: attitude primary 1.85->2.5
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 1.0, "authority_asset": 1.0,
         "alliance_liability": 0.4, "alliance_asset": 0.4,

@@ -1319,11 +1319,11 @@ def _build_library():
             "D": {**_z, "authority_liability": 0.50, "attitude_liability": 0.25,
                         "aptitude_liability":  0.25},                   # P + crossover
         },
-        "Q20": {  # Aptitude HIGH (built_to_fail). Authority drain v15.
+        "Q20": {  # Aptitude HIGH (built_to_fail). Authority drain v15. v19: C/D 0.60->0.80.
             "A": {**_z, "aptitude_asset":     0.40},                    # F
             "B": {**_z, "aptitude_liability": 0.25},                    # A
-            "C": {**_z, "aptitude_liability": 0.60},                    # P
-            "D": {**_z, "aptitude_liability": 0.60},                    # P
+            "C": {**_z, "aptitude_liability": 0.80},                    # P
+            "D": {**_z, "aptitude_liability": 0.80},                    # P
         },
         "Q21": {  # Authority MED + Alliance (dual).
             "A": {**_z, "authority_asset":     0.40},                   # F
