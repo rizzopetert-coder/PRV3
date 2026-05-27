@@ -85,7 +85,7 @@ def make_rankings(scores: dict) -> list:
 
 
 def uniform_rankings():
-    s = 1.0 / n
+    s = -0.5000  # below SCD_WCS_ALIGNMENT_THRESHOLD (-0.4000) — updated v22
     return make_rankings({sid: s for sid in STATE_PROFILES})
 
 

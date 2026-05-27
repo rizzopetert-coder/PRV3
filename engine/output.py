@@ -35,11 +35,11 @@ SIGNAL_FLOOR_MULTIPLIER_AUTHORITY: float = 1.00   # RETIRED v21
 SIGNAL_FLOOR_MULTIPLIER_DEFAULT:   float = 1.08   # RETIRED v21
 SIGNAL_FLOOR_CEILING:              float = 0.9650 # RETIRED v21
 
-# SCD-WCS absolute alignment threshold — v21
-# All 47 states use a single geometric threshold: score > 0.25 clears the floor.
-# Geometric interpretation: cosine similarity > 0.25 (~75.5 degrees alignment required).
-# CALIBRATION TARGET -- set via Phase 2 calibration analysis.
-SCD_WCS_ALIGNMENT_THRESHOLD: float = 0.2500
+# SCD-WCS floor gate constants — v22
+# Hybrid gate: absolute floor + relative margin constraint.
+# Both are CALIBRATION TARGETS — set via Session 25 calibration analysis.
+SCD_WCS_ALIGNMENT_THRESHOLD: float = -0.4000   # CALIBRATION TARGET — Session 25
+SCD_WCS_MARGIN_GATE: float = 0.0500            # CALIBRATION TARGET — Session 25
 
 # Number of randomized simulations for noise baseline calculation. LOCKED.
 NOISE_SIMULATION_COUNT: int = 1000  # LOCKED
@@ -187,12 +187,30 @@ def compute_signal_floors(noise_baseline: dict) -> dict:
     return floors
 
 
-def check_signal_gate(state_id: str, session_scores: dict) -> bool:
+def check_signal_gate(
+    score: float,
+    rank_1_score: Optional[float] = None,
+) -> bool:
     """
-    Return True if the state's session score clears the SCD-WCS alignment threshold.
-    session_scores: dict mapping state_id -> score (from rank_states()).
+    Hybrid floor gate for SCD-WCS space.
+
+    Constraint 1 -- Absolute floor: score must meet or exceed
+    SCD_WCS_ALIGNMENT_THRESHOLD (-0.4000). States below this carry
+    insufficient signal regardless of session context.
+
+    Constraint 2 -- Relative margin gate: if rank_1_score is provided,
+    score must be within SCD_WCS_MARGIN_GATE (0.0500) cosine units of
+    rank_1_score to qualify for multi-state output. Applied only when
+    rank_1_score is supplied; if None, only Constraint 1 applies.
+
+    Both constraints are CALIBRATION TARGETS (Session 25).
     """
-    return session_scores.get(state_id, 0.0) > SCD_WCS_ALIGNMENT_THRESHOLD
+    if score < SCD_WCS_ALIGNMENT_THRESHOLD:
+        return False
+    if rank_1_score is not None:
+        if score < rank_1_score - SCD_WCS_MARGIN_GATE:
+            return False
+    return True
 
 
 # ── Output data structures ─────────────────────────────────────────────────────
@@ -337,13 +355,13 @@ def apply_signal_floor(
     Spec reference: Section VI.1 — v21 absolute threshold
     """
     baseline_map = noise_baseline if noise_baseline is not None else _PRECOMPUTED_NOISE_BASELINE
-    session_scores = {r.state_id: r.score for r in rankings}
+    rank_1_score = next((r.score for r in rankings if r.rank == 1), None)
     result = []
     for r in rankings:
         sid = r.state_id
         profile = STATE_PROFILES.get(sid)
         baseline = baseline_map.get(sid, 0.0)
-        cleared = check_signal_gate(sid, session_scores)
+        cleared = check_signal_gate(r.score, rank_1_score=rank_1_score)
         lift = ((r.score / baseline) - 1.0) * 100.0 if baseline > 0.0 else 0.0
         result.append(QualifiedState(
             rank=r.rank,

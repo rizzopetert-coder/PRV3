@@ -846,7 +846,7 @@ _reg(_profile(
     state_name="The Suppression Filter",
     primary_dimension="Alliance",
     signal_weight="cluster",
-    cluster_id="C-InfoFlow",
+    cluster_id=None,
     liability_axes=["Cultural & Behavioral", "Governance & Authority", "Strategic"],
     asset_axes=["Communication Integrity", "Relational Trust"],
     sev_min="Entrenched", sev_max="Endemic",
@@ -942,7 +942,7 @@ _reg(_profile(
     state_name="What Nobody Says",
     primary_dimension="Attitude",
     signal_weight="cluster",
-    cluster_id="C-Silence",
+    cluster_id=None,
     liability_axes=["Cultural & Behavioral", "Governance & Authority", "Strategic"],
     asset_axes=["Relational Trust", "Communication Integrity"],
     sev_min="Emerging", sev_max="Endemic",
@@ -965,22 +965,22 @@ _reg(_profile(
     state_name="Leadership Deafness",
     primary_dimension="Attitude",
     signal_weight="cluster",
-    cluster_id="C-InfoFlow",
+    cluster_id=None,
     liability_axes=["Governance & Authority", "Cultural & Behavioral", "Strategic"],
     asset_axes=["Communication Integrity", "Adaptive Capacity"],
     sev_min="Entrenched", sev_max="Endemic",
     # Inferred from profiles doc: Organizational Deafness
     resolution_family="Executive Counsel",
 ))
-STATE_PROFILES["leadership_deafness"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.15,
-    aptitude_asset=0.15,
-    authority_liability=0.15,
-    authority_asset=0.15,
-    alliance_liability=0.25,
-    alliance_asset=0.15,
-    attitude_liability=0.35,
-    attitude_asset=0.15,
+STATE_PROFILES["leadership_deafness"].dimensional_vector = DimensionalVector(  # v23: att_l=0.50, all others=0.10
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
+    authority_liability=0.10,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.50,
+    attitude_asset=0.10,
 )
 
 _reg(_profile(
@@ -1237,7 +1237,7 @@ _reg(_profile(
     state_name="The Unreported Hazard",
     primary_dimension="Attitude",
     signal_weight="cluster",
-    cluster_id="C-Silence",
+    cluster_id=None,
     liability_axes=["Safety & Wellbeing", "Legal & Compliance", "Cultural & Behavioral"],
     asset_axes=["Relational Trust", "Accountability Architecture"],
     sev_min="Emerging", sev_max="Entrenched",
@@ -1260,7 +1260,7 @@ _reg(_profile(
     state_name="The Unlocked Door",
     primary_dimension="Attitude",
     signal_weight="cluster",
-    cluster_id="C-Silence",
+    cluster_id=None,
     liability_axes=["Safety & Wellbeing", "Legal & Compliance", "Financial & Economic"],
     asset_axes=["Cultural Stewardship", "Accountability Architecture"],
     sev_min="Emerging", sev_max="Entrenched",
@@ -1314,14 +1314,5 @@ CLUSTERS: dict[str, list[str]] = {
         "culture_drift",
         "identity_erosion",
         "the_culture_that_wasnt",
-    ],
-    "C-Silence": [
-        "what_nobody_says",
-        "the_unreported_hazard",
-        "the_unlocked_door",
-    ],
-    "C-InfoFlow": [
-        "the_suppression_filter",
-        "leadership_deafness",
     ],
 }

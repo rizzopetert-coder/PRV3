@@ -210,7 +210,7 @@ SALIENCE_PROFILES = {
     },
 
     # ── ALLIANCE — LOW/CLUSTER (primary=Alliance, secondary=Authority) ────────
-    "the_suppression_filter": {  # Tier 2 v18: authority secondary 2.5->1.0
+    "the_suppression_filter": {  # v23: revert to Three-Tier -- alliance primary 2.5, authority secondary 1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 1.0, "authority_asset": 1.0,
         "alliance_liability": 2.5, "alliance_asset": 2.5,
@@ -288,7 +288,7 @@ SALIENCE_PROFILES = {
         "alliance_liability": 2.5, "alliance_asset": 2.5,
         "attitude_liability": 1.0, "attitude_asset": 1.0,
     },
-    "leadership_deafness": {  # Tier 2 v18: secondary changed Alliance->Authority(1.0)
+    "leadership_deafness": {  # v23: revert to Three-Tier -- attitude primary 2.5, authority secondary 1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 1.0, "authority_asset": 1.0,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
