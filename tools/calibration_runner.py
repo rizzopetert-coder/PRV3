@@ -37,7 +37,7 @@ sys.path.insert(0, str(Path(__file__).parents[1]))
 
 from engine.accumulation import IntakeData, AccumulationEngine, rank_states
 from engine.severity import SeverityEngine
-from engine.output import OutputEngine, compute_noise_baseline
+from engine.output import OutputEngine, compute_noise_baseline, SCD_WCS_ALIGNMENT_THRESHOLD
 from engine.contract import SessionData, assemble_output
 from engine.test_suite import run_test_case, run_suite, PROFILE_TYPES
 from engine.data.questions import QUESTION_LIBRARY
@@ -69,7 +69,9 @@ ALL_PROFILES = (
 _NOISE_BASELINE: dict = {}
 
 # v23 calibration cluster window -- HC/extreme pass criterion: target within SCD_WCS_CLUSTER_WINDOW of rank-1
-SCD_WCS_CLUSTER_WINDOW: float = 0.3500  # CALIBRATION TARGET -- Session 26
+SCD_WCS_CLUSTER_WINDOW:      float = 0.3500  # CALIBRATION TARGET -- Session 26
+MODERATE_PROMINENCE_DELTA:   float = 0.20   # CALIBRATION TARGET -- Session 28
+WEAK_PROMINENCE_DELTA:       float = 0.50   # CALIBRATION TARGET -- Session 28
 
 
 def _get_noise_baseline() -> dict:
@@ -281,13 +283,44 @@ def _passes_cluster_criterion(rankings: list, target_state_id: str) -> bool:
     return target.score >= rank_1_score - SCD_WCS_CLUSTER_WINDOW
 
 
+def _passes_prominence_criterion(result: dict, profile_type: str) -> bool:
+    """
+    Prominence-based pass criterion for moderate and weak profiles.
+    Replaces strict single_state output_type requirement.
+
+    Pass conditions (both required):
+      1. Target state score >= SCD_WCS_ALIGNMENT_THRESHOLD (floor gate)
+      2. Target state score >= rank_1_score - delta
+         where delta = MODERATE_PROMINENCE_DELTA for moderate profiles
+                       WEAK_PROMINENCE_DELTA for weak profiles
+
+    Calibration targets -- subject to revision with real-world signal data.
+    Session 28.
+    """
+    target_score = result['target_score']
+    rank_1_score = result['rank_1_score']
+
+    if target_score < SCD_WCS_ALIGNMENT_THRESHOLD:
+        return False
+
+    if profile_type == 'moderate':
+        delta = MODERATE_PROMINENCE_DELTA
+    elif profile_type == 'weak':
+        delta = WEAK_PROMINENCE_DELTA
+    else:
+        raise ValueError(
+            f'_passes_prominence_criterion called with unexpected profile_type: {profile_type!r}'
+        )
+
+    return target_score >= (rank_1_score - delta)
+
+
 def _build_suite_v23(
     test_cases: list,
     engine_outputs: dict,
 ) -> dict:
-    # HC/extreme: pass iff _passes_cluster_criterion() -- bypasses output_type ==
-    # single_state requirement since all scores fall below the absolute floor.
-    # Moderate/weak: run_test_case() unchanged.
+    # HC/extreme: pass iff _passes_cluster_criterion().
+    # Moderate/weak: pass iff _passes_prominence_criterion() -- Session 28.
     import types as _types
     from engine.test_suite import TestResult
     results = []
@@ -309,6 +342,30 @@ def _build_suite_v23(
                 violations=[],
                 criteria_failures=[] if passed else [
                     f'{tc.profile_type}: cluster criterion failed for {tc.target_state!r}'
+                ],
+                output=output,
+            )
+        elif tc.profile_type in ('moderate', 'weak'):
+            if output:
+                _dist   = sorted(output.get('state_distribution', []),
+                                 key=lambda e: e.get('rank', 99))
+                _target = next(
+                    (e for e in _dist if e.get('state_id') == tc.target_state), None
+                )
+                _rank1  = _dist[0] if _dist else None
+                _pdata  = {
+                    'target_score': _target.get('score', -999.0) if _target else -999.0,
+                    'rank_1_score': _rank1.get('score',  -999.0) if _rank1  else -999.0,
+                }
+                passed = _passes_prominence_criterion(_pdata, tc.profile_type)
+            else:
+                passed = False
+            result = TestResult(
+                test_id=tc.test_id,
+                passed=passed,
+                violations=[],
+                criteria_failures=[] if passed else [
+                    f'{tc.profile_type}: prominence criterion failed for {tc.target_state!r}'
                 ],
                 output=output,
             )
