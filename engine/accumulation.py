@@ -37,6 +37,22 @@ MC_CENTROID_39: dict = {
     "attitude_asset":      0.9795,
 }
 
+# Field-specific centroid displacement scalars — Path B, Session 27.
+# Scales MC_CENTROID_39 per field: mu_focused[f] = MC_CENTROID_39[f] * scalar[f] * (N/39).
+# Derived from state_targets coverage per dimension / 39 questions.
+# Managed by tools/harness_s27_autonomous_calibration.py — do not hand-edit.
+# All 1.0 = undamped (current SCD-WCS behavior). Harness writes derived values at round 0.
+CENTROID_FIELD_SCALARS = {
+    "aptitude_liability": 0.2415,
+    "aptitude_asset": 0.4000,
+    "authority_liability": 0.3318,
+    "authority_asset": 0.4000,
+    "alliance_liability": 0.2185,
+    "alliance_asset": 0.4000,
+    "attitude_liability": 0.4267,
+    "attitude_asset": 0.4000,
+}
+
 
 def _coeff(v: Optional[float]) -> float:
     """Return 1.0 for CALIBRATION_TARGET (None), else the value."""
@@ -350,7 +366,7 @@ def rank_states(
     N = float(answered_question_count)
     scale = N / 39.0
 
-    mu_N = np.array([MC_CENTROID_39[f] * scale for f in fields])
+    mu_N = np.array([MC_CENTROID_39[f] * CENTROID_FIELD_SCALARS.get(f, 1.0) * scale for f in fields])
     vec_A = np.array([accumulated_vector.get(f, 0.0) for f in fields])
     vec_A_displaced = vec_A - mu_N
 

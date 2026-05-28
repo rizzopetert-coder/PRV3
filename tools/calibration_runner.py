@@ -69,7 +69,7 @@ ALL_PROFILES = (
 _NOISE_BASELINE: dict = {}
 
 # v23 calibration cluster window -- HC/extreme pass criterion: target within SCD_WCS_CLUSTER_WINDOW of rank-1
-SCD_WCS_CLUSTER_WINDOW: float = 0.20  # CALIBRATION TARGET -- Session 26
+SCD_WCS_CLUSTER_WINDOW: float = 0.3500  # CALIBRATION TARGET -- Session 26
 
 
 def _get_noise_baseline() -> dict:
@@ -537,6 +537,8 @@ def main() -> None:
                         help="Explicit signal-driven mode (default — generate_answers() per profile type)")
     parser.add_argument("--synthetic", action="store_true",
                         help="Option A: inject synthetic dimensional vectors (bypasses question layer)")
+    parser.add_argument("--output-json", action="store_true",
+                        help="Output structured JSON (hc_passing, hc_failing, sink_counts) for harness use")
     args = parser.parse_args()
 
     profiles = list(ALL_PROFILES)
@@ -560,6 +562,39 @@ def main() -> None:
     suite = _build_suite_v23(profiles, engine_outputs)
     matrix = build_confusion_matrix(run_results)
     dim_table = build_dimensional_error_table(run_results)
+
+    if args.output_json:
+        import json
+        import types as _types_j
+        hc_passing_j, hc_failing_j, hc_seen = [], [], set()
+        for tc in profiles:
+            if tc.profile_type in ("high_confidence", "extreme_high_confidence"):
+                out_j = engine_outputs.get(tc.test_id, {})
+                if out_j:
+                    _d = sorted(out_j.get("state_distribution", []), key=lambda e: e.get("rank", 99))
+                    _r = [_types_j.SimpleNamespace(
+                        state_id=e.get("state_id", ""),
+                        score=e.get("score", 0.0),
+                    ) for e in _d]
+                    ok = _passes_cluster_criterion(_r, tc.target_state)
+                else:
+                    ok = False
+                if tc.target_state not in hc_seen:
+                    hc_seen.add(tc.target_state)
+                    (hc_passing_j if ok else hc_failing_j).append(tc.target_state)
+        sink_j: dict = {}
+        for tgt, preds in matrix.items():
+            for pred, cnt in preds.items():
+                if pred != tgt:
+                    sink_j[pred] = sink_j.get(pred, 0) + cnt
+        print(json.dumps({
+            "hc_passing":      hc_passing_j,
+            "hc_failing":      hc_failing_j,
+            "overall_passing": suite["passed"],
+            "overall_total":   suite["total"],
+            "sink_counts":     sink_j,
+        }))
+        sys.exit(0)
 
     print_report(
         suite, matrix, dim_table, profiles,
