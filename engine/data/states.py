@@ -324,14 +324,14 @@ _reg(_profile(
     # Inferred from profiles doc: Role Clarity Deficit
     resolution_family="Roadmap",
 ))
-STATE_PROFILES["the_undefined_role"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.45,
+STATE_PROFILES["the_undefined_role"].dimensional_vector = DimensionalVector(  # S29 Rank 3: dual-axis reshape, was single-axis apt_l=0.45
+    aptitude_liability=0.35,
     aptitude_asset=0.15,
-    authority_liability=0.15,
+    authority_liability=0.35,
     authority_asset=0.15,
-    alliance_liability=0.15,
+    alliance_liability=0.10,
     alliance_asset=0.15,
-    attitude_liability=0.15,
+    attitude_liability=0.10,
     attitude_asset=0.15,
 )
 
