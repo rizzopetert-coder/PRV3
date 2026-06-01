@@ -1922,7 +1922,7 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
   
 
-| \\\*\\\*PRV3\\\_MOB\\\*\\\* | This document. tools/_mob_v33_textonly.txt. Updated each session close. Write target for closeout protocol. |
+| \\\*\\\*PRV3\\\_MOB\\\*\\\* | This document. tools/_mob.txt. Updated each session close. Write target for closeout protocol. |
 
   
 
@@ -1994,7 +1994,7 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
   
 
-| \\\*\\\*mempalace.yaml\\\*\\\* | MemPalace PRV3 wing configuration. 5 rooms. Note: PRV3 wing contains \\\~4,100+ drawers. Engine files, scripts, tools, and CLAUDE.md updated via mine at every session close. MOB not updatable via mine — file-based since Path B. Palace MOB content is v1.8 (pre-Session 12); treat as supplementary context only. tools/_mob_v33_textonly.txt governs. |
+| \\\*\\\*mempalace.yaml\\\*\\\* | MemPalace PRV3 wing configuration. 5 rooms. Note: PRV3 wing contains \\\~4,100+ drawers. Engine files, scripts, tools, and CLAUDE.md updated via mine at every session close. MOB not updatable via mine — file-based since Path B. Palace MOB content is v1.8 (pre-Session 12); treat as supplementary context only. tools/_mob.txt governs. |
 
   
 
