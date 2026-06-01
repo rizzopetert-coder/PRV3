@@ -1922,7 +1922,7 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
   
 
-| \\\*\\\*PRV3\\\_MOB\\\*\\\* | This document. Google Doc. Updated each session close. Write target for closeout protocol. |
+| \\\*\\\*PRV3\\\_MOB\\\*\\\* | This document. tools/_mob_v33_textonly.txt. Updated each session close. Write target for closeout protocol. |
 
   
 
@@ -1990,7 +1990,7 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
   
 
-| \\\*\\\*CLAUDE.md\\\*\\\* | Claude Code session protocol. PRV3 version. MOB Google Doc ID. PRV3 project root. |
+| \\\*\\\*CLAUDE.md\\\*\\\* | Claude Code session protocol. PRV3 version. MOB file path. PRV3 project root. |
 
   
 

@@ -25,10 +25,9 @@ Call `mempalace_search` with these queries in order:
 If any query returns empty or clearly wrong results, retry once with broader terms. If still empty, flag to Pete before proceeding.
 
 ### Step 4 — MOB
-Read the PRV3 MOB from Google Drive.
-**MOB Google Doc ID:** `1D31y-KbZvtCbgT2y0WvpZ3_K6Kwdmd4J5UcHynNzOAo`
+Read the PRV3 MOB from `tools/_mob_v33_textonly.txt`.
 
-Use the Drive MCP tool to fetch it. The MOB is the irreducible core — palace retrieval extends it, does not replace it.
+Use the Read tool to load it. The MOB is the irreducible core — palace retrieval extends it, does not replace it.
 
 ### Step 5 — Engine State Check
 Run: `python engine/tests/run_tests.py` (or equivalent test runner).
@@ -66,8 +65,7 @@ If any files were modified this session, run:
 Skip only if zero files were touched.
 
 ### Step 3 — Update MOB
-Write the updated MOB to the Google Drive document.
-**MOB Google Doc ID:** `1D31y-KbZvtCbgT2y0WvpZ3_K6Kwdmd4J5UcHynNzOAo`
+Write the updated MOB content to `tools/_mob_v33_textonly.txt`.
 
 Update:
 - Current workstream status
@@ -75,10 +73,10 @@ Update:
 - Session log entry (date + one-line summary)
 - Version number: increment when locked decisions are added, rules change, or workstream status changes materially. Leave unchanged for session log entries only.
 
-Use the Drive MCP tool to write. Overwrite the full document with the updated content.
+Use `pathlib.Path('tools/_mob_v33_textonly.txt').write_text(content, encoding='utf-8')` to overwrite the file.
 
-### Step 3b — Confirm and update MOB Doc ID in CLAUDE.md
-After writing the MOB to Drive, confirm the Doc ID of the document just written. If it differs from the Doc ID currently in CLAUDE.md, update CLAUDE.md with the new ID before proceeding. This step fires every session without exception.
+### Step 3b — Commit MOB file
+After writing `tools/_mob_v33_textonly.txt`, include it in the session commit. This step fires every session without exception.
 
 ### Step 4 — Commit
 Run `git status`. Identify every file touched this session.
@@ -145,8 +143,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 
 | Item | Value |
 |---|---|
-| MOB Google Doc ID | `1D31y-KbZvtCbgT2y0WvpZ3_K6Kwdmd4J5UcHynNzOAo` |
-| PRV3 Drive folder ID | `19CdQS2VTY_m1l4_0XPr-S1SKKDBstG_R` |
+| MOB file | `tools/_mob_v33_textonly.txt` |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 47 (locked) |
