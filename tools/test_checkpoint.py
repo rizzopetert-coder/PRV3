@@ -251,10 +251,14 @@ check("Q27 no-fire: narrative_trigger=False",
       result_q27_conc.narrative_trigger is False,
       f"narrative_trigger={result_q27_conc.narrative_trigger}")
 
+# the_unformed_leader is in C-Manager — cluster_override fires Q11 even below threshold
 result_q11_conc = evaluate_checkpoint("Q11", concentrated)
-check("Q11 with concentrated distribution: fires=" + str(h_conc > THRESHOLD_Q11),
-      result_q11_conc.fires == (h_conc > THRESHOLD_Q11),
+check("Q11 with concentrated C-Manager state: fires=True via cluster_override",
+      result_q11_conc.fires is True,
       f"entropy={h_conc:.6f}, threshold={THRESHOLD_Q11}")
+check("Q11 cluster_override: trigger_path=cluster_override",
+      result_q11_conc.trigger_path == "cluster_override",
+      f"trigger_path={result_q11_conc.trigger_path!r}")
 
 
 # ── 9. narrative_should_fire ───────────────────────────────────────────────────
@@ -367,14 +371,33 @@ check("should_fire_narrative_at_q34 returns True when not yet fired",
       "Q34 should fire on fresh engine")
 
 
-# ── 14. select_distinguisher_questions — empty library returns empty list ──────
-print("\n14. select_distinguisher_questions — empty question library")
+# ── 14. select_distinguisher_questions — populated library ─────────────────────
+print("\n14. select_distinguisher_questions — populated library")
 
-result_dq = select_distinguisher_questions("C-Manager", already_asked=[])
-check("Empty question library returns empty distinguisher list",
-      result_dq == [],
-      f"got {result_dq}")
+# C-Manager pool: DIST-CM-01, DIST-CM-02 (max 2 returned)
+result_cm = select_distinguisher_questions("C-Manager", already_asked=[])
+check("C-Manager pool returns 2 distinguishers",
+      len(result_cm) == 2,
+      f"got {len(result_cm)}")
+check("C-Manager pool contains DIST-CM-01",
+      any(q.question_id == "DIST-CM-01" for q in result_cm),
+      f"ids: {[q.question_id for q in result_cm]}")
 
+# Already-asked filtering excludes asked questions
+result_cm_filtered = select_distinguisher_questions(
+    "C-Manager", already_asked=["DIST-CM-01"]
+)
+check("already_asked filtering: 1 asked → 1 returned",
+      len(result_cm_filtered) == 1 and result_cm_filtered[0].question_id == "DIST-CM-02",
+      f"got {[q.question_id for q in result_cm_filtered]}")
+
+# C-Culture pool: DIST-CC-01, DIST-CC-02 (max 2 returned)
+result_cc = select_distinguisher_questions("C-Culture", already_asked=[])
+check("C-Culture pool returns 2 distinguishers",
+      len(result_cc) == 2,
+      f"got {len(result_cc)}")
+
+# Invalid cluster still returns empty list
 result_dq_invalid = select_distinguisher_questions("INVALID_CLUSTER", already_asked=[])
 check("Invalid cluster_id returns empty list",
       result_dq_invalid == [],

@@ -151,20 +151,22 @@ class CheckpointResult:
     """
     Result of evaluating one checkpoint against the current state distribution.
 
-    fires:             True if entropy > threshold (distinguishers or narrative needed).
+    fires:             True if entropy > threshold OR cluster override fires.
     top_cluster:       Dominant named cluster (populated at Q11 and Q19; None at Q27).
     distinguishers:    Questions selected for firing (empty list if none available).
     narrative_trigger: True if this checkpoint fires the early narrative prompt (Q27 only).
+    trigger_path:      "entropy" | "cluster_override" | "none"
 
     Spec reference: Section III.2 and III.3
     """
     checkpoint:        str             # "Q11" | "Q19" | "Q27"
     entropy:           float           # computed Shannon Entropy in bits
     threshold:         float           # threshold applied at this checkpoint
-    fires:             bool            # entropy > threshold
+    fires:             bool            # entropy > threshold OR cluster override
     top_cluster:       Optional[str]   # dominant cluster, or None
     distinguishers:    list            # list of QuestionDefinition
     narrative_trigger: bool            # III.3 early trigger
+    trigger_path:      str = "none"   # "entropy" | "cluster_override" | "none"
 
 
 def evaluate_checkpoint(
@@ -199,20 +201,33 @@ def evaluate_checkpoint(
     probabilities = scores_to_probabilities(rankings)
     entropy = compute_entropy(probabilities)
     fires = entropy > threshold
-
+    trigger_path = "entropy" if fires else "none"
     top_cluster = None
     distinguishers = []
     narrative_trigger = False
 
+    CLUSTER_TRIGGER_TARGETS = ["C-Manager", "C-Culture"]
+
     if fires:
         if checkpoint_position in ("Q11", "Q19"):
             top_cluster = top_cluster_by_score(rankings)
-            if top_cluster is not None:
-                distinguishers = select_distinguisher_questions(
-                    top_cluster, asked
-                )
         elif checkpoint_position == "Q27":
             narrative_trigger = True
+
+    elif checkpoint_position in ("Q11", "Q19"):
+        top_3_ids = [r.state_id for r in rankings[:3]]
+        for state_id in top_3_ids:
+            for cluster_name in CLUSTER_TRIGGER_TARGETS:
+                if state_id in CLUSTERS[cluster_name]:
+                    fires = True
+                    top_cluster = cluster_name
+                    trigger_path = "cluster_override"
+                    break
+            if top_cluster:
+                break
+
+    if fires and top_cluster:
+        distinguishers = select_distinguisher_questions(top_cluster, asked)
 
     return CheckpointResult(
         checkpoint=checkpoint_position,
@@ -222,6 +237,7 @@ def evaluate_checkpoint(
         top_cluster=top_cluster,
         distinguishers=distinguishers,
         narrative_trigger=narrative_trigger,
+        trigger_path=trigger_path,
     )
 
 

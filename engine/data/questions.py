@@ -1086,6 +1086,84 @@ _QDATA = [
         ["narrative_lock", "groundhog_day", "the_broken_compass"],
         True,
     ),
+    # -- Distinguisher questions (Session 30) -----------------------------------
+    (
+        "DIST-CM-01",
+        "When you think about the manager whose development of their team concerns you,"
+        " which of the following best describes what changed in the last 18 months?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "The role or team grew significantly — more people, more scope,"
+             " or a restructuring added responsibility without removing anything.", False, None),
+            ("B", "The role hasn't changed materially."
+             " This manager has had roughly the same span and scope for a while.", False, None),
+            ("C", "The manager is newer to the role"
+             " — promoted or hired into it within the past year.", False, None),
+            ("D", "I'm not certain there's been a change"
+             " — the concern has been building gradually.", False, None),
+        ],
+        ["the_overloaded_manager", "the_unformed_leader", "the_dormant_talent"],
+        False,
+    ),
+    (
+        "DIST-CM-02",
+        "When this manager is asked directly about what their team members need to grow,"
+        " what typically happens?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "They can describe what each person needs with real specificity"
+             " — they just haven't acted on it.", False, None),
+            ("B", "Their answers are vague or general"
+             " — it's hard to tell if they've thought about it.", False, None),
+            ("C", "They point to workload or time as the reason development hasn't happened.",
+             False, None),
+            ("D", "Their answers vary — they can speak to some team members but not others,"
+             " with no consistent pattern.", False, None),
+        ],
+        ["the_dormant_talent", "the_unformed_leader", "the_overloaded_manager"],
+        False,
+    ),
+    (
+        "DIST-CC-01",
+        "When you think about the employees who have left — or who you're most concerned"
+        " about losing — how would you describe their tenure with the organization?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "Mostly newer employees — people who've been here less than a year,"
+             " often within their first few months.", False, None),
+            ("B", "Mostly longer-tenured employees — people who've been here for several years"
+             " and who built something here.", False, None),
+            ("C", "It's mixed — departures are spread across tenure levels without a clear pattern.",
+             False, None),
+            ("D", "Departures haven't been concentrated in any particular group"
+             " — the concern is more about engagement or direction than actual turnover.",
+             False, None),
+        ],
+        ["the_culture_that_wasnt", "identity_erosion", "culture_drift"],
+        False,
+    ),
+    (
+        "DIST-CC-02",
+        "When departing employees or disengaged employees describe what's wrong,"
+        " which framing comes up most?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "“This isn't what I was told it would be” or"
+             " “what they described in the interview isn't what I found here.”",
+             False, None),
+            ("B", "“This isn't who we used to be” or"
+             " “something important got lost when we grew.”",
+             False, None),
+            ("C", "“Leadership says one thing and does another” or"
+             " “the values on the wall don't match how decisions get made.”",
+             False, None),
+            ("D", "People aren't saying much — the concern is more visible in"
+             " engagement scores or quiet behavior than in explicit feedback.",
+             False, None),
+        ],
+        ["the_culture_that_wasnt", "identity_erosion", "culture_drift"],
+        False,
+    ),
 ]
 
 
@@ -1533,6 +1611,31 @@ def _build_library():
             "B": {**_z},                                                           # Strong — documented; Q23-A base stands
             "C": {**_z, "authority_asset": -0.30, "authority_liability": 0.30},    # Weak — retroactive downgrade
             "D": {**_z, "authority_asset": -0.30, "authority_liability": 0.30},    # Weak — retroactive downgrade
+        },
+        # -- Distinguisher questions (Session 30) ----------------------------------
+        "DIST-CM-01": {
+            "A": {**_z, "aptitude_liability": 0.35, "aptitude_asset": 0.25, "authority_liability": 0.25},
+            "B": {**_z, "aptitude_liability": 0.25},
+            "C": {**_z, "aptitude_liability": 0.45},
+            "D": {**_z, "aptitude_liability": 0.15},
+        },
+        "DIST-CM-02": {
+            "A": {**_z, "aptitude_asset": 0.40, "attitude_liability": 0.45},
+            "B": {**_z, "aptitude_liability": 0.45},
+            "C": {**_z, "aptitude_liability": 0.35, "aptitude_asset": 0.20, "authority_liability": 0.25},
+            "D": {**_z, "aptitude_liability": 0.15},
+        },
+        "DIST-CC-01": {
+            "A": {**_z, "alliance_liability": 0.25, "attitude_liability": 0.40},
+            "B": {**_z, "alliance_liability": 0.35, "attitude_liability": 0.40},
+            "C": {**_z, "authority_liability": 0.30, "attitude_liability": 0.40},
+            "D": {**_z, "attitude_liability": 0.15},
+        },
+        "DIST-CC-02": {
+            "A": {**_z, "aptitude_liability": 0.30, "attitude_liability": 0.45},
+            "B": {**_z, "alliance_liability": 0.40, "attitude_liability": 0.40},
+            "C": {**_z, "authority_liability": 0.40, "attitude_liability": 0.40},
+            "D": {**_z, "attitude_liability": 0.15},
         },
     }
 
