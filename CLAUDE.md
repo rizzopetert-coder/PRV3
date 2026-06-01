@@ -25,7 +25,7 @@ Call `mempalace_search` with these queries in order:
 If any query returns empty or clearly wrong results, retry once with broader terms. If still empty, flag to Pete before proceeding.
 
 ### Step 4 — MOB
-Read the PRV3 MOB from `tools/_mob_v33_textonly.txt`.
+Read the PRV3 MOB from `tools/_mob_v33_textonly.txt`. If the file is missing or empty, stop immediately and alert Pete — do not proceed with session startup.
 
 Use the Read tool to load it. The MOB is the irreducible core — palace retrieval extends it, does not replace it.
 
