@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v3.3
+\\\#\\\# MOB v3.4
 
   
 
@@ -2331,6 +2331,10 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
   
 
 | \\\*\\\*May 2026 — Session 30\\\*\\\* | C-Manager / C-Culture cluster stress-test completed. Gemini brief 1 confirmed entropy suppression finding — built\\\_to\\\_fail attractor suppresses global entropy for cluster profiles under SCD-WCS; secondary cluster-override trigger required. Four distinguisher questions written and confirmed: DIST-CM-01, DIST-CM-02, DIST-CC-01, DIST-CC-02. Contribution vectors specified by Gemini, two corrections applied (DIST-CM-01 Option B attitude\\\_liability removed; DIST-CC-01 Option A aptitude\\\_liability→alliance\\\_liability). checkpoint.py updated: trigger\\\_path field added to CheckpointResult; cluster\\\_override secondary trigger fires if any C-Manager or C-Culture state appears in top-3 ranked states regardless of global entropy. Applies at Q11 and Q19 only. C-Silence and C-InfoFlow explicitly excluded. Cleanup commit: test\\\_narrative.py, test\\\_severity.py, diag\\\_s28/s29/v21 diagnostics added to repo. Commits 9dcc8ca, a77bff4. 405 tests, 0 failures. Workstream 1 closed — engine is Phase 3 ready. MOB updated to v3.3. |
+
+
+
+| \\\*\\\*May 2026 — Session 30 (addendum)\\\*\\\* | Path B migration: MOB source moved from Google Drive to tools/_mob.txt (git-tracked local file). Drive upload path retired permanently. CLAUDE.md startup protocol collapsed to 4 steps (was 6), closeout tightened. 10 stale working files purged. 3 partial Drive docs need manual deletion from Drive UI. Commits 993e515, 7875bf9, c277f85, 23ef9ee. MOB updated to v3.4. |
 
   
 
