@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v3.4
+\\\#\\\# MOB v3.5
 
   
 
@@ -1130,7 +1130,7 @@ Phase 3 (real-world signal): Deferred. Live instrument delivery. Salience weight
 
   
 
-\\\*\\\*Next workstream priority (Pete decides):\\\*\\\* Three parallel workstreams now open:
+\\\*\\\*Workstream 3 — Commercial Layer: ACTIVE (Session 31, first session). Workstreams 2 (Output Layer) and 1 (Engine/Phase 3 prep: COMPLETE) available when sequencing confirmed.\\\*\\\* Three parallel workstreams:
 
   
 
@@ -1146,7 +1146,7 @@ Phase 3 (real-world signal): Deferred. Live instrument delivery. Salience weight
 
   
 
-3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface
+3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 31.\\\*\\\* Positioning draft confirmed. Practice values locked: Effectiveness, Candor, Humanity. Service menu retained — hard silos rejected, lines may blur in practice. Service offering names deferred Session 32. Tagline and spine in progress — not locked.
 
   
 
@@ -1154,7 +1154,7 @@ Phase 3 (real-world signal): Deferred. Live instrument delivery. Salience weight
 
   
 
-Pete decides sequencing. All three have dependencies on each other.
+WS3 (Commercial Layer) active Session 31. WS1 (Engine) complete. WS2 (Output Layer) queued — Pete decides when to open. All three have dependencies on each other.
 
   
 
@@ -1788,6 +1788,22 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
 | the\\\_undefined\\\_role sink monitoring | CLOSED — S29 v27 dual-axis reshape collapsed sink 23→1. No longer a concern. |
 
+
+
+| Tagline and spine | In progress, not locked. Session 32 opening priority. |
+
+
+
+| Service offering names | Deferred to Session 32. |
+
+
+
+| Gemini commercial brief | Produced Session 31. Pete to engage separately. |
+
+
+
+| Content library citation audit | Open. |
+
   
 
   
@@ -1891,6 +1907,10 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
   
 
 | \\\*\\\*Session 29\\\*\\\* | MODERATE\\\_PROMINENCE\\\_DELTA raised 0.20-\\\>0.26 (v26). the\\\_undefined\\\_role dual-axis reshape (v27): apt\\\_l 0.45-\\\>0.35, auth\\\_l 0.15-\\\>0.35, all\\\_l/att\\\_l 0.15-\\\>0.10. Phase 2 CLOSED 137/142. Asset field standard corrected (tier-standard 0.10/0.15, not 0.4000). Liability budget 0.90 invariant confirmed. |
+
+
+
+| \\\*\\\*Session 31\\\*\\\* | Practice values locked: Effectiveness. Candor. Humanity. Named as values, demonstrated by the work. Positioning draft confirmed. Load-bearing statements confirmed: "We don't arrive with a methodology and fit you into it. We start with you." and "We don't fix people problems. We change the conditions that produce them." Terraforming as practice endgame: confirmed framing, not yet in positioning copy. Bilateral understanding arc confirmed as value delivery sequence. PRV3 diagnostic confirmed as primary SEO entry point. Service menu retained — hard silos rejected, lines may blur in practice. Path B migration closed as infrastructure item (tools/_mob.txt authoritative, Drive dependency retired). |
 
   
 
@@ -2334,7 +2354,11 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
 
 
 
-| \\\*\\\*May 2026 — Session 30 (addendum)\\\*\\\* | Path B migration: MOB source moved from Google Drive to tools/_mob.txt (git-tracked local file). Drive upload path retired permanently. CLAUDE.md startup protocol collapsed to 4 steps (was 6), closeout tightened. 10 stale working files purged. 3 partial Drive docs need manual deletion from Drive UI. Commits 993e515, 7875bf9, c277f85, 23ef9ee. MOB updated to v3.4. |
+| \\\*\\\*May 2026 — Session 30 (addendum)\\\*\\\* | Path B migration: MOB source moved from Google Drive to tools/_mob.txt (git-tracked local file). Drive upload path retired permanently. CLAUDE.md startup protocol collapsed to 4 steps (was 6), closeout tightened. 10 stale working files purged. 3 partial Drive docs deleted from Drive UI (completed this session). Commits 993e515, 7875bf9, c277f85, 23ef9ee. MOB updated to v3.4. |
+
+
+
+| \\\*\\\*June 2026 — Session 31\\\*\\\* | Commercial Layer (WS3) Session 1. Practice values locked: Effectiveness, Candor, Humanity. Positioning draft confirmed. Two load-bearing statements confirmed. Terraforming as practice endgame confirmed. Bilateral understanding arc confirmed. PRV3 as primary SEO entry point confirmed. Service menu retained — hard silos rejected, lines may blur in practice. Service offering names deferred Session 32. Tagline and spine in progress — not locked. Gemini commercial brief produced (Pete to engage separately). Path B migration closed as infrastructure item. 405 tests, 0 failures (no engine changes this session). MOB updated to v3.5. |
 
   
 
