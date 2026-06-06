@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v3.6
+\\\#\\\# MOB v3.7
 
   
 
@@ -54,7 +54,7 @@ PRV3 is a diagnostic instrument for organizational friction. An internal leader 
 
   
 
-The five service offerings the diagnostic routes to: Roadmap, Stability Support, Development, Intervention, Executive Counsel. Names and pricing under review — not locked.
+The diagnostic is the primary entry point. Four resolution services sit beneath it: Formation, Practicum, Counsel, Navigation. Service names locked Session 32. Two-tier structure locked Session 33. Pricing not locked.
 
   
 
@@ -445,6 +445,25 @@ Service offering names, pricing, UX, marketing site, instrument delivery interfa
 
 
 \*\*The Work — Session 32:\*\* Held. Weight confirmed. Address unknown. Do not assign until Session 33 or later surfaces the right home.
+
+
+\*\*Site architecture — locked Session 33:\*\* Three parallel entry points: diagnostic path, direct inquiry path, service-specific path. All converge to a conversation. Diagnostic is intellectual center of gravity, not sole entry point.
+
+
+
+\*\*Two-tier service structure — locked Session 33:\*\* Diagnostic sits above the four resolution services (Formation, Practicum, Counsel, Navigation). Diagnostic is the entry point layer. The four are the resolution layer.
+
+
+
+\*\*Content principles — locked Session 33:\*\* Site is short. Three content types: condition language, short-form proof, clear next steps (one per path). Methodology, instrument architecture, 47-state taxonomy, and pricing stay off the site. Content library lives adjacent to the commercial surface, not on it. Two-minute test governs: visitor understands the practice, confirms relevance, finds next step in under two minutes.
+
+
+
+\*\*Navigation subtitle — locked Session 33:\*\* Primary name confirmed. Subtitle carries urgency for the acute entry point. Executives in crisis need to know the practice recognizes the emergency before they register the capability.
+
+
+
+\*\*Diagnostic name — locked Session 33:\*\* Clarity confirmed over intrigue. Clinical register is the differentiator. Name sets the standard of Expertise before the client engages.
 
   
 
@@ -1176,7 +1195,7 @@ Phase 3 (real-world signal): Deferred. Live instrument delivery. Salience weight
 
   
 
-3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 32.\\\*\\\* Practice spine locked (internal standard: Expertise. Resonance. Effectiveness.). Five service names final and locked (Formation, Practicum, Counsel, Navigation, Diagnostic). Terraforming four-address architecture recorded. The Work held — address deferred. Session 33 priority: service menu structure, Navigation urgency question, Diagnostic intrigue question.
+3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 32.\\\*\\\* Practice spine locked (internal standard: Expertise. Resonance. Effectiveness.). Five service names final and locked (Formation, Practicum, Counsel, Navigation, Diagnostic). Terraforming four-address architecture recorded. The Work held — address deferred. Session 33 complete. Navigation and Diagnostic names confirmed. Two-tier service structure locked. Site architecture locked. Content principles locked. Session 34 priority: service-specific path design and execution-level menu layout.
 
   
 
@@ -1832,15 +1851,27 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
 
 
-| Navigation urgency question | Open. How urgency/emergency positioning is surfaced commercially. Session 33 scope. |
+| Navigation urgency question | CLOSED Session 33. Name confirmed. Subtitle carries urgency. |
 
 
 
-| Diagnostic intrigue question | Open. Whether and how the Diagnostic service name earns more than clinical clarity. Session 33 scope. |
+| Diagnostic intrigue question | CLOSED Session 33. Clarity confirmed over intrigue. |
 
 
 
 | The Work | Held. Weight confirmed. Address unknown. Do not assign until Session 33 or later surfaces the right home. |
+
+
+
+| Service-specific path design | Open. How each of the four resolution services presents on the site. What a practitioner-directed arrival finds. Session 34 scope. |
+
+
+
+| Menu execution layout | Open. How the two-tier structure looks on the page. Weight and position of Diagnostic relative to the four. Session 34 scope. |
+
+
+
+| Placement of two load-bearing positioning statements | Open. Both confirmed for commercial surface. Specific location not yet decided. |
 
 
 
@@ -2408,52 +2439,8 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
 
   
 
-| \\\*\\\*June 2026 — Session 32\\\*\\\* | Commercial Layer (WS3) Session 2. No engine work. No code touched. Practice spine locked: Expertise. Resonance. Effectiveness. (internal standard). Five service names final: Formation, Practicum, Counsel, Navigation, Diagnostic. Terraforming four-address architecture recorded. The Work held. MOB updated to v3.6. | Positioning draft confirmed. Two load-bearing statements confirmed. Terraforming as practice endgame confirmed. Bilateral understanding arc confirmed. PRV3 as primary SEO entry point confirmed. Service menu retained — hard silos rejected, lines may blur in practice. Service offering names deferred Session 32. Tagline and spine in progress — not locked. Gemini commercial brief produced (Pete to engage separately). Path B migration closed as infrastructure item. 405 tests, 0 failures (no engine changes this session). MOB updated to v3.5. |
+| \\\*\\\*June 2026 — Session 32\\\*\\\* | Commercial Layer (WS3) Session 2. No engine work. No code touched. Practice spine locked: Expertise. Resonance. Effectiveness. (internal standard). Five service names final: Formation, Practicum, Counsel, Navigation, Diagnostic. Terraforming four-address architecture recorded. The Work held. Load-bearing statements confirmed: “We don’t arrive with a methodology and fit you into it. We start with you.” and “We don’t fix people problems. We change the conditions that produce them.” Terraforming as practice endgame confirmed. Bilateral understanding arc confirmed as value delivery sequence. PRV3 diagnostic confirmed as primary SEO entry point. Service menu retained — hard silos rejected. MOB updated to v3.6. |
 
   
 
-  
-
-  
-
-\\---
-
-  
-
-  
-
-  
-
-\\\# 17. External Citations
-
-  
-
-  
-
-  
-
-17.1 The Octopus Organization
-
-  
-
-  
-
-  
-
-Werner, Jana and Le-Brun, Phil. "Become an Octopus Organization." Harvard Business Review, November 2025. Adapted from The Octopus Organization: A Guide to Thriving in a World of Continuous Transformation (Harvard Business Review Press, 2025).
-
-  
-
-  
-
-  
-
-https://hbr.org/2025/11/become-an-octopus-organization
-
-  
-
-  
-
-  
-
-\\---
+| \\\*\\\*June 2026 — Session 33\\\*\\\* | Commercial Layer (WS3) Session 3. Navigation name confirmed — subtitle carries urgency. Diagnostic name confirmed — clarity over intrigue. Two-tier service structure locked: Diagnostic above, four resolution services beneath. Site architecture locked: three entry points (diagnostic, direct inquiry, service-specific), all converge to conversation. Content principles locked: condition language, short-form proof, clear next steps. Two-minute test adopted as governing standard. Content library confirmed as adjacent to commercial surface, not on it. No engine changes. MOB updated to v3.7. |
