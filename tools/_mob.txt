@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v3.5
+\\\#\\\# MOB v3.6
 
   
 
@@ -414,7 +414,37 @@ The five service offerings the diagnostic routes to: Roadmap, Stability Support,
 
   
 
-Service offering names, pricing, UX, marketing site, instrument delivery interface — all under review. Not locked. Pete decides.
+Service offering names, pricing, UX, marketing site, instrument delivery interface. Core commercial records below.
+
+
+
+\*\*Practice spine — locked Session 32:\*\* Expertise. Resonance. Effectiveness. Internal standard, not a market-facing tagline. Every engagement, every service type, every deliverable is held accountable to all three: Did we bring expertise? Did we produce resonance? Did it result in effectiveness?
+
+
+
+\*\*Five service names — final, locked Session 32:\*\*
+
+
+
+| \*\*Formation\*\* | Group training for developing leaders |
+
+| --- | --- |
+
+| \*\*Practicum\*\* | Individual coaching for developing leaders, bounded engagement |
+
+| \*\*Counsel\*\* | Retainer advisory for executives and HR leaders |
+
+| \*\*Navigation\*\* | Change navigation and emergency response for executives |
+
+| \*\*Diagnostic\*\* | Organizational assessment leading to recovery consulting if warranted |
+
+
+
+\*\*Terraforming four-address architecture — Session 32:\*\* Terraforming as the practice endgame surfaces differently across four distinct addresses. Shareable output: credibility document. Names the condition with precision. Terraforming premise felt through diagnostic framing — condition language not failure language — concept not introduced explicitly. Private output: where the Principal feels understood. Their language used precisely and sparingly. Consultation: where terraforming is named. The destination the diagnostic was pointing toward. Commercial surface: where the practice speaks about itself. "We don't fix people problems. We change the conditions that produce them." Lives here.
+
+
+
+\*\*The Work — Session 32:\*\* Held. Weight confirmed. Address unknown. Do not assign until Session 33 or later surfaces the right home.
 
   
 
@@ -1146,7 +1176,7 @@ Phase 3 (real-world signal): Deferred. Live instrument delivery. Salience weight
 
   
 
-3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 31.\\\*\\\* Positioning draft confirmed. Practice values locked: Effectiveness, Candor, Humanity. Service menu retained — hard silos rejected, lines may blur in practice. Service offering names deferred Session 32. Tagline and spine in progress — not locked.
+3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 32.\\\*\\\* Practice spine locked (internal standard: Expertise. Resonance. Effectiveness.). Five service names final and locked (Formation, Practicum, Counsel, Navigation, Diagnostic). Terraforming four-address architecture recorded. The Work held — address deferred. Session 33 priority: service menu structure, Navigation urgency question, Diagnostic intrigue question.
 
   
 
@@ -1790,11 +1820,11 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
 
 
-| Tagline and spine | In progress, not locked. Session 32 opening priority. |
+| Tagline and spine | CLOSED Session 32. Practice spine locked as internal standard: Expertise. Resonance. Effectiveness. No separate market-facing tagline pending. |
 
 
 
-| Service offering names | Deferred to Session 32. |
+| Service offering names | CLOSED Session 32. Final: Formation, Practicum, Counsel, Navigation, Diagnostic. |
 
 
 
@@ -1802,7 +1832,19 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
 
 
-| Content library citation audit | Open. |
+| Navigation urgency question | Open. How urgency/emergency positioning is surfaced commercially. Session 33 scope. |
+
+
+
+| Diagnostic intrigue question | Open. Whether and how the Diagnostic service name earns more than clinical clarity. Session 33 scope. |
+
+
+
+| The Work | Held. Weight confirmed. Address unknown. Do not assign until Session 33 or later surfaces the right home. |
+
+
+
+| Content library citation audit | Open. E2, E5, E7 priority. |
 
   
 
@@ -1910,7 +1952,11 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
 
 
-| \\\*\\\*Session 31\\\*\\\* | Practice values locked: Effectiveness. Candor. Humanity. Named as values, demonstrated by the work. Positioning draft confirmed. Load-bearing statements confirmed: "We don't arrive with a methodology and fit you into it. We start with you." and "We don't fix people problems. We change the conditions that produce them." Terraforming as practice endgame: confirmed framing, not yet in positioning copy. Bilateral understanding arc confirmed as value delivery sequence. PRV3 diagnostic confirmed as primary SEO entry point. Service menu retained — hard silos rejected, lines may blur in practice. Path B migration closed as infrastructure item (tools/_mob.txt authoritative, Drive dependency retired). |
+| \\\*\\\*Session 31\\\*\\\* |
+
+  
+
+| \\\*\\\*Session 32\\\*\\\* | Practice spine locked: Expertise. Resonance. Effectiveness. (internal standard, not tagline). Five service names final: Formation, Practicum, Counsel, Navigation, Diagnostic. Terraforming four-address architecture recorded. The Work held — address deferred. | Load-bearing statements confirmed: "We don't arrive with a methodology and fit you into it. We start with you." and "We don't fix people problems. We change the conditions that produce them." Terraforming as practice endgame: confirmed framing, not yet in positioning copy. Bilateral understanding arc confirmed as value delivery sequence. PRV3 diagnostic confirmed as primary SEO entry point. Service menu retained — hard silos rejected, lines may blur in practice. Path B migration closed as infrastructure item (tools/_mob.txt authoritative, Drive dependency retired). |
 
   
 
@@ -2359,6 +2405,10 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
 
 
 | \\\*\\\*June 2026 — Session 31\\\*\\\* | Commercial Layer (WS3) Session 1. Practice values locked: Effectiveness, Candor, Humanity. Positioning draft confirmed. Two load-bearing statements confirmed. Terraforming as practice endgame confirmed. Bilateral understanding arc confirmed. PRV3 as primary SEO entry point confirmed. Service menu retained — hard silos rejected, lines may blur in practice. Service offering names deferred Session 32. Tagline and spine in progress — not locked. Gemini commercial brief produced (Pete to engage separately). Path B migration closed as infrastructure item. 405 tests, 0 failures (no engine changes this session). MOB updated to v3.5. |
+
+  
+
+| \\\*\\\*June 2026 — Session 32\\\*\\\* | Commercial Layer (WS3) Session 2. No engine work. No code touched. Practice spine locked: Expertise. Resonance. Effectiveness. (internal standard). Five service names final: Formation, Practicum, Counsel, Navigation, Diagnostic. Terraforming four-address architecture recorded. The Work held. MOB updated to v3.6. | Positioning draft confirmed. Two load-bearing statements confirmed. Terraforming as practice endgame confirmed. Bilateral understanding arc confirmed. PRV3 as primary SEO entry point confirmed. Service menu retained — hard silos rejected, lines may blur in practice. Service offering names deferred Session 32. Tagline and spine in progress — not locked. Gemini commercial brief produced (Pete to engage separately). Path B migration closed as infrastructure item. 405 tests, 0 failures (no engine changes this session). MOB updated to v3.5. |
 
   
 
