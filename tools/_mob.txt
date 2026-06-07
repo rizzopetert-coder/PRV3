@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v3.8
+\\\#\\\# MOB v3.9
 
   
 
@@ -392,11 +392,7 @@ The diagnostic is the primary entry point. Four resolution services sit beneath 
 
 | \\\*\\\*JSON contract\\\*\\\* | 14 top-level fields. monitoring\\\_metadata added Session 11. ENGINE\\\_VERSION 0.2.0. |
 
-  
-
-  
-
-  
+\*\*Shareable output design intent — locked Session 34:\*\* The shareable output is designed to travel without the user present. It enters rooms the practitioner isn’t in — a board meeting, a budget conversation, a leadership team discussion about whether to engage outside help. Its job is to carry the condition’s financial weight and behavioral precision into those rooms and do the persuasion work required to justify the engagement before the practitioner arrives. Friction Tax multipliers (sourced from McKinsey, SHRM, Gallup, and peer-reviewed research) give the condition economic visibility. Patterned consequence logic gives it behavioral precision. The combination makes the condition undeniable to a financially-oriented audience. The shareable output never names a specific service. It names the condition, the severity, and the resolution family. Service recommendation is made by the practitioner in the live consultation — not by the instrument. This boundary is architecturally enforced, not aspirational.
 
 \\---
 
@@ -465,21 +461,25 @@ Service offering names, pricing, UX, marketing site, instrument delivery interfa
 
 \*\*Diagnostic name — locked Session 33:\*\* Clarity confirmed over intrigue. Clinical register is the differentiator. Name sets the standard of Expertise before the client engages.
 
-\*\*Site copy — locked Session 34:\*\* Primary surface, three path introductions, two load-bearing statement placement confirmed.
+\*\*State descriptions — locked Session 34:\*\* 47 state descriptions written for recognition. Register: individual lived experience first, organizational cost at the close. Designed for the self-selection surface. Available in session 34 conversation history.
 
-\*\*47 state descriptions — locked Session 34:\*\* Recognition register. Individual experience first, organizational cost at close.
+\*\*Common signatures — locked Session 34:\*\* Five signatures: Leadership Bottleneck, Culture Erosion, Stunted Growth, Compounding Risks, Information Blindness. Each contains: named states, coexistence interpretation, organizational cost. State-to-signature mapping confirmed. Some states appear in multiple signatures — intentional, reflects genuine co-occurrence. Available in session 34 conversation history.
 
-\*\*Five common signatures — locked Session 34:\*\* Leadership Bottleneck, Culture Erosion, Stunted Growth, Compounding Risks, Information Blindness.
+\*\*Service descriptions and inclusions — locked Session 34:\*\* Five service descriptions written. Formation, Practicum, Counsel, Navigation, Diagnostic. Each contains: who it’s for, what it involves, what the client leaves with. Inclusions defined here for the first time — this is the governing record. Available in session 34 conversation history.
 
-\*\*Five service descriptions and inclusions — locked Session 34.\*\*
+\*\*Self-selection output language — locked Session 34:\*\* Six-phase sequence. Phase 1: live selection feedback. Phase 2: cluster display showing states grouped by signature. Phase 3: coexistence interpretation — the differentiator. Phase 4: per-signature detail with selected states highlighted, unselected states dimmed and visible. Phase 5: resolution orientation without service prescription. Phase 6: transition to diagnostic or conversation. Dimmed missing states are a deliberate design intent — they show the visitor the incompleteness of self-portrait without stating it directly, creating pull toward the diagnostic. Available in session 34 conversation history.
 
-\*\*Self-selection output language — locked Session 34:\*\* Six-phase sequence. Dimmed missing states confirmed as design intent.
+\*\*Primary site copy — locked Session 34:\*\* Full primary surface written. Opening, practice description, differentiator statement, three path introductions, load-bearing statement placement, service orientation, values close. Two-minute test applied. Available in session 34 conversation history.
 
-\*\*Storage architecture — decided Session 34:\*\* Option D baseline — anonymized aggregate retention. Option B layered — client-controlled full retention on opt-in.
+\*\*Load-bearing statement placement — locked Session 34:\*\* “We don’t arrive with a methodology and fit you into it. We start with you.” — above the paths, early in the primary surface. “We don’t fix people problems. We change the conditions that produce them.” — below the path choices, after the visitor has seen enough of the practice to feel its weight.
 
-\*\*Disclosure approach — decided Session 34:\*\* Engagement agreement carries primary disclosure weight. Site language lighter.
+\*\*Storage architecture — decided Session 34:\*\* Option D baseline — anonymized aggregate retention for instrument calibration. No individual session data retained in identifiable form. Option B layered — client-controlled full retention on opt-in. Clients who want continuity across sessions can consent to full engagement record retention. Default is Option D.
 
-\*\*LinkedIn BD strategy — decided Session 34:\*\* Content-first under shadow model. Personal account shares practice intellectual territory without direct attribution. Legal read required before execution — non-solicitation agreement governs.
+\*\*Disclosure approach — decided Session 34:\*\* Engagement agreement carries primary disclosure weight. Site language lighter. Engagement agreement must cover: confidentiality terms, data handling, scope limitations, no-guarantee language, independence representation, client representation that engagement is independent of any affiliated entity.
+
+\*\*Diagnostic output constraint — locked Session 34:\*\* The diagnostic output names the condition, the severity, and the resolution family. It does not name a specific service. Service recommendation is made by the practitioner in the live consultation. This boundary is architecturally enforced. The output is a clinical read — not a sales funnel. Gemini flagged this as the critical commercial boundary. Confirmed and locked.
+
+\*\*LinkedIn BD strategy — decided Session 34:\*\* Content-first under shadow model. Publish intellectual territory content under practitioner’s personal name without direct attribution to Principal Resolution. Personal account does not directly promote or link to the practice until legal read on non-solicitation agreement is complete. Principal Resolution LinkedIn operates independently under shadow model. Legal read required before any personal amplification — non-solicitation agreement with OneDigital governs. Attorney to advise on: passive content sharing, definition of solicitation under agreement, LinkedIn as channel.
 
 
 
@@ -1211,7 +1211,7 @@ Phase 3 (real-world signal): Deferred. Live instrument delivery. Salience weight
 
   
 
-3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 32.\\\*\\\* Practice spine locked (internal standard: Expertise. Resonance. Effectiveness.). Five service names final and locked (Formation, Practicum, Counsel, Navigation, Diagnostic). Terraforming four-address architecture recorded. The Work held — address deferred. Session 33 complete. Navigation and Diagnostic names confirmed. Two-tier service structure locked. Site architecture locked. Content principles locked. Session 34 complete. Full commercial surface written and locked. State descriptions, common signatures, service descriptions, signature output language, primary site copy all produced this session. Session 35 scope: engagement agreement draft, data handling terms, and next surface to build — likely the self-selection interface itself or the common signatures library.
+3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 32.\\\*\\\* Practice spine locked (internal standard: Expertise. Resonance. Effectiveness.). Five service names final and locked (Formation, Practicum, Counsel, Navigation, Diagnostic). Terraforming four-address architecture recorded. The Work held — address deferred. Session 33 complete. Navigation and Diagnostic names confirmed. Two-tier service structure locked. Site architecture locked. Content principles locked. Session 34 complete. Full commercial surface written and locked this session: 47 state descriptions, 5 common signatures, 5 service descriptions and inclusions, 6-phase self-selection output language, primary site copy and path framing. Storage architecture and disclosure approach decided. Diagnostic output constraint locked — service names never appear in automated output. LinkedIn BD strategy established pending legal read. Session 35 scope: engagement agreement draft, data handling terms, and next build surface — self-selection interface or common signatures library.
 
   
 
@@ -2004,6 +2004,8 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
   
 
 | \\\*\\\*Session 32\\\*\\\* | Practice spine locked: Expertise. Resonance. Effectiveness. (internal standard, not tagline). Five service names final: Formation, Practicum, Counsel, Navigation, Diagnostic. Terraforming four-address architecture recorded. The Work held — address deferred. | Load-bearing statements confirmed: "We don't arrive with a methodology and fit you into it. We start with you." and "We don't fix people problems. We change the conditions that produce them." Terraforming as practice endgame: confirmed framing, not yet in positioning copy. Bilateral understanding arc confirmed as value delivery sequence. PRV3 diagnostic confirmed as primary SEO entry point. Service menu retained — hard silos rejected, lines may blur in practice. Path B migration closed as infrastructure item (tools/_mob.txt authoritative, Drive dependency retired). |
+
+| \\\*\\\*Session 34\\\*\\\* | 47 state descriptions locked. Five common signatures locked: Leadership Bottleneck, Culture Erosion, Stunted Growth, Compounding Risks, Information Blindness. Five service descriptions and inclusions locked. Self-selection output language locked — six-phase sequence. Primary site copy locked. Load-bearing statement placement locked. Storage architecture decided: Option D baseline, Option B layered. Diagnostic output constraint locked: no service names in automated output. Shareable output design intent locked: room-runner, Friction Tax financial weight, travels without practitioner. |
 
   
 
