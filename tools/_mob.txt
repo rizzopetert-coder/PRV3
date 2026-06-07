@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v3.9
+\\\#\\\# MOB v4.0
 
   
 
@@ -779,7 +779,7 @@ Script: tools/patch\\\_v10\\\_tier\\\_standardization.py. Applied 2026-05-17.
 
   
 
-\\\*\\\*Session 20 changes — locked:\\\*\\\*
+\*\*[S20] HC/extreme state_targets gating + the_unexamined_algorithm — locked:\*\* generate_answers() in calibration_runner.py: HC/extreme profiles call best_option_for_state() on state_targets questions only; _neutral_option() elsewhere. the_unexamined_algorithm: auth_l=0.50, apt_l=0.35, all other fields=0.10.
 
   
 
@@ -787,203 +787,15 @@ Script: tools/patch\\\_v10\\\_tier\\\_standardization.py. Applied 2026-05-17.
 
   
 
-| HC/extreme state\\\_targets gating | generate\\\_answers() in calibration\\\_runner.py: high\\\_confidence and extreme\\\_high\\\_confidence profiles now call best\\\_option\\\_for\\\_state() only on questions where target state\\\_id appears in state\\\_targets. All other core sequence questions use \\\_neutral\\\_option(). Moderate profile logic unchanged. Locked Session 20. |
+\*\*[S21] SALIENCE_PROFILES weighted cosine + v15 authority drain — locked:\*\* Phase 2 calibration metric updated to SALIENCE_PROFILES weighted cosine (target dimension fields: 2.5, off-axis: 0.4). v15 authority drain: authority_liability stripped from Q07/Q09/Q16/Q20/Q26/Q29 secondary options. Q06 APT-PT-00 state_targets corrected.
 
   
 
-| --- | --- |
-
-  
-
-| the\\\_unexamined\\\_algorithm vector | authority\\\_liability=0.50, aptitude\\\_liability=0.35, all 6 other fields=0.10. Updated from auth\\\_l=0.35/apt\\\_l=0.25/others=0.15. Per Gemini Path C spec, confirmed Session 19/20. authority\\\_liability at 0.50 is MEDIUM tier territory on the primary axis — intentional. Locked Session 20. |
-
-  
-
-  
-
-  
-
-\\\*\\\*Session 21 changes — locked:\\\*\\\*
-
-  
-
-  
-
-  
-
-| SALIENCE\\\_PROFILES weighted cosine adopted | Phase 2 calibration metric updated to weighted cosine similarity using per-state SALIENCE\\\_PROFILES weight vectors (target dimension fields: 2.5; off-axis: 0.4). Replaces unweighted cosine used in v5-v13. Baseline mean shifted from 0.8012 (v13, unweighted) to 0.8937 (v15, SALIENCE\\\_PROFILES). All subsequent baselines use SALIENCE\\\_PROFILES. |
-
-  
-
-| --- | --- |
-
-  
-
-| v15 authority drain | Q07-B/C/D, Q09-C/D, Q16-B/C, Q20-B/C, Q26-C/D, Q29-B/C — authority\\\_liability stripped from secondary co-signal question options. state\\\_targets purge: decision\\\_paralysis removed from Q07/Q09 state\\\_targets. Q06: Paper Tiger (APT-PT-00) state\\\_targets entry corrected. |
-
-  
-
-  
-
-  
-
-\\\*\\\*Session 22 changes — locked:\\\*\\\*
-
-  
-
-  
-
-  
-
-| v16 contrast injection | Negative authority\\\_liability appended to 8 option vectors across 6 questions. Q14-B/C: authority\\\_liability 0.25 -\\\> -0.05 (delta -0.30, neutral drain). Q16-B/C: authority\\\_liability 0.10 -\\\> -0.20 (delta -0.30, Attitude HC active path). Q22-B: authority\\\_liability 0.25 -\\\> -0.10 (delta -0.35, neutral drain). Q26-C: authority\\\_liability -0.30 added (Alliance HC active path). Q35-B: authority\\\_liability -0.35 added (Aptitude HC best-option pick). Q36-E: authority\\\_liability -0.40 added (APT-PT-00 decoupling). Total installed drain: -1.20. Primary Authority neutral accumulation estimate: \\\~2.40. Net: drain \\\~50% of accumulation load — directionally correct, magnitude insufficient for HC routing. |
-
-  
-
-| --- | --- |
-
-  
-
-  
-
-  
-
-\\\*\\\*Session 23 changes — locked:\\\*\\\*
-
-  
-
-  
-
-  
-
-| v19 Track 2 (Q20 amplification) | Q20 C/D: authority\\\_liability 0.60-\\\>0.80. Retained in v20. |
-
-  
-
-| --- | --- |
-
-  
-
-| v19 Track 1 (culture\\\_drift salience) | culture\\\_drift attitude salience 2.5-\\\>1.85. Applied v19, reverted v20. Net: salience.py at pre-Track-1 values; comment updated. |
-
-  
-
-| v19 Track 3 (Authority vector sharpening) | Six HIGH Authority states: auth\\\_l 0.60-\\\>0.70, all others 0.10-\\\>0.05. the\\\_uninitiated: auth\\\_l 0.45-\\\>0.40, all others 0.15-\\\>0.10. Applied v19, reverted v20. Net: states.py unchanged from pre-Session-23 committed state. |
-
-  
-
-| Router experiment (v20 — reverted) | Two-Tier Hierarchical Router implemented in accumulation.py and calibration\\\_runner.py: identify\\\_dominant\\\_dimension(), \\\_DIMENSION\\\_FIELD\\\_MAP, rank\\\_states(dominant\\\_dimension), AccumulationEngine.rank(use\\\_router=True). Tested, reverted. Full 47-state rank\\\_states() path restored. Net: accumulation.py and calibration\\\_runner.py unchanged from pre-session state. |
-
-  
-
-  
-
-  
-
-\\\*\\\*Session 26 changes — locked:\\\*\\\*
-
-  
-
-  
-
-  
-
-v23 leadership\\\_deafness vector reshape: attitude\\\_liability raised 0.35-\\\>0.50. All other 7 fields set to 0.10. Moves state out of near-zero SCD-WCS origin region. Reduces rank-1 non-target captures from \\\~65-70% (v22) to \\\~27% (v23). Gemini spec, Pete confirmed.
-
-  
-
-  
-
-  
-
-v22 salience revert: leadership\\\_deafness: att 1.65-\\\>2.5, auth 0.65-\\\>1.0 (Three-Tier standard, authority secondary per v18 lock). the\\\_suppression\\\_filter: all\\\_l 2.85-\\\>2.5, auth 1.20-\\\>1.0. v22 salience changes proven counterproductive — origin-proximity sink mechanism cannot be addressed via salience reduction.
-
-  
-
-  
-
-  
-
-Cluster architecture: C-Silence and C-InfoFlow dismantled (Session 25 decision, executed Session 26). cluster\\\_id = None for: what\\\_nobody\\\_says, the\\\_unreported\\\_hazard, the\\\_unlocked\\\_door, leadership\\\_deafness, the\\\_suppression\\\_filter. C-Manager and C-Culture retained. Session 26 cleanup commit.
-
-  
-
-  
-
-  
-
-Calibration pass criterion: HC/extreme profiles: top-cluster presence criterion replaces rank-1 requirement. \\\_passes\\\_cluster\\\_criterion() in calibration\\\_runner.py: target passes if target.score \\\>= rank\\\_1\\\_score - SCD\\\_WCS\\\_CLUSTER\\\_WINDOW (0.20). Rank-1 not required. Implements score-gap-driven multi-state output model confirmed Session 26.
-
-  
-
-  
-
-  
-
-\\\*\\\*Session 27 changes — locked:\\\*\\\*
-
-  
-
-  
-
-  
-
-CENTROID\\\_FIELD\\\_SCALARS (Path B): per-field scalars added to engine/accumulation.py. Applied to MC\\\_CENTROID\\\_39 before session-length scaling: mu\\\_focused\\\[f\\\] = MC\\\_CENTROID\\\_39\\\[f\\\] \\\* CENTROID\\\_FIELD\\\_SCALARS\\\[f\\\] \\\* (N/39.0). Derived from state\\\_targets question coverage per dimension (Aptitude 18/39, Authority 34/39, Alliance 21/39, Attitude 26/39). Starting scalars derived at Round 0; liability scalars reduced iteratively over 28 rounds. Root cause addressed: authority centroid (5.3601) was structurally dominant over HC session accumulation (\\\~4.3), causing all Authority HC profiles to produce negative displaced scores with built\\\_to\\\_fail as rank-1. With authority\\\_liability scalar at 0.3318, effective authority centroid reduces from 5.36 to \\\~1.78, restoring positive displaced signal for HC Authority profiles.
-
-  
-
-  
-
-  
-
-Autonomous calibration harness (tools/harness\\\_s27\\\_autonomous\\\_calibration.py): iterates CENTROID\\\_FIELD\\\_SCALARS (Path B) and SCD\\\_WCS\\\_CLUSTER\\\_WINDOW (Path C) until 47/47 HC, 5-round impasse, or escalation trigger. 28 rounds executed, no regressions, RESOLVED at 47/47. Final scalars: aptitude\\\_liability=0.2415, authority\\\_liability=0.3318, alliance\\\_liability=0.2185, attitude\\\_liability=0.4267 (all asset fields=0.4000). Final window: 0.35.
-
-  
-
-  
-
-  
-
-\\--output-json flag added to calibration\\\_runner.py for harness integration. Returns hc\\\_passing, hc\\\_failing, overall\\\_passing, overall\\\_total, sink\\\_counts as JSON to stdout.
-
-  
-
-  
-
-  
-
-\\\_PRECOMPUTED\\\_NOISE\\\_BASELINE recalibrated under v24 CENTROID\\\_FIELD\\\_SCALARS: N=1000, seed=42, Q01-Q39, Session 27. Global mean 0.8724. Used for score\\\_lift\\\_pct computation only — not for floor gating (SCD\\\_WCS\\\_ALIGNMENT\\\_THRESHOLD governs gating).
-
-  
-
-  
-
-  
-
-tools/test\\\_accumulation.py: hardcoded SCD-WCS distance value (1.480801, computed at all-1.0 scalars) replaced with structural invariant check (finite + relative ordering). Required for harness compatibility with variable CENTROID\\\_FIELD\\\_SCALARS.
-
-  
-
-  
-
-  
-
-Commit: 15ffb8d.
-
-  
-
-  
-
-  
-
-\\\*\\\*Session 28 changes — locked:\\\*\\\*
-
-  
-
   
 
   
 
-Prominence-based pass criterion for moderate and weak profiles. Replaces strict single\\\_state output\\\_type requirement (which was structurally unachievable — all 47 states clear SCD\\\_WCS\\\_ALIGNMENT\\\_THRESHOLD=-0.4000 under any profile type, so output is always multi\\\_state).
+\*\*[S22] v16 negative authority contrast injection — locked:\*\* Contrast injection across 8 option vectors, 6 questions (Q14-B/C, Q16-B/C, Q22-B, Q26-C, Q35-B, Q36-E). Total installed authority drain: -1.20.
 
   
 
@@ -991,7 +803,7 @@ Prominence-based pass criterion for moderate and weak profiles. Replaces strict 
 
   
 
-\\\_passes\\\_prominence\\\_criterion() added to calibration\\\_runner.py. Pass conditions (both required): (1) target score \\\>= SCD\\\_WCS\\\_ALIGNMENT\\\_THRESHOLD; (2) target score \\\>= rank\\\_1\\\_score - delta, where delta = MODERATE\\\_PROMINENCE\\\_DELTA (0.20) for moderate profiles, WEAK\\\_PROMINENCE\\\_DELTA (0.50) for weak profiles.
+\*\*[S23] Q20 C/D authority_liability 0.60->0.80 — locked:\*\* Track 2 (Q20 C/D raise) retained. Track 1 (culture_drift salience reduction) and Track 3 (Authority vector sharpening) applied and reverted. states.py and salience.py net unchanged from pre-session committed state. Q20 0.80 is the sole lasting change.
 
   
 
@@ -999,7 +811,7 @@ Prominence-based pass criterion for moderate and weak profiles. Replaces strict 
 
   
 
-WEAK\\\_PROMINENCE\\\_DELTA adjusted 0.45 -\\\> 0.50 to rescue 5 structurally identical Authority HIGH weak profile failures (the\\\_exposed, hr\\\_capture, the\\\_unsolved\\\_problem, the\\\_tolerated\\\_violation, heard\\\_and\\\_ignored) — all at gap -0.4975, all with built\\\_to\\\_fail as rank-1 at 0.8976 under neutral-only answer generation. Geometric property of Authority HIGH tier; not a calibration error.
+\*\*[S26] leadership_deafness reshape + cluster cleanup + top-cluster criterion — locked:\*\* leadership_deafness att_l raised 0.35->0.50. C-Silence/C-InfoFlow dismantled: cluster_id=None for what_nobody_says, the_unreported_hazard, the_unlocked_door, leadership_deafness, the_suppression_filter. C-Manager/C-Culture retained. _passes_cluster_criterion(): target passes if score >= rank_1_score — SCD_WCS_CLUSTER_WINDOW (initial 0.20). HC 38/47.
 
   
 
@@ -1007,7 +819,7 @@ WEAK\\\_PROMINENCE\\\_DELTA adjusted 0.45 -\\\> 0.50 to rescue 5 structurally id
 
   
 
-Diagnostic established prior to implementation: tools/diag\\\_s28\\\_moderate\\\_weak\\\_gap.py. All 85 failing moderate/weak profiles confirmed competition-blocked (0 floor-gated). Gap mean -0.2337, median -0.2085. built\\\_to\\\_fail rank-1 in 59/85, the\\\_undefined\\\_role in 12/85.
+\*\*[S27] CENTROID_FIELD_SCALARS + window 0.35, 28-round calibration — HC RESOLVED — locked:\*\* CENTROID_FIELD_SCALARS per-field scalars added to accumulation.py (Path B): mu_focused[f] = MC_CENTROID_39[f] * CENTROID_FIELD_SCALARS[f] * (N/39.0). SCD_WCS_CLUSTER_WINDOW raised 0.20->0.35 (Path C). 28-round autonomous calibration, no regressions: HC 47/47 RESOLVED. Final scalars: apt_l=0.2415, auth_l=0.3318, all_l=0.2185, att_l=0.4267 (all asset=0.4000). _PRECOMPUTED_NOISE_BASELINE recalibrated (mean 0.8724). --output-json flag added. Commit: 15ffb8d.
 
   
 
@@ -1015,7 +827,7 @@ Diagnostic established prior to implementation: tools/diag\\\_s28\\\_moderate\\\
 
   
 
-Commit: 30738d4.
+\*\*[S28] Prominence criterion for moderate/weak — locked:\*\* _passes_prominence_criterion() added to calibration_runner.py. Pass conditions (both required): (1) target score >= SCD_WCS_ALIGNMENT_THRESHOLD; (2) target score >= rank_1_score - delta (MODERATE_PROMINENCE_DELTA=0.20, WEAK_PROMINENCE_DELTA=0.50). WEAK delta adjusted from 0.45 for Authority HIGH tier geometry. 57/142->133/142. Commit: 30738d4.
 
   
 
@@ -1227,35 +1039,7 @@ WS3 (Commercial Layer) active Session 31. WS1 (Engine) complete. WS2 (Output Lay
 
   
 
-\\\*\\\*Phase 1 summary — closed Session 12\\\*\\\*
-
-  
-
-\\- State profile vector seeding complete: 11 HIGH states at 0.60, 21 MEDIUM states at 0.40, 15 LOW/cluster states unchanged at 0.25.
-
-  
-
-\\- Synthetic injection infrastructure built (tools/calibration\\\_runner.py --synthetic).
-
-  
-
-\\- Baseline run (zero answers): 19/142 passed — zero-signal artifact confirmed expected.
-
-  
-
-\\- Synthetic run: 26/142 passed — dimensional routing confirmed. HIGH/MEDIUM profiles route correctly at dimension level, zero cross-dimension errors.
-
-  
-
-\\- Intra-dimension ties assessed: data-layer property (states within same dimension have identical profile vectors), not an algorithmic failure. Euclidean distance math stable.
-
-  
-
-\\- Phase 1 acceptance criterion met: scoring layer validates at dimension level.
-
-  
-
-\\- Gemini confirmed transition to Phase 2.
+\*\*Phase 1 — CLOSED Session 12.\*\* Synthetic injection confirmed dimensional routing at dimension level. 26/142 synthetic profiles passed — zero cross-dimension errors. Gemini confirmed transition to Phase 2.
 
   
 
@@ -1263,7 +1047,23 @@ WS3 (Commercial Layer) active Session 31. WS1 (Engine) complete. WS2 (Output Lay
 
   
 
-\\\*\\\*Phase 2 objective\\\*\\\*
+\*\*Phase 2 — CLOSED Session 29 at 137/142 (96.5%): 47 HC + 1 extreme HC + 44 moderate + 45 weak.\*\* Key interventions:
+
+\- v12 (S19): _neutral_option() fixed, signal-driven mode activated — 14/142
+
+\- v21 (S24): SCD-WCS metric + centroid displacement implemented — coordinate-space change, HC 0/47
+
+\- v23 (S26): leadership_deafness reshape + top-cluster criterion — 42/142, HC 38/47
+
+\- v24 (S27): CENTROID_FIELD_SCALARS + window=0.35, 28-round autonomous calibration — HC 47/47 RESOLVED
+
+\- v25 (S28): Prominence criterion added — 133/142
+
+\- v26 (S29): MODERATE_PROMINENCE_DELTA 0.20->0.26 — 137/142
+
+\- v27 (S29): the_undefined_role dual-axis reshape, sink collapsed 23->1 — Phase 2 CLOSED
+
+Full progression in Section 16 session log.
 
   
 
@@ -1271,7 +1071,7 @@ WS3 (Commercial Layer) active Session 31. WS1 (Engine) complete. WS2 (Output Lay
 
   
 
-Populate the 142 test profile answers arrays using best\\\_option\\\_for\\\_state() helper. Run first question-layer Confusion Matrix. Phase 2 success criterion: confirms internal map consistency of the question library.
+\*\*5 remaining structural failures (deferred Phase 3):\*\* identity_erosion moderate (gap -0.4266), transition_paralysis moderate (-0.3441), the_untouchable moderate (-0.3079), leadership_deafness weak (-0.5502), the_untouchable weak (-0.6027). All built_to_fail casualties. Defer to real-world signal — checkpoint routing and narrative prompts not exercised in synthetic testing.
 
   
 
@@ -1279,15 +1079,7 @@ Populate the 142 test profile answers arrays using best\\\_option\\\_for\\\_stat
 
   
 
-\\- high\\\_confidence profiles: best-fit option for every question
-
-  
-
-\\- moderate profiles: best-fit for primary dimension questions, neutral elsewhere
-
-  
-
-\\- weak profiles: neutral throughout
+\*\*Open items\*\*
 
   
 
@@ -1295,571 +1087,79 @@ Populate the 142 test profile answers arrays using best\\\_option\\\_for\\\_stat
 
   
 
-Salience weight derivation requires real-world signal — deferred to Phase 3.
+| Router prerequisites | Deferred — HC criterion met via cluster window. Two prerequisites unmet for re-attempt: (a) intra-dimensional sink suppression; (b) question library signal sufficient for all 4 dimensions under generate_answers(). |
 
-  
 
-  
-
-  
-
-\\\*\\\*Completed Session 10\\\*\\\*
-
-  
-
-\\- engine/data/questions.py populated — 50 entries, 0.25 baseline vectors, all schema checks pass
-
-  
-
-\\- 24 accumulation tests: passed, 0 failed
-
-  
-
-\\- test\\\_suite.py schema updated: pass\\\_criterion (Optional\\\[str\\\], profile-implied fallback), severity\\\_escalation\\\_flag, extreme\\\_high\\\_confidence profile type
-
-  
-
-\\- 142 test profiles wired across 8 files — 47/47 states covered
-
-  
-
-\\- 363 tests, 0 failures
-
-  
-
-\\- Attitude B3 missing from Drive at session open — recovered from session history and synced
-
-  
-
-  
-
-  
-
-\\\*\\\*Session 10 schema decisions — locked\\\*\\\*
-
-  
-
-  
-
-  
-
-| \\\*\\\*pass\\\_criterion field\\\*\\\* | Optional\\\[str\\\] = None with profile-implied fallback. None implies rank\\\_1 for high\\\_confidence/extreme; top\\\_3 for moderate; not applicable for weak. Set explicitly only when non-default behavior needed. |
-
-  
 
 | --- | --- |
 
-  
 
-| \\\*\\\*severity\\\_escalation\\\_flag\\\*\\\* | bool = False on ExpectedOutput. Fires independent check on engine output when True. Used for APT-PT-00 (extreme Paper Tiger). |
 
-  
+| culture_drift intra-dimensional dominance | Captures 15/17 Attitude HC profiles within Attitude-only competition pool. Primary Attitude sink. Not resolved by salience reduction (Track 1 reverted). Phase 3 scope. |
 
-| \\\*\\\*extreme\\\_high\\\_confidence profile type\\\*\\\* | Added to PROFILE\\\_TYPES. Used for APT-PT-00. Behaves like high\\\_confidence for rank/output\\\_type checks; pass\\\_criterion drives rank behavior. |
 
-  
 
-  
+| the_overloaded_manager co-dominant sink | Aptitude primary salience (2.5). Persistent secondary sink. |
 
-  
 
-\\\*\\\*Fixed-severity states — calibration pass criteria differ from standard\\\*\\\*
 
-  
+| the_uninitiated intra-Authority sink | Residual moderate Authority sink. |
 
-  
 
-  
 
-| The Paper Tiger | Entrenched only (locked) |
+| paper_shield intra-Authority sink | Secondary intra-Authority sink. Persistent. |
 
-  
 
-| --- | --- |
 
-  
+| APT-PT-00 (the_paper_tiger) | Routes to built_to_fail (x3) + culture_drift (x1) in v20. Severity escalation flag in use. |
 
-| The Uninitiated | Emerging only (acute by definition) |
 
-  
 
-| The Culture That Wasn't | Emerging only (acute at discovery) |
+| the_fracture | Routes to the_suppression_filter (x2) + the_overloaded_manager (x1). |
 
-  
 
-| The Broken Compass | Entrenched only (locked) |
 
-  
+| Mode 2 floor deficits (Track 4) | the_arbitrary_standard, what_nobody_says, the_dormant_talent, the_overloaded_manager. Deferred. |
 
-  
 
-  
-
-\\\*\\\*States with Entrenched severity floor (no Emerging tier)\\\*\\\*
-
-  
-
-  
-
-  
-
-The Untouchable — The Basement Standard — The Inside Track — Narrative Lock — Groundhog Day — Silosolation — The Suppression Filter — Leadership Deafness — Decision Blindness
-
-  
-
-  
-
-  
-
-\\\*\\\*Completed Sessions 11-17\\\*\\\* — see session log for detail. Summary: cosine metric introduced (S16), tiered floor locked (S16), option-level valence seeding complete (S15), Phase 2 v5 calibration: 3/142 first floor-gated result (S16). Global tier standardization all 47 states (S17). 402 tests, 0 failures.
-
-  
-
-  
-
-  
-
-\\\*\\\*Phase 2 v5 open decisions — all resolved Session 17\\\*\\\*
-
-  
-
-  
-
-  
-
-| Issue 1 | the\\\_unexamined\\\_algorithm centroid trap | RESOLVED — LOW/CLUSTER tier, auth\\\_l=0.35/apt\\\_l=0.25/others=0.15 |
-
-  
-
-| --- | --- | --- |
-
-  
-
-| Issue 2 | Attitude/Aptitude 1.15x floor too aggressive | RESOLVED — floor multiplier reduced to 1.08x Session 17 |
-
-  
-
-| Issue 3 | Wrong-axis patch (the\\\_unreported\\\_hazard, what\\\_nobody\\\_says) | RESOLVED — both correctly set to att\\\_l as secondary in LOW/CLUSTER tier |
-
-  
-
-| Issue 4 | 12 Authority LOW states unpatched | RESOLVED — all 47 states differentiated via global tier standardization |
-
-  
-
-| Issue 5 | Authority HIGH identical vectors (0.60/0.15) | RESOLVED — updated to 0.60/0.10, all HIGH states retain distinct primary field |
-
-  
-
-  
-
-  
-
-\\\*\\\*Phase 2 calibration progression\\\*\\\*
-
-  
-
-  
-
-  
-
-| Version | Dominant sink | Pass | Notes |
-
-  
-
-| --- | --- | --- | --- |
-
-  
-
-| v5 | the\\\_unexamined\\\_algorithm (centroid) | 3/142 | First floor-gated run |
-
-  
-
-| v6 | paper\\\_shield (centroid) | — | S17 centroid cascade |
-
-  
-
-| v7 | invisible\\\_influence\\\_architecture (centroid) | — | S17 centroid cascade |
-
-  
-
-| v8 | narrative\\\_lock (centroid) | 1/142 | All Authority LOW centroids cleared |
-
-  
-
-| v9 | the\\\_uninitiated (medium-Authority, auth\\\_l=0.40) | 1/142 | Geometric sink, not centroid |
-
-  
-
-| v10 | paper\\\_shield (LOW/CLUSTER, auth\\\_l=0.35+all\\\_l=0.25) | 3/142 | Tier standardization applied |
-
-  
-
-| v11 | paper\\\_shield (LOW/CLUSTER) | 3/142 | Contrast field injection — no pass rate change (noise regime confirmed) |
-
-  
-
-| v12 | the\\\_unexamined\\\_algorithm (LOW/CLUSTER, auth\\\_l=0.35+apt\\\_l=0.25) | 14/142 | Signal-driven mode — first answer-populated run. paper\\\_shield resolved. |
-
-  
-
-| v13 | the\\\_uninitiated (MEDIUM Authority, auth\\\_l=0.45) | 13/142 | HC gating + UEA vector patch (Path C). UEA captures reduced \\\~90-\\\>\\\~41. the\\\_uninitiated now dominant (\\\~81 captures). Authority structural dominance confirmed. |
-
-  
-
-| v14 | the\\\_uninitiated (dominant, \\\~90+ captures) | 19/142 | SALIENCE\\\_PROFILES weighted cosine adopted. HC 0/47, mod 3/47, weak 16/47. Session 21. |
-
-  
-
-| v15 | the\\\_uninitiated (dominant) | 15/142 | Authority drain Q07/Q09/Q16/Q20/Q26/Q29. Regression from v14. HC 0/47, mod 3/47, weak 12/47. Session 21. |
-
-  
-
-| v16 | the\\\_uninitiated (dominant); culture\\\_drift secondary | 17/142 | Contrast injection Q14/Q16/Q22/Q26/Q35/Q36. +2 from v15. HC 0/47, mod 4/47, weak 13/47. Session 22. |
-
-  
-
-| v17 | culture\\\_drift (99); the\\\_uninitiated (12) | 18/142 | Angular Separation Track 3: six HIGH Authority 0.60/0.10-\\\>0.70/0.05; the\\\_uninitiated 0.45/0.15-\\\>0.40/0.10. HC 0/47, mod 7/47, weak 11/47. Session 23. |
-
-  
-
-| v18 | culture\\\_drift (60); the\\\_overloaded\\\_manager (48) | 20/142 | Angular Separation Track 2: Q20 C/D 0.60-\\\>0.80. HC 0/47, mod 10/47, weak 10/47. Session 23. |
-
-  
-
-| v19 | culture\\\_drift (50); the\\\_overloaded\\\_manager (48); leadership\\\_continuity\\\_risk (14) | 21/142 | Angular Separation Track 1: culture\\\_drift salience attitude 2.5-\\\>1.85. HC 0/47, mod 9/47, weak 12/47. Session 23. |
-
-  
-
-| v20 | culture\\\_drift (\\\~55); the\\\_overloaded\\\_manager (\\\~45) | 20/142 | Router experiment (13/142 intermediate — reverted). states.py/salience.py reverted; Q20 0.80 retained. HC 0/47, mod 10/47, weak 10/47. Session 23. |
-
-  
-
-| v21 | leadership\\\_deafness (dominant, att/all); built\\\_to\\\_fail (secondary, auth/apt); the\\\_fracture (tertiary) | 1/142 | SCD-WCS metric + absolute threshold floor (T=0.25). HC 0/47, mod 0/47, weak 1/47. Metric change — not directly comparable to v20 (different coordinate system). Architecture structurally clean. Session 24. |
-
-  
-
-| v22 | leadership\\\_deafness (dominant, att/auth); built\\\_to\\\_fail (secondary) | 3/142 | SCD-WCS floor recalibration (T=-0.4000) + salience patch. Floor still zero clearances. Salience reduction backfired — LD non-target presence 65%-\\\>70%. HC 0/47. Session 25/26. |
-
-  
-
-| v23 | built\\\_to\\\_fail (dominant, \\\~42% captures); leadership\\\_deafness (secondary, \\\~27%) | 42/142 | Salience revert + LD vector reshape (att\\\_l 0.35-\\\>0.50) + cluster cleanup + top-cluster criterion (Delta=0.20). HC 38/47 (81%) — first meaningful HC result. Moderate 2/47, Weak 1/47. Session 26. |
-
-  
-
-| v24 | built\\\_to\\\_fail (rank-1 for most profiles; HC passes via cluster window) | 57/142 | CENTROID\\\_FIELD\\\_SCALARS focus-damped displacement (Path B) + SCD\\\_WCS\\\_CLUSTER\\\_WINDOW raised 0.20-\\\>0.35 (Path C). 28-round autonomous calibration, no regressions. HC 47/47 (100%) — RESOLVED. Moderate 4/47, Weak 5/47 (strict single\\\_state criterion). Overall 40.1%. Session 27. |
-
-  
-
-| v25 | built\\\_to\\\_fail (rank-1 for most profiles; HC passes via cluster window; moderate/weak pass via prominence criterion) | 133/142 | Prominence criterion: \\\_passes\\\_prominence\\\_criterion() added to calibration\\\_runner.py. MODERATE\\\_PROMINENCE\\\_DELTA=0.20, WEAK\\\_PROMINENCE\\\_DELTA=0.50. Moderate 4-\\\>40/47, Weak 5-\\\>45/47. 9 structural failures remain. Session 28. |
-
-  
-
-| v26 | built\\\_to\\\_fail (dominant); 5 structural failures remain | 137/142 | MODERATE\\\_PROMINENCE\\\_DELTA raised 0.20-\\\>0.26. Rescued 4 moderate failures: dueling\\\_narratives, invisible\\\_burnout, leadership\\\_deafness (moderate), the\\\_arbitrary\\\_standard. HC 47/47, Moderate 44/47, Weak 45/47, Extreme HC 1/1. Session 29. |
-
-  
-
-| v27 | built\\\_to\\\_fail (dominant); the\\\_undefined\\\_role sink collapsed | 137/142 | the\\\_undefined\\\_role dual-axis reshape: apt\\\_l 0.45-\\\>0.35, auth\\\_l 0.15-\\\>0.35, all\\\_l 0.15-\\\>0.10, att\\\_l 0.15-\\\>0.10. Sink count 23-\\\>1. Zero rescues, no regression. Structural cleanup only. 5 remaining failures all built\\\_to\\\_fail casualties. Phase 2 CLOSED. Session 29. |
-
-  
-
-  
-
-  
-
-\\\*\\\*Completed Session 18\\\*\\\*
-
-  
-
-\\- Contrast field injection: Q02-B, Q04-D, Q10-C, Q11-C, Q15-C, Q23-C/D — 7 edits to questions.py.
-
-  
-
-\\- Monte Carlo v11: N=1000, seed=42. \\\_PRECOMPUTED\\\_NOISE\\\_BASELINE updated — mean 0.8011.
-
-  
-
-\\- v11 calibration: 3/142 — unchanged from v10. Confirmed signal-driven mode was already active; \\\_neutral\\\_option() F-option bias was the blocking issue.
-
-  
-
-\\- 402 tests, 0 failures. Commit c8b79a2.
-
-  
-
-  
-
-  
-
-\\\*\\\*Completed Session 19\\\*\\\*
-
-  
-
-\\- calibration\\\_runner.py refactored: \\\_neutral\\\_option() fixed to absolute sum of all dimensional fields (was signed liability-only sum). \\\_conditional sentinel values skipped (isinstance guard). --signal flag added. Mode label updated.
-
-  
-
-\\- Phase 2 v12 calibration: 14/142. HC: 0/47. Moderate: 5/47. Weak: 9/47.
-
-  
-
-\\- paper\\\_shield: resolved as dominant sink.
-
-  
-
-\\- New dominant sink: the\\\_unexamined\\\_algorithm (LOW/CLUSTER, auth\\\_l=0.35, apt\\\_l=0.25, floor=0.8926).
-
-  
-
-\\- 402 tests, 0 failures. Commit e96eaf6.
-
-  
-
-  
-
-  
-
-\\\*\\\*Completed Session 20\\\*\\\*
-
-  
-
-\\- Pre-session deferred files committed: engine/data/intake.py (3 new PriorAdjuster entries), tools/test\\\_output.py (1.15x label updated to 1.08x). Commit 71d6a86.
-
-  
-
-\\- Change 1: calibration\\\_runner.py generate\\\_answers() — HC/extreme profiles now call best\\\_option\\\_for\\\_state() only on state\\\_targets questions; neutral elsewhere. Moderate/weak unchanged.
-
-  
-
-\\- Change 2: states.py the\\\_unexamined\\\_algorithm vector patch — authority\\\_liability=0.50, aptitude\\\_liability=0.35, all 6 other fields=0.10.
-
-  
-
-\\- Monte Carlo v13: N=1000, seed=42. Mean 0.8012 (stable). One state shifted: the\\\_unexamined\\\_algorithm 0.8926-\\\>0.8996. \\\_PRECOMPUTED\\\_NOISE\\\_BASELINE updated in output.py.
-
-  
-
-\\- Phase 2 v13: 13/142. HC 0/47, extreme 0/1, moderate 4/47, weak 9/47. Regression of 1 from v12. UEA captures reduced \\\~90-\\\>\\\~41. the\\\_uninitiated is new dominant sink (\\\~81 captures). 36 states at 0/3. the\\\_paper\\\_tiger APT-PT-00 regressed to rank-41.
-
-  
-
-\\- 402 tests, 0 failures. Commit e2be5ea.
-
-  
-
-  
-
-  
-
-\\\*\\\*Completed Session 21\\\*\\\*
-
-  
-
-\\- Gemini brief on authority leakage structural root cause: question library is the intervention target. Primary Authority questions accumulate authority\\\_liability via neutral-option answers for all profile types. the\\\_uninitiated (MEDIUM Authority, flat auth\\\_l=0.45 vector) is a geometric attractor.
-
-  
-
-\\- SALIENCE\\\_PROFILES weighted cosine adopted as Phase 2 calibration metric. Per-state weight vectors: target dimension fields = 2.5, off-axis = 0.4. rank\\\_states() updated to accept SALIENCE\\\_PROFILES parameter.
-
-  
-
-\\- v14 calibration run: 19/142. HC 0/47, extreme 0/1, moderate 3/47, weak 16/47.
-
-  
-
-\\- v15 authority drain: Q07/Q09/Q16/Q20/Q26/Q29 authority\\\_liability stripped from secondary co-signal question options. state\\\_targets purge: decision\\\_paralysis removed from Q07/Q09 state\\\_targets. Q06 Paper Tiger (APT-PT-00) state\\\_targets fix.
-
-  
-
-\\- Monte Carlo v15 baseline: N=1000, seed=42, SALIENCE\\\_PROFILES weighted cosine. Mean 0.8937. the\\\_uninitiated: 0.9659-\\\>0.9582 (-0.0077, first consecutive compression).
-
-  
-
-\\- v15 calibration: 15/142. HC 0/47, extreme 0/1, moderate 3/47, weak 12/47. Regression from v14 19/142.
-
-  
-
-\\- 402 tests, 0 failures. Commits: d9209f5, a518c75.
-
-  
-
-  
-
-  
-
-\\\*\\\*Completed Session 22\\\*\\\*
-
-  
-
-\\- Gemini v16 corrected contrast injection spec received and executed end-to-end. Three hard stops resolved during dry-run phase.
-
-  
-
-\\- patch\\\_v16\\\_step1\\\_contrast\\\_injection.py: 6 question blocks, 8 option vectors, applied in one write pass after dry-run confirmation.
-
-  
-
-\\- Session 18 locked fields verified: 19/19 PASS (audit\\\_contrast\\\_fields\\\_v16.py). No regression to locked fields.
-
-  
-
-\\- Monte Carlo v16 baseline: N=1000, seed=42, SALIENCE\\\_PROFILES weighted cosine. Mean 0.8962.
-
-  
-
-\\- v16 calibration: 17/142. HC 0/47, extreme 0/1, moderate 4/47, weak 13/47. +2 from v15.
-
-  
-
-\\- 402 tests, 0 failures. Commit 72b3107.
-
-  
-
-  
-
-  
-
-\\\*\\\*Completed Session 23\\\*\\\*
-
-  
-
-\\- Three-track Angular Separation applied across v17-v19. Progression: v17 18/142 -\\\> v18 20/142 -\\\> v19 21/142 (best result to date). HC 0/47 at all three intermediates.
-
-  
-
-\\- v19 baseline computed. Mean 0.8915.
-
-  
-
-\\- v20 Two-Tier Hierarchical Router: implemented, intermediate result 13/142, reverted. Router architectural finding documented.
-
-  
-
-\\- v20 clean: states.py/salience.py reverted (Track 1+3 removed; Track 2 retained at Q20 C/D 0.80). Full 47-state rank\\\_states() path restored. Clean Monte Carlo baseline computed. Mean 0.8968. \\\_PRECOMPUTED\\\_NOISE\\\_BASELINE updated in engine/output.py.
-
-  
-
-\\- v20 calibration: 20/142 (HC 0/47, Moderate 10/47, Weak 10/47).
-
-  
-
-\\- 402 tests, 0 failures. Commit c1ddb38.
-
-  
-
-  
-
-  
-
-\\\*\\\*Open items carried into v21\\\*\\\*
-
-  
-
-  
-
-  
-
-| HC routing failure — 0/47 across v13-v20 | CLOSED — RESOLVED in v24. 47/47 HC via Path B (CENTROID\\\_FIELD\\\_SCALARS) + Path C (window=0.35). Session 27. |
-
-  
-
-| --- | --- |
-
-  
-
-| Router prerequisites — two unmet before re-attempt | (a) intra-dimensional sink suppression/penalization mechanism; (b) question library signal sufficient to produce correct dimension-dominant vectors for all 4 dimensions under generate\\\_answers(). Both required before router can function. Deferred — HC criterion met via cluster window. |
-
-  
-
-| culture\\\_drift intra-dimensional dominance | Captures 15/17 Attitude HC profiles within Attitude-only competition pool. Primary Attitude sink. Not resolved by salience reduction (Track 1 reverted). |
-
-  
-
-| the\\\_overloaded\\\_manager co-dominant sink — \\\~45 captures | Aptitude primary salience (2.5). Persistent secondary sink across v18-v20. |
-
-  
-
-| the\\\_uninitiated intra-Authority sink — residual | Drops to 12 captures under Track 3 sharpening but Track 3 reverted. At v20 clean: moderate Authority sink. |
-
-  
-
-| paper\\\_shield intra-Authority sink | Secondary intra-Authority sink. Persistent. |
-
-  
-
-| APT-PT-00 (the\\\_paper\\\_tiger) — 0/4 | Routing to built\\\_to\\\_fail (x3) + culture\\\_drift (x1) in v20. |
-
-  
-
-| the\\\_fracture — 0/3 | Routing to the\\\_suppression\\\_filter (x2) + the\\\_overloaded\\\_manager (x1). |
-
-  
-
-| Mode 2 floor deficits (Track 4) — deferred | the\\\_arbitrary\\\_standard, what\\\_nobody\\\_says, the\\\_dormant\\\_talent, the\\\_overloaded\\\_manager. |
-
-  
 
 | Q06 neutral drain | Skipped v17-v20. Carries forward. |
 
-  
+
 
 | VERIFY-Q25 copy review | Queued. |
 
-  
+
 
 | Q23-A SEVER-05 paths | Queued. |
 
-  
+
 
 | Negative accumulated values assertion | Queued. |
 
-  
+
 
 | Construction and Logistics intake expansion | Queued. |
 
-  
 
-| The Dormant Talent Signal Map correction | Signal Map lists Attitude/Alliance; states.py correctly says Aptitude. Signal Map document requires correction. |
 
-  
-
-| Untracked tools files + diag\\\_s29\\\_gap\\\_profiles.py | CLOSED Session 30 — committed a77bff4 |
-
-  
-
-| built\\\_to\\\_fail as structural rank-1 sink | Remains rank-1 for \\\~83+ profiles (all types) under v24/v25. HC profiles pass via cluster criterion; moderate/weak profiles pass via prominence criterion. HIGH-tier Aptitude state (apt\\\_l=0.60) — structural attractor in SCD-WCS space. Intervention requires either: (a) question library signal strong enough to displace built\\\_to\\\_fail from rank-1, or (b) salience adjustment. Deferred — Pete decides. |
-
-  
-
-| Moderate/weak calibration gap assessment | CLOSED — RESOLVED v25. Prominence criterion implemented. 133/142 (93.7%). Session 28. |
-
-  
-
-| 5 remaining structural failures | identity\\\_erosion moderate (gap -0.4266), transition\\\_paralysis moderate (-0.3441), the\\\_untouchable moderate (-0.3079), leadership\\\_deafness weak (-0.5502), the\\\_untouchable weak (-0.6027). All route to built\\\_to\\\_fail as rank-1. Deferred to Phase 3 — built\\\_to\\\_fail intervention would require either HC-risking vector surgery (Gemini advised against) or dedicated per-state question-library signal work. Data-first principle: defer to real-world signal. Synthetic calibration is harder than reality for low-signal profiles — checkpoint routing and narrative prompts not exercised in synthetic testing and may resolve several once live. |
-
-  
-
-| C-Manager / C-Culture cluster stress-test | CLOSED Session 30 |
-
-  
-
-| Asset axis calibration | Asset axis calibration deferred to Phase 3 — requires real-world signal data. Note: the 0.4000 values in CENTROID\\\_FIELD\\\_SCALARS are displacement scalars, not state-vector asset field values (which are tier-standard 0.10/0.15). See Section 9 asset field correction note. |
-
-  
-
-| Rank 2 (Q5/Q7 attitude injection) | Considered S29, stood down. Gemini assessed insufficient against -0.43 gap (identity\\\_erosion); may marginally hurt transition\\\_paralysis. Revisit only with real-world signal. Not carried as live work. |
-
-  
-
-| the\\\_undefined\\\_role sink monitoring | CLOSED — S29 v27 dual-axis reshape collapsed sink 23→1. No longer a concern. |
+| The Dormant Talent Signal Map correction | Signal Map lists Attitude/Alliance; states.py correctly assigns primary_dimension=Aptitude. Document requires correction. |
 
 
 
-| Tagline and spine | CLOSED Session 32. Practice spine locked as internal standard: Expertise. Resonance. Effectiveness. No separate market-facing tagline pending. |
+| built_to_fail as structural rank-1 sink | Remains rank-1 for ~83+ profiles (all types) under v24/v25. HC passes via cluster criterion; moderate/weak via prominence criterion. Intervention requires: (a) question library signal to displace btf from rank-1, or (b) salience adjustment. Deferred — Pete decides. |
 
 
 
-| Service offering names | CLOSED Session 32. Final: Formation, Practicum, Counsel, Navigation, Diagnostic. |
+| 5 remaining structural failures | identity_erosion moderate (gap -0.4266), transition_paralysis moderate (-0.3441), the_untouchable moderate (-0.3079), leadership_deafness weak (-0.5502), the_untouchable weak (-0.6027). All built_to_fail casualties. Deferred to Phase 3. |
+
+
+
+| Asset axis calibration | Deferred to Phase 3. CENTROID_FIELD_SCALARS 0.4000 values are displacement scalars, not state-vector asset field values (tier-standard 0.10/0.15). See Section 9 asset field correction note. |
+
+
+
+| Rank 2 (Q5/Q7 attitude injection) | Stood down Session 29. Gemini assessed insufficient against -0.43 gap. Revisit only with real-world signal. Not live work. |
 
 
 
@@ -1867,31 +1167,23 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
 
 
-| Navigation urgency question | CLOSED Session 33. Name confirmed. Subtitle carries urgency. |
+| The Work | Held. Weight confirmed. Address unknown. |
 
 
 
-| Diagnostic intrigue question | CLOSED Session 33. Clarity confirmed over intrigue. |
+| Service-specific path design | How each of the four resolution services presents on the site. What a practitioner-directed arrival finds. |
 
 
 
-| The Work | Held. Weight confirmed. Address unknown. Do not assign until Session 33 or later surfaces the right home. |
-
-
-
-| Service-specific path design | Open. How each of the four resolution services presents on the site. What a practitioner-directed arrival finds. Session 34 scope. |
-
-
-
-| Menu execution layout | Open. How the two-tier structure looks on the page. Weight and position of Diagnostic relative to the four. Session 34 scope. |
-
-
-
-| Placement of two load-bearing positioning statements | Open. Both confirmed for commercial surface. Specific location not yet decided. |
+| Menu execution layout | How the two-tier structure looks on the page. Weight and position of Diagnostic relative to the four. |
 
 
 
 | Content library citation audit | Open. E2, E5, E7 priority. |
+
+
+
+| LinkedIn BD legal read | Required before personal account amplification. Non-solicitation agreement with OneDigital governs. Attorney to advise on: passive content sharing, definition of solicitation under agreement, LinkedIn as channel. |
 
   
 
@@ -2117,27 +1409,27 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
   
 
-| \\\*\\\*engine/data/states.py\\\*\\\* | 47 state profiles. Session 17: all 47 states have explicit DimensionalVector overrides — global tier standardization complete. No centroid states remain. Session 20: the\\\_unexamined\\\_algorithm vector updated to auth\\\_l=0.50/apt\\\_l=0.35/others=0.10. Session 23: v19 Track 3 applied and reverted — net unchanged from pre-Session-23 committed state. Session 26: leadership\\\_deafness vector reshape — att\\\_l=0.50, all other 7 fields=0.10 (v23). cluster\\\_id=None for what\\\_nobody\\\_says, the\\\_unreported\\\_hazard, the\\\_unlocked\\\_door, leadership\\\_deafness, the\\\_suppression\\\_filter (C-Silence/C-InfoFlow dismantled). Session 29: the\\\_undefined\\\_role dual-axis reshape (v27) — aptitude\\\_liability 0.45→0.35, authority\\\_liability 0.15→0.35, alliance\\\_liability 0.15→0.10, attitude\\\_liability 0.15→0.10. Asset fields unchanged at 0.15. Liability budget 0.90 preserved. Reshaped from single-axis Aptitude (MEDIUM standard) to dual-axis Authority/Aptitude. Narrows cosine aperture: sink count collapsed 23→1. Commit 627d19b. |
+| \\\*\\\*engine/data/states.py\\\*\\\* | 47 state profiles. All 47 states at explicit DimensionalVector overrides — global tier standardization complete (S17). Current locked changes: the\_unexamined\_algorithm auth\_l=0.50/apt\_l=0.35 (S20); leadership\_deafness att\_l=0.50 (S26); cluster\_id=None for C-Silence/C-InfoFlow 5 states (S26); the\_undefined\_role dual-axis reshape apt\_l/auth\_l=0.35/0.35, sink 23->1 (S29). |
 
   
 
-| \\\*\\\*engine/data/questions.py\\\*\\\* | 67 entries. Session 15: all Q01-Q34 options in \\\_opt\\\_contrib. SEVER-05 added. Session 16: Q10/Q25/Q30 governing state reclassified. Session 18: contrast field injection on Q02-B, Q04-D, Q10-C, Q11-C, Q15-C, Q23-C/D. Session 21: authority drain Q07/Q09/Q16/Q20/Q26/Q29 options; state\\\_targets purge Q07/Q09; Q06 APT-PT-00 fix. Session 22: contrast injection Q14-B/C (-0.05), Q16-B/C (-0.20), Q22-B (-0.10), Q26-C (-0.30 added), Q35-B (-0.35 added), Q36-E (-0.40 added). Session 23: Q20 C/D 0.60-\\\>0.80 (v19 Track 2, retained in v20). Do not modify without Gemini brief. |
+| \\\*\\\*engine/data/questions.py\\\*\\\* | 67 entries. All options in \_opt\_contrib. SEVER-05 signed delta contributions. Contrast fields injected S18 (Q02-B, Q04-D, Q10-C, Q11-C, Q15-C, Q23-C/D) and S22 (Q14-B/C, Q16-B/C, Q22-B, Q26-C, Q35-B, Q36-E). Q20 C/D auth\_l=0.80 (S23). \\*\\*Do not modify without Gemini brief.\\*\\* |
 
   
 
-| \\\*\\\*engine/data/salience.py\\\*\\\* | SALIENCE\\\_PROFILES weight vectors. Session 21: adopted for Phase 2 calibration. Session 23: culture\\\_drift attitude salience 2.5-\\\>1.85 (Track 1) applied and reverted — comment updated, value at 2.5 (unchanged from pre-Session-23 committed state). Session 26: v22 salience changes (leadership\\\_deafness att 1.65/auth 0.65, the\\\_suppression\\\_filter all\\\_l 2.85/auth 1.20) reverted to Three-Tier standard. |
+| \\\*\\\*engine/data/salience.py\\\*\\\* | SALIENCE_PROFILES weight vectors. Three-Tier standard. culture\_drift and the\_suppression\_filter reverted to standard (S26). |
 
   
 
-| \\\*\\\*engine/data/intake.py\\\*\\\* | Intake field definitions and prior adjusters. Session 20: 3 new PriorAdjuster entries added — attitude\\\_conduct (1.10x), attitude\\\_departure (1.07x), aptitude\\\_redesign (1.12x). All calibration targets. Commit 71d6a86. |
+| \\\*\\\*engine/data/intake.py\\\*\\\* | Intake field definitions and prior adjusters. Three PriorAdjuster entries: attitude\_conduct (1.10x), attitude\_departure (1.07x), aptitude\_redesign (1.12x). All calibration targets. |
 
   
 
-| \\\*\\\*engine/output.py\\\*\\\* | Session 17: SIGNAL\\\_FLOOR\\\_MULTIPLIER\\\_DEFAULT updated 1.15-\\\>1.08. Session 22: \\\_PRECOMPUTED\\\_NOISE\\\_BASELINE updated to v16 (mean 0.8962). Session 23: \\\_PRECOMPUTED\\\_NOISE\\\_BASELINE updated to v20 clean (mean 0.8968). Session 24: floor system replaced with SCD\\\_WCS\\\_ALIGNMENT\\\_THRESHOLD=0.25 and check\\\_signal\\\_gate(). Session 27: \\\_PRECOMPUTED\\\_NOISE\\\_BASELINE recalibrated under v24 CENTROID\\\_FIELD\\\_SCALARS (N=1000, seed=42, Q01-Q39, global mean 0.8724). Commit 15ffb8d. |
+| \\\*\\\*engine/output.py\\\*\\\* | Output engine. SIGNAL\_FLOOR\_MULTIPLIER\_DEFAULT 1.08x. SCD\_WCS\_ALIGNMENT\_THRESHOLD=-0.4000 governs floor gating. \_PRECOMPUTED\_NOISE\_BASELINE mean 0.8724 (v24 calibration, used for score\_lift\_pct only). |
 
   
 
-| \\\*\\\*engine/accumulation.py\\\*\\\* | Session 15: is\\\_high\\\_hazard added to IntakeData. Session 21: rank\\\_states() accepts SALIENCE\\\_PROFILES weight parameter. Session 23: Two-Tier Router applied and reverted — net unchanged. Session 24: SCD-WCS implemented. MC\\\_CENTROID\\\_39 constant added. rank\\\_states() updated — asymmetric displacement, answered\\\_question\\\_count parameter. Commit bf4f86e. Session 27: CENTROID\\\_FIELD\\\_SCALARS dict added (Path B). rank\\\_states() displacement formula updated to apply field-specific scalars. Final v24 values: apt\\\_l=0.2415, auth\\\_l=0.3318, all\\\_l=0.2185, att\\\_l=0.4267, all asset fields=0.4000. Commit 15ffb8d. |
+| \\\*\\\*engine/accumulation.py\\\*\\\* | Accumulation engine. SCD-WCS implemented. MC\_CENTROID\_39 constant. CENTROID\_FIELD\_SCALARS per-field scalars (Path B). Final v24 values: apt_l=0.2415, auth_l=0.3318, all_l=0.2185, att_l=0.4267. answered\_question\_count parameter in rank\_states(). |
 
   
 
@@ -2177,7 +1469,7 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
   
 
-| \\\*\\\*tools/calibration\\\_runner.py\\\*\\\* | Phase 1/2 calibration runner. Session 12: synthetic injection added. Session 16: generate\\\_answers() Phase 2 dynamic answer generation. Session 19: \\\_neutral\\\_option() fixed; --signal flag added. Session 20: HC/extreme profiles use state\\\_targets gating. Session 21: SALIENCE\\\_PROFILES weighted cosine adopted. Session 23: router applied and reverted — net unchanged. Session 24: rank\\\_states() call site updated to include answered\\\_question\\\_count. Commit bf4f86e. Session 26: \\\_passes\\\_margin\\\_gate() replaced with \\\_passes\\\_cluster\\\_criterion(). SCD\\\_WCS\\\_CLUSTER\\\_WINDOW=0.20 (calibration target). Top-cluster presence criterion for HC/extreme profiles. Session 27: SCD\\\_WCS\\\_CLUSTER\\\_WINDOW raised 0.20-\\\>0.35. --output-json flag added for harness integration. Commit 15ffb8d. Session 28: \\\_passes\\\_prominence\\\_criterion() added — tiered prominence delta for moderate (0.20) and weak (0.50) profiles. \\\_build\\\_suite\\\_v23() routing updated — moderate/weak no longer require single\\\_state output\\\_type. WEAK\\\_PROMINENCE\\\_DELTA adjusted 0.45-\\\>0.50 for Authority HIGH tier geometry. Commit 30738d4. |
+| \\\*\\\*tools/calibration\\\_runner.py\\\*\\\* | Phase 1/2 calibration runner. Signal-driven mode. HC/extreme state_targets gating. SALIENCE_PROFILES weighted cosine. _passes_cluster_criterion() for HC/extreme (SCD_WCS_CLUSTER_WINDOW=0.35). _passes_prominence_criterion() for moderate/weak. --output-json flag for harness. |
 
   
 
@@ -2209,15 +1501,15 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
   
 
-| \\\*\\\*tools/patch\\\_v21\\\_cdwcs.py\\\*\\\* | Session 24. SCD-WCS implementation: MC\\\_CENTROID\\\_39 constant, rank\\\_states() asymmetric displacement, answered\\\_question\\\_count parameter. |
+| \\\*\\\*tools/patch\\\_v21\\\_cdwcs.py\\\*\\\* | S24. Applied SCD-WCS: MC_CENTROID_39 constant, rank_states() displacement, answered_question_count. |
 
   
 
-| \\\*\\\*tools/patch\\\_v21\\\_absolute\\\_threshold.py\\\*\\\* | Session 24. Floor system replacement: adds SCD\\\_WCS\\\_ALIGNMENT\\\_THRESHOLD=0.25 and check\\\_signal\\\_gate(). |
+| \\\*\\\*tools/patch\\\_v21\\\_absolute\\\_threshold.py\\\*\\\* | S24. Floor system replacement: SCD_WCS_ALIGNMENT_THRESHOLD=0.25 and check_signal_gate(). |
 
   
 
-| \\\*\\\*tools/diag\\\_v21\\\_accumulated\\\_centroid.py\\\*\\\* | Session 24. Accumulated vector centroid diagnostic. N=1000, seed=42, Q01-Q39. Produced MC\\\_CENTROID\\\_39 empirical means. Not committed. |
+| \\\*\\\*tools/diag\\\_v21\\\_accumulated\\\_centroid.py\\\*\\\* | S24. Produced MC_CENTROID_39 empirical means. N=1000, seed=42, Q01-Q39. Not committed. |
 
   
 
@@ -2237,11 +1529,11 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
   
 
-| \\\*\\\*tools/patch\\\_v23\\\_cluster\\\_criterion.py\\\*\\\* | Session 26. Replaces \\\_passes\\\_margin\\\_gate() with \\\_passes\\\_cluster\\\_criterion(). SCD\\\_WCS\\\_CLUSTER\\\_WINDOW=0.20. Updates \\\_build\\\_suite\\\_v23() call site. |
+| \\\*\\\*tools/patch\\\_v23\\\_cluster\\\_criterion.py\\\*\\\* | S26. Adds _passes_cluster_criterion(); SCD_WCS_CLUSTER_WINDOW=0.20. |
 
   
 
-| \\\*\\\*tools/harness\\\_s27\\\_autonomous\\\_calibration.py\\\*\\\* | Session 27. Autonomous calibration harness — iterates CENTROID\\\_FIELD\\\_SCALARS and SCD\\\_WCS\\\_CLUSTER\\\_WINDOW until 47/47 HC, impasse (5 flat rounds), or escalation trigger. 28 rounds executed. RESOLVED 47/47. Not committed (Pete decides on tools cleanup commit). |
+| \\\*\\\*tools/harness\\\_s27\\\_autonomous\\\_calibration.py\\\*\\\* | S27. Autonomous calibration harness. 28 rounds executed, RESOLVED 47/47 HC. Not committed. |
 
   
 
@@ -2249,27 +1541,27 @@ The Untouchable — The Basement Standard — The Inside Track — Narrative Loc
 
   
 
-| \\\*\\\*tools/diag\\\_s27\\\_failing\\\_hc\\\_characterization.py\\\*\\\* | Session 27. Read-only diagnostic — characterized 9 failing HC profiles under v23. Root cause: authority centroid dominance (5.3601 \\\>\\\> session accumulation \\\~4.3). Not committed. |
+| \\\*\\\*tools/diag\\\_s27\\\_failing\\\_hc\\\_characterization.py\\\*\\\* | S27. Characterized 9 failing HC profiles under v23. Root cause: authority centroid dominance. Not committed. |
 
   
 
-| \\\*\\\*tools/diag\\\_s27\\\_failing\\\_hc\\\_characterization.md\\\*\\\* | Session 27. Diagnostic output — 5-section analysis. Key finding: displacement paradox — all Authority HC profiles produce negative displaced scores under all-1.0 scalars. Not committed. |
+| \\\*\\\*tools/diag\\\_s27\\\_failing\\\_hc\\\_characterization.md\\\*\\\* | S27. Diagnostic output: displacement paradox finding. Not committed. |
 
   
 
-| \\\*\\\*tools/patch\\\_output\\\_noise\\\_baseline\\\_v24.py\\\*\\\* | Session 27. Patches \\\_PRECOMPUTED\\\_NOISE\\\_BASELINE in engine/output.py with v24 per-state means. Not committed. |
+| \\\*\\\*tools/patch\\\_output\\\_noise\\\_baseline\\\_v24.py\\\*\\\* | S27. Patches _PRECOMPUTED_NOISE_BASELINE with v24 per-state means. Not committed. |
 
   
 
-| \\\*\\\*tools/test\\\_accumulation.py\\\*\\\* | Session 27: hardcoded SCD-WCS distance check (1.480801, valid only at all-1.0 CENTROID\\\_FIELD\\\_SCALARS) replaced with structural invariant check (finite distance + relative ordering). Required for harness compatibility. Committed 15ffb8d. |
+| \\\*\\\*tools/test\\\_accumulation.py\\\*\\\* | S27: hardcoded SCD-WCS distance replaced with structural invariant check. Required for harness compatibility. Committed 15ffb8d. |
 
   
 
-| \\\*\\\*tools/diag\\\_s28\\\_moderate\\\_weak\\\_gap.py\\\*\\\* | Session 28. Read-only diagnostic — characterizes 85 failing moderate/weak profiles under v24. Captures target score, rank-1 state, prominence gap, output\\\_type, states above floor per profile. Key finding: all 85 failures competition-blocked (0 floor-gated). Not committed (Pete decides on tools cleanup commit). |
+| \\\*\\\*tools/diag\\\_s28\\\_moderate\\\_weak\\\_gap.py\\\*\\\* | S28. Characterized 85 failing moderate/weak profiles under v24. All competition-blocked (0 floor-gated). built_to_fail rank-1 in 59/85. Not committed. |
 
   
 
-| \\\*\\\*tools/diag\\\_s28\\\_moderate\\\_weak\\\_gap.md\\\*\\\* | Session 28. Diagnostic output — 4-section report. Gap distribution: moderate clusters -0.05 to -0.20, weak clusters -0.30 to -0.50. built\\\_to\\\_fail rank-1 in 59/85, the\\\_undefined\\\_role in 12/85. Mean gap -0.2337. Not committed. |
+| \\\*\\\*tools/diag\\\_s28\\\_moderate\\\_weak\\\_gap.md\\\*\\\* | S28. Gap distribution: moderate -0.05 to -0.20, weak -0.30 to -0.50. Mean gap -0.2337. built_to_fail rank-1 in 59/85. Not committed. |
 
   
 
