@@ -85,13 +85,19 @@ export default function Home() {
   }
 
   return (
-    <div>
-      <main>
-        {/* Phases 1 + 2 — Signature Recognition and State Assembly */}
-        <section>
-          {phase === 1 && <p>{uiCopy.phase1Instruction}</p>}
+    <div className="flex min-h-screen bg-gray-50">
+      <main className="flex-1 min-w-0 px-6 py-10 md:px-10 md:py-14 pb-20 md:pb-14">
+        <div className={`max-w-2xl ${phase === 1 ? "mx-auto" : ""}`}>
 
-          <div>
+          {/* Phase 1 instruction */}
+          {phase === 1 && (
+            <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+              {uiCopy.phase1Instruction}
+            </p>
+          )}
+
+          {/* Signature cards — visible in all phases */}
+          <div className="space-y-3">
             {signatures.map((sig) => {
               const sigSelected = selectedStates.some(
                 (s) => s.signatureId === sig.id
@@ -111,41 +117,71 @@ export default function Home() {
             })}
           </div>
 
+          {/* Phase 1 CTA */}
           {phase === 1 && selectedStateIds.length > 0 && (
-            <button onClick={() => setPhase(2)}>
-              {uiCopy.transitionTrigger}
-            </button>
+            <div className="mt-8">
+              <button
+                onClick={() => setPhase(2)}
+                className="bg-gray-900 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                {uiCopy.transitionTrigger}
+              </button>
+            </div>
           )}
 
+          {/* Phase 2 CTA */}
           {phase === 2 && selectedStateIds.length > 0 && (
-            <button onClick={handleSeeWhatThisMeans}>
-              {uiCopy.seeWhatThisMeans}
-            </button>
+            <div className="mt-8">
+              <button
+                onClick={handleSeeWhatThisMeans}
+                className="bg-gray-900 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                {uiCopy.seeWhatThisMeans}
+              </button>
+            </div>
           )}
-        </section>
 
-        {/* Phase 3 — Coexistence Interpretation */}
-        {phase === 3 && (
-          <section>
-            {isLoadingInterpretation ? (
-              <p>Loading&hellip;</p>
-            ) : (
-              <p>{interpretation}</p>
-            )}
-            {!isLoadingInterpretation && (
-              <button onClick={() => setPhase(4)}>{uiCopy.phase4Copy}</button>
-            )}
-          </section>
-        )}
+          {/* Phase 3 — Coexistence Interpretation */}
+          {phase === 3 && (
+            <div className="mt-10 pt-10 border-t border-gray-200">
+              {isLoadingInterpretation ? (
+                <p className="text-sm text-gray-400">Loading&hellip;</p>
+              ) : (
+                <p className="text-gray-900 text-base leading-relaxed">
+                  {interpretation}
+                </p>
+              )}
+              {!isLoadingInterpretation && (
+                <div className="mt-6">
+                  <button
+                    onClick={() => setPhase(4)}
+                    className="bg-gray-900 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    {uiCopy.phase4Copy}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
-        {/* Phase 4 — Transition */}
-        {phase === 4 && (
-          <section>
-            <p>{uiCopy.phase4Copy}</p>
-            <button>{uiCopy.diagnosticCTA}</button>
-            <button>{uiCopy.conversationCTA}</button>
-          </section>
-        )}
+          {/* Phase 4 — Transition */}
+          {phase === 4 && (
+            <div className="mt-10 pt-10 border-t border-gray-200">
+              <p className="text-gray-900 text-base leading-relaxed mb-6">
+                {uiCopy.phase4Copy}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button className="flex-1 bg-gray-900 text-white text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                  {uiCopy.diagnosticCTA}
+                </button>
+                <button className="flex-1 border border-gray-900 text-gray-900 text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                  {uiCopy.conversationCTA}
+                </button>
+              </div>
+            </div>
+          )}
+
+        </div>
       </main>
 
       {/* Assembly Panel — visible from Phase 2 onward */}
