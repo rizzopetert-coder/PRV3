@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.3
+\\\#\\\# MOB v4.4
 
   
 
@@ -488,6 +488,8 @@ Service offering names, pricing, UX, marketing site, instrument delivery interfa
 \*\*web/ layer initialized — Session 36:\*\* Stack: Next.js 16.2.9 / React 19.2.4 / Tailwind v4 (CSS-based config — no tailwind.config.ts). web/data/taxonomy.ts placed — 47 states, 5 signatures. Six taxonomy patches applied this session: silosolation signatureId stunted_growth → information_blindness; narrative_lock signatureId information_blindness → culture_erosion with secondarySignatureIds: ["information_blindness"]; the_fracture added to leadership_bottleneck.stateIds; the_second_close added to stunted_growth.stateIds; the_uninitiated added to compounding_risks.stateIds; silosolation added to information_blindness.stateIds. 47/47 states anchored in signature stateIds arrays. Prompt confirmed: two-to-three sentences, condition pattern and cost, no service names, no severity language, no prescriptive language. Route Handler: payload validation enforces name + signatureId only — rejects additional fields with 400. Component shells in place: SignatureCard.tsx (Radix Collapsible), AssemblyPanel.tsx (Vaul mobile drawer), page.tsx (phase state machine 1–4). TypeScript: 0 errors. web/CLAUDE.md and web/AGENTS.md excluded from repo — root CLAUDE.md governs. Commit: ff178d0.
 
 \*\*web/ styling pass — Session 37:\*\* Tailwind v4 classes applied across five files. globals.css: background updated to gray-50 (#f9fafb), body font wired to Geist variable, dark mode block removed. layout.tsx: title updated to "Principal Resolution." page.tsx: flex layout with phase-aware content centering (mx-auto Phase 1, left-aligned Phase 2+), pb-20 mobile padding for floating bar, CTA button classes, Phase 3/4 sections styled with divider border. SignatureCard.tsx: card border dynamic (gray-200 default / gray-900 selected), state item dimmed/selected treatment (selected: solid gray-900 border + font-semibold + gray-900 text; unselected: no border + gray-400 text). AssemblyPanel.tsx: desktop sticky sidebar (w-72, bg-white, border-l, sticky h-screen, overflow-y-auto), mobile Vaul drawer (fixed trigger bar z-40, overlay z-40 bg-black/30, content z-50 + drag handle + rounded-t-2xl + max-h-80vh). TypeScript: 0 errors. Open flags: (1) Phase 3 CTA button uses uiCopy.phase4Copy as its label — full paragraph, not a button label; needs a short label or separate copy key. (2) handleSelectState sets phase=2 on first selection, so the Phase 1 transition trigger button (phase===1 && selectedStateIds.length > 0) never renders — Pete to review UX intent. Next session: Phase 2 state selection UX (auto-expand selected signatures on Phase 2 entry, selection feedback), Phase 3 copy fix, Phase 4 CTA routing.
+
+\*\*Output Layer scaffolding — Session 38:\*\* WS2 opened. Pre-work: phase3CTALabel added to taxonomy.ts UICopy interface and uiCopy object ("See what this means."); Phase 1 auto-advance line removed from handleSelectState in page.tsx; Phase 3 button label corrected to use uiCopy.phase3CTALabel (was incorrectly using uiCopy.phase4Copy — full paragraph as button label). Engine output layer: contract.py extended (org_size field added to intake echo and _INTAKE_FIELDS validator). Four new engine files: friction_tax.py (severity scalars LOCKED: E=0.6/N=1.0/D=1.4; org_size bands CALIBRATION TARGET; STATE_MULTIPLIERS all 47 states CALIBRATION TARGET; compute_friction_tax() returns {low, high, currency} with high=low*1.4); resolution_families.py (47-state→4 resolution family mapping: structural/developmental/investigative/directional; assert at import verifies count; family descriptions COPY PENDING; no service names); output_synthesis.py (follows narrative.py pattern; system prompt enforces no service names and no semicolons; synthesize() with 5s timeout and deterministic fallback; OutputSynthesisEngine class). Web output layer: web/lib/output-renderer.ts (PrivateOutputPayload and ShareableOutputPayload types; renderPrivateOutput() and renderShareableOutput(); 3-pass structure — Layer 1 async synthesis, Layer 2 sync state blocks, Layer 3 sync resolution direction; no engine/ imports — clinical boundary enforced). Three route handlers: /api/result (PrivateOutput only — ShareableOutput never serialized); /api/share/create (writes ShareableOutput to KV, PrivateOutput never written to KV); /api/share/[id] (returns ShareableOutput only, 404 on expired — KV TTL handles expiry). Payload separation enforced at serialization, not component level. @vercel/kv installed (deprecated — Vercel migrated to Upstash Redis; flag for deployment review). nanoid installed. Three component shells: PrivateOutput.tsx, ShareableOutput.tsx, ShareButton.tsx (no final copy, no styling). Tests: test_friction_tax.py (17 pass), test_resolution_families.py (29 pass), test_output_synthesis.py (25 pass) — 71 new tests, all existing tests pass. TypeScript: 0 errors. Gemini handoff written: prompts/gemini-output-layer-payload-handoff.md (payload separation review, 5 questions). Open: all friction_tax multipliers CALIBRATION TARGET; family descriptions COPY PENDING; route handlers have TODO placeholders for engine call wiring (S39 scope).
 
 
 
@@ -1024,7 +1026,7 @@ Phase 3 (real-world signal): Deferred. Live instrument delivery. Salience weight
 
   
 
-2\\. Output layer — diagnostic report the principal receives: copy, structure, Patterned Consequence Logic financial output, private vs. shareable format
+2\\. Output layer — diagnostic report the principal receives: copy, structure, Patterned Consequence Logic financial output, private vs. shareable format. \*\*ACTIVE — Session 38.\*\* Engine output layer scaffolded (friction_tax.py, resolution_families.py, output_synthesis.py, contract.py extended). Web output layer scaffolded (output-renderer.ts, three route handlers with payload separation, three component shells). All friction_tax multipliers CALIBRATION TARGET. All family descriptions COPY PENDING. Route handler engine call wiring deferred to S39. Gemini payload separation review queued (prompts/gemini-output-layer-payload-handoff.md).
 
   
 
@@ -1312,6 +1314,8 @@ Full progression in Section 16 session log.
 
 | \\\*\\\*Session 37\\\*\\\* | Styling pass complete. Tailwind v4 classes applied across 5 files. Dimmed/selected state treatment delivered per spec. Desktop sidebar and mobile Vaul drawer styled. TypeScript: 0 errors. Open flags: Phase 3 CTA button label (uiCopy.phase4Copy is full paragraph — needs short copy); Phase 1 auto-advance behavior (transition trigger never renders — Pete to review). |
 
+| \\\*\\\*Session 38\\\*\\\* | WS2 (Output Layer) opened. Payload separation locked as server boundary enforced at serialization — not at component render level. PrivateOutput never serialized into /api/share endpoints. ShareableOutput never appears in /api/result. PrivateOutput never written to KV. Four resolution families confirmed: structural, developmental, investigative, directional — family descriptions COPY PENDING, service names never in output. Friction tax severity scalars LOCKED: Emerging=0.6, Entrenched=1.0, Endemic=1.4. high=low*1.4 range spread LOCKED. org_size added to engine output contract intake echo. phase3CTALabel added to taxonomy UICopy — Phase 3 button label corrected. Phase 1 auto-advance removed from handleSelectState. @vercel/kv deprecation flagged (Vercel migrated to Upstash Redis — deployment review required). |
+
   
 
   
@@ -1432,7 +1436,7 @@ Full progression in Section 16 session log.
 
 | \\\*\\\*web/components/AssemblyPanel.tsx\\\*\\\* | Assembly panel. Desktop: persistent sidebar. Mobile: Vaul bottom sheet (floating bar collapsed, full list expanded). |
 
-| \\\*\\\*web/app/page.tsx\\\*\\\* | Main interface. Phase state machine (1–4). Static interpretation path (≥70% single-signature). Dynamic path: calls /api/interpret. |
+| \\\*\\\*web/app/page.tsx\\\*\\\* | Main interface. Phase state machine (1–4). Static interpretation path (≥70% single-signature). Dynamic path: calls /api/interpret. Phase 1 auto-advance removed S38. Phase 3 button uses uiCopy.phase3CTALabel S38. |
 
   
 
@@ -1460,7 +1464,35 @@ Full progression in Section 16 session log.
 
   
 
-| \\\*\\\*engine/contract.py\\\*\\\* | Section VII output contract. 14 top-level fields. ENGINE\\\_VERSION 0.2.0. |
+| \\\*\\\*engine/contract.py\\\*\\\* | Section VII output contract. 14 top-level fields. ENGINE\\\_VERSION 0.2.0. org_size added to intake echo and _INTAKE_FIELDS validator S38. |
+
+| \\\*\\\*engine/friction_tax.py\\\*\\\* | Output layer. Friction tax computation. Severity scalars LOCKED (E=0.6/N=1.0/D=1.4). org_size bands CALIBRATION TARGET. STATE_MULTIPLIERS all 47 states CALIBRATION TARGET. compute_friction_tax() returns {low, high, currency, org_size_label, severity_scalar, calibration_complete}. high=low*1.4 LOCKED. Created S38. |
+
+| \\\*\\\*engine/resolution_families.py\\\*\\\* | Output layer. 47-state resolution family mapping. Four families: structural, developmental, investigative, directional. Family descriptions COPY PENDING. No service names. Assert at import verifies 47. Helpers: get_family(), get_primary_family(), get_all_families(). Created S38. |
+
+| \\\*\\\*engine/output_synthesis.py\\\*\\\* | Output layer. LLM synthesis engine. Follows narrative.py pattern. System prompt enforces no service names, no semicolons. synthesize(): state_cluster, severity_tier, resolution_family_id → SynthesisResult. Timeout 5s. Deterministic fallback on error. OutputSynthesisEngine class. Created S38. |
+
+| \\\*\\\*web/lib/output-renderer.ts\\\*\\\* | Output layer renderer. PrivateOutputPayload and ShareableOutputPayload types. renderPrivateOutput() and renderShareableOutput(). 3-pass structure: Layer 1 async synthesis, Layer 2 sync state blocks, Layer 3 sync resolution. No engine/ imports — clinical boundary enforced. Created S38. |
+
+| \\\*\\\*web/app/api/result/route.ts\\\*\\\* | POST Route Handler. Returns PrivateOutput only. ShareableOutput never serialized into this response. Engine call wired via TODO(S39). Created S38. |
+
+| \\\*\\\*web/app/api/share/create/route.ts\\\*\\\* | POST Route Handler. Writes ShareableOutput to Vercel KV (NanoID key, 30-day TTL). PrivateOutput never written to KV. Returns {shareKey, shareUrl, expiresAt}. Engine call wired via TODO(S39). Created S38. |
+
+| \\\*\\\*web/app/api/share/[id]/route.ts\\\*\\\* | GET Route Handler. Returns ShareableOutput only. PrivateOutput never exists in this response. Returns 404 if not found or expired (KV TTL governs). Created S38. |
+
+| \\\*\\\*web/components/PrivateOutput.tsx\\\*\\\* | Component shell. Renders RenderedPrivateOutput — synthesis, state blocks, severity, friction tax, resolution direction. No final copy. No styling. Created S38. |
+
+| \\\*\\\*web/components/ShareableOutput.tsx\\\*\\\* | Component shell. Renders RenderedShareableOutput — synthesis, framing text, observable indicators, state blocks, resolution framing, attribution. No final copy. No styling. Created S38. |
+
+| \\\*\\\*web/components/ShareButton.tsx\\\*\\\* | Component shell. Calls /api/share/create, shows share URL and copy affordance. Three states: idle, creating, ready. Created S38. |
+
+| \\\*\\\*prompts/gemini-output-layer-payload-handoff.md\\\*\\\* | Gemini handoff for output layer Route Handler payload separation review. 5 questions: separation audit, KV write boundary, synthesis optional field risk, score exposure in ShareableOutput, serialization boundary pattern. Created S38. |
+
+| \\\*\\\*tools/test_friction_tax.py\\\*\\\* | Friction tax unit tests. 17 tests. SEVERITY_SCALAR values, calibration_complete logic, high=low*1.4, severity scalar application, band resolution, STATE_MULTIPLIERS registry alignment. Created S38. |
+
+| \\\*\\\*tools/test_resolution_families.py\\\*\\\* | Resolution families unit tests. 29 tests. 47-entry count, registry alignment, valid family values, all families populated, lookup helpers, no service names in descriptions. Created S38. |
+
+| \\\*\\\*tools/test_output_synthesis.py\\\*\\\* | Output synthesis unit tests. 25 tests. Parse valid/invalid JSON, fallbacks, empty state cluster, missing anthropic, system prompt constraints, _build_synthesis_prompt content, OutputSynthesisEngine interface. Created S38. |
 
   
 
@@ -1789,3 +1821,5 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
 | \\\*\\\*June 2026 — Session 36\\\*\\\* | Web layer initialization. web/ directory created from scratch. Next.js 16.2.9 / React 19.2.4 / Tailwind v4 scaffold. taxonomy.ts: 47/47 states anchored after 6 taxonomy patches (silosolation → information_blindness; narrative_lock → culture_erosion with secondary; the_fracture, the_second_close, the_uninitiated, silosolation added to respective signature stateIds). prompts.ts confirmed. Route Handler: payload validation enforces name + signatureId only. Component shells: SignatureCard.tsx, AssemblyPanel.tsx, page.tsx. TypeScript: 0 errors. web/CLAUDE.md and web/AGENTS.md gitignored — root CLAUDE.md governs. Commit ff178d0. MOB updated to v4.2. |
 
 | \\\*\\\*June 2026 — Session 37\\\*\\\* | Web layer styling pass. Tailwind v4 classes applied to globals.css (gray-50 background, Geist font wired), layout.tsx (title updated), page.tsx (flex layout, phase-aware centering, CTA classes, Phase 3/4 sections), SignatureCard.tsx (dimmed/selected state treatment, dynamic card border), AssemblyPanel.tsx (desktop sticky sidebar, mobile Vaul drawer with drag handle). TypeScript: 0 errors. Two open flags for Pete: Phase 3 CTA button uses full paragraph as label; Phase 1 auto-advance means transition trigger never renders. No engine changes. MOB updated to v4.3. |
+
+| \\\*\\\*June 2026 — Session 38\\\*\\\* | Output Layer (WS2) opened. Pre-work: phase3CTALabel added to taxonomy.ts, Phase 1 auto-advance removed from handleSelectState, Phase 3 button label corrected. Engine: contract.py (org_size to intake echo), friction_tax.py (severity scalars LOCKED, all multipliers CALIBRATION TARGET), resolution_families.py (47-state→4 family map, no service names, COPY PENDING descriptions), output_synthesis.py (follows narrative.py, 5s timeout, fallback). Web: output-renderer.ts (types + renderers, clinical boundary enforced), /api/result (PrivateOutput only), /api/share/create (ShareableOutput→KV, PrivateOutput never written), /api/share/[id] (ShareableOutput only, 404 on expired), PrivateOutput.tsx, ShareableOutput.tsx, ShareButton.tsx shells. Tests: 71 new (17+29+25), all pass, all existing pass. TypeScript: 0 errors. Gemini handoff written. @vercel/kv deprecated — flag for deployment. MOB updated to v4.4. |

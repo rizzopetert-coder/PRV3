@@ -31,7 +31,6 @@ export default function Home() {
       const next = prev.includes(stateId)
         ? prev.filter((id) => id !== stateId)
         : [...prev, stateId];
-      if (phase === 1 && next.length > 0) setPhase(2);
       return next;
     });
   }
@@ -157,7 +156,7 @@ export default function Home() {
                     onClick={() => setPhase(4)}
                     className="bg-gray-900 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
                   >
-                    {uiCopy.phase4Copy}
+                    {uiCopy.phase3CTALabel}
                   </button>
                 </div>
               )}

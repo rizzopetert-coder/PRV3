@@ -369,6 +369,7 @@ def assemble_output(session: SessionData) -> dict:
     # ── intake echo ──
     intake_obj = {
         "headcount":          session.intake.headcount,
+        "org_size":           session.intake.headcount,   # org_size band — resolved by friction_tax
         "industry":           session.intake.industry,
         "org_type":           session.intake.org_type,
         "jurisdictions":      list(session.intake.jurisdictions),
@@ -450,7 +451,7 @@ _SHAREABLE_OUTPUT_FIELDS = {
     "resolution_framing", "attribution_text",
 }
 _INTAKE_FIELDS = {
-    "headcount", "industry", "org_type",
+    "headcount", "org_size", "industry", "org_type",
     "jurisdictions", "significant_events", "principal_role",
 }
 

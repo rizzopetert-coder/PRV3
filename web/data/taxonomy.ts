@@ -40,6 +40,7 @@ export interface UICopy {
   assemblyTitle: string;
   assemblyEmpty: string;
   collapsedCountSuffix: string;
+  phase3CTALabel: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -528,6 +529,7 @@ export const uiCopy: UICopy = {
   assemblyTitle: "What you're carrying",
   assemblyEmpty: "Select conditions above to build your picture.",
   collapsedCountSuffix: "conditions inside",
+  phase3CTALabel: "See what this means.",
 };
 
 // ---------------------------------------------------------------------------
