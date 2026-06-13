@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.1
+\\\#\\\# MOB v4.2
 
   
 
@@ -485,8 +485,7 @@ Service offering names, pricing, UX, marketing site, instrument delivery interfa
 
 \*\*Engagement Agreement Draft v1.0 — produced Session 35:\*\* Ten sections plus Exhibit A Statement of Work. Shadow model compliant — no personal name, no affiliated entity reference. Categorical independence language throughout (Section 3). Six attorney review flags embedded. Five service types described with diagnostic output constraint preserved. Data handling: Option D default, Option B elective with checkbox election block. Governing law: Massachusetts. Load-bearing open item: attorney must read independence representation against non-solicitation agreement before execution. Draft is working — not execution-ready. Document: PRV3_Engagement_Agreement_Draft_v1.0.docx, outputs folder.
 
-
-
+\*\*web/ layer initialized — Session 36:\*\* Stack: Next.js 16.2.9 / React 19.2.4 / Tailwind v4 (CSS-based config — no tailwind.config.ts). web/data/taxonomy.ts placed — 47 states, 5 signatures. Six taxonomy patches applied this session: silosolation signatureId stunted_growth → information_blindness; narrative_lock signatureId information_blindness → culture_erosion with secondarySignatureIds: ["information_blindness"]; the_fracture added to leadership_bottleneck.stateIds; the_second_close added to stunted_growth.stateIds; the_uninitiated added to compounding_risks.stateIds; silosolation added to information_blindness.stateIds. 47/47 states anchored in signature stateIds arrays. Prompt confirmed: two-to-three sentences, condition pattern and cost, no service names, no severity language, no prescriptive language. Route Handler: payload validation enforces name + signatureId only — rejects additional fields with 400. Component shells in place: SignatureCard.tsx (Radix Collapsible), AssemblyPanel.tsx (Vaul mobile drawer), page.tsx (phase state machine 1–4). TypeScript: 0 errors. web/CLAUDE.md and web/AGENTS.md excluded from repo — root CLAUDE.md governs. Commit: ff178d0. Next session: styling pass, Phase 2 state selection UX, mobile bottom sheet implementation.
 
 
 
@@ -1027,7 +1026,7 @@ Phase 3 (real-world signal): Deferred. Live instrument delivery. Salience weight
 
   
 
-3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 32.\\\*\\\* Practice spine locked (internal standard: Expertise. Resonance. Effectiveness.). Five service names final and locked (Formation, Practicum, Counsel, Navigation, Diagnostic). Terraforming four-address architecture recorded. The Work held — address deferred. Session 33 complete. Navigation and Diagnostic names confirmed. Two-tier service structure locked. Site architecture locked. Content principles locked. Session 34 complete. Full commercial surface written and locked this session: 47 state descriptions, 5 common signatures, 5 service descriptions and inclusions, 6-phase self-selection output language, primary site copy and path framing. Storage architecture and disclosure approach decided. Diagnostic output constraint locked — service names never appear in automated output. LinkedIn BD strategy established pending legal read. Session 35 scope: engagement agreement draft, data handling terms, and next build surface — self-selection interface or common signatures library.
+3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 32.\\\*\\\* Practice spine locked (internal standard: Expertise. Resonance. Effectiveness.). Five service names final and locked (Formation, Practicum, Counsel, Navigation, Diagnostic). Terraforming four-address architecture recorded. The Work held — address deferred. Session 33 complete. Navigation and Diagnostic names confirmed. Two-tier service structure locked. Site architecture locked. Content principles locked. Session 34 complete. Full commercial surface written and locked this session: 47 state descriptions, 5 common signatures, 5 service descriptions and inclusions, 6-phase self-selection output language, primary site copy and path framing. Storage architecture and disclosure approach decided. Diagnostic output constraint locked — service names never appear in automated output. LinkedIn BD strategy established pending legal read. Session 35 complete. Engagement agreement drafted (v1.0, working, attorney review required before execution). Self-selection interface Architecture Spec v0.2 locked. Session 36 complete. web/ layer initialized — Next.js 16.2.9 / React 19 / Tailwind v4, taxonomy.ts placed (47/47 states anchored), Route Handler scaffolded, component shells in place. Next session: styling pass, Phase 2 state selection UX, mobile bottom sheet implementation.
 
   
 
@@ -1301,7 +1300,13 @@ Full progression in Section 16 session log.
 
 | \\\*\\\*Session 32\\\*\\\* | Practice spine locked: Expertise. Resonance. Effectiveness. (internal standard, not tagline). Five service names final: Formation, Practicum, Counsel, Navigation, Diagnostic. Terraforming four-address architecture recorded. The Work held — address deferred. | Load-bearing statements confirmed: "We don't arrive with a methodology and fit you into it. We start with you." and "We don't fix people problems. We change the conditions that produce them." Terraforming as practice endgame: confirmed framing, not yet in positioning copy. Bilateral understanding arc confirmed as value delivery sequence. PRV3 diagnostic confirmed as primary SEO entry point. Service menu retained — hard silos rejected, lines may blur in practice. Path B migration closed as infrastructure item (tools/_mob.txt authoritative, Drive dependency retired). |
 
+| \\\*\\\*Session 33\\\*\\\* | Navigation subtitle confirmed — urgency for acute entry point. Diagnostic name confirmed — clarity over intrigue, clinical register as differentiator. Two-tier service structure locked: Diagnostic above, four resolution services beneath. Site architecture locked: three parallel entry points (diagnostic, direct inquiry, service-specific) converging to conversation. Content principles locked: condition language, short-form proof, clear next steps. Two-minute test adopted as governing standard. |
+
 | \\\*\\\*Session 34\\\*\\\* | 47 state descriptions locked. Five common signatures locked: Leadership Bottleneck, Culture Erosion, Stunted Growth, Compounding Risks, Information Blindness. Five service descriptions and inclusions locked. Self-selection output language locked — six-phase sequence. Primary site copy locked. Load-bearing statement placement locked. Storage architecture decided: Option D baseline, Option B layered. Diagnostic output constraint locked: no service names in automated output. Shareable output design intent locked: room-runner, Friction Tax financial weight, travels without practitioner. |
+
+| \\\*\\\*Session 35\\\*\\\* | Self-selection interface Architecture Spec v0.2 locked — four-phase build-ready spec. Engagement Agreement Draft v1.0 produced — shadow model compliant, six attorney review flags, not execution-ready. |
+
+| \\\*\\\*Session 36\\\*\\\* | web/ layer initialized. Stack: Next.js 16.2.9 / React 19.2.4 / Tailwind v4. taxonomy.ts: 47/47 states anchored — 6 patches applied. Prompt confirmed. Route Handler: payload validation enforces name + signatureId only. Component shells: SignatureCard, AssemblyPanel, page.tsx. web/CLAUDE.md and web/AGENTS.md gitignored — root CLAUDE.md governs. Commit ff178d0. |
 
   
 
@@ -1409,7 +1414,21 @@ Full progression in Section 16 session log.
 
   
 
-| \\\*\\\*engine/\\\*\\\* | Scoring engine. All 7 sections. 401 tests, 0 failures. ENGINE\\\_VERSION 0.2.0. GitHub repo: synced. |
+| \\\*\\\*engine/\\\*\\\* | Scoring engine. All 7 sections. 405 tests, 0 failures. ENGINE\\\_VERSION 0.2.0. GitHub repo: synced. |
+
+| \\\*\\\*web/\\\*\\\* | Self-selection interface. Next.js 16.2.9 App Router / React 19 / Tailwind v4 / TypeScript. Initialized Session 36. Commit ff178d0. |
+
+| \\\*\\\*web/data/taxonomy.ts\\\*\\\* | Authoritative content data file. 47 states, 5 signatures, coexistence interpretations, UI copy, three helpers (getStatesForSignature, getSignatureForState, getDominantSignature). No imports from engine/ — clinical boundary enforced permanently. |
+
+| \\\*\\\*web/lib/prompts.ts\\\*\\\* | buildInterpretationPrompt() — groups selected states by signature name, returns confirmed prompt string. 2–3 sentence constraint. No service names, no severity language, no prescriptive language. |
+
+| \\\*\\\*web/app/api/interpret/route.ts\\\*\\\* | POST Route Handler. Payload validation: rejects fields beyond name + signatureId with 400. Model: claude-sonnet-4-6, max\_tokens: 200. Clinical boundary enforced at API layer. |
+
+| \\\*\\\*web/components/SignatureCard.tsx\\\*\\\* | Signature card component. Radix Collapsible expand/collapse. Per-state selection with dimmed/selected treatment. Count affordance. |
+
+| \\\*\\\*web/components/AssemblyPanel.tsx\\\*\\\* | Assembly panel. Desktop: persistent sidebar. Mobile: Vaul bottom sheet (floating bar collapsed, full list expanded). |
+
+| \\\*\\\*web/app/page.tsx\\\*\\\* | Main interface. Phase state machine (1–4). Static interpretation path (≥70% single-signature). Dynamic path: calls /api/interpret. |
 
   
 
@@ -1758,3 +1777,9 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
   
 
 | \\\*\\\*June 2026 — Session 33\\\*\\\* | Commercial Layer (WS3) Session 3. Navigation name confirmed — subtitle carries urgency. Diagnostic name confirmed — clarity over intrigue. Two-tier service structure locked: Diagnostic above, four resolution services beneath. Site architecture locked: three entry points (diagnostic, direct inquiry, service-specific), all converge to conversation. Content principles locked: condition language, short-form proof, clear next steps. Two-minute test adopted as governing standard. Content library confirmed as adjacent to commercial surface, not on it. No engine changes. MOB updated to v3.7. |
+
+| \\\*\\\*June 2026 — Session 34\\\*\\\* | Commercial Layer (WS3) Session 4. No engine work. No code touched. Full commercial surface written and locked: 47 state descriptions, 5 common signatures (Leadership Bottleneck, Culture Erosion, Stunted Growth, Compounding Risks, Information Blindness), 5 service descriptions and inclusions, 6-phase self-selection output language, primary site copy and path framing. Storage architecture decided: Option D baseline, Option B layered. Disclosure approach decided. Diagnostic output constraint locked — no service names in automated output. Shareable output design intent locked. LinkedIn BD strategy established pending legal read. MOB updated to v3.8. |
+
+| \\\*\\\*June 2026 — Session 35\\\*\\\* | Commercial Layer (WS3) Session 5. No engine work. No code touched. Self-selection interface Architecture Spec v0.2 locked — four-phase architecture, Option C assembly, Option A interpretation, Vaul mobile bottom sheet, Radix Collapsible signature cards. Engagement Agreement Draft v1.0 produced — ten sections plus Exhibit A, shadow model compliant, six attorney review flags, not execution-ready. MOB updated to v4.1. |
+
+| \\\*\\\*June 2026 — Session 36\\\*\\\* | Web layer initialization. web/ directory created from scratch. Next.js 16.2.9 / React 19.2.4 / Tailwind v4 scaffold. taxonomy.ts: 47/47 states anchored after 6 taxonomy patches (silosolation → information_blindness; narrative_lock → culture_erosion with secondary; the_fracture, the_second_close, the_uninitiated, silosolation added to respective signature stateIds). prompts.ts confirmed. Route Handler: payload validation enforces name + signatureId only. Component shells: SignatureCard.tsx, AssemblyPanel.tsx, page.tsx. TypeScript: 0 errors. web/CLAUDE.md and web/AGENTS.md gitignored — root CLAUDE.md governs. Commit ff178d0. MOB updated to v4.2. |
