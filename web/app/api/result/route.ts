@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { PrivateOutputPayload } from "@/lib/output-renderer";
+import type {
+  PrivateOutputPayload,
+  StateRef,
+  IntakeEcho,
+  ResolutionFamily,
+} from "@/lib/types";
 import { invokeEngine } from "@/lib/engine-client";
 
 // ---------------------------------------------------------------------------
@@ -14,7 +19,7 @@ import { invokeEngine } from "@/lib/engine-client";
 // No service names. Four families: structural | developmental | investigative | directional
 // ---------------------------------------------------------------------------
 
-const STATE_RESOLUTION_FAMILY: Record<string, string> = {
+const STATE_RESOLUTION_FAMILY: Record<string, ResolutionFamily> = {
   // Developmental
   the_unformed_leader:              "developmental",
   the_overloaded_manager:           "developmental",
@@ -68,21 +73,58 @@ const STATE_RESOLUTION_FAMILY: Record<string, string> = {
   leadership_deafness:              "directional",
 };
 
-function getPrimaryFamily(stateIds: string[]): string {
+function getPrimaryFamily(stateIds: string[]): ResolutionFamily {
   if (stateIds.length === 0) return "structural";
   return STATE_RESOLUTION_FAMILY[stateIds[0]] ?? "structural";
 }
 
-function formatStateName(stateId: string): string {
-  return stateId.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+// ---------------------------------------------------------------------------
+// Weight computation
+// Path B: equal weight (1 / n) for all selected states.
+// Path A: normalized cosine scores.
+// ---------------------------------------------------------------------------
+
+function computeWeights(
+  states: Array<{ id: string; name: string; score: number }>,
+  path: "A" | "B"
+): StateRef[] {
+  if (states.length === 0) return [];
+  if (path === "B") {
+    const w = 1 / states.length;
+    return states.map((s) => ({ id: s.id, name: s.name, weight: w }));
+  }
+  const total = states.reduce((sum, s) => sum + s.score, 0);
+  return states.map((s) => ({
+    id: s.id,
+    name: s.name,
+    weight: total > 0 ? s.score / total : 1 / states.length,
+  }));
 }
+
+// ---------------------------------------------------------------------------
+// Intake mapping — engine echo fields → IntakeEcho contract
+// ---------------------------------------------------------------------------
+
+function mapIntake(engineIntake: Record<string, unknown>): IntakeEcho {
+  const jurisdictions = Array.isArray(engineIntake.jurisdictions)
+    ? (engineIntake.jurisdictions as string[])
+    : [];
+  return {
+    organization_size: (engineIntake.org_size as string) ?? "",
+    industry: (engineIntake.industry as string) ?? "",
+    role_level: (engineIntake.principal_role as string) ?? "",
+    tenure_in_role: "",
+    direct_reports: "",
+    jurisdiction: jurisdictions[0] ?? "",
+  };
+}
+
 
 // ---------------------------------------------------------------------------
 // Request schema
 // ---------------------------------------------------------------------------
 
 interface ResultRequest {
-  sessionId: string;
   selectedStateIds: string[];
   intake: {
     headcount: string;
@@ -98,7 +140,6 @@ function validateRequest(body: unknown): body is ResultRequest {
   if (typeof body !== "object" || body === null) return false;
   const b = body as Record<string, unknown>;
   return (
-    typeof b.sessionId === "string" &&
     Array.isArray(b.selectedStateIds) &&
     b.selectedStateIds.every((id) => typeof id === "string") &&
     typeof b.intake === "object" &&
@@ -122,32 +163,41 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const { sessionId, selectedStateIds, intake } = body;
+  const { selectedStateIds, intake } = body;
 
   const engineResult = await invokeEngine({ selectedStateIds, intake });
 
-  const privatePayload: PrivateOutputPayload = {
-    sessionId,
-    outputType: engineResult.output_type,
-    identifiedStates: engineResult.identified_states.map((s) => ({
-      state_id: s.state_id,
-      state_name: s.state_name,
+  const allEngineStates = engineResult.identified_states;
+  if (allEngineStates.length === 0) {
+    return NextResponse.json({ error: "Engine returned no states" }, { status: 500 });
+  }
+
+  const stateRefs = computeWeights(
+    allEngineStates.map((s) => ({
+      id: s.state_id,
+      name: s.state_name,
       score: s.score,
-      distinguishing_language: s.distinguishing_language,
     })),
-    severity: {
-      tier: engineResult.severity.tier,
-      score: engineResult.severity.score,
-      anchor_text: engineResult.severity.anchor_text,
-    },
-    privateOutput: {
-      opening_text: engineResult.private_output.opening_text,
-      liability_block: engineResult.private_output.liability_block,
-      asset_anchor_text: engineResult.private_output.asset_anchor_text,
-      resolution_routing: engineResult.private_output.resolution_routing,
-      friction_tax_estimate: null,
-    },
-    // synthesis: opaque string from engine — not present in Path B (no output_synthesis call)
+    "B"
+  );
+
+  const privatePayload: PrivateOutputPayload = {
+    // synthesis: opaque string from engine. Not present in Path B (no output_synthesis call).
+    synthesis: "",
+
+    primary_state: stateRefs[0],
+    secondary_states: stateRefs.slice(1),
+
+    severity: engineResult.severity.tier,
+
+    resolution_family: getPrimaryFamily(selectedStateIds),
+    // resolution_routing: legacy service-name string from states.py profile (old naming, pre-S32)
+    resolution_routing: engineResult.private_output.resolution_routing,
+
+    // friction_tax_estimate: null in Path B (CALIBRATION TARGET — STATE_MULTIPLIERS not set)
+    friction_tax_estimate: null,
+
+    intake: mapIntake(engineResult.intake as Record<string, unknown>),
   };
 
   // ShareableOutput is NEVER serialized into this response.

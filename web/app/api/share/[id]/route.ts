@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
-import type { ShareableOutputPayload } from "@/lib/output-renderer";
+import type { ShareableOutputPayload } from "@/lib/types";
 
 const redis = Redis.fromEnv();
 

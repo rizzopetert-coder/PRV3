@@ -1,51 +1,52 @@
 "use client";
 
-import type { RenderedPrivateOutput } from "@/lib/output-renderer";
+import type { PrivateOutputPayload } from "@/lib/types";
 
 interface PrivateOutputProps {
-  output: RenderedPrivateOutput;
+  payload: PrivateOutputPayload;
 }
 
-export default function PrivateOutput({ output }: PrivateOutputProps) {
+export default function PrivateOutput({ payload }: PrivateOutputProps) {
+  const allStates = [payload.primary_state, ...payload.secondary_states];
+
   return (
     <div>
-      {/* Layer 1 — Pass 1: LLM synthesis (async, may not be ready on first render) */}
-      {output.synthesis.isReady && (
+      {/* Layer 1 — Pass 1: LLM synthesis (async, opaque string from engine) */}
+      {Boolean(payload.synthesis) && (
         <div>
-          <p>{output.synthesis.text}</p>
+          <p>{payload.synthesis}</p>
         </div>
       )}
 
       {/* Layer 2 — Pass 2: Identified state blocks (sync) */}
       <div>
-        {output.identifiedStates.map((state) => (
-          <div key={state.stateId}>
-            <p>{state.stateName}</p>
+        {allStates.map((state) => (
+          <div key={state.id}>
+            <p>{state.name}</p>
           </div>
         ))}
       </div>
 
       {/* Layer 2 — Severity */}
       <div>
-        <p>{output.severity.tier}</p>
-        <p>{output.severity.anchorText}</p>
+        <p>{payload.severity}</p>
       </div>
 
-      {/* Layer 2 — Friction tax (calibration pending) */}
-      {output.frictionTax.calibrationComplete && (
+      {/* Layer 2 — Friction tax (calibration pending — null in Path B) */}
+      {payload.friction_tax_estimate !== null && (
         <div>
           <p>
-            {output.frictionTax.low} – {output.frictionTax.high}{" "}
-            {output.frictionTax.currency}
+            {payload.friction_tax_estimate.low} &ndash;{" "}
+            {payload.friction_tax_estimate.high}{" "}
+            {payload.friction_tax_estimate.currency}
           </p>
         </div>
       )}
 
       {/* Layer 3 — Pass 3: Resolution direction (sync) */}
       <div>
-        <p>{output.resolution.openingText}</p>
-        <p>{output.resolution.liabilityBlock}</p>
-        <p>{output.resolution.assetAnchorText}</p>
+        <p>{payload.resolution_family}</p>
+        <p>{payload.resolution_routing}</p>
       </div>
     </div>
   );

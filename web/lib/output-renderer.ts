@@ -2,8 +2,9 @@
  * PRV3 Output Renderer
  * web/lib/output-renderer.ts
  *
- * Normalizes API response data for the PrivateOutput and ShareableOutput
- * component trees. No imports from engine/ — clinical boundary enforced.
+ * Normalizes PrivateOutputPayload and ShareableOutputPayload for the
+ * PrivateOutput and ShareableOutput component trees. Payload type definitions
+ * live in web/lib/types.ts. No imports from engine/ — clinical boundary enforced.
  *
  * Three rendering passes:
  *   Pass 1 (Layer 1) — LLM synthesis text, async, may arrive after initial render
@@ -13,8 +14,13 @@
  * Spec reference: PRV3 Output Layer Brief — Step 5
  */
 
+import type {
+  PrivateOutputPayload,
+  ShareableOutputPayload,
+} from "./types";
+
 // ---------------------------------------------------------------------------
-// Shared types
+// Renderer-internal view model types (component-facing)
 // ---------------------------------------------------------------------------
 
 export interface IdentifiedStateBlock {
@@ -33,48 +39,11 @@ export interface FrictionTax {
 }
 
 // ---------------------------------------------------------------------------
-// Private output types (principal-facing only)
+// Private output view model (principal-facing only)
 // ---------------------------------------------------------------------------
-
-/** Raw shape of the /api/result response payload. */
-export interface PrivateOutputPayload {
-  sessionId: string;
-  outputType: "single_state" | "multi_state" | "no_signal";
-  identifiedStates: Array<{
-    state_id: string;
-    state_name: string;
-    score: number;
-    distinguishing_language?: string | null;
-  }>;
-  severity: {
-    tier: string;
-    score: number;
-    anchor_text: string;
-  };
-  privateOutput: {
-    opening_text: string;
-    liability_block: string;
-    asset_anchor_text: string;
-    resolution_routing: string;
-    friction_tax_estimate: {
-      low: number | null;
-      high: number | null;
-      currency: string;
-      org_size_label: string;
-      severity_scalar: number;
-      calibration_complete: boolean;
-    } | null;
-  };
-  synthesis?: {
-    privateSynthesis: string;
-    synthesisConfidence: number;
-    isFallback: boolean;
-  };
-}
 
 /** Normalized private output ready for PrivateOutput.tsx. */
 export interface RenderedPrivateOutput {
-  sessionId: string;
   outputType: "single_state" | "multi_state" | "no_signal";
 
   // Layer 1 — Pass 1 (async synthesis)
@@ -104,40 +73,11 @@ export interface RenderedPrivateOutput {
 }
 
 // ---------------------------------------------------------------------------
-// Shareable output types (third-party safe)
+// Shareable output view model (third-party safe)
 // ---------------------------------------------------------------------------
-
-/** Raw shape of the /api/share/[id] response payload. */
-export interface ShareableOutputPayload {
-  sessionId: string;
-  shareKey: string;
-  expiresAt: string;
-  outputType: "single_state" | "multi_state" | "no_signal";
-  identifiedStates: Array<{
-    state_id: string;
-    state_name: string;
-    score: number;
-  }>;
-  severity: {
-    tier: string;
-    anchor_text: string;
-  };
-  shareableOutput: {
-    framing_text: string;
-    observable_indicators: string[];
-    resolution_framing: string;
-    attribution_text: string;
-  };
-  synthesis?: {
-    shareableSynthesis: string;
-    synthesisConfidence: number;
-    isFallback: boolean;
-  };
-}
 
 /** Normalized shareable output ready for ShareableOutput.tsx. */
 export interface RenderedShareableOutput {
-  sessionId: string;
   shareKey: string;
   expiresAt: string;
   outputType: "single_state" | "multi_state" | "no_signal";
@@ -173,29 +113,32 @@ export interface RenderedShareableOutput {
 export function renderPrivateOutput(
   payload: PrivateOutputPayload
 ): RenderedPrivateOutput {
-  const ft = payload.privateOutput.friction_tax_estimate;
+  const allStates = [payload.primary_state, ...payload.secondary_states];
+  const outputType: RenderedPrivateOutput["outputType"] =
+    payload.secondary_states.length === 0 ? "single_state" : "multi_state";
+
+  const ft = payload.friction_tax_estimate;
 
   return {
-    sessionId: payload.sessionId,
-    outputType: payload.outputType,
+    outputType,
 
     synthesis: {
-      text: payload.synthesis?.privateSynthesis ?? "",
-      confidence: payload.synthesis?.synthesisConfidence ?? 0,
-      isFallback: payload.synthesis?.isFallback ?? true,
-      isReady: Boolean(payload.synthesis?.privateSynthesis),
+      text: payload.synthesis,
+      confidence: 1.0,
+      isFallback: !payload.synthesis,
+      isReady: Boolean(payload.synthesis),
     },
 
-    identifiedStates: payload.identifiedStates.map((s) => ({
-      stateId: s.state_id,
-      stateName: s.state_name,
-      score: s.score,
+    identifiedStates: allStates.map((s) => ({
+      stateId: s.id,
+      stateName: s.name,
+      score: s.weight,
     })),
 
     severity: {
-      tier: payload.severity.tier,
-      score: payload.severity.score,
-      anchorText: payload.severity.anchor_text,
+      tier: payload.severity,
+      score: 0,
+      anchorText: "",
     },
 
     frictionTax: ft
@@ -203,9 +146,9 @@ export function renderPrivateOutput(
           low: ft.low,
           high: ft.high,
           currency: ft.currency,
-          orgSizeLabel: ft.org_size_label,
-          severityScalar: ft.severity_scalar,
-          calibrationComplete: ft.calibration_complete,
+          orgSizeLabel: "",
+          severityScalar: 1.0,
+          calibrationComplete: true,
         }
       : {
           low: null,
@@ -217,10 +160,10 @@ export function renderPrivateOutput(
         },
 
     resolution: {
-      openingText: payload.privateOutput.opening_text,
-      liabilityBlock: payload.privateOutput.liability_block,
-      assetAnchorText: payload.privateOutput.asset_anchor_text,
-      routingFamily: payload.privateOutput.resolution_routing,
+      openingText: "",
+      liabilityBlock: "",
+      assetAnchorText: "",
+      routingFamily: payload.resolution_family,
     },
   };
 }
@@ -228,36 +171,39 @@ export function renderPrivateOutput(
 export function renderShareableOutput(
   payload: ShareableOutputPayload
 ): RenderedShareableOutput {
+  const allStates = [payload.primary_state, ...payload.secondary_states];
+  const outputType: RenderedShareableOutput["outputType"] =
+    payload.secondary_states.length === 0 ? "single_state" : "multi_state";
+
   return {
-    sessionId: payload.sessionId,
-    shareKey: payload.shareKey,
-    expiresAt: payload.expiresAt,
-    outputType: payload.outputType,
+    shareKey: payload.share_id,
+    expiresAt: payload.expires_at,
+    outputType,
 
     synthesis: {
-      text: payload.synthesis?.shareableSynthesis ?? "",
-      confidence: payload.synthesis?.synthesisConfidence ?? 0,
-      isFallback: payload.synthesis?.isFallback ?? true,
-      isReady: Boolean(payload.synthesis?.shareableSynthesis),
+      text: "",
+      confidence: 0,
+      isFallback: true,
+      isReady: false,
     },
 
-    identifiedStates: payload.identifiedStates.map((s) => ({
-      stateId: s.state_id,
-      stateName: s.state_name,
-      score: s.score,
+    identifiedStates: allStates.map((s) => ({
+      stateId: s.id,
+      stateName: s.name,
+      score: s.weight,
     })),
 
     severity: {
-      tier: payload.severity.tier,
-      anchorText: payload.severity.anchor_text,
+      tier: payload.severity,
+      anchorText: "",
     },
 
-    observableIndicators: payload.shareableOutput.observable_indicators,
-    framingText: payload.shareableOutput.framing_text,
+    observableIndicators: [],
+    framingText: "",
 
     resolution: {
-      resolutionFraming: payload.shareableOutput.resolution_framing,
-      attributionText: payload.shareableOutput.attribution_text,
+      resolutionFraming: payload.resolution_family,
+      attributionText: "Identified using the PRV3 diagnostic instrument.",
     },
   };
 }
