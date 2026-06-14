@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { PrivateOutputPayload } from "@/lib/output-renderer";
+import { invokeEngine } from "@/lib/engine-client";
 
 // ---------------------------------------------------------------------------
 // Payload separation contract:
@@ -121,44 +122,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const { sessionId, selectedStateIds } = body;
+  const { sessionId, selectedStateIds, intake } = body;
 
-  const outputType: PrivateOutputPayload["outputType"] =
-    selectedStateIds.length === 0
-      ? "no_signal"
-      : selectedStateIds.length === 1
-        ? "single_state"
-        : "multi_state";
-
-  const primaryFamily = getPrimaryFamily(selectedStateIds);
-
-  // TODO(S40): Call Python engine with session payload.
-  // Engine returns full contract VII.1 output. Extract private_output fields only.
-  // synthesis.private_synthesis arrives from engine as an opaque string — never generated here.
-  // ShareableOutput is never constructed in this handler.
+  const engineResult = await invokeEngine({ selectedStateIds, intake });
 
   const privatePayload: PrivateOutputPayload = {
     sessionId,
-    outputType,
-    identifiedStates: selectedStateIds.map((id, i) => ({
-      state_id: id,
-      state_name: formatStateName(id),
-      score: parseFloat((1.0 - i * 0.05).toFixed(4)), // TODO(S40): replace with engine scores
-      distinguishing_language: null as null,
+    outputType: engineResult.output_type,
+    identifiedStates: engineResult.identified_states.map((s) => ({
+      state_id: s.state_id,
+      state_name: s.state_name,
+      score: s.score,
+      distinguishing_language: s.distinguishing_language,
     })),
     severity: {
-      tier: "Entrenched",             // TODO(S40): from engine severity_result
-      score: 50,                      // TODO(S40): from engine severity_result
-      anchor_text: "COPY PENDING",
+      tier: engineResult.severity.tier,
+      score: engineResult.severity.score,
+      anchor_text: engineResult.severity.anchor_text,
     },
     privateOutput: {
-      opening_text: "COPY PENDING",      // TODO(S40): from engine private_output
-      liability_block: "COPY PENDING",   // TODO(S40): from engine private_output
-      asset_anchor_text: "COPY PENDING", // TODO(S40): from engine private_output
-      resolution_routing: primaryFamily, // wired — mirrors engine/resolution_families.py
-      friction_tax_estimate: null,       // TODO(S40): from compute_friction_tax()
+      opening_text: engineResult.private_output.opening_text,
+      liability_block: engineResult.private_output.liability_block,
+      asset_anchor_text: engineResult.private_output.asset_anchor_text,
+      resolution_routing: engineResult.private_output.resolution_routing,
+      friction_tax_estimate: null,
     },
-    // synthesis populated by engine (S40) — opaque string, never generated in TypeScript layer
+    // synthesis: opaque string from engine — not present in Path B (no output_synthesis call)
   };
 
   // ShareableOutput is NEVER serialized into this response.

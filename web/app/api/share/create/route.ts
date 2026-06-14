@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
 import { nanoid } from "nanoid";
 import type { ShareableOutputPayload } from "@/lib/output-renderer";
+import { invokeEngine } from "@/lib/engine-client";
 
 // ---------------------------------------------------------------------------
 // Payload separation contract:
@@ -17,12 +18,26 @@ const redis = Redis.fromEnv();
 const KV_TTL_SECONDS = 30 * 24 * 60 * 60; // 30 days
 
 interface CreateShareRequest {
-  sessionId: string;
+  selectedStateIds: string[];
+  intake: {
+    headcount: string;
+    industry: string;
+    orgType: string;
+    jurisdictions: string[];
+    significantEvents: string[];
+    principalRole: string;
+  };
 }
 
 function validateRequest(body: unknown): body is CreateShareRequest {
   if (typeof body !== "object" || body === null) return false;
-  return typeof (body as Record<string, unknown>).sessionId === "string";
+  const b = body as Record<string, unknown>;
+  return (
+    Array.isArray(b.selectedStateIds) &&
+    b.selectedStateIds.every((id) => typeof id === "string") &&
+    typeof b.intake === "object" &&
+    b.intake !== null
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -37,10 +52,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  // TODO(S40): Call Python engine afresh with session payload.
-  // This is an independent engine call — does not depend on /api/result having run.
-  // Extract shareable_output section only. Never touch private_output.
-  // synthesis.shareable_synthesis arrives from engine as an opaque string.
+  const { selectedStateIds, intake } = body;
+
+  const engineResult = await invokeEngine({ selectedStateIds, intake });
 
   const shareKey = nanoid(21);
   const expiresAt = new Date(
@@ -49,23 +63,26 @@ export async function POST(request: NextRequest) {
 
   // Shareable payload — PrivateOutput fields are NEVER included here.
   const shareablePayload: ShareableOutputPayload = {
-    sessionId: body.sessionId,
+    sessionId: engineResult.session_id,
     shareKey,
     expiresAt,
-    outputType: "multi_state",   // TODO(S40): from engine output
-    identifiedStates: [],        // TODO(S40): from engine shareable_output
+    outputType: engineResult.output_type,
+    identifiedStates: engineResult.identified_states.map((s) => ({
+      state_id: s.state_id,
+      state_name: s.state_name,
+      score: s.score,
+    })),
     severity: {
-      tier: "Entrenched",        // TODO(S40): from engine severity_result
-      anchor_text: "COPY PENDING",
+      tier: engineResult.severity.tier,
+      anchor_text: engineResult.severity.anchor_text,
     },
     shareableOutput: {
-      framing_text: "COPY PENDING",      // TODO(S40): from engine shareable_output
-      observable_indicators: [],         // TODO(S40): from engine shareable_output
-      resolution_framing: "COPY PENDING",
-      attribution_text:
-        "Identified using the PRV3 diagnostic instrument.",
+      framing_text: engineResult.shareable_output.framing_text,
+      observable_indicators: engineResult.shareable_output.observable_indicators,
+      resolution_framing: engineResult.shareable_output.resolution_framing,
+      attribution_text: engineResult.shareable_output.attribution_text,
     },
-    // synthesis.shareableSynthesis from engine (S40) — opaque string, never generated here
+    // synthesis: opaque string from engine — not present in Path B (no output_synthesis call)
     // synthesis.privateSynthesis is NEVER written here
   };
 
