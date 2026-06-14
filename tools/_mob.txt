@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.4
+\\\#\\\# MOB v4.5
 
   
 
@@ -1026,7 +1026,7 @@ Phase 3 (real-world signal): Deferred. Live instrument delivery. Salience weight
 
   
 
-2\\. Output layer — diagnostic report the principal receives: copy, structure, Patterned Consequence Logic financial output, private vs. shareable format. \*\*ACTIVE — Session 38.\*\* Engine output layer scaffolded (friction_tax.py, resolution_families.py, output_synthesis.py, contract.py extended). Web output layer scaffolded (output-renderer.ts, three route handlers with payload separation, three component shells). All friction_tax multipliers CALIBRATION TARGET. All family descriptions COPY PENDING. Route handler engine call wiring deferred to S39. Gemini payload separation review queued (prompts/gemini-output-layer-payload-handoff.md).
+2\\. Output layer — diagnostic report the principal receives: copy, structure, Patterned Consequence Logic financial output, private vs. shareable format. \*\*ACTIVE — Session 39.\*\* Engine output layer scaffolded (friction_tax.py, resolution_families.py, output_synthesis.py, contract.py extended). Web output layer scaffolded and wired: @vercel/kv replaced with @upstash/redis@1.38.0; resolution family routing wired in /api/result (TypeScript map mirrors resolution_families.py); payload separation confirmed and tested; Gemini rejected session store (Option D violation) and TypeScript synthesis (divergence surface) — both removed. Architecture locked: /api/result calls engine (S40) → PrivateOutput to browser, no KV write; /api/share/create calls engine independently (S40) → ShareableOutput to KV (30-day TTL); /api/share/[id] reads KV → returns ShareableOutput. Python engine owns synthesis — TypeScript treats it as opaque string. Env vars UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN not yet provisioned — Pete to add to Vercel project settings before deployment. S40 gate: Python engine invocation mechanism (how web layer calls Python engine).
 
   
 
@@ -1316,6 +1316,8 @@ Full progression in Section 16 session log.
 
 | \\\*\\\*Session 38\\\*\\\* | WS2 (Output Layer) opened. Payload separation locked as server boundary enforced at serialization — not at component render level. PrivateOutput never serialized into /api/share endpoints. ShareableOutput never appears in /api/result. PrivateOutput never written to KV. Four resolution families confirmed: structural, developmental, investigative, directional — family descriptions COPY PENDING, service names never in output. Friction tax severity scalars LOCKED: Emerging=0.6, Entrenched=1.0, Endemic=1.4. high=low*1.4 range spread LOCKED. org_size added to engine output contract intake echo. phase3CTALabel added to taxonomy UICopy — Phase 3 button label corrected. Phase 1 auto-advance removed from handleSelectState. @vercel/kv deprecation flagged (Vercel migrated to Upstash Redis — deployment review required). |
 
+| \\\*\\\*Session 39\\\*\\\* | Upstash migration complete: @vercel/kv removed, @upstash/redis@1.38.0 installed, Redis.fromEnv() pattern in both share route handlers. Resolution family routing wired in /api/result — TypeScript map (47-state→4-family) mirrors engine/resolution_families.py, no service names. Gemini rejected two S39 additions: (1) session store (session:{sessionId} write in /api/result violated Option D data baseline — no KV write before user share action); (2) TypeScript synthesis duplicate (divergence surface — output_synthesis.py is single source of truth). Both removed. Option A data handling confirmed: no KV write without explicit user share action. Architecture locked: /api/result → PrivateOutput only, no KV write; /api/share/create → independent engine call (S40), ShareableOutput → KV 30-day TTL; /api/share/[id] → ShareableOutput retrieval, 404 on miss. TypeScript synthesis constraint: TypeScript treats synthesis as opaque string from engine — never generated in TypeScript layer. Env vars UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN not provisioned — Pete to add before deployment. TypeScript: 0 errors. Tests: 137/142 engine + 71/71 output layer. Commit: 2d2da5d. |
+
   
 
   
@@ -1474,9 +1476,9 @@ Full progression in Section 16 session log.
 
 | \\\*\\\*web/lib/output-renderer.ts\\\*\\\* | Output layer renderer. PrivateOutputPayload and ShareableOutputPayload types. renderPrivateOutput() and renderShareableOutput(). 3-pass structure: Layer 1 async synthesis, Layer 2 sync state blocks, Layer 3 sync resolution. No engine/ imports — clinical boundary enforced. Created S38. |
 
-| \\\*\\\*web/app/api/result/route.ts\\\*\\\* | POST Route Handler. Returns PrivateOutput only. ShareableOutput never serialized into this response. Engine call wired via TODO(S39). Created S38. |
+| \\\*\\\*web/app/api/result/route.ts\\\*\\\* | POST Route Handler. Returns PrivateOutput only. No KV write of any kind. ShareableOutput never constructed here. Resolution family routing wired (STATE_RESOLUTION_FAMILY map, 47 states). Engine call TODO(S40) — synthesis arrives from engine as opaque string, never generated in TypeScript. Created S38. Wired S39. |
 
-| \\\*\\\*web/app/api/share/create/route.ts\\\*\\\* | POST Route Handler. Writes ShareableOutput to Vercel KV (NanoID key, 30-day TTL). PrivateOutput never written to KV. Returns {shareKey, shareUrl, expiresAt}. Engine call wired via TODO(S39). Created S38. |
+| \\\*\\\*web/app/api/share/create/route.ts\\\*\\\* | POST Route Handler. Independent engine call (TODO S40) — runs separately from /api/result, no session store dependency. Writes ShareableOutput to Upstash Redis (NanoID key, 30-day TTL). PrivateOutput never written to KV. No KV write occurs until user explicitly requests share link (Option A confirmed). Returns {shareKey, shareUrl, expiresAt}. Created S38. Wired S39. |
 
 | \\\*\\\*web/app/api/share/[id]/route.ts\\\*\\\* | GET Route Handler. Returns ShareableOutput only. PrivateOutput never exists in this response. Returns 404 if not found or expired (KV TTL governs). Created S38. |
 
@@ -1823,3 +1825,5 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
 | \\\*\\\*June 2026 — Session 37\\\*\\\* | Web layer styling pass. Tailwind v4 classes applied to globals.css (gray-50 background, Geist font wired), layout.tsx (title updated), page.tsx (flex layout, phase-aware centering, CTA classes, Phase 3/4 sections), SignatureCard.tsx (dimmed/selected state treatment, dynamic card border), AssemblyPanel.tsx (desktop sticky sidebar, mobile Vaul drawer with drag handle). TypeScript: 0 errors. Two open flags for Pete: Phase 3 CTA button uses full paragraph as label; Phase 1 auto-advance means transition trigger never renders. No engine changes. MOB updated to v4.3. |
 
 | \\\*\\\*June 2026 — Session 38\\\*\\\* | Output Layer (WS2) opened. Pre-work: phase3CTALabel added to taxonomy.ts, Phase 1 auto-advance removed from handleSelectState, Phase 3 button label corrected. Engine: contract.py (org_size to intake echo), friction_tax.py (severity scalars LOCKED, all multipliers CALIBRATION TARGET), resolution_families.py (47-state→4 family map, no service names, COPY PENDING descriptions), output_synthesis.py (follows narrative.py, 5s timeout, fallback). Web: output-renderer.ts (types + renderers, clinical boundary enforced), /api/result (PrivateOutput only), /api/share/create (ShareableOutput→KV, PrivateOutput never written), /api/share/[id] (ShareableOutput only, 404 on expired), PrivateOutput.tsx, ShareableOutput.tsx, ShareButton.tsx shells. Tests: 71 new (17+29+25), all pass, all existing pass. TypeScript: 0 errors. Gemini handoff written. @vercel/kv deprecated — flag for deployment. MOB updated to v4.4. |
+
+| \\\*\\\*June 2026 — Session 39\\\*\\\* | Upstash migration: @vercel/kv removed, @upstash/redis@1.38.0 installed, Redis.fromEnv() in share/create and share/[id]. .env.local.example updated. Route handler wiring: /api/result wired with TypeScript resolution family map (STATE_RESOLUTION_FAMILY, 47 states, mirrors engine/resolution_families.py) — resolution_routing field now live. Gemini review rejected two additions: (1) session store write in /api/result violated Option D data baseline; (2) TypeScript synthesis duplicate violated single-source-of-truth for output_synthesis.py. Both reverted. Architecture locked: /api/result returns PrivateOutput only, no KV write; /api/share/create independent engine call (TODO S40), ShareableOutput→KV 30-day TTL; /api/share/[id] KV retrieval 404 on miss. TypeScript synthesis constraint locked: synthesis is opaque string from Python engine, never generated in TypeScript. Env vars UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN not provisioned — Pete to add to Vercel before deployment. TypeScript: 0 errors. Tests: 137/142 engine + 71/71 output layer. Commit: 2d2da5d. MOB updated to v4.5. |
