@@ -22,9 +22,14 @@ sys.path.insert(0, str(Path(__file__).parents[1]))
 from engine.resolution_families import (
     STATE_RESOLUTION_FAMILY,
     RESOLUTION_FAMILY_DESCRIPTIONS,
+    ENGINE_TO_COMMERCIAL_NAME,
+    RESOLUTION_FALLBACK_COPY,
+    _FALLBACK_GENERIC,
     get_family,
     get_primary_family,
     get_all_families,
+    translate_resolution_family,
+    get_fallback_copy,
 )
 from engine.data.states import STATE_PROFILES
 
@@ -200,6 +205,140 @@ for fam_id, fam_dict in RESOLUTION_FAMILY_DESCRIPTIONS.items():
         f"No service names in {fam_id} description",
         len(found_service_names) == 0,
         f"found service names: {found_service_names}",
+    )
+
+
+# ── 12. ENGINE_TO_COMMERCIAL_NAME mapping ────────────────────────────────────
+
+check(
+    "ENGINE_TO_COMMERCIAL_NAME has 4 entries",
+    len(ENGINE_TO_COMMERCIAL_NAME) == 4,
+    f"got {len(ENGINE_TO_COMMERCIAL_NAME)}",
+)
+_expected_mapping = {
+    "Roadmap":           "Groundwork",
+    "Development":       "Development",
+    "Intervention":      "First Call",
+    "Executive Counsel": "Advisory",
+}
+for engine_name, commercial_name in _expected_mapping.items():
+    check(
+        f"ENGINE_TO_COMMERCIAL_NAME['{engine_name}'] == '{commercial_name}'",
+        ENGINE_TO_COMMERCIAL_NAME.get(engine_name) == commercial_name,
+        f"got {ENGINE_TO_COMMERCIAL_NAME.get(engine_name)}",
+    )
+
+
+# ── 13. translate_resolution_family ──────────────────────────────────────────
+
+check(
+    "translate_resolution_family: single 'Roadmap' -> 'Groundwork'",
+    translate_resolution_family("Roadmap") == "Groundwork",
+    f"got {translate_resolution_family('Roadmap')}",
+)
+check(
+    "translate_resolution_family: single 'Intervention' -> 'First Call'",
+    translate_resolution_family("Intervention") == "First Call",
+    f"got {translate_resolution_family('Intervention')}",
+)
+check(
+    "translate_resolution_family: compound 'Roadmap + Intervention'",
+    translate_resolution_family("Roadmap + Intervention") == "Groundwork + First Call",
+    f"got {translate_resolution_family('Roadmap + Intervention')}",
+)
+check(
+    "translate_resolution_family: compound 'Executive Counsel + Intervention'",
+    translate_resolution_family("Executive Counsel + Intervention") == "Advisory + First Call",
+    f"got {translate_resolution_family('Executive Counsel + Intervention')}",
+)
+check(
+    "translate_resolution_family: unknown name passes through unchanged",
+    translate_resolution_family("Unknown Service") == "Unknown Service",
+    f"got {translate_resolution_family('Unknown Service')}",
+)
+
+
+# ── 14. RESOLUTION_FALLBACK_COPY structure ────────────────────────────────────
+
+_SINGLE_KEYS = [
+    ("Groundwork",   "Emerging"),
+    ("Groundwork",   "Entrenched"),
+    ("Groundwork",   "Endemic"),
+    ("Development",  "Emerging"),
+    ("Development",  "Entrenched"),
+    ("Development",  "Endemic"),
+    ("First Call",   "Emerging"),
+    ("First Call",   "Entrenched"),
+    ("First Call",   "Endemic"),
+    ("Advisory",     "Emerging"),
+    ("Advisory",     "Entrenched"),
+    ("Advisory",     "Endemic"),
+]
+_COMPOUND_KEYS = [
+    ("Groundwork + First Call",   None),
+    ("First Call + Groundwork",   None),
+    ("Advisory + First Call",     None),
+    ("First Call + Advisory",     None),
+    ("Development + Groundwork",  None),
+    ("Groundwork + Development",  None),
+    ("Development + First Call",  None),
+]
+_all_expected_keys = _SINGLE_KEYS + _COMPOUND_KEYS
+
+check(
+    "RESOLUTION_FALLBACK_COPY has 19 entries (12 single + 7 compound)",
+    len(RESOLUTION_FALLBACK_COPY) == 19,
+    f"got {len(RESOLUTION_FALLBACK_COPY)}",
+)
+for key in _all_expected_keys:
+    check(
+        f"RESOLUTION_FALLBACK_COPY has key {key}",
+        key in RESOLUTION_FALLBACK_COPY,
+        f"missing key {key}",
+    )
+
+
+# ── 15. get_fallback_copy: lookups ────────────────────────────────────────────
+
+check(
+    "get_fallback_copy: single-service Groundwork/Entrenched returns non-empty string",
+    len(get_fallback_copy("Groundwork", "Entrenched")) > 0,
+    "returned empty string",
+)
+check(
+    "get_fallback_copy: compound returns tier-agnostic copy",
+    get_fallback_copy("Groundwork + First Call", "Entrenched") ==
+    RESOLUTION_FALLBACK_COPY[("Groundwork + First Call", None)],
+    "compound key lookup failed",
+)
+check(
+    "get_fallback_copy: unknown name returns generic fallback",
+    get_fallback_copy("Unknown", "Emerging") == _FALLBACK_GENERIC,
+    f"got {get_fallback_copy('Unknown', 'Emerging')!r}",
+)
+check(
+    "get_fallback_copy: unknown compound returns generic fallback",
+    get_fallback_copy("Unknown + Advisory", None) == _FALLBACK_GENERIC,
+    f"got {get_fallback_copy('Unknown + Advisory', None)!r}",
+)
+
+
+# ── 16. Fallback copy quality checks ─────────────────────────────────────────
+
+_OLD_SERVICE_NAMES = {"formation", "practicum", "counsel", "navigation"}
+
+for key, copy_str in RESOLUTION_FALLBACK_COPY.items():
+    copy_lower = copy_str.lower()
+    _found_old = [sn for sn in _OLD_SERVICE_NAMES if sn in copy_lower]
+    check(
+        f"No old service names in fallback copy {key[0]}",
+        len(_found_old) == 0,
+        f"found old names: {_found_old}",
+    )
+    check(
+        f"No semicolons in fallback copy {key[0]}",
+        ";" not in copy_str,
+        "contains semicolon",
     )
 
 

@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.7
+\\\#\\\# MOB v4.8
 
   
 
@@ -54,7 +54,7 @@ PRV3 is a diagnostic instrument for organizational friction. An internal leader 
 
   
 
-The diagnostic is the primary entry point. Four resolution services sit beneath it: Formation, Practicum, Counsel, Navigation. Service names locked Session 32. Two-tier structure locked Session 33. Pricing not locked.
+The diagnostic is the primary entry point. Four resolution services sit beneath it: Groundwork, Development, First Call, Advisory. Service names locked Session 32. Two-tier structure locked Session 33. Pricing not locked.
 
   
 
@@ -422,15 +422,15 @@ Service offering names, pricing, UX, marketing site, instrument delivery interfa
 
 
 
-| \*\*Formation\*\* | Group training for developing leaders |
+| \*\*Groundwork\*\* | Group training for developing leaders |
 
 | --- | --- |
 
-| \*\*Practicum\*\* | Individual coaching for developing leaders, bounded engagement |
+| \*\*Development\*\* | Individual coaching for developing leaders, bounded engagement |
 
-| \*\*Counsel\*\* | Retainer advisory for executives and HR leaders |
+| \*\*First Call\*\* | Retainer advisory for executives and HR leaders |
 
-| \*\*Navigation\*\* | Change navigation and emergency response for executives |
+| \*\*Advisory\*\* | Change navigation and emergency response for executives |
 
 | \*\*Diagnostic\*\* | Organizational assessment leading to recovery consulting if warranted |
 
@@ -447,7 +447,7 @@ Service offering names, pricing, UX, marketing site, instrument delivery interfa
 
 
 
-\*\*Two-tier service structure — locked Session 33:\*\* Diagnostic sits above the four resolution services (Formation, Practicum, Counsel, Navigation). Diagnostic is the entry point layer. The four are the resolution layer.
+\*\*Two-tier service structure — locked Session 33:\*\* Diagnostic sits above the four resolution services (Groundwork, Development, First Call, Advisory). Diagnostic is the entry point layer. The four are the resolution layer.
 
 
 
@@ -455,7 +455,7 @@ Service offering names, pricing, UX, marketing site, instrument delivery interfa
 
 
 
-\*\*Navigation subtitle — locked Session 33:\*\* Primary name confirmed. Subtitle carries urgency for the acute entry point. Executives in crisis need to know the practice recognizes the emergency before they register the capability.
+\*\*Advisory subtitle — locked Session 33:\*\* Primary name confirmed. Subtitle carries urgency for the acute entry point. Executives in crisis need to know the practice recognizes the emergency before they register the capability.
 
 
 
@@ -465,7 +465,7 @@ Service offering names, pricing, UX, marketing site, instrument delivery interfa
 
 \*\*Common signatures — locked Session 34:\*\* Five signatures: Leadership Bottleneck, Culture Erosion, Stunted Growth, Compounding Risks, Information Blindness. Each contains: named states, coexistence interpretation, organizational cost. State-to-signature mapping confirmed. Some states appear in multiple signatures — intentional, reflects genuine co-occurrence. Available in session 34 conversation history.
 
-\*\*Service descriptions and inclusions — locked Session 34:\*\* Five service descriptions written. Formation, Practicum, Counsel, Navigation, Diagnostic. Each contains: who it’s for, what it involves, what the client leaves with. Inclusions defined here for the first time — this is the governing record. Available in session 34 conversation history.
+\*\*Service descriptions and inclusions — locked Session 34:\*\* Five service descriptions written. Groundwork, Development, First Call, Advisory, Diagnostic. Each contains: who it’s for, what it involves, what the client leaves with. Inclusions defined here for the first time — this is the governing record. Available in session 34 conversation history.
 
 \*\*Self-selection output language — locked Session 34:\*\* Six-phase sequence. Phase 1: live selection feedback. Phase 2: cluster display showing states grouped by signature. Phase 3: coexistence interpretation — the differentiator. Phase 4: per-signature detail with selected states highlighted, unselected states dimmed and visible. Phase 5: resolution orientation without service prescription. Phase 6: transition to diagnostic or conversation. Dimmed missing states are a deliberate design intent — they show the visitor the incompleteness of self-portrait without stating it directly, creating pull toward the diagnostic. Available in session 34 conversation history.
 
@@ -1030,7 +1030,7 @@ Phase 3 (real-world signal): Deferred. Live instrument delivery. Salience weight
 
   
 
-3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 32.\\\*\\\* Practice spine locked (internal standard: Expertise. Resonance. Effectiveness.). Five service names final and locked (Formation, Practicum, Counsel, Navigation, Diagnostic). Terraforming four-address architecture recorded. The Work held — address deferred. Session 33 complete. Navigation and Diagnostic names confirmed. Two-tier service structure locked. Site architecture locked. Content principles locked. Session 34 complete. Full commercial surface written and locked this session: 47 state descriptions, 5 common signatures, 5 service descriptions and inclusions, 6-phase self-selection output language, primary site copy and path framing. Storage architecture and disclosure approach decided. Diagnostic output constraint locked — service names never appear in automated output. LinkedIn BD strategy established pending legal read. Session 35 complete. Engagement agreement drafted (v1.0, working, attorney review required before execution). Self-selection interface Architecture Spec v0.2 locked. Session 36 complete. web/ layer initialized — Next.js 16.2.9 / React 19 / Tailwind v4, taxonomy.ts placed (47/47 states anchored), Route Handler scaffolded, component shells in place. Session 37 complete. Styling pass applied — Tailwind v4 classes across 5 files, dimmed/selected state treatment delivered, desktop sidebar and mobile Vaul drawer styled, TypeScript 0 errors. Next session: Phase 2 state selection UX (auto-expand selected signatures, selection feedback), Phase 3 copy fix (button label), Phase 4 CTA routing.
+3\\. Commercial layer — positioning, pricing, service offering names, UX, marketing site, instrument delivery interface. \\\*\\\*ACTIVE — Session 32.\\\*\\\* Practice spine locked (internal standard: Expertise. Resonance. Effectiveness.). Five service names final and locked (Groundwork, Development, First Call, Advisory, Diagnostic). Terraforming four-address architecture recorded. The Work held — address deferred. Session 33 complete. Advisory and Diagnostic names confirmed. Two-tier service structure locked. Site architecture locked. Content principles locked. Session 34 complete. Full commercial surface written and locked this session: 47 state descriptions, 5 common signatures, 5 service descriptions and inclusions, 6-phase self-selection output language, primary site copy and path framing. Storage architecture and disclosure approach decided. Diagnostic output constraint locked — service names never appear in automated output. LinkedIn BD strategy established pending legal read. Session 35 complete. Engagement agreement drafted (v1.0, working, attorney review required before execution). Self-selection interface Architecture Spec v0.2 locked. Session 36 complete. web/ layer initialized — Next.js 16.2.9 / React 19 / Tailwind v4, taxonomy.ts placed (47/47 states anchored), Route Handler scaffolded, component shells in place. Session 37 complete. Styling pass applied — Tailwind v4 classes across 5 files, dimmed/selected state treatment delivered, desktop sidebar and mobile Vaul drawer styled, TypeScript 0 errors. Next session: Phase 2 state selection UX (auto-expand selected signatures, selection feedback), Phase 3 copy fix (button label), Phase 4 CTA routing.
 
   
 
@@ -1193,6 +1193,10 @@ Full progression in Section 16 session log.
 | LinkedIn BD legal read | Required before personal account amplification. Non-solicitation agreement with OneDigital governs. Attorney to advise on: passive content sharing, definition of solicitation under agreement, LinkedIn as channel. |
 | private_output.resolution_routing stale values | engine/data/states.py serializes pre-S32 service names (Development, Roadmap + Intervention, Executive Counsel + Intervention, etc.) in the resolution_routing field. TypeScript layer bypasses this via STATE_RESOLUTION_FAMILY map in /api/result and /api/share/create. Python-side cleanup required in engine/data/states.py and engine/output.py before output layer is fully clean. Deferred to Phase 3. ENGINE DEBT. |
 
+| Commercial site service descriptions | Service descriptions on the commercial site (Session 34) still reference Formation, Practicum, Counsel, Navigation. Update to Groundwork, Development, First Call, Advisory. Not blocking current work. |
+
+| Copy rule — human register signals | Occasional human register signals are permitted and intentional in client-facing copy. A moment of directness or warmth that breaks from the clinical register can signal human connection when used sparingly. It is not a lapse. Evaluate per instance. |
+
   
 
   
@@ -1303,9 +1307,9 @@ Full progression in Section 16 session log.
 
   
 
-| \\\*\\\*Session 32\\\*\\\* | Practice spine locked: Expertise. Resonance. Effectiveness. (internal standard, not tagline). Five service names final: Formation, Practicum, Counsel, Navigation, Diagnostic. Terraforming four-address architecture recorded. The Work held — address deferred. | Load-bearing statements confirmed: "We don't arrive with a methodology and fit you into it. We start with you." and "We don't fix people problems. We change the conditions that produce them." Terraforming as practice endgame: confirmed framing, not yet in positioning copy. Bilateral understanding arc confirmed as value delivery sequence. PRV3 diagnostic confirmed as primary SEO entry point. Service menu retained — hard silos rejected, lines may blur in practice. Path B migration closed as infrastructure item (tools/_mob.txt authoritative, Drive dependency retired). |
+| \\\*\\\*Session 32\\\*\\\* | Practice spine locked: Expertise. Resonance. Effectiveness. (internal standard, not tagline). Five service names final: Groundwork, Development, First Call, Advisory, Diagnostic. Terraforming four-address architecture recorded. The Work held — address deferred. | Load-bearing statements confirmed: "We don't arrive with a methodology and fit you into it. We start with you." and "We don't fix people problems. We change the conditions that produce them." Terraforming as practice endgame: confirmed framing, not yet in positioning copy. Bilateral understanding arc confirmed as value delivery sequence. PRV3 diagnostic confirmed as primary SEO entry point. Service menu retained — hard silos rejected, lines may blur in practice. Path B migration closed as infrastructure item (tools/_mob.txt authoritative, Drive dependency retired). |
 
-| \\\*\\\*Session 33\\\*\\\* | Navigation subtitle confirmed — urgency for acute entry point. Diagnostic name confirmed — clarity over intrigue, clinical register as differentiator. Two-tier service structure locked: Diagnostic above, four resolution services beneath. Site architecture locked: three parallel entry points (diagnostic, direct inquiry, service-specific) converging to conversation. Content principles locked: condition language, short-form proof, clear next steps. Two-minute test adopted as governing standard. |
+| \\\*\\\*Session 33\\\*\\\* | Advisory subtitle confirmed — urgency for acute entry point. Diagnostic name confirmed — clarity over intrigue, clinical register as differentiator. Two-tier service structure locked: Diagnostic above, four resolution services beneath. Site architecture locked: three parallel entry points (diagnostic, direct inquiry, service-specific) converging to conversation. Content principles locked: condition language, short-form proof, clear next steps. Two-minute test adopted as governing standard. |
 
 | \\\*\\\*Session 34\\\*\\\* | 47 state descriptions locked. Five common signatures locked: Leadership Bottleneck, Culture Erosion, Stunted Growth, Compounding Risks, Information Blindness. Five service descriptions and inclusions locked. Self-selection output language locked — six-phase sequence. Primary site copy locked. Load-bearing statement placement locked. Storage architecture decided: Option D baseline, Option B layered. Diagnostic output constraint locked: no service names in automated output. Shareable output design intent locked: room-runner, Friction Tax financial weight, travels without practitioner. |
 
@@ -1650,6 +1654,12 @@ Full progression in Section 16 session log.
 
   
 
+| \*\*PRV3\_Resolution\_Families\_Copy\_v3.0.docx\*\* | Static fallback copy for four resolution services keyed by (commercial name, severity tier). Engine-to-commercial name mapping. Copy standard and standing copy rules. Produced S42. Source for RESOLUTION\_FALLBACK\_COPY in engine/resolution\_families.py. |
+
+| \*\*PRV3\_Output\_Synthesis\_Prompts\_v1.0.docx\*\* | System prompt and five field-level prompt specifications for output\_synthesis.py single LLM call. Context object definition and fallback priority order. Produced S42. |
+
+| \*\*prompts/gemini-s42-synthesis-handoff.md\*\* | Gemini review request for output\_synthesis.py 5-field contract migration. Five review questions. Cascade file inventory. S42. |
+
 \\\*\\\*GitHub sync scope (locked Session 5)\\\*\\\*
 
   
@@ -1826,11 +1836,11 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
 
   
 
-| \\\*\\\*June 2026 — Session 32\\\*\\\* | Commercial Layer (WS3) Session 2. No engine work. No code touched. Practice spine locked: Expertise. Resonance. Effectiveness. (internal standard). Five service names final: Formation, Practicum, Counsel, Navigation, Diagnostic. Terraforming four-address architecture recorded. The Work held. Load-bearing statements confirmed: “We don’t arrive with a methodology and fit you into it. We start with you.” and “We don’t fix people problems. We change the conditions that produce them.” Terraforming as practice endgame confirmed. Bilateral understanding arc confirmed as value delivery sequence. PRV3 diagnostic confirmed as primary SEO entry point. Service menu retained — hard silos rejected. MOB updated to v3.6. |
+| \\\*\\\*June 2026 — Session 32\\\*\\\* | Commercial Layer (WS3) Session 2. No engine work. No code touched. Practice spine locked: Expertise. Resonance. Effectiveness. (internal standard). Five service names final: Groundwork, Development, First Call, Advisory, Diagnostic. Terraforming four-address architecture recorded. The Work held. Load-bearing statements confirmed: “We don’t arrive with a methodology and fit you into it. We start with you.” and “We don’t fix people problems. We change the conditions that produce them.” Terraforming as practice endgame confirmed. Bilateral understanding arc confirmed as value delivery sequence. PRV3 diagnostic confirmed as primary SEO entry point. Service menu retained — hard silos rejected. MOB updated to v3.6. |
 
   
 
-| \\\*\\\*June 2026 — Session 33\\\*\\\* | Commercial Layer (WS3) Session 3. Navigation name confirmed — subtitle carries urgency. Diagnostic name confirmed — clarity over intrigue. Two-tier service structure locked: Diagnostic above, four resolution services beneath. Site architecture locked: three entry points (diagnostic, direct inquiry, service-specific), all converge to conversation. Content principles locked: condition language, short-form proof, clear next steps. Two-minute test adopted as governing standard. Content library confirmed as adjacent to commercial surface, not on it. No engine changes. MOB updated to v3.7. |
+| \\\*\\\*June 2026 — Session 33\\\*\\\* | Commercial Layer (WS3) Session 3. Advisory name confirmed — subtitle carries urgency. Diagnostic name confirmed — clarity over intrigue. Two-tier service structure locked: Diagnostic above, four resolution services beneath. Site architecture locked: three entry points (diagnostic, direct inquiry, service-specific), all converge to conversation. Content principles locked: condition language, short-form proof, clear next steps. Two-minute test adopted as governing standard. Content library confirmed as adjacent to commercial surface, not on it. No engine changes. MOB updated to v3.7. |
 
 | \\\*\\\*June 2026 — Session 34\\\*\\\* | Commercial Layer (WS3) Session 4. No engine work. No code touched. Full commercial surface written and locked: 47 state descriptions, 5 common signatures (Leadership Bottleneck, Culture Erosion, Stunted Growth, Compounding Risks, Information Blindness), 5 service descriptions and inclusions, 6-phase self-selection output language, primary site copy and path framing. Storage architecture decided: Option D baseline, Option B layered. Disclosure approach decided. Diagnostic output constraint locked — no service names in automated output. Shareable output design intent locked. LinkedIn BD strategy established pending legal read. MOB updated to v3.8. |
 
@@ -1849,3 +1859,5 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
   
 
 | \\\*\\\*June 2026 — Session 41\\\*\\\* | S41 output layer data contract complete. web/lib/types.ts created — authoritative type contract. output-renderer.ts updated — types imported from types.ts. /api/result, /api/share/create, /api/share/[id] updated. page.tsx Phase 5 wired. PrivateOutput.tsx updated to PrivateOutputPayload direct. ENGINE DEBT flagged: private_output.resolution_routing stale field in states.py, deferred to Phase 3. TypeScript: 0 errors. MOB updated to v4.7. |
+
+| \*\*June 2026 — Session 42\*\* | Service names renamed (locked Session 42, supersedes Session 32 lock): Formation→Groundwork, Practicum→Development, Counsel→First Call, Navigation→Advisory. MOB updated throughout. Copy rule confirmed: occasional human register signals are intentional, not a lapse, evaluate per instance. engine/resolution\_families.py: ENGINE\_TO\_COMMERCIAL\_NAME mapping, translate\_resolution\_family() helper, RESOLUTION\_FALLBACK\_COPY dict (12 single-service + 7 compound entries from PRV3\_Resolution\_Families\_Copy\_v3.0.docx), get\_fallback\_copy() helper. 101/101 resolution family tests. engine/data/states.py: the\_exposed resolution\_family corrected from \u201cIntervention + Stability Support\u201d to \u201cIntervention + Executive Counsel\u201d (PRV2 residue). PRV3\_Resolution\_Families\_Copy\_v3.0.docx and PRV3\_Output\_Synthesis\_Prompts\_v1.0.docx added to registry. output\_synthesis.py 5-field contract migration — Gemini review in progress, deferred to next session. MOB updated to v4.8. |

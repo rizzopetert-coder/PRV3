@@ -394,7 +394,7 @@ _reg(_profile(
     liability_axes=["Legal & Compliance", "Governance & Authority", "Financial & Economic"],
     asset_axes=["Governance Discipline", "Relational Trust"],
     sev_min="Emerging", sev_max="Entrenched",
-    resolution_family="Intervention + Stability Support",
+    resolution_family="Intervention + Executive Counsel",
 ))
 STATE_PROFILES["the_exposed"].dimensional_vector = DimensionalVector(
     aptitude_liability=0.10,
