@@ -230,7 +230,7 @@ def _assemble_monitoring_metadata(session: SessionData) -> dict:
     }
 
 
-def assemble_output(session: SessionData) -> dict:
+def assemble_output(session: SessionData, synthesis_result=None) -> dict:
     """
     Assemble the complete VII.1 engine output object from session data.
 
@@ -349,22 +349,32 @@ def assemble_output(session: SessionData) -> dict:
     # ── private_output ──
     priv = session.output_package.private
     private_output = {
-        "opening_text":        priv.state_name if priv else "",
-        "liability_block":     priv.liability_condition_text if priv else "",
-        "asset_anchor_text":   priv.asset_resolution_anchor_text if priv else "",
-        "resolution_routing":  priv.resolution_family if priv else "",
+        "opening_text":          priv.state_name if priv else "",
+        "resolution_routing":    priv.resolution_family if priv else "",
         "friction_tax_estimate": priv.friction_tax_estimate if priv else None,
     }
 
     # ── shareable_output ──
     sha = session.output_package.shareable
     shareable_output = {
-        "framing_text":        sha.framing_text if sha else "",
-        "observable_indicators": sha.observable_indicators if sha else [],
-        "resolution_framing":  sha.resolution_framing_text if sha else "",
-        "attribution_text":    sha.attribution if sha else
-                               "Identified using the PRV3 diagnostic instrument.",
+        "attribution_text": sha.attribution if sha else
+                            "Identified using the PRV3 diagnostic instrument.",
     }
+
+    # ── synthesis ──
+    synthesis_dict = (
+        {
+            "liability_condition_text":     synthesis_result.liability_condition_text,
+            "asset_resolution_anchor_text": synthesis_result.asset_resolution_anchor_text,
+            "framing_text":                 synthesis_result.framing_text,
+            "observable_indicators":        synthesis_result.observable_indicators,
+            "resolution_framing_text":      synthesis_result.resolution_framing_text,
+            "synthesis_confidence":         synthesis_result.synthesis_confidence,
+            "is_fallback":                  synthesis_result.is_fallback,
+        }
+        if synthesis_result is not None
+        else None
+    )
 
     # ── intake echo ──
     intake_obj = {
@@ -378,20 +388,21 @@ def assemble_output(session: SessionData) -> dict:
     }
 
     return {
-        "session_id":          session.session_id,
-        "intake":              intake_obj,
-        "state_distribution":  state_distribution,
-        "output_type":         output_type,
-        "identified_states":   identified_states,
-        "severity":            severity_obj,
-        "asset_score":         asset_obj,
+        "session_id":           session.session_id,
+        "intake":               intake_obj,
+        "state_distribution":   state_distribution,
+        "output_type":          output_type,
+        "identified_states":    identified_states,
+        "severity":             severity_obj,
+        "asset_score":          asset_obj,
         "narrative_modulation": narrative_obj,
-        "checkpoint_log":      checkpoint_log,
-        "jurisdiction_flags":  jurisdiction_flags,
-        "private_output":      private_output,
-        "shareable_output":    shareable_output,
-        "engine_version":      ENGINE_VERSION,
-        "monitoring_metadata": _assemble_monitoring_metadata(session),
+        "checkpoint_log":       checkpoint_log,
+        "jurisdiction_flags":   jurisdiction_flags,
+        "private_output":       private_output,
+        "shareable_output":     shareable_output,
+        "synthesis":            synthesis_dict,
+        "engine_version":       ENGINE_VERSION,
+        "monitoring_metadata":  _assemble_monitoring_metadata(session),
     }
 
 
@@ -443,12 +454,15 @@ _JURISDICTION_FLAGS_FIELDS = {
     "transparency", "retaliation", "procedural", "applied_multipliers",
 }
 _PRIVATE_OUTPUT_FIELDS = {
-    "opening_text", "liability_block", "asset_anchor_text",
-    "resolution_routing", "friction_tax_estimate",
+    "opening_text", "resolution_routing", "friction_tax_estimate",
 }
 _SHAREABLE_OUTPUT_FIELDS = {
-    "framing_text", "observable_indicators",
-    "resolution_framing", "attribution_text",
+    "attribution_text",
+}
+_SYNTHESIS_FIELDS = {
+    "liability_condition_text", "asset_resolution_anchor_text",
+    "framing_text", "observable_indicators", "resolution_framing_text",
+    "synthesis_confidence", "is_fallback",
 }
 _INTAKE_FIELDS = {
     "headcount", "org_size", "industry", "org_type",
@@ -585,6 +599,14 @@ def validate_schema(output: dict) -> list:
     for f in _INTAKE_FIELDS:
         if f not in output["intake"]:
             violations.append(f"intake MISSING field {f!r}")
+
+    # synthesis — None or dict with 7 required fields
+    if "synthesis" not in output:
+        violations.append("MISSING top-level field: 'synthesis'")
+    elif output["synthesis"] is not None:
+        for f in _SYNTHESIS_FIELDS:
+            if f not in output["synthesis"]:
+                violations.append(f"synthesis MISSING field {f!r}")
 
     # monitoring_metadata
     mm = output["monitoring_metadata"]

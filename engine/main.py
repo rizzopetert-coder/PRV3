@@ -16,11 +16,18 @@ from engine.accumulation import IntakeData, StateRanking
 from engine.severity import SeverityEngine
 from engine.output import OutputEngine
 from engine.contract import SessionData, assemble_output
+from engine.data.states import STATE_PROFILES
+from engine.output_synthesis import OutputSynthesisEngine
+from engine.resolution_families import translate_resolution_family
 
 
-def run_engine(payload: dict) -> dict:
+def run_engine(
+    payload: dict,
+    narrative_response: str = "",
+    signal_map_context: str = "",
+) -> dict:
     """
-    Accept web layer payload, return 14-field JSON contract dict.
+    Accept web layer payload, return engine output contract dict.
 
     payload shape:
     {
@@ -32,7 +39,9 @@ def run_engine(payload: dict) -> dict:
             "jurisdictions": list[str],
             "significantEvents": list[str],
             "principalRole": str
-        }
+        },
+        "narrative_response":  str (optional),
+        "signal_map_context":  str (optional)
     }
     """
     intake_dict = payload.get("intake", {})
@@ -62,6 +71,30 @@ def run_engine(payload: dict) -> dict:
     output_engine = OutputEngine()
     output_package = output_engine.build(final_rankings, severity_result)
 
+    # Synthesis — anchored on first ranked state
+    synthesis_result = None
+    if final_rankings:
+        lead_id = final_rankings[0].state_id
+        lead_name = (
+            STATE_PROFILES[lead_id].state_name
+            if lead_id in STATE_PROFILES
+            else lead_id
+        )
+        commercial_family = translate_resolution_family(
+            output_package.private.resolution_family
+            if output_package.private else ""
+        )
+        synthesis_result = OutputSynthesisEngine().synthesize(
+            state_name=lead_name,
+            severity_tier=severity_result.tier,
+            resolution_family=commercial_family,
+            asset_score=0.0,
+            liability_score=0.0,
+            narrative_response=narrative_response,
+            intake=intake_dict,
+            signal_map_context=signal_map_context,
+        )
+
     session_data = SessionData(
         session_id=SessionData.new_session_id(),
         intake=intake_data,
@@ -71,4 +104,4 @@ def run_engine(payload: dict) -> dict:
         severity_result=severity_result,
     )
 
-    return assemble_output(session_data)
+    return assemble_output(session_data, synthesis_result=synthesis_result)

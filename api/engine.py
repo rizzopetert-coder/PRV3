@@ -26,7 +26,13 @@ async def invoke_engine(request: Request):
         raise HTTPException(status_code=400, detail="Invalid JSON payload")
 
     try:
-        result = run_engine(payload)
+        narrative_response = payload.get("narrative_response", "") if isinstance(payload, dict) else ""
+        signal_map_context = payload.get("signal_map_context", "") if isinstance(payload, dict) else ""
+        result = run_engine(
+            payload,
+            narrative_response=narrative_response,
+            signal_map_context=signal_map_context,
+        )
         return JSONResponse(content=result)
     except KeyError as e:
         # Bad state ID or missing intake field — client fault

@@ -195,13 +195,22 @@ export async function POST(request: NextRequest) {
   // Airgap: liability_condition_text and asset_resolution_anchor_text are private —
   // principal only, never written to KV (Gemini Q1 revised, S42).
   // framing_text, observable_indicators, resolution_framing_text are KV-safe.
-  const synthesis: ShareableSynthesisFields = {
-    framing_text:           engineResult.shareable_output.framing_text,
-    observable_indicators:  engineResult.shareable_output.observable_indicators,
-    resolution_framing_text: engineResult.shareable_output.resolution_framing,
-    synthesis_confidence:   0.0,
-    is_fallback:            true,
-  };
+  const engSynthesis = engineResult.synthesis;
+  const synthesis: ShareableSynthesisFields = engSynthesis
+    ? {
+        framing_text:            engSynthesis.framing_text,
+        observable_indicators:   engSynthesis.observable_indicators,
+        resolution_framing_text: engSynthesis.resolution_framing_text,
+        synthesis_confidence:    engSynthesis.synthesis_confidence,
+        is_fallback:             engSynthesis.is_fallback,
+      }
+    : {
+        framing_text:            "",
+        observable_indicators:   [],
+        resolution_framing_text: "",
+        synthesis_confidence:    0.0,
+        is_fallback:             true,
+      };
 
   const shareablePayload: ShareableOutputPayload = {
     synthesis,

@@ -182,18 +182,26 @@ export async function POST(request: NextRequest) {
     "B"
   );
 
-  // Build SynthesisFields from engine response sub-fields.
-  // synthesis_confidence and is_fallback are placeholders until output_synthesis.py
-  // is wired into engine/main.py — at that point these values come from the engine.
-  const synthesis: SynthesisFields = {
-    liability_condition_text:     engineResult.private_output.liability_block,
-    asset_resolution_anchor_text: engineResult.private_output.asset_anchor_text,
-    framing_text:                 engineResult.shareable_output.framing_text,
-    observable_indicators:        engineResult.shareable_output.observable_indicators,
-    resolution_framing_text:      engineResult.shareable_output.resolution_framing,
-    synthesis_confidence:         0.0,
-    is_fallback:                  true,
-  };
+  const engSynthesis = engineResult.synthesis;
+  const synthesis: SynthesisFields = engSynthesis
+    ? {
+        liability_condition_text:     engSynthesis.liability_condition_text,
+        asset_resolution_anchor_text: engSynthesis.asset_resolution_anchor_text,
+        framing_text:                 engSynthesis.framing_text,
+        observable_indicators:        engSynthesis.observable_indicators,
+        resolution_framing_text:      engSynthesis.resolution_framing_text,
+        synthesis_confidence:         engSynthesis.synthesis_confidence,
+        is_fallback:                  engSynthesis.is_fallback,
+      }
+    : {
+        liability_condition_text:     "",
+        asset_resolution_anchor_text: "",
+        framing_text:                 "",
+        observable_indicators:        [],
+        resolution_framing_text:      "",
+        synthesis_confidence:         0.0,
+        is_fallback:                  true,
+      };
 
   const privatePayload: PrivateOutputPayload = {
     synthesis,

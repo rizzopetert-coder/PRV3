@@ -59,17 +59,21 @@ export interface EngineResult {
   jurisdiction_flags: Record<string, unknown>;
   private_output: {
     opening_text: string;
-    liability_block: string;
-    asset_anchor_text: string;
     resolution_routing: string;
     friction_tax_estimate: number | null;
   };
   shareable_output: {
-    framing_text: string;
-    observable_indicators: string[];
-    resolution_framing: string;
     attribution_text: string;
   };
+  synthesis: {
+    liability_condition_text:     string;
+    asset_resolution_anchor_text: string;
+    framing_text:                 string;
+    observable_indicators:        string[];
+    resolution_framing_text:      string;
+    synthesis_confidence:         number;
+    is_fallback:                  boolean;
+  } | null;
   engine_version: string;
   monitoring_metadata: Record<string, unknown>;
 }
