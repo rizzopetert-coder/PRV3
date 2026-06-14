@@ -190,6 +190,7 @@ export async function POST(request: NextRequest) {
     .slice(0, 2);
 
   const shareId = nanoid(21);
+  const createdAt = new Date().toISOString();
   const expiresAt = new Date(Date.now() + KV_TTL_SECONDS * 1000).toISOString();
 
   // Airgap: liability_condition_text and asset_resolution_anchor_text are private —
@@ -229,6 +230,7 @@ export async function POST(request: NextRequest) {
 
     share_id: shareId,
     expires_at: expiresAt,
+    created_at: createdAt,
   };
 
   // Write to KV — ShareableOutput only. PrivateOutput never written to KV.

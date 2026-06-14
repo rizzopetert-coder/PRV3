@@ -158,4 +158,5 @@ export interface ShareableOutputPayload {
   // Share metadata
   share_id: string;
   expires_at: string; // ISO 8601 timestamp, 30-day TTL
+  created_at: string; // ISO 8601 timestamp, moment of share creation
 }

@@ -1,51 +1,121 @@
 "use client";
 
 // Airgap enforced at component boundary (S42):
-// RenderedShareableOutput never contains liability_condition_text or
-// asset_resolution_anchor_text — those fields are excluded at /api/share/create
-// before KV write, and are not present in ShareableSynthesisFields.
+// liability_condition_text and asset_resolution_anchor_text are never present in
+// ShareableOutputPayload — excluded at /api/share/create before KV write.
 
-import type { RenderedShareableOutput } from "@/lib/output-renderer";
+import type { ShareableOutputPayload } from "@/lib/types";
 
-interface ShareableOutputProps {
-  output: RenderedShareableOutput;
+function Rule() {
+  return (
+    <div style={{ height: 0, borderTop: "0.5px solid #e5e7eb" }} />
+  );
 }
 
-export default function ShareableOutput({ output }: ShareableOutputProps) {
+interface ShareableOutputProps {
+  payload: ShareableOutputPayload;
+}
+
+export default function ShareableOutput({ payload }: ShareableOutputProps) {
+  const createdDate = new Date(payload.created_at).toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
+
+  const hasIndustry = Boolean(payload.intake.industry);
+  const hasOrgSize = Boolean(payload.intake.organization_size);
+  let clientIdentifier: string;
+  if (hasIndustry && hasOrgSize) {
+    clientIdentifier = `${payload.intake.industry} · ${payload.intake.organization_size} · ${createdDate}`;
+  } else if (hasIndustry) {
+    clientIdentifier = `${payload.intake.industry} · ${createdDate}`;
+  } else if (hasOrgSize) {
+    clientIdentifier = `${payload.intake.organization_size} · ${createdDate}`;
+  } else {
+    clientIdentifier = `Confidential · Assessed ${createdDate}`;
+  }
+
+  const observableIndicators = payload.synthesis.observable_indicators ?? [];
+
   return (
-    <div>
-      {/* Layer 1 — Pass 1: framing_text (shareable synthesis, sync) */}
-      {output.synthesis.isReady && (
-        <div>
-          <p>{output.synthesis.text}</p>
+    <div className="max-w-2xl">
+
+      {/* Block 1 — Header bar */}
+      <div className="flex items-center justify-between pb-3">
+        <span className="text-[12px] font-medium text-gray-900">
+          Principal Resolution
+        </span>
+        <span className="text-[11px] text-gray-400">{clientIdentifier}</span>
+      </div>
+      <Rule />
+
+      {/* Block 2 — Condition identified */}
+      <div className="py-4">
+        <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+          Condition identified
+        </p>
+        <div className="flex items-center flex-wrap gap-2">
+          <span className="text-[13px] font-medium text-gray-500">
+            {payload.primary_state.name}
+          </span>
+          <span className="text-[11px] bg-gray-100 border border-gray-200 text-gray-500 rounded-md px-2 py-0.5 align-middle">
+            {payload.severity}
+          </span>
         </div>
-      )}
+      </div>
+      <Rule />
 
-      {/* Layer 2 — Pass 2: Observable indicators (shareable, sync) */}
-      {output.observableIndicators.length > 0 && (
-        <ul>
-          {output.observableIndicators.map((indicator, i) => (
-            <li key={i}>{indicator}</li>
-          ))}
-        </ul>
-      )}
+      {/* Block 3 — Framing text */}
+      <div className="py-4">
+        <p className="text-sm leading-[1.65] text-gray-900">
+          {payload.synthesis.framing_text}
+        </p>
+      </div>
+      <Rule />
 
-      {/* Layer 2 — Identified states (sync) */}
-      <div>
-        {output.identifiedStates.map((state) => (
-          <div key={state.stateId}>
-            <p>{state.stateName}</p>
+      {/* Block 4 — Observable indicators (omit entirely if empty) */}
+      {observableIndicators.length > 0 && (
+        <>
+          <div className="py-4">
+            <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+              Observable indicators
+            </p>
+            <ul className="space-y-1">
+              {observableIndicators.map((indicator, i) => (
+                <li key={i} className="flex gap-2 text-[13px] leading-[1.6] text-gray-500">
+                  <span className="text-gray-300 shrink-0" aria-hidden>—</span>
+                  <span>{indicator}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-        ))}
+          <Rule />
+        </>
+      )}
+
+      {/* Block 5 — Resolution pathway */}
+      <div className="py-4 space-y-1">
+        <p className="text-[11px] uppercase tracking-wide text-gray-400">
+          Resolution pathway
+        </p>
+        <p className="text-[13px] font-medium text-gray-900">
+          {payload.resolution_family}
+        </p>
+        {payload.synthesis.resolution_framing_text && (
+          <p className="text-[13px] text-gray-500">
+            {payload.synthesis.resolution_framing_text}
+          </p>
+        )}
       </div>
 
-      {/* Layer 3 — Pass 3: Resolution direction (sync) */}
-      <div>
-        <p>{output.resolution.resolutionFraming}</p>
+      {/* Block 6 — Attribution */}
+      <div className="mt-6 pt-4" style={{ borderTop: "0.5px solid #e5e7eb" }}>
+        <p className="text-[11px] text-gray-400">
+          Assessed using the PRV3 diagnostic instrument. This document was generated
+          from the principal&apos;s responses and is intended for senior leadership review.
+        </p>
       </div>
 
-      {/* Attribution */}
-      <p>{output.resolution.attributionText}</p>
     </div>
   );
 }

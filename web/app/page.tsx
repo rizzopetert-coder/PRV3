@@ -9,6 +9,7 @@ import {
 } from "@/data/taxonomy";
 import type { State } from "@/data/taxonomy";
 import type { PrivateOutputPayload } from "@/lib/types";
+import type { EnginePayload } from "@/lib/engine-client";
 import SignatureCard from "@/components/SignatureCard";
 import AssemblyPanel from "@/components/AssemblyPanel";
 import PrivateOutput from "@/components/PrivateOutput";
@@ -24,6 +25,7 @@ export default function Home() {
   const [interpretation, setInterpretation] = useState<string | null>(null);
   const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
   const [resultPayload, setResultPayload] = useState<PrivateOutputPayload | null>(null);
+  const [intakeForShare, setIntakeForShare] = useState<EnginePayload["intake"] | null>(null);
   const [isLoadingResult, setIsLoadingResult] = useState(false);
 
   const selectedStates: State[] = states.filter((s) =>
@@ -89,24 +91,23 @@ export default function Home() {
 
   async function handleTakeDiagnostic() {
     if (selectedStateIds.length === 0) return;
+    // Path B: intake fields not yet collected in self-selection flow.
+    // Engine uses selectedStateIds as declared diagnosis; intake is echoed only.
+    const intake: EnginePayload["intake"] = {
+      headcount: "",
+      industry: "",
+      orgType: "",
+      jurisdictions: [],
+      significantEvents: [],
+      principalRole: "",
+    };
+    setIntakeForShare(intake);
     setIsLoadingResult(true);
     try {
       const res = await fetch("/api/result", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          selectedStateIds,
-          // Path B: intake fields not yet collected in self-selection flow.
-          // Engine uses selectedStateIds as declared diagnosis; intake is echoed only.
-          intake: {
-            headcount: "",
-            industry: "",
-            orgType: "",
-            jurisdictions: [],
-            significantEvents: [],
-            principalRole: "",
-          },
-        }),
+        body: JSON.stringify({ selectedStateIds, intake }),
       });
       if (!res.ok) {
         return;
@@ -125,8 +126,12 @@ export default function Home() {
         <div className={`max-w-2xl ${phase === 1 ? "mx-auto" : ""}`}>
 
           {/* Phase 5 — Private Output (result view, no assembly panel) */}
-          {phase === 5 && resultPayload && (
-            <PrivateOutput payload={resultPayload} />
+          {phase === 5 && resultPayload && intakeForShare && (
+            <PrivateOutput
+              payload={resultPayload}
+              selectedStateIds={selectedStateIds}
+              intake={intakeForShare}
+            />
           )}
 
           {/* Phases 1–4: self-selection interface */}
