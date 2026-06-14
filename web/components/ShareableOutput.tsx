@@ -1,5 +1,10 @@
 "use client";
 
+// Airgap enforced at component boundary (S42):
+// RenderedShareableOutput never contains liability_condition_text or
+// asset_resolution_anchor_text — those fields are excluded at /api/share/create
+// before KV write, and are not present in ShareableSynthesisFields.
+
 import type { RenderedShareableOutput } from "@/lib/output-renderer";
 
 interface ShareableOutputProps {
@@ -9,18 +14,14 @@ interface ShareableOutputProps {
 export default function ShareableOutput({ output }: ShareableOutputProps) {
   return (
     <div>
-      {/* Layer 1 — Pass 1: LLM synthesis (async, may not be ready on first render) */}
+      {/* Layer 1 — Pass 1: framing_text (shareable synthesis, sync) */}
       {output.synthesis.isReady && (
         <div>
           <p>{output.synthesis.text}</p>
         </div>
       )}
 
-      {/* Layer 2 — Pass 2: Framing and observable indicators (sync) */}
-      <div>
-        <p>{output.framingText}</p>
-      </div>
-
+      {/* Layer 2 — Pass 2: Observable indicators (shareable, sync) */}
       {output.observableIndicators.length > 0 && (
         <ul>
           {output.observableIndicators.map((indicator, i) => (

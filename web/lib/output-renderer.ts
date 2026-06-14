@@ -123,10 +123,10 @@ export function renderPrivateOutput(
     outputType,
 
     synthesis: {
-      text: payload.synthesis,
-      confidence: 1.0,
-      isFallback: !payload.synthesis,
-      isReady: Boolean(payload.synthesis),
+      text:       payload.synthesis.liability_condition_text,
+      confidence: payload.synthesis.synthesis_confidence,
+      isFallback: payload.synthesis.is_fallback,
+      isReady:    Boolean(payload.synthesis.liability_condition_text),
     },
 
     identifiedStates: allStates.map((s) => ({
@@ -160,10 +160,10 @@ export function renderPrivateOutput(
         },
 
     resolution: {
-      openingText: "",
-      liabilityBlock: "",
-      assetAnchorText: "",
-      routingFamily: payload.resolution_family,
+      openingText:    "",
+      liabilityBlock: payload.synthesis.liability_condition_text,
+      assetAnchorText: payload.synthesis.asset_resolution_anchor_text,
+      routingFamily:  payload.resolution_family,
     },
   };
 }
@@ -181,10 +181,10 @@ export function renderShareableOutput(
     outputType,
 
     synthesis: {
-      text: "",
-      confidence: 0,
-      isFallback: true,
-      isReady: false,
+      text:       payload.synthesis.framing_text,
+      confidence: payload.synthesis.synthesis_confidence,
+      isFallback: payload.synthesis.is_fallback,
+      isReady:    Boolean(payload.synthesis.framing_text),
     },
 
     identifiedStates: allStates.map((s) => ({
@@ -198,11 +198,11 @@ export function renderShareableOutput(
       anchorText: "",
     },
 
-    observableIndicators: [],
-    framingText: "",
+    observableIndicators: payload.synthesis.observable_indicators,
+    framingText: payload.synthesis.framing_text,
 
     resolution: {
-      resolutionFraming: payload.resolution_family,
+      resolutionFraming: payload.synthesis.resolution_framing_text,
       attributionText: "Identified using the PRV3 diagnostic instrument.",
     },
   };

@@ -2,21 +2,15 @@
 PRV3 Scoring Engine — Output Layer
 Output Synthesis
 
-Generates two synthesis outputs from the ranked state cluster:
-  private:   LLM-authored synthesis for the principal only
-  shareable: LLM-authored synthesis safe for external sharing
+Generates five synthesis fields from a diagnosed organizational state.
+Single LLM call. Returns SynthesisResult. On timeout or parse failure,
+returns full SynthesisResult from fallback_synthesis.py static dict.
+No partial LLM survival — coherence over completeness (Gemini Q2, S42).
 
-Both are Pass 1 (async, LLM-generated). Pass 2 (per-state blocks) and
-Pass 3 (resolution direction) are sync and rendered by output-renderer.ts
-without LLM involvement.
+Context object: state_name, severity_tier, resolution_family (commercial name),
+asset_score, liability_score, narrative_response, intake, signal_map_context.
 
-Failure fallback: on timeout (5s) or API error, returns deterministic
-fallback text so the rendering layer never blocks.
-
-Pattern: follows engine/narrative.py — system prompt constant, dataclass
-result, parse function, public call function, engine class.
-
-Spec reference: PRV3 Output Layer Brief — Step 4
+Spec reference: PRV3_Output_Synthesis_Prompts_v1.0.docx — Session 42.
 """
 
 from __future__ import annotations
@@ -25,64 +19,90 @@ import json
 from dataclasses import dataclass
 from typing import Optional
 
+from engine.data.fallback_synthesis import get_fallback_synthesis
+
 
 # ── System prompt ──────────────────────────────────────────────────────────────
 
 OUTPUT_SYNTHESIS_SYSTEM_PROMPT: str = """\
-You are a synthesis engine for the PRV3 organizational diagnostic instrument. \
-Your function is to generate two output texts from a ranked state cluster. \
-You do not make recommendations. You do not name specific services or \
-interventions. You return only structured JSON.
+You are generating output copy for a professional organizational diagnostic instrument.
+The person reading this is an internal leader with budget authority who has just received
+a verdict about their organization. They are not a consulting industry insider. They did
+not come here to be impressed. They came here because something is wrong and they want
+to understand it clearly.
 
-PRIVATE OUTPUT
-A synthesis for the principal who completed the diagnostic. \
-This text acknowledges what they are carrying, names the condition pattern, \
-and indicates the resolution direction without naming a specific service. \
-Tone: direct, clinical, without softening. Length: 3-5 sentences.
+Voice standard:
+Write the way a trusted advisor would speak. Someone who has been in rooms like this
+before, who knows what they are looking at, and who respects the reader enough to say
+it plainly. Direct and warm. Serious without being clinical. No consulting vocabulary.
+No jargon. No passive constructions. No hedging.
 
-SHAREABLE OUTPUT
-A synthesis safe for sharing with a third party (board member, advisor, \
-external party). This text describes what the organization is exhibiting \
-without identifying the principal or disclosing internal details. \
-It frames the pattern from an organizational-observation perspective. \
-Tone: objective, professional. Length: 2-3 sentences.
+Banned words and phrases: alignment, bandwidth, stakeholder, ecosystem, synergy,
+leverage (as a verb), utilize, robust, scalable, actionable, going forward, at the end
+of the day, best practices, move the needle, circle back, deep dive.
 
-CONSTRAINTS
-- Do not name any specific service, program, or intervention.
-- Do not use jargon requiring a glossary.
-- Do not use semicolons in any output string.
-- Do not soften the condition description.
-- The private output may be more direct than the shareable output.
-- If the state cluster is empty or insufficient, return the fallback structure.
+Format rules:
+No em dashes. No bullet points unless the field specification requires a list.
+No semicolons. Limit all text fields to 2-3 concise sentences. Output strict JSON.
+Short sentences preferred over long ones. Plain words preferred over elevated ones.
+
+The diagnostic has already named the condition and the severity. Do not restate
+them unless the field specification requires it. Do not soften the verdict.
+Do not add encouragement that was not earned. Do not add caveats that
+undermine the finding.
+
+Clinical boundary: no service names appear in any generated field other than the
+resolution_family name provided. The diagnostic instrument does not prescribe
+specific engagements.
+
+Use all fields in the context object. Copy that could have been written without
+the principal's specific responses is not good enough.
+
+FIELDS
+
+liability_condition_text (private — principal only):
+What is happening in this organization. Clinical and direct. 2-4 sentences.
+Draw from narrative_response and intake. Name what they described. Do not
+restate the state name. Describe what it is doing inside their organization right now.
+Severity calibration:
+  Emerging: describe what is visible and what is coming if not addressed.
+  Entrenched: describe what has become normal and what that normalization is costing.
+  Endemic: describe what the organization has organized itself around.
+
+asset_resolution_anchor_text (private — principal only):
+What strength exists to build from. 1-3 sentences. Draw from asset_score and intake.
+Not reassurance. An honest account of what is working. If asset_score is low, say so
+plainly. Do not manufacture strength the diagnostic did not find.
+
+framing_text (shareable — professional audience):
+Professional framing for a board member or senior leader. 2-3 sentences.
+Non-confrontational. No liability language. Behavioral and operational, not accusatory.
+Creates conditions for a conversation, not a verdict.
+
+observable_indicators (shareable — JSON array of strings):
+3-5 behavioral and operational signals from signal_map_context. Things visible and
+verifiable by someone outside the principal's team. Specific enough to be
+recognizable, general enough for a shared document. No accusatory framing.
+Return as JSON array of strings.
+
+resolution_framing_text (shareable — professional audience):
+2-3 sentences describing the resolution pathway in organizational benefit language.
+No liability framing. Reference the resolution_family name naturally. Forward-facing.
+Do not name specific service inclusions or make guarantees.
 
 REQUIRED OUTPUT FORMAT
 
 Return only this JSON structure. No preamble. No explanation. No markdown.
 
 {
-  "private_synthesis": "<3-5 sentence synthesis for the principal>",
-  "shareable_synthesis": "<2-3 sentence synthesis for external sharing>",
+  "liability_condition_text": "<2-4 sentences>",
+  "asset_resolution_anchor_text": "<1-3 sentences>",
+  "framing_text": "<2-3 sentences>",
+  "observable_indicators": ["<indicator>", "<indicator>", "<indicator>"],
+  "resolution_framing_text": "<2-3 sentences>",
   "synthesis_confidence": <float 0.0-1.0>
-}
-
-If the cluster is empty or synthesis is not possible:
-{"private_synthesis": "", "shareable_synthesis": "", "synthesis_confidence": 0.0}\
+}\
 """
-
-
-# ── Fallback text ──────────────────────────────────────────────────────────────
-# Returned deterministically on timeout or API failure.
-# Rendering layer uses this when Pass 1 does not resolve.
-
-_FALLBACK_PRIVATE: str = (
-    "The diagnostic has identified a pattern that warrants closer examination. "
-    "A full synthesis will be available once the analysis completes."
-)
-
-_FALLBACK_SHAREABLE: str = (
-    "An organizational pattern has been identified. "
-    "Full analysis is pending."
-)
 
 
 # ── Data structures ────────────────────────────────────────────────────────────
@@ -90,45 +110,68 @@ _FALLBACK_SHAREABLE: str = (
 @dataclass
 class SynthesisResult:
     """
-    Output of one synthesis call.
-    Both fields are empty string on failure — never None.
+    Output of one synthesis call. Five content fields plus metadata.
+    All string fields are empty string on failure. observable_indicators is
+    empty list on failure. is_fallback=True when LLM call failed or response
+    was unparseable.
     """
-    private_synthesis:    str
-    shareable_synthesis:  str
-    synthesis_confidence: float
-    raw_response:         str = ""
-    parse_error:          str = ""
-    is_fallback:          bool = False
+    liability_condition_text:     str
+    asset_resolution_anchor_text: str
+    framing_text:                 str
+    observable_indicators:        list
+    resolution_framing_text:      str
+    synthesis_confidence:         float
+    raw_response:                 str  = ""
+    parse_error:                  str  = ""
+    is_fallback:                  bool = False
 
 
 # ── Parse ──────────────────────────────────────────────────────────────────────
 
-def _parse_synthesis_response(response_text: str) -> SynthesisResult:
-    """Parse LLM JSON response. Returns fallback SynthesisResult on any failure."""
+def _parse_synthesis_response(
+    response_text: str,
+    commercial_name: str = "",
+    severity_tier: str | None = None,
+) -> SynthesisResult:
+    """Parse LLM JSON response. Full fallback from static dict on any failure."""
     try:
         data = json.loads(response_text)
     except json.JSONDecodeError as e:
+        fb = get_fallback_synthesis(commercial_name, severity_tier)
         return SynthesisResult(
-            private_synthesis=_FALLBACK_PRIVATE,
-            shareable_synthesis=_FALLBACK_SHAREABLE,
+            **fb,
             synthesis_confidence=0.0,
             raw_response=response_text,
             parse_error=str(e),
             is_fallback=True,
         )
 
-    private = str(data.get("private_synthesis", "")).strip()
-    shareable = str(data.get("shareable_synthesis", "")).strip()
+    liability  = str(data.get("liability_condition_text", "")).strip()
+    asset      = str(data.get("asset_resolution_anchor_text", "")).strip()
+    framing    = str(data.get("framing_text", "")).strip()
+    indicators = data.get("observable_indicators", [])
+    if not isinstance(indicators, list):
+        indicators = []
+    indicators = [str(i) for i in indicators]
+    resolution = str(data.get("resolution_framing_text", "")).strip()
     confidence = float(data.get("synthesis_confidence", 0.0))
 
-    if not private:
-        private = _FALLBACK_PRIVATE
-    if not shareable:
-        shareable = _FALLBACK_SHAREABLE
+    if not liability or not framing or not resolution:
+        fb = get_fallback_synthesis(commercial_name, severity_tier)
+        return SynthesisResult(
+            **fb,
+            synthesis_confidence=0.0,
+            raw_response=response_text,
+            parse_error="missing required fields",
+            is_fallback=True,
+        )
 
     return SynthesisResult(
-        private_synthesis=private,
-        shareable_synthesis=shareable,
+        liability_condition_text=liability,
+        asset_resolution_anchor_text=asset,
+        framing_text=framing,
+        observable_indicators=indicators,
+        resolution_framing_text=resolution,
         synthesis_confidence=confidence,
         raw_response=response_text,
     )
@@ -137,103 +180,115 @@ def _parse_synthesis_response(response_text: str) -> SynthesisResult:
 # ── LLM call ──────────────────────────────────────────────────────────────────
 
 def _build_synthesis_prompt(
-    state_cluster: list[dict],
+    state_name: str,
     severity_tier: str,
-    resolution_family_id: str,
+    resolution_family: str,
+    asset_score: float,
+    liability_score: float,
+    narrative_response: str,
+    intake: dict,
+    signal_map_context: str = "",
 ) -> str:
-    """
-    Build the user message for the synthesis LLM call.
-
-    state_cluster: list of {"state_id": str, "state_name": str, "score": float}
-    severity_tier: "Emerging" | "Entrenched" | "Endemic"
-    resolution_family_id: "structural" | "developmental" | "investigative" | "directional"
-    """
-    cluster_lines = "\n".join(
-        f"  - {s['state_name']} (score: {s['score']:.4f})"
-        for s in state_cluster
+    intake_lines = (
+        f"  organization_size: {intake.get('organization_size', intake.get('org_size', ''))}\n"
+        f"  industry: {intake.get('industry', '')}\n"
+        f"  role: {intake.get('role_level', intake.get('principal_role', ''))}"
     )
-    return (
-        f"State cluster (ranked by score):\n{cluster_lines}\n\n"
-        f"Severity tier: {severity_tier}\n"
-        f"Resolution family: {resolution_family_id}\n\n"
-        "Generate the private_synthesis and shareable_synthesis for this cluster."
-    )
+    parts = [
+        f"state_name: {state_name}",
+        f"severity_tier: {severity_tier}",
+        f"resolution_family: {resolution_family}",
+        f"asset_score: {asset_score:.4f}",
+        f"liability_score: {liability_score:.4f}",
+        f"narrative_response: {narrative_response or '[not provided]'}",
+        f"intake:\n{intake_lines}",
+    ]
+    if signal_map_context:
+        parts.append(f"signal_map_context: {signal_map_context}")
+    parts.append("\nGenerate all five synthesis fields for this diagnostic result.")
+    return "\n".join(parts)
 
 
 def synthesize(
-    state_cluster: list[dict],
+    state_name: str,
     severity_tier: str,
-    resolution_family_id: str,
+    resolution_family: str,
+    asset_score: float = 0.0,
+    liability_score: float = 0.0,
+    narrative_response: str = "",
+    intake: dict | None = None,
+    signal_map_context: str = "",
     model: str = "claude-sonnet-4-6",
     client=None,
     timeout: float = 5.0,
 ) -> SynthesisResult:
     """
-    Call the LLM to generate private and shareable synthesis for a state cluster.
+    Call the LLM to generate five synthesis fields for a diagnostic result.
 
     Parameters:
-      state_cluster:        list of {"state_id", "state_name", "score"} dicts
-      severity_tier:        "Emerging" | "Entrenched" | "Endemic"
-      resolution_family_id: primary family for the cluster
-      model:                LLM model identifier
-      client:               anthropic.Anthropic client instance
-      timeout:              max seconds to wait for LLM response (5s LOCKED)
+      state_name:         identified state name, e.g. "The Founder's Grip"
+      severity_tier:      "Emerging" | "Entrenched" | "Endemic"
+      resolution_family:  commercial name, e.g. "Groundwork"
+      asset_score:        float — counterbalancing strength present
+      liability_score:    float — how significantly the dimension is compromised
+      narrative_response: principal's free-text from narrative prompt
+      intake:             org_size, industry, role, significant events
+      signal_map_context: observable signals for the identified state
+      model:              LLM model identifier
+      client:             anthropic.Anthropic client instance
+      timeout:            max seconds to wait (5s LOCKED, Gemini Q4, S42)
 
-    Returns SynthesisResult. On timeout or API error, returns a deterministic
-    fallback SynthesisResult (is_fallback=True) so the rendering layer never
-    blocks on Pass 1.
-
-    LLM call parameters:
-      temperature: 0.3
-      max_tokens:  400
+    On timeout or any exception: returns full SynthesisResult from static
+    fallback dict. No partial LLM survival. max_tokens=800 (Gemini Q5, S42).
     """
+    if intake is None:
+        intake = {}
+
     try:
         import anthropic as _anthropic
     except ImportError:
+        fb = get_fallback_synthesis(resolution_family, severity_tier)
         return SynthesisResult(
-            private_synthesis=_FALLBACK_PRIVATE,
-            shareable_synthesis=_FALLBACK_SHAREABLE,
+            **fb,
             synthesis_confidence=0.0,
             parse_error="anthropic package not installed",
-            is_fallback=True,
-        )
-
-    if not state_cluster:
-        return SynthesisResult(
-            private_synthesis=_FALLBACK_PRIVATE,
-            shareable_synthesis=_FALLBACK_SHAREABLE,
-            synthesis_confidence=0.0,
-            parse_error="empty state cluster",
             is_fallback=True,
         )
 
     if client is None:
         client = _anthropic.Anthropic()
 
-    prompt = _build_synthesis_prompt(state_cluster, severity_tier, resolution_family_id)
+    prompt = _build_synthesis_prompt(
+        state_name=state_name,
+        severity_tier=severity_tier,
+        resolution_family=resolution_family,
+        asset_score=asset_score,
+        liability_score=liability_score,
+        narrative_response=narrative_response,
+        intake=intake,
+        signal_map_context=signal_map_context,
+    )
 
     try:
-        import httpx as _httpx
-        with _httpx.Client(timeout=timeout):
-            message = client.messages.create(
-                model=model,
-                max_tokens=400,
-                temperature=0.3,
-                system=OUTPUT_SYNTHESIS_SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": prompt}],
-                timeout=timeout,
-            )
-            response_text = message.content[0].text
+        message = client.messages.create(
+            model=model,
+            max_tokens=800,
+            temperature=0.3,
+            system=OUTPUT_SYNTHESIS_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": prompt}],
+            timeout=timeout,
+        )
+        response_text = message.content[0].text
     except Exception as e:
+        fb = get_fallback_synthesis(resolution_family, severity_tier)
         return SynthesisResult(
-            private_synthesis=_FALLBACK_PRIVATE,
-            shareable_synthesis=_FALLBACK_SHAREABLE,
+            **fb,
             synthesis_confidence=0.0,
             parse_error=f"API error: {e}",
             is_fallback=True,
         )
 
-    return _parse_synthesis_response(response_text)
+    return _parse_synthesis_response(response_text, resolution_family, severity_tier)
 
 
 # ── Engine class ───────────────────────────────────────────────────────────────
@@ -241,15 +296,7 @@ def synthesize(
 class OutputSynthesisEngine:
     """
     Orchestrates one synthesis pass for a scoring session.
-
-    Usage:
-        engine = OutputSynthesisEngine(model="claude-sonnet-4-6")
-        result = engine.synthesize(state_cluster, severity_tier, resolution_family_id)
-        # result.private_synthesis   → private output text
-        # result.shareable_synthesis → shareable output text
-        # result.is_fallback         → True if LLM call failed
-
-    Spec reference: PRV3 Output Layer Brief — Step 4
+    Stores result for downstream access.
     """
 
     def __init__(self, model: str = "claude-sonnet-4-6", client=None):
@@ -259,16 +306,26 @@ class OutputSynthesisEngine:
 
     def synthesize(
         self,
-        state_cluster: list[dict],
+        state_name: str,
         severity_tier: str,
-        resolution_family_id: str,
+        resolution_family: str,
+        asset_score: float = 0.0,
+        liability_score: float = 0.0,
+        narrative_response: str = "",
+        intake: dict | None = None,
+        signal_map_context: str = "",
         timeout: float = 5.0,
     ) -> SynthesisResult:
         """Run synthesis and store result for downstream access."""
         self.result = synthesize(
-            state_cluster=state_cluster,
+            state_name=state_name,
             severity_tier=severity_tier,
-            resolution_family_id=resolution_family_id,
+            resolution_family=resolution_family,
+            asset_score=asset_score,
+            liability_score=liability_score,
+            narrative_response=narrative_response,
+            intake=intake,
+            signal_map_context=signal_map_context,
             model=self.model,
             client=self._client,
             timeout=timeout,

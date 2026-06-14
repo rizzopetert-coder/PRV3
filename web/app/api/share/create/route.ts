@@ -6,6 +6,7 @@ import type {
   StateRef,
   IntakeEcho,
   ResolutionFamily,
+  ShareableSynthesisFields,
 } from "@/lib/types";
 import { invokeEngine } from "@/lib/engine-client";
 
@@ -191,9 +192,20 @@ export async function POST(request: NextRequest) {
   const shareId = nanoid(21);
   const expiresAt = new Date(Date.now() + KV_TTL_SECONDS * 1000).toISOString();
 
-  // Shareable payload — PrivateOutput fields are NEVER included here.
-  // synthesis is NEVER written to KV (clinical boundary, S39).
+  // Airgap: liability_condition_text and asset_resolution_anchor_text are private —
+  // principal only, never written to KV (Gemini Q1 revised, S42).
+  // framing_text, observable_indicators, resolution_framing_text are KV-safe.
+  const synthesis: ShareableSynthesisFields = {
+    framing_text:           engineResult.shareable_output.framing_text,
+    observable_indicators:  engineResult.shareable_output.observable_indicators,
+    resolution_framing_text: engineResult.shareable_output.resolution_framing,
+    synthesis_confidence:   0.0,
+    is_fallback:            true,
+  };
+
   const shareablePayload: ShareableOutputPayload = {
+    synthesis,
+
     primary_state: primaryState,
     secondary_states: filteredSecondaries,
 

@@ -4,6 +4,7 @@ import type {
   StateRef,
   IntakeEcho,
   ResolutionFamily,
+  SynthesisFields,
 } from "@/lib/types";
 import { invokeEngine } from "@/lib/engine-client";
 
@@ -181,9 +182,21 @@ export async function POST(request: NextRequest) {
     "B"
   );
 
+  // Build SynthesisFields from engine response sub-fields.
+  // synthesis_confidence and is_fallback are placeholders until output_synthesis.py
+  // is wired into engine/main.py — at that point these values come from the engine.
+  const synthesis: SynthesisFields = {
+    liability_condition_text:     engineResult.private_output.liability_block,
+    asset_resolution_anchor_text: engineResult.private_output.asset_anchor_text,
+    framing_text:                 engineResult.shareable_output.framing_text,
+    observable_indicators:        engineResult.shareable_output.observable_indicators,
+    resolution_framing_text:      engineResult.shareable_output.resolution_framing,
+    synthesis_confidence:         0.0,
+    is_fallback:                  true,
+  };
+
   const privatePayload: PrivateOutputPayload = {
-    // synthesis: opaque string from engine. Not present in Path B (no output_synthesis call).
-    synthesis: "",
+    synthesis,
 
     primary_state: stateRefs[0],
     secondary_states: stateRefs.slice(1),

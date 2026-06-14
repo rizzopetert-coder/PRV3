@@ -11,10 +11,15 @@ export default function PrivateOutput({ payload }: PrivateOutputProps) {
 
   return (
     <div>
-      {/* Layer 1 — Pass 1: LLM synthesis (async, opaque string from engine) */}
-      {Boolean(payload.synthesis) && (
+      {/* Layer 1 — Pass 1: LLM synthesis private fields */}
+      {Boolean(payload.synthesis.liability_condition_text) && (
         <div>
-          <p>{payload.synthesis}</p>
+          <p>{payload.synthesis.liability_condition_text}</p>
+        </div>
+      )}
+      {Boolean(payload.synthesis.asset_resolution_anchor_text) && (
+        <div>
+          <p>{payload.synthesis.asset_resolution_anchor_text}</p>
         </div>
       )}
 

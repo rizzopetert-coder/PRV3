@@ -71,6 +71,29 @@ export interface FrictionTaxEstimate {
 }
 
 // ---------------------------------------------------------------------------
+// Synthesis types — S42 5-field contract migration
+// ---------------------------------------------------------------------------
+
+export interface SynthesisFields {
+  liability_condition_text:     string;
+  asset_resolution_anchor_text: string;
+  framing_text:                 string;
+  observable_indicators:        string[];
+  resolution_framing_text:      string;
+  synthesis_confidence:         number;
+  is_fallback:                  boolean;
+}
+
+// Airgap enforced per Gemini Q1 revised (S42):
+// liability_condition_text: private — principal only, never written to KV.
+// asset_resolution_anchor_text: private — principal only, never written to KV.
+// framing_text, observable_indicators, resolution_framing_text are KV-safe.
+export type ShareableSynthesisFields = Omit<
+  SynthesisFields,
+  "liability_condition_text" | "asset_resolution_anchor_text"
+>;
+
+// ---------------------------------------------------------------------------
 // PrivateOutputPayload
 // ---------------------------------------------------------------------------
 // Confrontational, felt. Stays in the session (React state only).
@@ -79,9 +102,9 @@ export interface FrictionTaxEstimate {
 
 export interface PrivateOutputPayload {
   // Layer 1 — synthesis
-  // Opaque string from Python engine (output_synthesis.py).
-  // TypeScript never generates this. Lock: S39.
-  synthesis: string;
+  // Five-field struct from Python engine (output_synthesis.py).
+  // TypeScript never generates this. Lock: S39. Contract: S42.
+  synthesis: SynthesisFields;
 
   // Layer 2 — state blocks
   // All returned states, normalized weights summing to 1.0.
@@ -114,6 +137,9 @@ export interface PrivateOutputPayload {
 // Rationale: precision over completeness for board/CFO audience.
 
 export interface ShareableOutputPayload {
+  // Layer 1 — synthesis (shareable fields only — private fields excluded at /api/share/create)
+  synthesis: ShareableSynthesisFields;
+
   // Condition
   primary_state: StateRef;
   secondary_states: StateRef[]; // pre-filtered: weight >= 0.20, max 2
