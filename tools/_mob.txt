@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.9
+\\\#\\\# MOB v4.10
 
   
 
@@ -1447,7 +1447,9 @@ Full progression in Section 16 session log.
 
 | \\\*\\\*web/components/AssemblyPanel.tsx\\\*\\\* | Assembly panel. Desktop: persistent sidebar. Mobile: Vaul bottom sheet (floating bar collapsed, full list expanded). |
 
-| \\\*\\\*web/app/page.tsx\\\*\\\* | Main interface. Phase state machine (1–4). Static interpretation path (≥70% single-signature). Dynamic path: calls /api/interpret. Phase 1 auto-advance removed S38. Phase 3 button uses uiCopy.phase3CTALabel S38. |
+| \\\*\\\*web/app/page.tsx\\\*\\\* | Main interface. Phase state machine (1–5). Static interpretation path (≥70% single-signature). Dynamic path: calls /api/interpret. intakeForShare state added S43 — passed to PrivateOutput alongside selectedStateIds for ShareButton. Phase 5 mounts PrivateOutput. |
+| \\\*\\\*web/app/share/[id]/page.tsx\\\*\\\* | Server Component. Share display page. Fetches /api/share/${id} server-side — Upstash credentials never reach browser bundle. notFound() on non-ok response or fetch error. Renders ShareableOutput with ShareableOutputPayload. Read-only, no share button, no back navigation. Created S44. |
+| \\\*\\\*web/app/share/[id]/not-found.tsx\\\*\\\* | Not-found handler for share display page. Catches notFound() from page.tsx. Renders: "Diagnostic report not found or expired." No id, no metadata. Created S44. |
 
   
 
@@ -1859,6 +1861,8 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
   
 
 | \\\*\\\*June 2026 — Session 41\\\*\\\* | S41 output layer data contract complete. web/lib/types.ts created — authoritative type contract. output-renderer.ts updated — types imported from types.ts. /api/result, /api/share/create, /api/share/[id] updated. page.tsx Phase 5 wired. PrivateOutput.tsx updated to PrivateOutputPayload direct. ENGINE DEBT flagged: private_output.resolution_routing stale field in states.py, deferred to Phase 3. TypeScript: 0 errors. MOB updated to v4.7. |
+
+| \*\*June 2026 — Session 44\*\* | Share display page built. web/app/share/[id]/page.tsx: Server Component — async params, absolute URL fetch from /api/share/${id} using VERCEL_URL or localhost, cache: no-store, notFound() on any non-ok response or fetch error. web/app/share/[id]/not-found.tsx: static, renders "Diagnostic report not found or expired." No id, no metadata. TypeScript: 0 errors. No engine changes. Tests: 137/142 + 71/71 + 43/43 + 18/18 (unchanged). Commit: see git log. MOB v4.10. |
 
 | \*\*June 2026 — Session 43\*\* | S43 rendering pass complete. web/lib/types.ts: created_at (ISO 8601) added to ShareableOutputPayload. /api/share/create: createdAt generated at KV write, included in payload. web/components/PrivateOutput.tsx: full 5-block rendering pass — condition header (state_name + severity pill + SEVERITY_ANCHOR tier text), liability condition (resolution_routing fallback), asset anchor (omit if empty), resolution pathway (resolution_routing fallback if not consumed in block 2), ShareButton child. web/components/ShareableOutput.tsx: rewritten from RenderedShareableOutput to ShareableOutputPayload direct — header bar with client identifier (industry · org_size · Mon YYYY or fallback), condition identified, framing text, observable indicators (omit if empty), resolution pathway (no fallback), attribution LOCKED copy verbatim. web/components/ShareButton.tsx: rewritten — props changed to { selectedStateIds, intake }, idle/creating/ready/error state machine, Copy confirmation with 2s reset. web/app/page.tsx: intakeForShare state added, set in handleTakeDiagnostic, passed to PrivateOutput alongside selectedStateIds. TypeScript: 0 errors. Tests: 137/142 engine + 71/71 output + 43/43 synthesis + 18/18 test_main. MOB v4.9. |
 
