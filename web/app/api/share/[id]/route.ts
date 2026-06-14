@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 import type { ShareableOutputPayload } from "@/lib/output-renderer";
+
+const redis = Redis.fromEnv();
 
 // ---------------------------------------------------------------------------
 // Returns ShareableOutput only.
@@ -18,7 +20,7 @@ export async function GET(
     return NextResponse.json({ error: "Invalid share key" }, { status: 400 });
   }
 
-  const raw = await kv.get<string>(`share:${id}`);
+  const raw = await redis.get<string>(`share:${id}`);
 
   if (raw === null || raw === undefined) {
     // Not found or expired — KV TTL removes the key automatically after 30 days
