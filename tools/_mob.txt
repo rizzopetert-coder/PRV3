@@ -1492,7 +1492,7 @@ Full progression in Section 16 session log.
 
 | \\\*\\\*api/engine.py\\\*\\\* | FastAPI serverless endpoint. x-engine-secret shared-secret validation. KeyError→400 (unknown state ID), TypeError/ValueError→400 (bad intake), Exception→500. sys.path.insert adds repo root so engine package resolves. Created S40. |
 
-| \\\*\\\*requirements.txt\\\*\\\* | Python deps for Vercel serverless: fastapi, uvicorn, numpy (numpy confirmed in engine/accumulation.py). Created S40. |
+| \\\*\\\*requirements.txt\\\*\\\* | Python deps for Vercel serverless: fastapi, uvicorn, numpy, anthropic. anthropic added S44 — required by engine/output_synthesis.py; missing from S40 original caused synthesis to always fall back to static dict. Created S40. |
 
 | \\\*\\\*vercel.json\\\*\\\* | Dual-runtime routing. @vercel/next for web/package.json. @vercel/python for api/engine.py. /api/engine → api/engine.py, /(.*) → /web/$1. Created S40. |
 
