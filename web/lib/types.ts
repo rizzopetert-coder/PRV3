@@ -17,12 +17,12 @@
 
 export type SeverityTier = "Emerging" | "Entrenched" | "Endemic";
 
-// Casing verified against engine/resolution_families.py (Task 0, S41): lowercase.
+// Commercial service names. Matches ENGINE_TO_COMMERCIAL_NAME in engine/resolution_families.py.
 export type ResolutionFamily =
-  | "structural"
-  | "developmental"
-  | "investigative"
-  | "directional";
+  | "Groundwork"
+  | "Development"
+  | "First Call"
+  | "Advisory";
 
 // ---------------------------------------------------------------------------
 // Shared interfaces

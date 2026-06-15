@@ -16,67 +16,67 @@ import { invokeEngine } from "@/lib/engine-client";
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// Resolution family map — mirrors engine/resolution_families.py (S38)
-// No service names. Four families: structural | developmental | investigative | directional
+// Resolution family map — commercial names (S45)
+// Groundwork | Development | First Call | Advisory
 // ---------------------------------------------------------------------------
 
 const STATE_RESOLUTION_FAMILY: Record<string, ResolutionFamily> = {
-  // Developmental
-  the_unformed_leader:              "developmental",
-  the_overloaded_manager:           "developmental",
-  the_dormant_talent:               "developmental",
-  built_to_fail:                    "developmental",
-  the_uninitiated:                  "developmental",
-  groundhog_day:                    "developmental",
-  // Structural
-  the_undefined_role:               "structural",
-  the_paper_tiger:                  "structural",
-  the_founders_grip:                "structural",
-  leadership_continuity_risk:       "structural",
-  decision_paralysis:               "structural",
-  the_policy_lag:                   "structural",
-  dueling_narratives:               "structural",
-  the_unsolved_problem:             "structural",
-  transition_paralysis:             "structural",
-  the_lost_map:                     "structural",
-  invisible_influence_architecture: "structural",
-  the_fracture:                     "structural",
-  silosolation:                     "structural",
-  the_broken_compass:               "structural",
-  // Investigative
-  the_exposed:                      "investigative",
-  hr_capture:                       "investigative",
-  the_unexamined_algorithm:         "investigative",
-  heard_and_ignored:                "investigative",
-  the_tolerated_violation:          "investigative",
-  paper_shield:                     "investigative",
-  pay_exposure:                     "investigative",
-  the_pay_fog:                      "investigative",
-  the_second_close:                 "investigative",
-  the_suppression_filter:           "investigative",
-  the_arbitrary_standard:           "investigative",
-  decision_blindness:               "investigative",
-  the_untouchable:                  "investigative",
-  what_nobody_says:                 "investigative",
-  the_diversity_ceiling:            "investigative",
-  the_unreported_hazard:            "investigative",
-  the_unlocked_door:                "investigative",
-  // Directional
-  culture_drift:                    "directional",
-  identity_erosion:                 "directional",
-  the_culture_that_wasnt:           "directional",
-  the_burned_credibility:           "directional",
-  invisible_burnout:                "directional",
-  the_basement_standard:            "directional",
-  the_inside_track:                 "directional",
-  narrative_lock:                   "directional",
-  the_wrong_reward:                 "directional",
-  leadership_deafness:              "directional",
+  // Development
+  the_unformed_leader:              "Development",
+  the_overloaded_manager:           "Development",
+  the_dormant_talent:               "Development",
+  built_to_fail:                    "Development",
+  the_uninitiated:                  "Development",
+  groundhog_day:                    "Development",
+  // Groundwork
+  the_undefined_role:               "Groundwork",
+  the_paper_tiger:                  "Groundwork",
+  the_founders_grip:                "Groundwork",
+  leadership_continuity_risk:       "Groundwork",
+  decision_paralysis:               "Groundwork",
+  the_policy_lag:                   "Groundwork",
+  dueling_narratives:               "Groundwork",
+  the_unsolved_problem:             "Groundwork",
+  transition_paralysis:             "Groundwork",
+  the_lost_map:                     "Groundwork",
+  invisible_influence_architecture: "Groundwork",
+  the_fracture:                     "Groundwork",
+  silosolation:                     "Groundwork",
+  the_broken_compass:               "Groundwork",
+  // First Call
+  the_exposed:                      "First Call",
+  hr_capture:                       "First Call",
+  the_unexamined_algorithm:         "First Call",
+  heard_and_ignored:                "First Call",
+  the_tolerated_violation:          "First Call",
+  paper_shield:                     "First Call",
+  pay_exposure:                     "First Call",
+  the_pay_fog:                      "First Call",
+  the_second_close:                 "First Call",
+  the_suppression_filter:           "First Call",
+  the_arbitrary_standard:           "First Call",
+  decision_blindness:               "First Call",
+  the_untouchable:                  "First Call",
+  what_nobody_says:                 "First Call",
+  the_diversity_ceiling:            "First Call",
+  the_unreported_hazard:            "First Call",
+  the_unlocked_door:                "First Call",
+  // Advisory
+  culture_drift:                    "Advisory",
+  identity_erosion:                 "Advisory",
+  the_culture_that_wasnt:           "Advisory",
+  the_burned_credibility:           "Advisory",
+  invisible_burnout:                "Advisory",
+  the_basement_standard:            "Advisory",
+  the_inside_track:                 "Advisory",
+  narrative_lock:                   "Advisory",
+  the_wrong_reward:                 "Advisory",
+  leadership_deafness:              "Advisory",
 };
 
 function getPrimaryFamily(stateIds: string[]): ResolutionFamily {
-  if (stateIds.length === 0) return "structural";
-  return STATE_RESOLUTION_FAMILY[stateIds[0]] ?? "structural";
+  if (stateIds.length === 0) return "Groundwork";
+  return STATE_RESOLUTION_FAMILY[stateIds[0]] ?? "Groundwork";
 }
 
 // ---------------------------------------------------------------------------
