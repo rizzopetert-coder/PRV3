@@ -20,7 +20,7 @@ export default function Home() {
   const [phase, setPhase] = useState<Phase>(1);
   const [selectedStateIds, setSelectedStateIds] = useState<string[]>([]);
   const [expandedSignatureIds, setExpandedSignatureIds] = useState<string[]>(
-    []
+    signatures.map((s) => s.id)
   );
   const [interpretation, setInterpretation] = useState<string | null>(null);
   const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
@@ -123,7 +123,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       <main className="flex-1 min-w-0 px-6 py-10 md:px-10 md:py-14 pb-20 md:pb-14">
-        <div className={`max-w-2xl ${phase === 1 ? "mx-auto" : ""}`}>
+        <div className={`max-w-5xl ${phase === 1 ? "mx-auto" : ""}`}>
 
           {/* Phase 5 — Private Output (result view, no assembly panel) */}
           {phase === 5 && resultPayload && intakeForShare && (
@@ -139,13 +139,27 @@ export default function Home() {
             <>
               {/* Phase 1 instruction */}
               {phase === 1 && (
-                <p className="text-sm text-gray-500 mb-8 leading-relaxed">
-                  {uiCopy.phase1Instruction}
-                </p>
+                <div className="mb-8">
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+                    What you&apos;re looking at
+                  </p>
+                  <p className="text-sm leading-relaxed text-gray-700 mb-2">
+                    Below are five patterns we see frequently in organizations
+                    experiencing friction. Each one is a cluster of conditions
+                    that tend to appear together. Read through them. Select the
+                    individual conditions that resemble what you&apos;re seeing
+                    in your organization. What you select will shape your
+                    signature.
+                  </p>
+                  <p className="text-sm leading-relaxed text-gray-500">
+                    You don&apos;t need to be certain. Select what sounds
+                    familiar.
+                  </p>
+                </div>
               )}
 
               {/* Signature cards — visible in phases 1–4 */}
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 [&>*:last-child]:md:col-start-2">
                 {signatures.map((sig) => {
                   const sigSelected = selectedStates.some(
                     (s) => s.signatureId === sig.id

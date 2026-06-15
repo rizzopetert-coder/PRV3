@@ -26,11 +26,6 @@ export default function SignatureCard({
   const cardStates = allStates.filter((s) =>
     signature.stateIds.includes(s.id)
   );
-  const selectedCount = cardStates.filter((s) =>
-    selectedStateIds.includes(s.id)
-  ).length;
-  const unselectedCount = cardStates.length - selectedCount;
-
   return (
     <Collapsible.Root open={isExpanded} onOpenChange={onToggleExpand}>
       <div
@@ -56,9 +51,7 @@ export default function SignatureCard({
           {/* Count affordance / collapse trigger */}
           <Collapsible.Trigger asChild>
             <button className="mt-3 text-xs text-gray-400 hover:text-gray-600 transition-colors">
-              {isExpanded
-                ? "Collapse"
-                : `${unselectedCount} ${unselectedCount === 1 ? "condition" : "conditions"} inside`}
+              {isExpanded ? "Hide conditions" : "Show conditions"}
             </button>
           </Collapsible.Trigger>
         </div>
