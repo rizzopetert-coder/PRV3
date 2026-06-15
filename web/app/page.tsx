@@ -1,250 +1,206 @@
-"use client";
-
-import { useState } from "react";
-import {
-  signatures,
-  states,
-  getDominantSignature,
-  uiCopy,
-} from "@/data/taxonomy";
-import type { State } from "@/data/taxonomy";
-import type { PrivateOutputPayload } from "@/lib/types";
-import type { EnginePayload } from "@/lib/engine-client";
-import SignatureCard from "@/components/SignatureCard";
-import AssemblyPanel from "@/components/AssemblyPanel";
-import PrivateOutput from "@/components/PrivateOutput";
-
-type Phase = 1 | 2 | 3 | 4 | 5;
+import Link from "next/link";
 
 export default function Home() {
-  const [phase, setPhase] = useState<Phase>(1);
-  const [selectedStateIds, setSelectedStateIds] = useState<string[]>([]);
-  const [expandedSignatureIds, setExpandedSignatureIds] = useState<string[]>(
-    []
-  );
-  const [interpretation, setInterpretation] = useState<string | null>(null);
-  const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
-  const [resultPayload, setResultPayload] = useState<PrivateOutputPayload | null>(null);
-  const [intakeForShare, setIntakeForShare] = useState<EnginePayload["intake"] | null>(null);
-  const [isLoadingResult, setIsLoadingResult] = useState(false);
-
-  const selectedStates: State[] = states.filter((s) =>
-    selectedStateIds.includes(s.id)
-  );
-
-  function handleSelectState(stateId: string) {
-    setSelectedStateIds((prev) => {
-      const next = prev.includes(stateId)
-        ? prev.filter((id) => id !== stateId)
-        : [...prev, stateId];
-      return next;
-    });
-  }
-
-  function handleRemoveState(stateId: string) {
-    setSelectedStateIds((prev) => prev.filter((id) => id !== stateId));
-  }
-
-  function handleToggleExpand(signatureId: string) {
-    setExpandedSignatureIds((prev) =>
-      prev.includes(signatureId)
-        ? prev.filter((id) => id !== signatureId)
-        : [...prev, signatureId]
-    );
-  }
-
-  async function handleSeeWhatThisMeans() {
-    if (selectedStateIds.length === 0) return;
-
-    if (selectedStateIds.length === 1) {
-      setInterpretation(uiCopy.singleStateEdgeCase);
-      setPhase(3);
-      return;
-    }
-
-    const dominant = getDominantSignature(selectedStateIds);
-    if (dominant && dominant.percentage >= 0.7) {
-      const sig = signatures.find((s) => s.id === dominant.signatureId);
-      setInterpretation(sig?.coexistenceInterpretation ?? null);
-      setPhase(3);
-      return;
-    }
-
-    setPhase(3);
-    setIsLoadingInterpretation(true);
-    try {
-      const payload = selectedStates.map((s) => ({
-        name: s.name,
-        signatureId: s.signatureId,
-      }));
-      const res = await fetch("/api/interpret", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ states: payload }),
-      });
-      const data = await res.json();
-      setInterpretation(data.interpretation ?? null);
-    } finally {
-      setIsLoadingInterpretation(false);
-    }
-  }
-
-  async function handleTakeDiagnostic() {
-    if (selectedStateIds.length === 0) return;
-    // Path B: intake fields not yet collected in self-selection flow.
-    // Engine uses selectedStateIds as declared diagnosis; intake is echoed only.
-    const intake: EnginePayload["intake"] = {
-      headcount: "",
-      industry: "",
-      orgType: "",
-      jurisdictions: [],
-      significantEvents: [],
-      principalRole: "",
-    };
-    setIntakeForShare(intake);
-    setIsLoadingResult(true);
-    try {
-      const res = await fetch("/api/result", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ selectedStateIds, intake }),
-      });
-      if (!res.ok) {
-        return;
-      }
-      const payload = (await res.json()) as PrivateOutputPayload;
-      setResultPayload(payload);
-      setPhase(5);
-    } finally {
-      setIsLoadingResult(false);
-    }
-  }
-
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <main className="flex-1 min-w-0 px-6 py-10 md:px-10 md:py-14 pb-20 md:pb-14">
-        <div className={`max-w-2xl ${phase === 1 ? "mx-auto" : ""}`}>
+    <main className="min-h-screen bg-gray-50">
+      <div className="max-w-2xl mx-auto px-6 py-16 md:px-10 md:py-24">
 
-          {/* Phase 5 — Private Output (result view, no assembly panel) */}
-          {phase === 5 && resultPayload && intakeForShare && (
-            <PrivateOutput
-              payload={resultPayload}
-              selectedStateIds={selectedStateIds}
-              intake={intakeForShare}
-            />
-          )}
+        {/* Section 1 — Opening */}
+        <section className="mb-14">
+          <p className="font-display text-xl leading-relaxed text-gray-900 mb-6">
+            Most organizations know something is wrong before they can say what
+            it is. The presenting complaint — the thing that prompted someone to
+            look for help — is real. It is rarely the whole story.
+          </p>
+          <p className="font-display text-xl leading-relaxed text-gray-500">
+            We don&apos;t arrive with a methodology and fit you into it. We start
+            with you.
+          </p>
+        </section>
 
-          {/* Phases 1–4: self-selection interface */}
-          {phase < 5 && (
-            <>
-              {/* Phase 1 instruction */}
-              {phase === 1 && (
-                <p className="text-sm text-gray-500 mb-8 leading-relaxed">
-                  {uiCopy.phase1Instruction}
-                </p>
-              )}
+        {/* Section 2 — Practice description */}
+        <section className="mb-14">
+          <p className="text-base leading-relaxed text-gray-700">
+            Principal Resolution is an organizational friction consulting
+            practice. We identify the conditions underneath the presenting
+            complaint — the ones producing it, sustaining it, and making it
+            resistant to the solutions that should be working. We name them
+            precisely. We put their coexistence in context. Then we resolve them.
+          </p>
+        </section>
 
-              {/* Signature cards — visible in phases 1–4 */}
-              <div className="space-y-3">
-                {signatures.map((sig) => {
-                  const sigSelected = selectedStates.some(
-                    (s) => s.signatureId === sig.id
-                  );
-                  return (
-                    <SignatureCard
-                      key={sig.id}
-                      signature={sig}
-                      isSelected={sigSelected}
-                      isExpanded={expandedSignatureIds.includes(sig.id)}
-                      selectedStateIds={selectedStateIds}
-                      onSelect={() => handleToggleExpand(sig.id)}
-                      onToggleExpand={() => handleToggleExpand(sig.id)}
-                      onSelectState={handleSelectState}
-                    />
-                  );
-                })}
-              </div>
+        {/* Section 3 — Differentiator */}
+        <section className="mb-14">
+          <p className="text-base leading-relaxed text-gray-900 font-medium">
+            Every other consulting service addresses the presenting complaint. We
+            address the condition underneath it. That distinction is the practice.
+          </p>
+        </section>
 
-              {/* Phase 1 CTA */}
-              {phase === 1 && selectedStateIds.length > 0 && (
-                <div className="mt-8">
-                  <button
-                    onClick={() => setPhase(2)}
-                    className="bg-gray-900 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
-                  >
-                    {uiCopy.transitionTrigger}
-                  </button>
-                </div>
-              )}
+        {/* Section 4 — Path introduction */}
+        <section className="mb-12">
+          <h2 className="font-display text-lg font-medium text-gray-900 mb-4">
+            How people work with us
+          </h2>
+          <div className="space-y-3">
+            <p className="text-base leading-relaxed text-gray-700">
+              There is no single entry point here. Organizations arrive at
+              different stages of understanding — some know precisely what
+              they&apos;re dealing with, some have a direction but not a name for
+              it, some are starting from a felt sense that something is wrong.
+              We meet you where you are.
+            </p>
+            <p className="text-base leading-relaxed text-gray-700">
+              Three paths in. All of them lead to the same place.
+            </p>
+          </div>
+        </section>
 
-              {/* Phase 2 CTA */}
-              {phase === 2 && selectedStateIds.length > 0 && (
-                <div className="mt-8">
-                  <button
-                    onClick={handleSeeWhatThisMeans}
-                    className="bg-gray-900 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
-                  >
-                    {uiCopy.seeWhatThisMeans}
-                  </button>
-                </div>
-              )}
+        {/* Section 5 — Three paths */}
+        <section className="space-y-12 mb-14">
 
-              {/* Phase 3 — Coexistence Interpretation */}
-              {phase === 3 && (
-                <div className="mt-10 pt-10 border-t border-gray-200">
-                  {isLoadingInterpretation ? (
-                    <p className="text-sm text-gray-400">Loading&hellip;</p>
-                  ) : (
-                    <p className="text-gray-900 text-base leading-relaxed">
-                      {interpretation}
-                    </p>
-                  )}
-                  {!isLoadingInterpretation && (
-                    <div className="mt-6">
-                      <button
-                        onClick={() => setPhase(4)}
-                        className="bg-gray-900 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
-                      >
-                        {uiCopy.phase3CTALabel}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+          {/* Path 1 */}
+          <div className="space-y-3">
+            <h3 className="font-display text-base font-medium text-gray-900">
+              Take the diagnostic
+            </h3>
+            <p className="text-sm leading-relaxed text-gray-700">
+              The instrument observes. The engine infers. The output names.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              You respond to a structured sequence of questions designed to
+              surface organizational signal without telegraphing what
+              they&apos;re measuring. The engine reads the pattern. What comes
+              back is a precise identification of the conditions present in your
+              organization — named, contextualized, and routed to a resolution
+              path.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              No two signatures are identical. Yours won&apos;t be either.
+            </p>
+            <Link
+              href="/diagnostic"
+              className="font-ui inline-block text-sm font-medium text-gray-900 underline underline-offset-2 decoration-gray-400 hover:decoration-gray-900 transition-colors"
+            >
+              Take the diagnostic →
+            </Link>
+          </div>
 
-              {/* Phase 4 — Transition */}
-              {phase === 4 && (
-                <div className="mt-10 pt-10 border-t border-gray-200">
-                  <p className="text-gray-900 text-base leading-relaxed mb-6">
-                    {uiCopy.phase4Copy}
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <button
-                      onClick={handleTakeDiagnostic}
-                      disabled={isLoadingResult}
-                      className="flex-1 bg-gray-900 text-white text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {isLoadingResult ? "Synthesizing…" : uiCopy.diagnosticCTA}
-                    </button>
-                    <button className="flex-1 border border-gray-900 text-gray-900 text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                      {uiCopy.conversationCTA}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+          {/* Path 2 */}
+          <div className="space-y-3">
+            <h3 className="font-display text-base font-medium text-gray-900">
+              Read the signatures
+            </h3>
+            <p className="text-sm leading-relaxed text-gray-700">
+              If you&apos;d rather start by recognizing than responding, start
+              here.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              Browse the conditions we identify — all 47 of them, each described
+              in plain language — and select the ones that resemble what
+              you&apos;re seeing in your organization. The engine assembles what
+              your selections suggest into a signature: which patterns are
+              present, what their coexistence means, and what resolution looks
+              like from where you are.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              Either way, what you build here is a starting point. The diagnostic
+              finds what you weren&apos;t looking for.
+            </p>
+            <Link
+              href="/diagnostic"
+              className="font-ui inline-block text-sm font-medium text-gray-900 underline underline-offset-2 decoration-gray-400 hover:decoration-gray-900 transition-colors"
+            >
+              Browse the signatures →
+            </Link>
+          </div>
 
-        </div>
-      </main>
+          {/* Path 3 */}
+          <div className="space-y-3">
+            <h3 className="font-display text-base font-medium text-gray-900">
+              Start a conversation
+            </h3>
+            <p className="text-sm leading-relaxed text-gray-700">
+              If you already know what you&apos;re dealing with and you&apos;re
+              ready to talk about what to do, skip the instrument entirely.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              Tell us what&apos;s happening. We&apos;ll tell you what we see and
+              whether we&apos;re the right practice for it.
+            </p>
+            <button
+              type="button"
+              className="font-ui text-sm font-medium text-gray-900 underline underline-offset-2 decoration-gray-400"
+            >
+              Start a conversation →
+            </button>
+          </div>
 
-      {/* Assembly Panel — visible from Phase 2 through Phase 4 */}
-      {phase >= 2 && phase < 5 && (
-        <AssemblyPanel
-          selectedStates={selectedStates}
-          onRemove={handleRemoveState}
-        />
-      )}
-    </div>
+        </section>
+
+        {/* Section 6 — Load-bearing statement */}
+        <section className="mb-14">
+          <p className="font-display text-xl leading-relaxed text-gray-900">
+            We don&apos;t fix people problems. We change the conditions that
+            produce them.
+          </p>
+        </section>
+
+        {/* Section 7 — Service orientation */}
+        <section className="mb-14">
+          <h2 className="font-display text-lg font-medium text-gray-900 mb-4">
+            What resolution looks like
+          </h2>
+          <div className="space-y-4">
+            <p className="text-sm leading-relaxed text-gray-700">
+              The diagnostic is where every engagement begins. What follows
+              depends on what it finds.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              For some organizations the work is structural — roles, processes,
+              decision rights, accountability architecture that hasn&apos;t kept
+              pace with what the organization has become.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              For some it&apos;s cultural — the conditions that have made it
+              impossible for people to do what the organization needs them to do.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              For some it&apos;s acute — something is happening now and it
+              can&apos;t wait for a deliberate process.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              For some it&apos;s developmental — the people the organization
+              needs to grow into its next chapter aren&apos;t being built.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              For some it&apos;s a standing resource — a thought partner outside
+              the org chart who can be reached when the situation requires honest
+              counsel rather than managed advice.
+            </p>
+            <p className="text-sm leading-relaxed text-gray-700">
+              The diagnostic tells us which. Sometimes it tells us several at
+              once.
+            </p>
+            <button
+              type="button"
+              className="font-ui text-sm font-medium text-gray-900 underline underline-offset-2 decoration-gray-400"
+            >
+              Learn about our services →
+            </button>
+          </div>
+        </section>
+
+        {/* Section 8 — Footer line */}
+        <section className="pt-10 border-t border-gray-200">
+          <p className="text-sm text-gray-500 leading-relaxed">
+            Principal Resolution operates on three commitments: effectiveness,
+            candor, and humanity. You&apos;ll see them in the work before you see
+            them on the page.
+          </p>
+        </section>
+
+      </div>
+    </main>
   );
 }
