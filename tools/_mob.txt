@@ -1496,7 +1496,7 @@ Full progression in Section 16 session log.
 
 | \\\*\\\*vercel.json\\\*\\\* | Dual-runtime routing. @vercel/next for web/package.json. @vercel/python for api/engine.py. /api/engine → api/engine.py, /(.*) → /web/$1. Created S40. |
 
-| \\\*\\\*web/lib/engine-client.ts\\\*\\\* | URL resolver + fetch helper. resolveEngineUrl(): localhost dev / VERCEL_URL prod. EnginePayload and EngineResult types (14-field contract). invokeEngine(): POST with x-engine-secret header. Created S40. |
+| \\\*\\\*web/lib/engine-client.ts\\\*\\\* | URL resolver + fetch helper. resolveEngineUrl(): NEXT_PUBLIC_ENGINE_URL (explicit override, checked first) → VERCEL_URL construction → localhost fallback. NEXT_PUBLIC_ENGINE_URL added S44. EnginePayload and EngineResult types (14-field contract). invokeEngine(): POST with x-engine-secret header. Created S40. |
 
 | \\\*\\\*web/app/api/result/route.ts\\\*\\\* | POST Route Handler. Returns PrivateOutput only. No KV write of any kind. ShareableOutput never constructed here. Engine wired S40: invokeEngine({ selectedStateIds, intake }) → engine result fields mapped to PrivateOutputPayload. friction_tax_estimate null (Path B). synthesis opaque string from engine — not present in Path B. Created S38. Wired S39/S40. |
 

@@ -1,6 +1,9 @@
 const ENGINE_SECRET = process.env.ENGINE_SECRET ?? "";
 
 function resolveEngineUrl(): string {
+  if (process.env.NEXT_PUBLIC_ENGINE_URL) {
+    return process.env.NEXT_PUBLIC_ENGINE_URL;
+  }
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}/api/engine`;
   }
