@@ -5,31 +5,32 @@ export default function Home() {
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto px-6 py-16 md:px-10 md:py-24">
 
-        {/* Section 1 — Opening */}
+        {/* Section 1,Opening */}
         <section className="mb-14">
           <p className="font-display text-xl leading-relaxed text-gray-900 mb-6">
-            Most organizations know something is wrong before they can say what
-            it is. The presenting complaint — the thing that prompted someone to
-            look for help — is real. It is rarely the whole story.
+            The presenting complaint is rarely the whole story. Most organizations
+            know something is wrong before they can say what it is. What prompted
+            someone to look for help is a signal. The condition underneath it is
+            what we&apos;re here to find.
           </p>
-          <p className="font-display text-xl leading-relaxed text-gray-500">
+          <p className="font-display text-xl leading-relaxed text-gray-900">
             We don&apos;t arrive with a methodology and fit you into it. We start
             with you.
           </p>
         </section>
 
-        {/* Section 2 — Practice description */}
+        {/* Section 2,Practice description */}
         <section className="mb-14">
           <p className="text-base leading-relaxed text-gray-700">
             Principal Resolution is an organizational friction consulting
             practice. We identify the conditions underneath the presenting
-            complaint — the ones producing it, sustaining it, and making it
+            complaint, the ones producing it, sustaining it, and making it
             resistant to the solutions that should be working. We name them
             precisely. We put their coexistence in context. Then we resolve them.
           </p>
         </section>
 
-        {/* Section 3 — Differentiator */}
+        {/* Section 3,Differentiator */}
         <section className="mb-14">
           <p className="text-base leading-relaxed text-gray-900 font-medium">
             Every other consulting service addresses the presenting complaint. We
@@ -37,7 +38,7 @@ export default function Home() {
           </p>
         </section>
 
-        {/* Section 4 — Path introduction */}
+        {/* Section 4,Path introduction */}
         <section className="mb-12">
           <h2 className="font-display text-lg font-medium text-gray-900 mb-4">
             How people work with us
@@ -45,7 +46,7 @@ export default function Home() {
           <div className="space-y-3">
             <p className="text-base leading-relaxed text-gray-700">
               There is no single entry point here. Organizations arrive at
-              different stages of understanding — some know precisely what
+              different stages of understanding, some know precisely what
               they&apos;re dealing with, some have a direction but not a name for
               it, some are starting from a felt sense that something is wrong.
               We meet you where you are.
@@ -56,7 +57,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Section 5 — Three paths */}
+        {/* Section 5,Three paths */}
         <section className="space-y-12 mb-14">
 
           {/* Path 1 */}
@@ -72,7 +73,7 @@ export default function Home() {
               surface organizational signal without telegraphing what
               they&apos;re measuring. The engine reads the pattern. What comes
               back is a precise identification of the conditions present in your
-              organization — named, contextualized, and routed to a resolution
+              organization, named, contextualized, and routed to a resolution
               path.
             </p>
             <p className="text-sm leading-relaxed text-gray-700">
@@ -96,8 +97,8 @@ export default function Home() {
               here.
             </p>
             <p className="text-sm leading-relaxed text-gray-700">
-              Browse the conditions we identify — all 47 of them, each described
-              in plain language — and select the ones that resemble what
+              Browse the conditions we identify, all 47 of them, each described
+              in plain language, and select the ones that resemble what
               you&apos;re seeing in your organization. The engine assembles what
               your selections suggest into a signature: which patterns are
               present, what their coexistence means, and what resolution looks
@@ -138,7 +139,7 @@ export default function Home() {
 
         </section>
 
-        {/* Section 6 — Load-bearing statement */}
+        {/* Section 6,Load-bearing statement */}
         <section className="mb-14">
           <p className="font-display text-xl leading-relaxed text-gray-900">
             We don&apos;t fix people problems. We change the conditions that
@@ -146,7 +147,7 @@ export default function Home() {
           </p>
         </section>
 
-        {/* Section 7 — Service orientation */}
+        {/* Section 7,Service orientation */}
         <section className="mb-14">
           <h2 className="font-display text-lg font-medium text-gray-900 mb-4">
             What resolution looks like
@@ -157,24 +158,24 @@ export default function Home() {
               depends on what it finds.
             </p>
             <p className="text-sm leading-relaxed text-gray-700">
-              For some organizations the work is structural — roles, processes,
+              For some organizations the work is structural, roles, processes,
               decision rights, accountability architecture that hasn&apos;t kept
               pace with what the organization has become.
             </p>
             <p className="text-sm leading-relaxed text-gray-700">
-              For some it&apos;s cultural — the conditions that have made it
+              For some it&apos;s cultural, the conditions that have made it
               impossible for people to do what the organization needs them to do.
             </p>
             <p className="text-sm leading-relaxed text-gray-700">
-              For some it&apos;s acute — something is happening now and it
+              For some it&apos;s acute, something is happening now and it
               can&apos;t wait for a deliberate process.
             </p>
             <p className="text-sm leading-relaxed text-gray-700">
-              For some it&apos;s developmental — the people the organization
+              For some it&apos;s developmental, the people the organization
               needs to grow into its next chapter aren&apos;t being built.
             </p>
             <p className="text-sm leading-relaxed text-gray-700">
-              For some it&apos;s a standing resource — a thought partner outside
+              For some it&apos;s a standing resource, a thought partner outside
               the org chart who can be reached when the situation requires honest
               counsel rather than managed advice.
             </p>
@@ -191,7 +192,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Section 8 — Footer line */}
+        {/* Section 8,Footer line */}
         <section className="pt-10 border-t border-gray-200">
           <p className="text-sm text-gray-500 leading-relaxed">
             Principal Resolution operates on three commitments: effectiveness,
