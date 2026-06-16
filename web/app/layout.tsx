@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lora, Inter } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -40,7 +41,23 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <nav className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-white">
+          <Link
+            href="/"
+            className="font-ui text-sm font-semibold text-gray-900 hover:text-gray-600 transition-colors"
+          >
+            Principal Resolution
+          </Link>
+          <Link
+            href="/book"
+            className="font-ui text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            The Book
+          </Link>
+        </nav>
+        {children}
+      </body>
     </html>
   );
 }
