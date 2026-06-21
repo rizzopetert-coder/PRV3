@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.13
+\\\#\\\# MOB v4.14
 
   
 
@@ -418,21 +418,49 @@ Service offering names, pricing, UX, marketing site, instrument delivery interfa
 
 
 
-\*\*Five service names — final, locked Session 32:\*\*
+\*\*Five service names — final, locked Session 32 (resolution service rows superseded S47 — see renaming entry below):\*\*
 
 
 
-| \*\*Groundwork\*\* | Group training for developing leaders |
+| \*\*Groundwork\*\* | Group training for developing leaders — superseded S47, renamed to People Tactics and Strategy |
 
 | --- | --- |
 
-| \*\*Development\*\* | Individual coaching for developing leaders, bounded engagement |
+| \*\*Development\*\* | Individual coaching for developing leaders, bounded engagement — superseded S47, renamed to Training & Development |
 
-| \*\*First Call\*\* | Retainer advisory for executives and HR leaders |
+| \*\*First Call\*\* | Retainer advisory for executives and HR leaders — superseded S47, renamed to Intervention |
 
-| \*\*Advisory\*\* | Change navigation and emergency response for executives |
+| \*\*Advisory\*\* | Change navigation and emergency response for executives — superseded S47, renamed to Executive Advisory |
 
 | \*\*Diagnostic\*\* | Organizational assessment leading to recovery consulting if warranted |
+
+\*\*Resolution service renaming — locked and executed S47:\*\* The four resolution services are renamed from their Session 32 brand-style names to literal, searchable names. This supersedes the Session 32 lock.
+
+| Old (S32, superseded) | New (locked) |
+| --- | --- |
+| Groundwork | \*\*People Tactics and Strategy\*\* |
+| Development | \*\*Training & Development\*\* |
+| First Call | \*\*Intervention\*\* |
+| Advisory | \*\*Executive Advisory\*\* |
+
+\*\*Diagnostic is unaffected\*\* — remains branded, sits above the four as the entry-point layer per the Session 33 two-tier lock. Nothing about Diagnostic's name, position, or treatment changed.
+
+\*\*Rationale:\*\* The diagnostic is the practice's actual IP and stays branded. The four resolution services are commodity-shaped categories a buyer already searches for by plain name (e.g., a visitor looking for training for their team should find something on the site called Training). No constraint on name length — accuracy and findability won over brevity.
+
+\*\*Execution record:\*\*
+
+- Gemini architectural review identified the core risk: the Python engine (resolution\_families.py) and the TypeScript web layer (web/lib/types.ts, both API route handlers) maintain independently hardcoded references to the four names with no shared contract. A rename had to update both halves in sync; no single source of truth exists between them.
+- Phase 1 (read-only scan, Claude Code): confirmed the legacy names function as both display strings and logic keys depending on file — RESOLUTION\_FALLBACK\_COPY's 26 tuple keys (19 single-service + 7 asymmetric compound) being the highest silent-failure risk, since a key mismatch degrades to generic fallback copy with no error or log.
+- Phase 2, Step 1 (Python core + test suite): ENGINE\_TO\_COMMERCIAL\_NAME values updated; all 26 RESOLUTION\_FALLBACK\_COPY keys and associated body copy renamed; tools/test\_resolution\_families.py assertions updated in the same pass. engine/data/states.py explicitly excluded — its "Development" value is pre-translation, engine-internal taxonomy vocabulary, a different semantic layer from the commercial name, and was confirmed to carry zero diff throughout. Checkpoint A: 101/101 tests passing.
+- Phase 2, Step 2 (TypeScript web layer): ResolutionFamily union type updated in web/lib/types.ts; STATE\_RESOLUTION\_FAMILY (47 entries) updated identically in both web/app/api/result/route.ts and web/app/api/share/create/route.ts (duplicated verbatim, no shared import between them); 4 hardcoded fallback string literals in both files' getPrimaryFamily() updated. Checkpoint B: tsc --noEmit, 0 errors. Post-write identicality between both route handlers confirmed.
+- Verification gate (isolated runtime logic test): empty-array and unknown-state-id fallback branches confirmed returning "People Tactics and Strategy" (not the old "Groundwork" default — this fallback choice was discussed and explicitly kept, confirmed as an error-path-only default with zero legitimate diagnostic combinations routing through it). One representative state from each of the four families confirmed returning its correct new name end-to-end. Full /api/result → external engine integration test deferred to post-deploy smoke test — the rename's logic lives entirely upstream of the engine call, so this gap does not represent unverified rename risk.
+- \*\*Known coincidental collision created by this rename:\*\* the engine-internal key "Intervention" and the new commercial name "Intervention" are now identical strings, the same situation "Development" already presented pre-rename on the engine-internal side. Not a defect — noted for future debugging context only.
+
+\*\*Outstanding, not yet executed:\*\*
+
+- PRV3\_Resolution\_Families\_Copy\_v3.0.docx — static fallback copy document, all three severity variants x four services x eight compound-service combination variants. Deferred to a distinct Phase 3 per Gemini's recommendation (decoupled from the code pipeline, no shared risk with the code changes). Not yet started as of this entry.
+- /about/services page — content drafted and revised this session cycle using the new names throughout (PTS copy rewritten for "hands-on, embedded" framing per Pete's direction; page-opening paragraph revised to include a Diagnostic pointer with CTA link). Drafted, pending Pete's final sign-off; not yet built into the live route.
+- /ask — services summary, not yet built. Will use new names from inception; no migration needed.
 
 
 
@@ -1505,7 +1533,7 @@ Full progression in Section 16 session log.
 
 | \\\*\\\*engine/output_synthesis.py\\\*\\\* | Output layer. LLM synthesis engine. Follows narrative.py pattern. System prompt enforces no service names, no semicolons. synthesize(): state_cluster, severity_tier, resolution_family_id → SynthesisResult. Timeout 5s. Deterministic fallback on error. OutputSynthesisEngine class. Created S38. |
 
-| \\\*\\\*web/lib/types.ts\\\*\\\* | Authoritative TypeScript type contract for output layer. Exports: PrivateOutputPayload, ShareableOutputPayload, StateRef, IntakeEcho, FrictionTaxEstimate, SeverityTier, ResolutionFamily, SynthesisFields, ShareableSynthesisFields. created_at field added to ShareableOutputPayload (S43). ResolutionFamily updated to commercial names S45: "Groundwork" | "Development" | "First Call" | "Advisory" (was internal IDs structural/developmental/investigative/directional). Source of truth for /api/result, /api/share/create, /api/share/[id], output-renderer.ts, PrivateOutput.tsx, ShareableOutput.tsx. Created S41. |
+| \\\*\\\*web/lib/types.ts\\\*\\\* | Authoritative TypeScript type contract for output layer. Exports: PrivateOutputPayload, ShareableOutputPayload, StateRef, IntakeEcho, FrictionTaxEstimate, SeverityTier, ResolutionFamily, SynthesisFields, ShareableSynthesisFields. created_at field added to ShareableOutputPayload (S43). ResolutionFamily updated to commercial names S47: "People Tactics and Strategy" | "Training & Development" | "Intervention" | "Executive Advisory" (was S45 names: "Groundwork" | "Development" | "First Call" | "Advisory"). Source of truth for /api/result, /api/share/create, /api/share/[id], output-renderer.ts, PrivateOutput.tsx, ShareableOutput.tsx. Created S41. |
 | \\\*\\\*web/lib/output-renderer.ts\\\*\\\* | Output layer renderer. PrivateOutputPayload and ShareableOutputPayload types. renderPrivateOutput() and renderShareableOutput(). 3-pass structure: Layer 1 async synthesis, Layer 2 sync state blocks, Layer 3 sync resolution. No engine/ imports — clinical boundary enforced. Created S38. |
 
 | \\\*\\\*engine/main.py\\\*\\\* | Path B orchestrator. run_engine(payload) — IntakeData → StateRanking(score=1.0) → SeverityEngine.score() → OutputEngine.build() → SessionData → assemble_output(). AccumulationEngine bypassed. selectedStateIds are declared diagnosis. Created S40. |
@@ -1518,9 +1546,9 @@ Full progression in Section 16 session log.
 
 | \\\*\\\*web/lib/engine-client.ts\\\*\\\* | URL resolver + fetch helper. resolveEngineUrl(): ENGINE_URL (explicit override, checked first) → VERCEL_URL construction → localhost fallback. ENGINE_URL override added S44 (renamed from NEXT_PUBLIC_ENGINE_URL — server-side resolver, NEXT_PUBLIC prefix incorrect). EnginePayload and EngineResult types (14-field contract). invokeEngine(): POST with x-engine-secret header. Created S40. |
 
-| \\\*\\\*web/app/api/result/route.ts\\\*\\\* | POST Route Handler. Returns PrivateOutput only. No KV write of any kind. ShareableOutput never constructed here. Engine wired S40: invokeEngine({ selectedStateIds, intake }) → engine result fields mapped to PrivateOutputPayload. friction_tax_estimate null (Path B). synthesis opaque string from engine — not present in Path B. STATE_RESOLUTION_FAMILY updated S45: maps to commercial names (Groundwork/Development/First Call/Advisory) instead of internal IDs. Created S38. Wired S39/S40. |
+| \\\*\\\*web/app/api/result/route.ts\\\*\\\* | POST Route Handler. Returns PrivateOutput only. No KV write of any kind. ShareableOutput never constructed here. Engine wired S40: invokeEngine({ selectedStateIds, intake }) → engine result fields mapped to PrivateOutputPayload. friction_tax_estimate null (Path B). synthesis opaque string from engine — not present in Path B. STATE_RESOLUTION_FAMILY updated S47: maps to commercial names (People Tactics and Strategy/Training & Development/Intervention/Executive Advisory) instead of internal IDs. Created S38. Wired S39/S40. |
 
-| \\\*\\\*web/app/api/share/create/route.ts\\\*\\\* | POST Route Handler. Independent engine call — runs separately from /api/result, no session store dependency. Engine wired S40: invokeEngine({ selectedStateIds, intake }) → engine result fields mapped to ShareableOutputPayload. sessionId from engineResult.session_id (removed from request contract S40). Writes ShareableOutput to Upstash Redis (NanoID key, 30-day TTL). PrivateOutput never written to KV. Returns {shareKey, shareUrl, expiresAt}. STATE_RESOLUTION_FAMILY updated S45: maps to commercial names (Groundwork/Development/First Call/Advisory) instead of internal IDs. Created S38. Wired S39/S40. |
+| \\\*\\\*web/app/api/share/create/route.ts\\\*\\\* | POST Route Handler. Independent engine call — runs separately from /api/result, no session store dependency. Engine wired S40: invokeEngine({ selectedStateIds, intake }) → engine result fields mapped to ShareableOutputPayload. sessionId from engineResult.session_id (removed from request contract S40). Writes ShareableOutput to Upstash Redis (NanoID key, 30-day TTL). PrivateOutput never written to KV. Returns {shareKey, shareUrl, expiresAt}. STATE_RESOLUTION_FAMILY updated S47: maps to commercial names (People Tactics and Strategy/Training & Development/Intervention/Executive Advisory) instead of internal IDs. Created S38. Wired S39/S40. |
 
 | \\\*\\\*web/app/api/share/[id]/route.ts\\\*\\\* | GET Route Handler. Returns ShareableOutput only. PrivateOutput never exists in this response. Returns 404 if not found or expired (KV TTL governs). Created S38. |
 
