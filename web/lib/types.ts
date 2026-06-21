@@ -19,10 +19,10 @@ export type SeverityTier = "Emerging" | "Entrenched" | "Endemic";
 
 // Commercial service names. Matches ENGINE_TO_COMMERCIAL_NAME in engine/resolution_families.py.
 export type ResolutionFamily =
-  | "Groundwork"
-  | "Development"
-  | "First Call"
-  | "Advisory";
+  | "People Tactics and Strategy"
+  | "Training & Development"
+  | "Intervention"
+  | "Executive Advisory";
 
 // ---------------------------------------------------------------------------
 // Shared interfaces

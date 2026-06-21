@@ -16,67 +16,67 @@ import { invokeEngine } from "@/lib/engine-client";
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// Resolution family map — commercial names (S45)
-// Groundwork | Development | First Call | Advisory
+// Resolution family map — commercial names (S47)
+// People Tactics and Strategy | Training & Development | Intervention | Executive Advisory
 // ---------------------------------------------------------------------------
 
 const STATE_RESOLUTION_FAMILY: Record<string, ResolutionFamily> = {
-  // Development
-  the_unformed_leader:              "Development",
-  the_overloaded_manager:           "Development",
-  the_dormant_talent:               "Development",
-  built_to_fail:                    "Development",
-  the_uninitiated:                  "Development",
-  groundhog_day:                    "Development",
-  // Groundwork
-  the_undefined_role:               "Groundwork",
-  the_paper_tiger:                  "Groundwork",
-  the_founders_grip:                "Groundwork",
-  leadership_continuity_risk:       "Groundwork",
-  decision_paralysis:               "Groundwork",
-  the_policy_lag:                   "Groundwork",
-  dueling_narratives:               "Groundwork",
-  the_unsolved_problem:             "Groundwork",
-  transition_paralysis:             "Groundwork",
-  the_lost_map:                     "Groundwork",
-  invisible_influence_architecture: "Groundwork",
-  the_fracture:                     "Groundwork",
-  silosolation:                     "Groundwork",
-  the_broken_compass:               "Groundwork",
-  // First Call
-  the_exposed:                      "First Call",
-  hr_capture:                       "First Call",
-  the_unexamined_algorithm:         "First Call",
-  heard_and_ignored:                "First Call",
-  the_tolerated_violation:          "First Call",
-  paper_shield:                     "First Call",
-  pay_exposure:                     "First Call",
-  the_pay_fog:                      "First Call",
-  the_second_close:                 "First Call",
-  the_suppression_filter:           "First Call",
-  the_arbitrary_standard:           "First Call",
-  decision_blindness:               "First Call",
-  the_untouchable:                  "First Call",
-  what_nobody_says:                 "First Call",
-  the_diversity_ceiling:            "First Call",
-  the_unreported_hazard:            "First Call",
-  the_unlocked_door:                "First Call",
-  // Advisory
-  culture_drift:                    "Advisory",
-  identity_erosion:                 "Advisory",
-  the_culture_that_wasnt:           "Advisory",
-  the_burned_credibility:           "Advisory",
-  invisible_burnout:                "Advisory",
-  the_basement_standard:            "Advisory",
-  the_inside_track:                 "Advisory",
-  narrative_lock:                   "Advisory",
-  the_wrong_reward:                 "Advisory",
-  leadership_deafness:              "Advisory",
+  // Training & Development
+  the_unformed_leader:              "Training & Development",
+  the_overloaded_manager:           "Training & Development",
+  the_dormant_talent:               "Training & Development",
+  built_to_fail:                    "Training & Development",
+  the_uninitiated:                  "Training & Development",
+  groundhog_day:                    "Training & Development",
+  // People Tactics and Strategy
+  the_undefined_role:               "People Tactics and Strategy",
+  the_paper_tiger:                  "People Tactics and Strategy",
+  the_founders_grip:                "People Tactics and Strategy",
+  leadership_continuity_risk:       "People Tactics and Strategy",
+  decision_paralysis:               "People Tactics and Strategy",
+  the_policy_lag:                   "People Tactics and Strategy",
+  dueling_narratives:               "People Tactics and Strategy",
+  the_unsolved_problem:             "People Tactics and Strategy",
+  transition_paralysis:             "People Tactics and Strategy",
+  the_lost_map:                     "People Tactics and Strategy",
+  invisible_influence_architecture: "People Tactics and Strategy",
+  the_fracture:                     "People Tactics and Strategy",
+  silosolation:                     "People Tactics and Strategy",
+  the_broken_compass:               "People Tactics and Strategy",
+  // Intervention
+  the_exposed:                      "Intervention",
+  hr_capture:                       "Intervention",
+  the_unexamined_algorithm:         "Intervention",
+  heard_and_ignored:                "Intervention",
+  the_tolerated_violation:          "Intervention",
+  paper_shield:                     "Intervention",
+  pay_exposure:                     "Intervention",
+  the_pay_fog:                      "Intervention",
+  the_second_close:                 "Intervention",
+  the_suppression_filter:           "Intervention",
+  the_arbitrary_standard:           "Intervention",
+  decision_blindness:               "Intervention",
+  the_untouchable:                  "Intervention",
+  what_nobody_says:                 "Intervention",
+  the_diversity_ceiling:            "Intervention",
+  the_unreported_hazard:            "Intervention",
+  the_unlocked_door:                "Intervention",
+  // Executive Advisory
+  culture_drift:                    "Executive Advisory",
+  identity_erosion:                 "Executive Advisory",
+  the_culture_that_wasnt:           "Executive Advisory",
+  the_burned_credibility:           "Executive Advisory",
+  invisible_burnout:                "Executive Advisory",
+  the_basement_standard:            "Executive Advisory",
+  the_inside_track:                 "Executive Advisory",
+  narrative_lock:                   "Executive Advisory",
+  the_wrong_reward:                 "Executive Advisory",
+  leadership_deafness:              "Executive Advisory",
 };
 
 function getPrimaryFamily(stateIds: string[]): ResolutionFamily {
-  if (stateIds.length === 0) return "Groundwork";
-  return STATE_RESOLUTION_FAMILY[stateIds[0]] ?? "Groundwork";
+  if (stateIds.length === 0) return "People Tactics and Strategy";
+  return STATE_RESOLUTION_FAMILY[stateIds[0]] ?? "People Tactics and Strategy";
 }
 
 // ---------------------------------------------------------------------------

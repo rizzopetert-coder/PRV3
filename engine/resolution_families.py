@@ -48,10 +48,10 @@ RESOLUTION_FAMILY_DESCRIPTIONS: dict[str, dict] = {
 # Locked Session 42. Supersedes Session 32 lock (Formation, Practicum, Counsel, Navigation).
 
 ENGINE_TO_COMMERCIAL_NAME: dict[str, str] = {
-    "Roadmap":           "Groundwork",
-    "Development":       "Development",
-    "Intervention":      "First Call",
-    "Executive Counsel": "Advisory",
+    "Roadmap":           "People Tactics and Strategy",
+    "Development":       "Training & Development",
+    "Intervention":      "Intervention",
+    "Executive Counsel": "Executive Advisory",
 }
 
 
@@ -140,90 +140,90 @@ assert len(STATE_RESOLUTION_FAMILY) == 47, (
 
 RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
 
-    # Groundwork — engine: Roadmap
-    ("Groundwork", "Emerging"): (
-        "A structural problem requires structural work. Groundwork brings in the right expertise, "
+    # People Tactics and Strategy — engine: Roadmap
+    ("People Tactics and Strategy", "Emerging"): (
+        "A structural problem requires structural work. People Tactics and Strategy brings in the right expertise, "
         "targeted at what the diagnostic found, before it has time to settle in deeper."
     ),
-    ("Groundwork", "Entrenched"): (
+    ("People Tactics and Strategy", "Entrenched"): (
         "The conditions producing this live in how your organization is designed, not in the people "
-        "navigating it. Groundwork addresses that level directly — expert, targeted, and aimed "
+        "navigating it. People Tactics and Strategy addresses that level directly — expert, targeted, and aimed "
         "at the architecture rather than the symptoms."
     ),
-    ("Groundwork", "Endemic"): (
+    ("People Tactics and Strategy", "Endemic"): (
         "When a condition becomes the environment, adjusting what happens inside it is not enough. "
-        "Groundwork is the structural redesign — expert work at the level where the problem actually lives."
+        "People Tactics and Strategy is the structural redesign — expert work at the level where the problem actually lives."
     ),
 
-    # Development — engine: Development
-    ("Development", "Emerging"): (
-        "There is a capability gap. Development addresses it directly — not off-the-shelf training, "
+    # Training & Development — engine: Development
+    ("Training & Development", "Emerging"): (
+        "There is a capability gap. Training & Development addresses it directly — not off-the-shelf training, "
         "but targeted work on the specific skills and practices the diagnostic identified."
     ),
-    ("Development", "Entrenched"): (
-        "The gap has had time to become normal. Development works against that — targeted, practical, "
+    ("Training & Development", "Entrenched"): (
+        "The gap has had time to become normal. Training & Development works against that — targeted, practical, "
         "and built around what your people actually need to be able to do, not a general program applied "
         "to a specific problem."
     ),
-    ("Development", "Endemic"): (
-        "At this depth the gap is the operating norm. Development at this severity is not about adding a "
+    ("Training & Development", "Endemic"): (
+        "At this depth the gap is the operating norm. Training & Development at this severity is not about adding a "
         "skill. It is about rebuilding the practices that determine whether any skill takes root."
     ),
 
-    # First Call — engine: Intervention
-    ("First Call", "Emerging"): (
-        "The situation requires someone in it, not advising from outside it. First Call is that presence "
+    # Intervention — engine: Intervention
+    ("Intervention", "Emerging"): (
+        "The situation requires someone in it, not advising from outside it. Intervention is that presence "
         "— engaged with what is happening while there is still room to shape it."
     ),
-    ("First Call", "Entrenched"): (
-        "What is live right now requires more than a plan. First Call means someone in the room, "
+    ("Intervention", "Entrenched"): (
+        "What is live right now requires more than a plan. Intervention means someone in the room, "
         "with the expertise and authority to move the situation, until it resolves."
     ),
-    ("First Call", "Endemic"): (
-        "This does not respond to a plan or a program. First Call is direct, immersive engagement "
+    ("Intervention", "Endemic"): (
+        "This does not respond to a plan or a program. Intervention is direct, immersive engagement "
         "— inside the situation, not above it, for as long as it takes."
     ),
 
-    # Advisory — engine: Executive Counsel
-    ("Advisory", "Emerging"): (
+    # Executive Advisory — engine: Executive Counsel
+    ("Executive Advisory", "Emerging"): (
         "Yes, it is what it sounds like. A confidential relationship with someone who has no stake "
         "in the outcome except getting it right — available before you need it urgently."
     ),
-    ("Advisory", "Entrenched"): (
-        "The honest read on your situation is not available inside the building. Advisory is that read "
+    ("Executive Advisory", "Entrenched"): (
+        "The honest read on your situation is not available inside the building. Executive Advisory is that read "
         "— confidential, direct, and without the organizational politics attached to every word."
     ),
-    ("Advisory", "Endemic"): (
+    ("Executive Advisory", "Endemic"): (
         "When you are close enough to something long enough, you lose the ability to see it clearly. "
-        "Advisory is the ongoing relationship that makes clarity possible — for the decisions that "
+        "Executive Advisory is the ongoing relationship that makes clarity possible — for the decisions that "
         "matter most and cannot be discussed with anyone inside the organization."
     ),
 
     # Compound copy — tier-agnostic
-    ("Groundwork + First Call", None): (
+    ("People Tactics and Strategy + Intervention", None): (
         "The structure needs redesigning and the situation it created is live right now. "
-        "Groundwork addresses the architecture. First Call addresses the present."
+        "People Tactics and Strategy addresses the architecture. Intervention addresses the present."
     ),
-    ("First Call + Groundwork", None): (
-        "First Call handles what is active. Groundwork follows — so what produced it does not reassemble."
+    ("Intervention + People Tactics and Strategy", None): (
+        "Intervention handles what is active. People Tactics and Strategy follows — so what produced it does not reassemble."
     ),
-    ("Advisory + First Call", None): (
-        "Advisory provides the honest read on what the situation requires. First Call executes it."
+    ("Executive Advisory + Intervention", None): (
+        "Executive Advisory provides the honest read on what the situation requires. Intervention executes it."
     ),
-    ("First Call + Advisory", None): (
-        "First Call is present in the work. Advisory is the confidential relationship running alongside it "
+    ("Intervention + Executive Advisory", None): (
+        "Intervention is present in the work. Executive Advisory is the confidential relationship running alongside it "
         "for the decisions the work produces."
     ),
-    ("Development + Groundwork", None): (
-        "Development addresses the capability gap. Groundwork addresses the structural conditions "
+    ("Training & Development + People Tactics and Strategy", None): (
+        "Training & Development addresses the capability gap. People Tactics and Strategy addresses the structural conditions "
         "that keep recreating it."
     ),
-    ("Groundwork + Development", None): (
-        "Groundwork redesigns the environment. Development follows — because capability built "
+    ("People Tactics and Strategy + Training & Development", None): (
+        "People Tactics and Strategy redesigns the environment. Training & Development follows — because capability built "
         "inside a broken structure does not hold."
     ),
-    ("Development + First Call", None): (
-        "First Call addresses what is live. Development addresses what the organization needs to be "
+    ("Training & Development + Intervention", None): (
+        "Intervention addresses what is live. Training & Development addresses what the organization needs to be "
         "able to do once it is through."
     ),
 }
