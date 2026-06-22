@@ -1,0 +1,7 @@
+Strong leaders pay attention.
+
+They can sense when the organization feels different from what the numbers say. Work is getting done, nothing is visibly broken, but there's a gap between what a leader can see and what they sense is true. The instinct is to look harder. Schedule more check-ins, gain more visibility into the work. That helps, a little. But the information that reaches a leader has already been shaped by the relationships that carry it. Looking harder through the same channels produces more of the same picture.
+
+An organizational assessment sends someone in with no position in the organization, no relationships to protect, and no stake in what the findings turn out to be. The job is to find out what is actually happening — where the friction actually is, how it originates, what sustains it — and say so in writing. What it produces is a diagnosis and a direction forward — not a set of recommendations designed to be palatable. A clear account of what is true and what to do about it.
+
+To find the most value, you have to believe knowing is better than not knowing, even when what you learn requires something of you. That's not a small thing to ask. Organizations that are functioning adequately have a strong pull toward staying exactly as they are. An honest external diagnosis introduces the possibility that some of that will need to change, and that possibility is easier to avoid than to face. Most leaders wait. Don't.
