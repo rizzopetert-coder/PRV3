@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 6 — HR Conference Theme Analysis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600;700&family=Newsreader:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f8f6f0;
+    --surface: #ffffff;
+    --border: #e0dbd2;
+    --border-mid: #c8c0b0;
+    --ink: #18160f;
+    --muted: #6a6458;
+    --dim: #a09880;
+    --gold: #b8842c;
+    --gold-light: #f5ecd8;
+    --gold-border: #d8b870;
+    --new: #1e4d2b;
+    --new-bg: #eef6f0;
+    --new-border: #90c8a0;
+    --confirm: #1a3060;
+    --confirm-bg: #eef2f8;
+    --confirm-border: #90a8d0;
+    --extend: #4d2e1a;
+    --extend-bg: #f8f0e8;
+    --extend-border: #c8a070;
+    --accent: #8b1a1a;
+    --teal: #1a4d4d;
+  }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    background: var(--ink);
+    padding: 60px 64px 52px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .masthead::after {
+    content: 'EXPERIMENT 6';
+    position: absolute;
+    right: 48px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-size: 80px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.03);
+    letter-spacing: 0.1em;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .masthead-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-family: 'Newsreader', serif;
+    font-size: clamp(34px, 4.5vw, 60px);
+    font-weight: 300;
+    line-height: 1.05;
+    color: #f0ece4;
+    margin-bottom: 24px;
+    max-width: 800px;
+  }
+
+  h1 em { font-style: italic; color: var(--gold); }
+
+  .masthead-desc {
+    font-size: 13px;
+    color: #5a5448;
+    font-weight: 300;
+    line-height: 1.8;
+    max-width: 620px;
+    margin-bottom: 40px;
+  }
+
+  .conference-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+
+  .conf-tag {
+    padding: 5px 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 10px;
+    font-weight: 500;
+    color: #6a6458;
+    letter-spacing: 0.05em;
+  }
+
+  .masthead-stats {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    padding-top: 32px;
+    border-top: 1px solid #2a2820;
+  }
+
+  .ms { display: flex; flex-direction: column; gap: 4px; }
+  .ms-n {
+    font-family: 'Newsreader', serif;
+    font-size: 40px;
+    font-weight: 400;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .ms-l {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #3a3830;
+    font-weight: 600;
+  }
+
+  /* PAGE */
+  .page { max-width: 1120px; margin: 0 auto; padding: 56px 64px 80px; }
+
+  /* TRAJECTORY BAR */
+  .trajectory-section {
+    margin-bottom: 48px;
+  }
+
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .trajectory-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr 100px;
+    gap: 0;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .tg-header {
+    background: var(--ink);
+    color: #4a4840;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 10px 14px;
+  }
+
+  .tg-row {
+    display: contents;
+  }
+
+  .tg-row > div {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--muted);
+    vertical-align: middle;
+  }
+
+  .tg-row > div:last-child {
+    border-right: none;
+    text-align: center;
+  }
+
+  .tg-row > div:first-child {
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 12px;
+  }
+
+  .tg-row:last-child > div {
+    border-bottom: none;
+  }
+
+  .trend-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .trend-dominant { background: #fee; color: var(--accent); }
+  .trend-high { background: var(--gold-light); color: var(--gold); }
+  .trend-steady { background: var(--confirm-bg); color: var(--confirm); }
+  .trend-emerging { background: var(--new-bg); color: var(--new); }
+
+  /* CLUSTER CARDS */
+  .cluster-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .cluster-top {
+    display: grid;
+    grid-template-columns: 60px 1fr 180px;
+    border-bottom: 1px solid var(--border);
+    min-height: 72px;
+  }
+
+  .cluster-num-cell {
+    background: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Newsreader', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .cluster-title-cell {
+    padding: 16px 20px;
+    border-right: 1px solid var(--border);
+  }
+
+  .cluster-theme-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .cluster-title {
+    font-family: 'Newsreader', serif;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .cluster-meta {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .meta-label {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+  }
+
+  .meta-val {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.4;
+  }
+
+  .cluster-body {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .worry-block {
+    background: var(--gold-light);
+    border: 1px solid var(--gold-border);
+    padding: 16px;
+  }
+
+  .worry-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .worry-text {
+    font-size: 12.5px;
+    color: #5c4010;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .condition-block {
+    background: #f8f6f4;
+    border: 1px solid var(--border-mid);
+    padding: 16px;
+  }
+
+  .condition-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .condition-text {
+    font-size: 12.5px;
+    color: var(--ink);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .candidates-section {
+    padding: 0 24px 24px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+
+  .candidates-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+    padding: 16px 0 12px;
+  }
+
+  .candidates-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 10px;
+  }
+
+  .candidate {
+    padding: 14px 16px;
+    border: 1px solid;
+    border-left-width: 3px;
+  }
+
+  .c-new { border-color: var(--new-border); background: var(--new-bg); border-left-color: var(--new); }
+  .c-confirm { border-color: var(--confirm-border); background: var(--confirm-bg); border-left-color: var(--confirm); }
+  .c-extend { border-color: var(--extend-border); background: var(--extend-bg); border-left-color: var(--extend); }
+
+  .c-badge {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .c-new .c-badge { color: var(--new); }
+  .c-confirm .c-badge { color: var(--confirm); }
+  .c-extend .c-badge { color: var(--extend); }
+
+  .c-name {
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .c-desc {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* SUMMARY */
+  .summary-divider {
+    border: none;
+    border-top: 2px solid var(--ink);
+    margin: 56px 0 32px;
+  }
+
+  .summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+  }
+
+  .summary-title {
+    font-family: 'Newsreader', serif;
+    font-size: 32px;
+    font-weight: 600;
+  }
+
+  .summary-note {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .new-candidates-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+  }
+
+  .nct thead th {
+    background: var(--ink);
+    color: var(--gold);
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 11px 16px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .nct tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--muted);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+
+  .nct tbody td:first-child {
+    font-family: 'Newsreader', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    font-style: normal;
+    width: 220px;
+  }
+
+  .nct tbody td:last-child {
+    font-size: 11px;
+    color: var(--new);
+    font-style: italic;
+    width: 180px;
+  }
+
+  .nct tbody tr:nth-child(even) td {
+    background: #faf8f4;
+  }
+
+  .findings-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .finding-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .finding-title {
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .finding-text {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .cross-experiment {
+    background: var(--gold-light);
+    border: 1px solid var(--gold-border);
+    padding: 20px 24px;
+    margin-bottom: 32px;
+  }
+
+  .cross-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .cross-text {
+    font-size: 13px;
+    color: #5c4010;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  @media (max-width: 800px) {
+    .masthead { padding: 40px 20px; }
+    .page { padding: 32px 20px; }
+    .cluster-top { grid-template-columns: 48px 1fr; }
+    .cluster-meta { display: none; }
+    .cluster-body { grid-template-columns: 1fr; }
+    .findings-section { grid-template-columns: 1fr; }
+    .trajectory-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-eyebrow">Principal Resolution — PRV3 Research // Experiment 6 of 7</div>
+  <h1>HR Conference<br><em>Theme Analysis</em></h1>
+  <p class="masthead-desc">Five conferences, five years, ten dominant theme clusters analyzed as market signals. What fills conference rooms is what keeps HR leaders up at night — and what their organizations are most systematically unprepared for. A practitioner-facing vantage point that neither exit interviews nor employee reviews can reach.</p>
+  <div class="conference-tags">
+    <span class="conf-tag">SHRM Annual 2020–2025</span>
+    <span class="conf-tag">HR Transform 2020–2025</span>
+    <span class="conf-tag">HR Tech 2020–2025</span>
+    <span class="conf-tag">Workhuman 2020–2025</span>
+    <span class="conf-tag">Unleash 2020–2025</span>
+  </div>
+  <div class="masthead-stats">
+    <div class="ms"><span class="ms-n">10</span><span class="ms-l">Theme Clusters</span></div>
+    <div class="ms"><span class="ms-n">16</span><span class="ms-l">New Candidates</span></div>
+    <div class="ms"><span class="ms-n">6</span><span class="ms-l">States Confirmed</span></div>
+    <div class="ms"><span class="ms-n">4</span><span class="ms-l">Extended</span></div>
+    <div class="ms"><span class="ms-n">3</span><span class="ms-l">Triple-Confirmed</span></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- TRAJECTORY TABLE -->
+  <div class="trajectory-section">
+    <div class="section-label">Five-Year Theme Trajectory — 2020 to 2025</div>
+    <div class="trajectory-grid" style="display:table; width:100%;">
+      <div style="display:table-row; background:var(--ink);">
+        <div class="tg-header" style="display:table-cell; width:220px;">Theme Cluster</div>
+        <div class="tg-header" style="display:table-cell;">Trajectory Description</div>
+        <div class="tg-header" style="display:table-cell; width:110px; text-align:center;">2025 Status</div>
+      </div>
+      <div style="display:table-row;">
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-weight:500; font-size:12px; color:var(--ink);">AI in HR</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:300; color:var(--muted);">Marginal in 2020, dominant by 2024-2025. Fastest-growing theme by session volume. Shift from "how to use AI" to "how to govern AI already deployed."</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); text-align:center;"><span class="trend-badge trend-dominant">Dominant</span></div>
+      </div>
+      <div style="display:table-row; background:#faf8f4;">
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-weight:500; font-size:12px; color:var(--ink);">Employee Wellbeing</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:300; color:var(--muted);">Peaked 2020-21, remained elevated. Shifted from physical health to holistic wellbeing. 2024-25 focus: measurement and ROI.</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); text-align:center;"><span class="trend-badge trend-high">High</span></div>
+      </div>
+      <div style="display:table-row;">
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-weight:500; font-size:12px; color:var(--ink);">DEI Accountability</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:300; color:var(--muted);">Peak volume 2020-21. Declining count, increasing depth 2022-25. Shift from "why" to "why it's not working."</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); text-align:center;"><span class="trend-badge trend-high">High</span></div>
+      </div>
+      <div style="display:table-row; background:#faf8f4;">
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-weight:500; font-size:12px; color:var(--ink);">The Manager Crisis</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:300; color:var(--muted);">Consistent and increasing. Shifted from celebrating the manager's importance to addressing why development investment isn't working.</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); text-align:center;"><span class="trend-badge trend-dominant">Dominant</span></div>
+      </div>
+      <div style="display:table-row;">
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-weight:500; font-size:12px; color:var(--ink);">Skills-Based Org</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:300; color:var(--muted);">Emerging 2021, dominant by 2024-25. Second-fastest growing theme. Most organizations stuck in transition middle state.</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); text-align:center;"><span class="trend-badge trend-dominant">Dominant</span></div>
+      </div>
+      <div style="display:table-row; background:#faf8f4;">
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-weight:500; font-size:12px; color:var(--ink);">Pay Transparency</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:300; color:var(--muted);">Regulatory-driven growth from 2022. State laws forcing organizations to confront what transparency reveals about their own practices.</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); text-align:center;"><span class="trend-badge trend-high">High</span></div>
+      </div>
+      <div style="display:table-row;">
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-weight:500; font-size:12px; color:var(--ink);">Future of Work / Hybrid</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:300; color:var(--muted);">Dominant 2020-22, declining but persistent. Now focused on organizational conditions hybrid created rather than hybrid itself.</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); text-align:center;"><span class="trend-badge trend-steady">Steady</span></div>
+      </div>
+      <div style="display:table-row; background:#faf8f4;">
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-weight:500; font-size:12px; color:var(--ink);">Workforce Planning</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:300; color:var(--muted);">Steady throughout, elevated 2023-25. Focus shifted to organizational standing — how to get workforce planning treated as strategy.</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); text-align:center;"><span class="trend-badge trend-high">High</span></div>
+      </div>
+      <div style="display:table-row;">
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-weight:500; font-size:12px; color:var(--ink);">Employee Listening</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); font-size:12px; font-weight:300; color:var(--muted);">Consistent and increasing. Shifted from "how to listen" to "why action is so rare" and "what happens when listening loses credibility."</div>
+        <div style="display:table-cell; padding:12px 14px; border-bottom:1px solid var(--border); text-align:center;"><span class="trend-badge trend-steady">Steady</span></div>
+      </div>
+      <div style="display:table-row; background:#faf8f4;">
+        <div style="display:table-cell; padding:12px 14px; font-weight:500; font-size:12px; color:var(--ink);">Leadership Dev ROI</div>
+        <div style="display:table-cell; padding:12px 14px; font-size:12px; font-weight:300; color:var(--muted);">Consistent throughout. The frustration that development investment doesn't produce behavior change has been the underlying theme for the full five years.</div>
+        <div style="display:table-cell; padding:12px 14px; text-align:center;"><span class="trend-badge trend-steady">Steady</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLUSTER CARDS -->
+
+  <div class="cluster-card">
+    <div class="cluster-top">
+      <div class="cluster-num-cell">1</div>
+      <div class="cluster-title-cell">
+        <div class="cluster-theme-label">Theme Cluster</div>
+        <div class="cluster-title">AI in HR — Governance, Bias, and the Human Question</div>
+      </div>
+      <div class="cluster-meta">
+        <div class="meta-item"><div class="meta-label">Trajectory</div><div class="meta-val">Marginal → Dominant</div></div>
+        <div class="meta-item"><div class="meta-label">Conferences</div><div class="meta-val">All five, 2023–2025</div></div>
+        <div class="meta-item"><div class="meta-label">New Candidates</div><div class="meta-val">2</div></div>
+      </div>
+    </div>
+    <div class="cluster-body">
+      <div class="worry-block">
+        <div class="worry-label">What Practitioners Are Worried About</div>
+        <div class="worry-text">The governance gap. Organizations are deploying AI in hiring, performance, compensation, and workforce planning faster than they can assess the bias, transparency, and liability implications. The sessions that fill rooms aren't "how to use AI" — they're "how to govern AI you've already deployed" and "what to do when your AI hiring tool gets you sued."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Condition Underneath</div>
+        <div class="condition-text">AI Governance Failure — the organization has deployed AI-assisted decision tools without understanding the regulatory exposure, bias risks, or explainability requirements those tools create. A specific and time-bounded variant of Regulatory Exposure but distinct in mechanism, exposure type, and resolution path.</div>
+      </div>
+    </div>
+    <div class="candidates-section">
+      <div class="candidates-label">Conditions Surfaced</div>
+      <div class="candidates-row">
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">AI Governance Failure</div>
+          <div class="c-desc">AI decision tools deployed without regulatory compliance, bias assessment, or explainability protocols. NYC Local Law 144, EU AI Act, and EEOC guidance all require what most organizations can't currently provide.</div>
+        </div>
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Human Displacement Anxiety</div>
+          <div class="c-desc">AI deployed without managing the human response. Employees uncertain about role security and value in an AI-augmented environment. Produces disengagement and departure of the people who would have been most effective AI collaborators.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cluster-card">
+    <div class="cluster-top">
+      <div class="cluster-num-cell">2</div>
+      <div class="cluster-title-cell">
+        <div class="cluster-theme-label">Theme Cluster</div>
+        <div class="cluster-title">Employee Wellbeing as Strategic Imperative</div>
+      </div>
+      <div class="cluster-meta">
+        <div class="meta-item"><div class="meta-label">Trajectory</div><div class="meta-val">Peaked 2020-21, elevated</div></div>
+        <div class="meta-item"><div class="meta-label">2024-25 Focus</div><div class="meta-val">Measurement and ROI</div></div>
+        <div class="meta-item"><div class="meta-label">New Candidates</div><div class="meta-val">2</div></div>
+      </div>
+    </div>
+    <div class="cluster-body">
+      <div class="worry-block">
+        <div class="worry-label">What Practitioners Are Worried About</div>
+        <div class="worry-text">Return on wellbeing. Organizations have significantly increased wellbeing spending without a measurement framework that demonstrates impact. The sessions that draw most attendance are about measurement — how to know whether wellbeing programs work and how to defend the investment to a CFO who wants to cut it.</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Condition Underneath</div>
+        <div class="condition-text">Wellbeing Theater — visible investments in wellbeing programs without addressing the organizational conditions producing the wellbeing problem. Mental health apps for employees whose managers create the conditions requiring intervention. Financial wellness programs in organizations that pay below market. The investment is real. The impact isn't.</div>
+      </div>
+    </div>
+    <div class="candidates-section">
+      <div class="candidates-label">Conditions Surfaced</div>
+      <div class="candidates-row">
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Wellbeing Theater</div>
+          <div class="c-desc">Structural mismatch between wellbeing investment and wellbeing conditions. A specific variant of Culture Drift — the stated value and the structural reality have diverged at the wellbeing dimension specifically.</div>
+        </div>
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Purpose Deficit</div>
+          <div class="c-desc">The organization can't answer whether its existence makes things better or worse — and younger employees are asking. Distinct from engagement (relationship to role) and culture (behavioral norms). About the organization's relationship to its own reason for existing.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cluster-card">
+    <div class="cluster-top">
+      <div class="cluster-num-cell">3</div>
+      <div class="cluster-title-cell">
+        <div class="cluster-theme-label">Theme Cluster</div>
+        <div class="cluster-title">DEI — From Commitment to Accountability</div>
+      </div>
+      <div class="cluster-meta">
+        <div class="meta-item"><div class="meta-label">Trajectory</div><div class="meta-val">Peak 2020-21, deeper 2022-25</div></div>
+        <div class="meta-item"><div class="meta-label">2024-25 Focus</div><div class="meta-val">Why it isn't working</div></div>
+        <div class="meta-item"><div class="meta-label">New Candidates</div><div class="meta-val">1 + 2 confirmed</div></div>
+      </div>
+    </div>
+    <div class="cluster-body">
+      <div class="worry-block">
+        <div class="worry-label">What Practitioners Are Worried About</div>
+        <div class="worry-text">The gap between commitment and outcome. Organizations that made public DEI commitments in 2020 are now five years in with measurably little to show in leadership representation. The sessions drawing most attendance in 2023-25 are specifically about why diverse talent is hired but not advanced, and why DEI training produces no behavior change.</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Condition Underneath</div>
+        <div class="condition-text">The accountability architecture for DEI commitments is absent. Commitments were made. The measurement framework, consequences for non-performance, and governance structure holding anyone responsible were never built. This is distinct from Performative Equity — it's specifically about the absence of consequences for DEI non-performance.</div>
+      </div>
+    </div>
+    <div class="candidates-section">
+      <div class="candidates-label">Conditions Surfaced</div>
+      <div class="candidates-row">
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">DEI Accountability Collapse</div>
+          <div class="c-desc">DEI commitments exist. The accountability infrastructure to enforce them doesn't. Leaders who don't advance diverse talent face no consequences for the gap. A governance condition, not a culture condition.</div>
+        </div>
+        <div class="candidate c-confirm">
+          <div class="c-badge">Triple-Confirmed</div>
+          <div class="c-name">Performative Equity</div>
+          <div class="c-desc">Confirmed across Glassdoor, exit interview, and conference data. Three independent experiments pointing to the same condition. High-priority placement in the taxonomy.</div>
+        </div>
+        <div class="candidate c-confirm">
+          <div class="c-badge">Triple-Confirmed</div>
+          <div class="c-name">The Inclusion Gap</div>
+          <div class="c-desc">Diverse talent hired at entry level, filtered out before leadership. Confirmed across all three experiments. Now the strongest cross-validated new candidate in the taxonomy.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cluster-card">
+    <div class="cluster-top">
+      <div class="cluster-num-cell">4</div>
+      <div class="cluster-title-cell">
+        <div class="cluster-theme-label">Theme Cluster</div>
+        <div class="cluster-title">The Manager Crisis</div>
+      </div>
+      <div class="cluster-meta">
+        <div class="meta-item"><div class="meta-label">Trajectory</div><div class="meta-val">Consistent and increasing</div></div>
+        <div class="meta-item"><div class="meta-label">2024-25 Focus</div><div class="meta-val">Why development isn't working</div></div>
+        <div class="meta-item"><div class="meta-label">New Candidates</div><div class="meta-val">3</div></div>
+      </div>
+    </div>
+    <div class="cluster-body">
+      <div class="worry-block">
+        <div class="worry-label">What Practitioners Are Worried About</div>
+        <div class="worry-text">Manager development investment isn't producing manager effectiveness. Organizations are spending more on manager training than at any previous point. Engagement scores attributed to manager quality aren't moving. The question has shifted from "how do we develop managers" to "why doesn't development change behavior."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Condition Underneath</div>
+        <div class="condition-text">Training-Behavior Gap — manager development investment is delivered but doesn't translate into changed behavior. The consistent upstream cause: managers are trained in isolation from the organizational systems governing their behavior. A manager trained in feedback doesn't give better feedback if their performance review doesn't measure it, their span of control doesn't give them time for it, and their own manager doesn't model it.</div>
+      </div>
+    </div>
+    <div class="candidates-section">
+      <div class="candidates-label">Conditions Surfaced</div>
+      <div class="candidates-row">
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Training-Behavior Gap</div>
+          <div class="c-desc">Development investment is delivered; behavior doesn't change. The organizational systems governing manager behavior haven't changed alongside the training. The investment is real. The environment rewards the old behavior.</div>
+        </div>
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Manager Accountability Vacuum</div>
+          <div class="c-desc">Managers are developed without being held accountable for the outcomes of their management. Training measured by completion. Manager effectiveness measured by the manager's output, not the team's experience. An extension of The Untouchable to the middle manager layer.</div>
+        </div>
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate — High Priority</div>
+          <div class="c-name">The Squeeze</div>
+          <div class="c-desc">Middle managers responsible simultaneously for their own individual contribution, team performance, and upward strategy communication — without adequate time, support, or authority for any of the three. The Overloaded Manager at cultural and systemic scale. One of the highest-frequency conditions in the current landscape.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cluster-card">
+    <div class="cluster-top">
+      <div class="cluster-num-cell">5</div>
+      <div class="cluster-title-cell">
+        <div class="cluster-theme-label">Theme Cluster</div>
+        <div class="cluster-title">Skills-Based Organization</div>
+      </div>
+      <div class="cluster-meta">
+        <div class="meta-item"><div class="meta-label">Trajectory</div><div class="meta-val">Emerging 2021 → Dominant</div></div>
+        <div class="meta-item"><div class="meta-label">Current State</div><div class="meta-val">Most orgs stuck in middle</div></div>
+        <div class="meta-item"><div class="meta-label">New Candidates</div><div class="meta-val">2</div></div>
+      </div>
+    </div>
+    <div class="cluster-body">
+      <div class="worry-block">
+        <div class="worry-label">What Practitioners Are Worried About</div>
+        <div class="worry-text">The transition is harder than it sounds and most organizations are stuck in the middle. They've announced a skills-based approach, started mapping skills taxonomies, and discovered their existing systems — HRIS, performance management, compensation architecture — weren't designed for skills-based operation. The middle state is worse than either end.</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Condition Underneath</div>
+        <div class="condition-text">Transition Paralysis — the organization has begun a significant talent management transformation and is stuck in the middle state where the old system no longer works reliably and the new system isn't operational. Distinct from Change Absorption Failure — the culture is willing. The infrastructure can't support the change yet.</div>
+      </div>
+    </div>
+    <div class="candidates-section">
+      <div class="candidates-label">Conditions Surfaced</div>
+      <div class="candidates-row">
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Transition Paralysis</div>
+          <div class="c-desc">Significant talent management transformation begun and stuck in middle state. Old system partially dismantled; new system not yet functional. High current frequency — most large organizations are somewhere in this middle state.</div>
+        </div>
+        <div class="candidate c-confirm">
+          <div class="c-badge">Confirms Existing Candidate</div>
+          <div class="c-name">Skills Visibility Gap</div>
+          <div class="c-desc">Confirmed across tool and conference experiments. Skills inventories built from job descriptions rather than demonstrated capability. The map is fiction.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cluster-card">
+    <div class="cluster-top">
+      <div class="cluster-num-cell">6</div>
+      <div class="cluster-title-cell">
+        <div class="cluster-theme-label">Theme Cluster</div>
+        <div class="cluster-title">Pay Transparency and Equity</div>
+      </div>
+      <div class="cluster-meta">
+        <div class="meta-item"><div class="meta-label">Trajectory</div><div class="meta-val">Regulatory-driven, 2022+</div></div>
+        <div class="meta-item"><div class="meta-label">Driver</div><div class="meta-val">State legislation</div></div>
+        <div class="meta-item"><div class="meta-label">New Candidates</div><div class="meta-val">2</div></div>
+      </div>
+    </div>
+    <div class="cluster-body">
+      <div class="worry-block">
+        <div class="worry-label">What Practitioners Are Worried About</div>
+        <div class="worry-text">Implementation. Most organizations don't know what pay transparency will reveal about their own compensation practices until they're required to post ranges. The sessions drawing most attendance are about what to do when the ranges reveal compression, inequity, and inconsistency the organization wasn't prepared to address publicly.</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Condition Underneath</div>
+        <div class="condition-text">Transparency Exposure — compensation practices with accumulated inconsistencies that are defensible in a low-transparency environment and indefensible in a high-transparency one. The regulations aren't creating the problem. They're revealing it. A time-bounded variant of Compensation Incoherence produced by regulatory change.</div>
+      </div>
+    </div>
+    <div class="candidates-section">
+      <div class="candidates-label">Conditions Surfaced</div>
+      <div class="candidates-row">
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Transparency Exposure</div>
+          <div class="c-desc">Compensation inconsistencies accumulated over time; now exposed by regulatory requirements. Organizations discovering their pay practices publicly rather than proactively face both the correction cost and the reputational damage simultaneously.</div>
+        </div>
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate — High Currency</div>
+          <div class="c-name">Compression Crisis</div>
+          <div class="c-desc">New hires offered at or above salaries of longer-tenured employees in the same role. Simultaneously losing existing employees who discover the compression and constrained on offers by transparency requirements. A dynamic condition created by intersecting pressures.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cluster-card">
+    <div class="cluster-top">
+      <div class="cluster-num-cell">7</div>
+      <div class="cluster-title-cell">
+        <div class="cluster-theme-label">Theme Cluster</div>
+        <div class="cluster-title">The Future of Work / Hybrid and Remote</div>
+      </div>
+      <div class="cluster-meta">
+        <div class="meta-item"><div class="meta-label">Trajectory</div><div class="meta-val">Dominant 2020-22, steady</div></div>
+        <div class="meta-item"><div class="meta-label">2024-25 Focus</div><div class="meta-val">Conditions hybrid created</div></div>
+        <div class="meta-item"><div class="meta-label">New Candidates</div><div class="meta-val">2</div></div>
+      </div>
+    </div>
+    <div class="cluster-body">
+      <div class="worry-block">
+        <div class="worry-label">What Practitioners Are Worried About</div>
+        <div class="worry-text">The equity and culture problems that hybrid creates rather than solves. Remote employees invisible to promotion decisions. In-person employees who feel culture has been diluted. Managers who can't build team cohesion across distributed arrangements. The sessions that persist in 2024-25 are about organizational conditions hybrid created, not about hybrid itself.</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Condition Underneath</div>
+        <div class="condition-text">Proximity Bias — decisions about advancement, recognition, and opportunity systematically favor physically present employees over remote employees regardless of contribution. A structural Attitude liability — the bias isn't intentional but it's consistent and produces measurable inequity in outcomes.</div>
+      </div>
+    </div>
+    <div class="candidates-section">
+      <div class="candidates-label">Conditions Surfaced</div>
+      <div class="candidates-row">
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Proximity Bias</div>
+          <div class="c-desc">Advancement, recognition, and opportunity systematically favor physically present employees regardless of contribution. Legal dimension: if the remote worker population correlates with protected class status, promotion disparities may create discrimination claims.</div>
+        </div>
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Distributed Culture Fragmentation</div>
+          <div class="c-desc">The organization's culture has fractured along location lines. In-office and remote cultures have diverged to the point of producing different experiences, different leadership relationships, and different career trajectories. Culture Drift applied to a geographic dimension.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cluster-card">
+    <div class="cluster-top">
+      <div class="cluster-num-cell">8</div>
+      <div class="cluster-title-cell">
+        <div class="cluster-theme-label">Theme Cluster</div>
+        <div class="cluster-title">Workforce Planning in Uncertainty</div>
+      </div>
+      <div class="cluster-meta">
+        <div class="meta-item"><div class="meta-label">Trajectory</div><div class="meta-val">Steady, elevated 2023-25</div></div>
+        <div class="meta-item"><div class="meta-label">Core Problem</div><div class="meta-val">Standing, not methodology</div></div>
+        <div class="meta-item"><div class="meta-label">New Candidates</div><div class="meta-val">2</div></div>
+      </div>
+    </div>
+    <div class="cluster-body">
+      <div class="worry-block">
+        <div class="worry-label">What Practitioners Are Worried About</div>
+        <div class="worry-text">They don't have the tools, data, or organizational standing to do strategic workforce planning at the speed and uncertainty level the current environment requires. The sessions drawing most attendance aren't about methodology — they're about how to get leadership to treat workforce planning as strategic input rather than HR administrative exercise.</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Condition Underneath</div>
+        <div class="condition-text">Planning Authority Gap — HR has the capability to do strategic workforce planning and lacks the organizational authority and credibility to have its output treated as strategic input. Distinct from HR Capture (compromised) — this is specifically about the gap between analytical capability and organizational standing to act on the analysis.</div>
+      </div>
+    </div>
+    <div class="candidates-section">
+      <div class="candidates-label">Conditions Surfaced</div>
+      <div class="candidates-row">
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Planning Authority Gap</div>
+          <div class="c-desc">HR has the analytical capability. The organization doesn't treat the output as strategic input. The analysis is done; the decisions are made without it. Extends the HR positioning conditions from the Glassdoor experiment.</div>
+        </div>
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Workforce Planning Myopia</div>
+          <div class="c-desc">Workforce needs planned on a 12-month budget cycle when talent development and market timing requirements operate on a 2-5 year horizon. The planning horizon mismatch means the organization makes long-term people decisions on short-term information — perpetually.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cluster-card">
+    <div class="cluster-top">
+      <div class="cluster-num-cell">9</div>
+      <div class="cluster-title-cell">
+        <div class="cluster-theme-label">Theme Cluster</div>
+        <div class="cluster-title">Employee Listening and Voice</div>
+      </div>
+      <div class="cluster-meta">
+        <div class="meta-item"><div class="meta-label">Trajectory</div><div class="meta-val">Consistent and increasing</div></div>
+        <div class="meta-item"><div class="meta-label">2024-25 Focus</div><div class="meta-val">The action gap</div></div>
+        <div class="meta-item"><div class="meta-label">Status</div><div class="meta-val">Extends existing</div></div>
+      </div>
+    </div>
+    <div class="cluster-body">
+      <div class="worry-block">
+        <div class="worry-label">What Practitioners Are Worried About</div>
+        <div class="worry-text">The question has shifted from "how do we collect employee feedback" to "what do organizations do with it and why is action so rare." The 2023-25 sessions are specifically about the listening-action gap and the self-reinforcing cycle that produces Listening Credibility Collapse.</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Condition Underneath</div>
+        <div class="condition-text">Listening Credibility Collapse — a more severe variant of Organizational Deafness. The organization collected feedback, communicated it was listening, and then did not act. The gap has been visible enough times that employees no longer trust the infrastructure. Survey participation declines. Data reliability deteriorates. The organization's ability to detect its own problems collapses further. Self-reinforcing.</div>
+      </div>
+    </div>
+    <div class="candidates-section">
+      <div class="candidates-label">Conditions Surfaced</div>
+      <div class="candidates-row">
+        <div class="candidate c-extend">
+          <div class="c-badge">Extends Existing Candidate</div>
+          <div class="c-name">Listening Credibility Collapse</div>
+          <div class="c-desc">What Organizational Deafness looks like at Endemic severity. The listening infrastructure itself has become the problem — its existence generates cynicism rather than signal. Confirmed across Glassdoor and conference data.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cluster-card">
+    <div class="cluster-top">
+      <div class="cluster-num-cell">10</div>
+      <div class="cluster-title-cell">
+        <div class="cluster-theme-label">Theme Cluster</div>
+        <div class="cluster-title">Leadership Development ROI</div>
+      </div>
+      <div class="cluster-meta">
+        <div class="meta-item"><div class="meta-label">Trajectory</div><div class="meta-val">Consistent throughout</div></div>
+        <div class="meta-item"><div class="meta-label">Core Frustration</div><div class="meta-val">Development doesn't change behavior</div></div>
+        <div class="meta-item"><div class="meta-label">New Candidates</div><div class="meta-val">1</div></div>
+      </div>
+    </div>
+    <div class="cluster-body">
+      <div class="worry-block">
+        <div class="worry-label">What Practitioners Are Worried About</div>
+        <div class="worry-text">The Leadership Development Paradox: organizations invest in leadership development, leaders complete the programs, behavior doesn't change. The 2024-25 sessions identify three upstream conditions that prevent development from producing behavior change — and one of them hadn't been named yet.</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Condition Underneath</div>
+        <div class="condition-text">Development Without Stakes — leadership development programs with no consequences attached to behavior change. Leaders participate because required or because it signals positively. They don't change behavior because nothing in their organizational environment requires it. The learning happens. The application doesn't. Not a program quality problem — a governance problem.</div>
+      </div>
+    </div>
+    <div class="candidates-section">
+      <div class="candidates-label">Conditions Surfaced</div>
+      <div class="candidates-row">
+        <div class="candidate c-new">
+          <div class="c-badge">New Candidate</div>
+          <div class="c-name">Development Without Stakes</div>
+          <div class="c-desc">Leadership development programs unattached to consequences. Leaders participate; behavior doesn't change because the organizational environment rewards the old behavior. Explains the Training-Behavior Gap at the structural level. An Authority condition — the governance architecture doesn't require behavior change as a development output.</div>
+        </div>
+        <div class="candidate c-confirm">
+          <div class="c-badge">Confirms Existing Candidate</div>
+          <div class="c-name">Training-Behavior Gap</div>
+          <div class="c-desc">Confirmed from the Manager Crisis cluster. The gap exists because development programs have no stakes attached. Same condition, confirmed from a second angle in the same experiment.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CROSS-EXPERIMENT VALIDATION -->
+  <hr class="summary-divider">
+
+  <div class="cross-experiment">
+    <div class="cross-label">Triple-Confirmed Conditions — Validated Across All Three Experiments</div>
+    <div class="cross-text">Three conditions have now been confirmed independently by the tool analysis, Glassdoor review clustering, exit interview analysis, and HR conference theme analysis. These are the highest-confidence new candidates in the taxonomy: <strong>Performative Equity</strong> (investment in DEI symbols without systems), <strong>The Inclusion Gap</strong> (diverse talent hired but not advanced), and <strong>Organizational Deafness</strong> (listening infrastructure that doesn't produce action). All three deserve high-priority placement in the PRV3 state taxonomy.</div>
+  </div>
+
+  <!-- NEW CANDIDATES TABLE -->
+  <div class="summary-header">
+    <div class="summary-title">New State Candidates — Experiment 6</div>
+    <div class="summary-note">16 new candidates from 10 theme clusters</div>
+  </div>
+
+  <table class="new-candidates-table nct">
+    <thead>
+      <tr>
+        <th>Condition Name</th>
+        <th>Root Condition Description</th>
+        <th>Primary Dimension</th>
+        <th>Financial Consequence</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>AI Governance Failure</td>
+        <td>AI decision tools deployed without regulatory compliance, bias assessment, or explainability protocols. The liability accumulates silently until a claim or audit.</td>
+        <td>Authority — Structural / Aptitude — Systemic</td>
+        <td>NYC LL144 fines, EEOC claims, EU AI Act penalties. Regulatory cost compounds with each AI tool deployed without audit.</td>
+      </tr>
+      <tr>
+        <td>Human Displacement Anxiety</td>
+        <td>AI deployed without managing the human response. Uncertainty about role and value produces disengagement and departure of the most valuable AI collaborators.</td>
+        <td>Attitude — Systemic / Alliance — Vertical</td>
+        <td>Organizations lose the employees who would have produced the most AI ROI. The productivity gain of AI is offset by the attrition of the people best positioned to use it.</td>
+      </tr>
+      <tr>
+        <td>Wellbeing Theater</td>
+        <td>Visible wellbeing investment without addressing the organizational conditions producing the wellbeing problem. Programs that don't reach the root cause.</td>
+        <td>Attitude — Systemic / Alliance — Structural</td>
+        <td>Wellbeing spend without wellbeing improvement. The CFO cuts the program. The conditions remain. The cycle repeats with the next program.</td>
+      </tr>
+      <tr>
+        <td>Purpose Deficit</td>
+        <td>The organization can't articulate whether its existence makes things better or worse. Younger employees are asking and leaving for organizations that can answer.</td>
+        <td>Attitude — Systemic / Alliance — Formation</td>
+        <td>Attrition concentrated in early-career employees — the talent pipeline the organization needs most for long-term organizational health.</td>
+      </tr>
+      <tr>
+        <td>DEI Accountability Collapse</td>
+        <td>DEI commitments made without measurement framework, consequences for non-performance, or governance structure holding anyone responsible for outcomes.</td>
+        <td>Authority — Structural / Attitude — Systemic</td>
+        <td>OFCCP exposure, EEOC investigation, reputational damage when commitment-to-outcome gap becomes public. Emerging litigation risk as DEI commitments are treated as enforceable representations.</td>
+      </tr>
+      <tr>
+        <td>Training-Behavior Gap</td>
+        <td>Development investment delivered; behavior doesn't change. The organizational systems governing manager behavior haven't changed alongside the training.</td>
+        <td>Authority — Structural / Aptitude — Formation</td>
+        <td>Leadership development spend with no measurable behavior change or engagement improvement. The spend continues; the ROI case can't be made.</td>
+      </tr>
+      <tr>
+        <td>Manager Accountability Vacuum</td>
+        <td>Managers developed without accountability for outcomes of their management. Training measured by completion. Manager effectiveness invisible in the governance architecture.</td>
+        <td>Authority — Structural / Attitude — Leadership</td>
+        <td>Extends The Untouchable's financial consequence to the middle manager layer. Manager-driven attrition continues unchecked because the signal isn't in the governance system.</td>
+      </tr>
+      <tr>
+        <td>The Squeeze</td>
+        <td>Middle managers responsible for individual contribution, team performance, and strategy communication simultaneously — without adequate time, support, or authority for any of the three.</td>
+        <td>Authority — Structural / Aptitude — Systemic</td>
+        <td>Systemic middle manager attrition and The Overloaded Manager condition at scale. The organization's primary execution layer is structurally set up to fail.</td>
+      </tr>
+      <tr>
+        <td>Transition Paralysis</td>
+        <td>Significant talent management transformation begun and stuck in middle state. Old system partially dismantled. New system not yet operational. Both fail simultaneously.</td>
+        <td>Authority — Structural / Alliance — Structural</td>
+        <td>The middle state is more expensive than either the old or new system. Decisions made without reliable infrastructure. Errors compound until the new system becomes operational.</td>
+      </tr>
+      <tr>
+        <td>Transparency Exposure</td>
+        <td>Compensation inconsistencies accumulated over time; now exposed by regulatory requirements requiring pay range disclosure. Revealed publicly rather than corrected proactively.</td>
+        <td>Authority — Structural / Attitude — Systemic</td>
+        <td>Correction cost plus reputational damage plus attrition from employees who discover inequities simultaneously with public disclosure.</td>
+      </tr>
+      <tr>
+        <td>Compression Crisis</td>
+        <td>New hire salaries at or above longer-tenured employees. Simultaneously losing tenured employees who discover compression and constrained on offers by transparency requirements.</td>
+        <td>Authority — Structural / Aptitude — Systemic</td>
+        <td>Retention cost of existing employees plus replacement cost of those who leave. A self-reinforcing cycle until the salary structure is corrected.</td>
+      </tr>
+      <tr>
+        <td>Proximity Bias</td>
+        <td>Advancement, recognition, and opportunity systematically favor physically present employees over remote employees regardless of contribution. Structural Attitude liability.</td>
+        <td>Attitude — Systemic / Authority — Structural</td>
+        <td>Remote employee attrition plus potential discrimination claims if remote worker demographics correlate with protected class status.</td>
+      </tr>
+      <tr>
+        <td>Distributed Culture Fragmentation</td>
+        <td>Organization's culture fractured along location lines. In-office and remote cultures producing different experiences, different leadership relationships, different career trajectories.</td>
+        <td>Alliance — Structural / Attitude — Systemic</td>
+        <td>Culture Drift applied to a geographic dimension. Two organizations in one. The same dysfunction Culture Drift produces, with an additional coordination cost.</td>
+      </tr>
+      <tr>
+        <td>Planning Authority Gap</td>
+        <td>HR has workforce planning capability. The organization doesn't treat the output as strategic input. The analysis is done; decisions are made without it.</td>
+        <td>Authority — Structural / Alliance — Vertical</td>
+        <td>Strategic people decisions made without the analytical foundation available. The errors compound across hiring, development, and retention decisions made without the planning output.</td>
+      </tr>
+      <tr>
+        <td>Workforce Planning Myopia</td>
+        <td>Workforce needs planned on 12-month budget cycle when talent development and market timing requirements operate on a 2-5 year horizon. Perpetual horizon mismatch.</td>
+        <td>Authority — Structural / Aptitude — Systemic</td>
+        <td>Long-term people decisions consistently made on short-term information. The organization is perpetually in reactive mode — paying premium prices for talent it should have developed or recruited 18 months earlier.</td>
+      </tr>
+      <tr>
+        <td>Development Without Stakes</td>
+        <td>Leadership development programs unattached to consequences for behavior change. Leaders participate; behavior doesn't change because the environment rewards the old behavior.</td>
+        <td>Authority — Structural / Aptitude — Formation</td>
+        <td>Leadership development budget spent without measurable leadership behavior change or engagement improvement. Explains the ROI problem that has been in the conference agenda for five years without resolution.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- KEY FINDINGS -->
+  <div class="summary-header">
+    <div class="summary-title">Key Findings for PRV3</div>
+  </div>
+
+  <div class="findings-section">
+    <div class="finding-card">
+      <div class="finding-title">The conference data confirms a practitioner blindspot the employee data doesn't see</div>
+      <div class="finding-text">Reviews and exit interviews describe conditions from the employee experience. Conference themes describe what practitioners know is wrong and can't fix. The gap between practitioner knowledge and practitioner capacity to act is itself a condition — Planning Authority Gap and Development Without Stakes are both examples of conditions where the organization knows what's needed and lacks the governance architecture to require it.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-title">The Squeeze is the highest-frequency current condition not yet in the taxonomy</div>
+      <div class="finding-text">Middle managers structurally set up to fail — responsible for individual contribution, team performance, and strategy communication simultaneously without adequate resources for any of them. This condition is producing The Overloaded Manager at scale, manager attrition, and team performance degradation simultaneously. It's the most prevalent structural condition in the current organizational landscape and it isn't in any existing state.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-title">AI Governance Failure is time-bounded but urgent</div>
+      <div class="finding-text">Organizations are deploying AI tools at a pace that significantly outstrips their governance infrastructure. The regulatory environment is catching up — NYC, EU, and EEOC guidance are all moving simultaneously. The window between deployment and regulatory consequence is narrowing. This condition has a specific and well-documented financial consequence narrative that earns its place in the PRV3 taxonomy despite being relatively new.</div>
+    </div>
+    <div class="finding-card">
+      <div class="finding-title">Three experiments have now independently confirmed the same conditions</div>
+      <div class="finding-text">Performative Equity, The Inclusion Gap, and Organizational Deafness have been confirmed by all three experiments from three completely different angles — employer reviews, exit interviews, and practitioner conference content. Triple confirmation by independent methodologies is the strongest validation the taxonomy process can produce. These three conditions should be among the first to receive complete dimensional profiles and severity specifications.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px; padding:18px 24px; background:var(--ink); color:#3a3828; font-size:11px; line-height:1.8; display:flex; justify-content:space-between;">
+    <span><span style="color:var(--gold); font-weight:600; letter-spacing:0.05em;">PRINCIPAL RESOLUTION</span> &nbsp;·&nbsp; Experiment 6 of 7: HR Conference Theme Analysis &nbsp;·&nbsp; PRV3 State Taxonomy Research &nbsp;·&nbsp; April 2026</span>
+    <span>Internal Document</span>
+  </div>
+
+</div>
+</body>
+</html>

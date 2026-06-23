@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 1 — Exit Interview Pattern Analysis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f2f0ed;
+    --surface: #faf9f7;
+    --surface2: #f0ede9;
+    --border: #ddd9d3;
+    --border-dark: #b8b2aa;
+    --ink: #1e1c19;
+    --muted: #6e6660;
+    --dim: #a09890;
+    --stated: #8b6030;
+    --stated-bg: #fdf8f0;
+    --actual: #2d4a5c;
+    --actual-bg: #f0f5f8;
+    --new: #2d5c3a;
+    --new-bg: #f0f8f2;
+    --confirm: #4a2d5c;
+    --confirm-bg: #f5f0f8;
+    --extend: #5c3d2d;
+    --extend-bg: #f8f2ee;
+    --accent: #8b2e1a;
+    --gold: #c9903c;
+  }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    background: var(--ink);
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    min-height: 280px;
+  }
+
+  .masthead-left {
+    padding: 52px 56px;
+    border-right: 1px solid #2e2a24;
+  }
+
+  .masthead-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #6b6055;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(36px, 4vw, 58px);
+    font-weight: 300;
+    line-height: 1.05;
+    color: #f0ede9;
+    margin-bottom: 20px;
+  }
+
+  h1 strong { font-weight: 600; color: var(--gold); }
+
+  .masthead-sub {
+    font-size: 13px;
+    color: #6b6055;
+    font-weight: 300;
+    line-height: 1.75;
+    max-width: 560px;
+  }
+
+  .masthead-right {
+    padding: 52px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .distortion-note {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #4a4440;
+    line-height: 1.7;
+    border-left: 2px solid #3a3530;
+    padding-left: 16px;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: #2e2a24;
+    border: 1px solid #2e2a24;
+  }
+
+  .stat-cell {
+    background: var(--ink);
+    padding: 16px;
+  }
+
+  .stat-n {
+    font-family: 'Crimson Pro', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-l {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4a4440;
+  }
+
+  /* PAGE */
+  .page { max-width: 1100px; margin: 0 auto; padding: 52px 56px 80px; }
+
+  /* KEY INSIGHT BOX */
+  .key-insight {
+    background: var(--stated-bg);
+    border: 1px solid #d4b070;
+    border-left: 4px solid var(--gold);
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+
+  .key-insight-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--stated);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .key-insight-text {
+    font-family: 'Crimson Pro', serif;
+    font-size: 17px;
+    color: var(--stated);
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  /* REASON CARDS */
+  .reason-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .reason-header {
+    display: grid;
+    grid-template-columns: 56px 1fr 140px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .reason-num {
+    background: var(--ink);
+    color: var(--gold);
+    font-family: 'Crimson Pro', serif;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .reason-title-cell {
+    padding: 16px 20px;
+    border-right: 1px solid var(--border);
+  }
+
+  .reason-stated {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--stated);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .reason-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .reason-freq {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .freq-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 4px;
+  }
+
+  .freq-val {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.4;
+  }
+
+  .reason-body {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .stated-block {
+    background: var(--stated-bg);
+    border: 1px solid #d4b070;
+    padding: 16px;
+  }
+
+  .actual-block {
+    background: var(--actual-bg);
+    border: 1px solid #90b0c4;
+    padding: 16px;
+  }
+
+  .block-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .stated-block .block-label { color: var(--stated); }
+  .actual-block .block-label { color: var(--actual); }
+
+  .block-text {
+    font-size: 12.5px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .stated-block .block-text { color: var(--stated); }
+  .actual-block .block-text { color: var(--actual); }
+
+  .conditions-section {
+    padding: 0 24px 24px;
+  }
+
+  .conditions-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 12px;
+    font-weight: 500;
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+
+  .condition-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
+  }
+
+  .condition-item {
+    padding: 14px 16px;
+    border: 1px solid;
+    border-left-width: 3px;
+  }
+
+  .ci-new { border-color: var(--new); background: var(--new-bg); }
+  .ci-confirm { border-color: var(--confirm); background: var(--confirm-bg); }
+  .ci-extend { border-color: var(--extend); background: var(--extend-bg); }
+
+  .ci-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .ci-new .ci-badge { color: var(--new); }
+  .ci-confirm .ci-badge { color: var(--confirm); }
+  .ci-extend .ci-badge { color: var(--extend); }
+
+  .ci-name {
+    font-family: 'Crimson Pro', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .ci-desc {
+    font-size: 11.5px;
+    line-height: 1.6;
+    font-weight: 300;
+    color: var(--muted);
+  }
+
+  .qdp-section {
+    padding: 0 24px 24px;
+  }
+
+  .qdp-box {
+    background: #fdf6ee;
+    border: 1px solid #e8c880;
+    padding: 14px 16px;
+  }
+
+  .qdp-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #8b6020;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .qdp-text {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #5c3d10;
+    line-height: 1.65;
+  }
+
+  /* SUMMARY */
+  .summary-section {
+    margin-top: 56px;
+  }
+
+  .summary-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 16px;
+    margin-bottom: 32px;
+  }
+
+  .summary-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 30px;
+    font-weight: 600;
+  }
+
+  .summary-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .new-candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .nc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--new);
+    padding: 20px;
+  }
+
+  .nc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--new);
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+
+  .nc-name {
+    font-family: 'Crimson Pro', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .nc-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+
+  .nc-dim {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.05em;
+  }
+
+  .nc-financial {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: var(--new-bg);
+    border: 1px solid #a0d0a8;
+    font-size: 11px;
+    color: var(--new);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* KEY FINDINGS */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .finding-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .finding-text {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .distortion-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+    font-size: 12px;
+  }
+
+  .distortion-table th {
+    background: var(--ink);
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .distortion-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.5;
+    vertical-align: top;
+  }
+
+  .distortion-table tr:nth-child(even) td {
+    background: var(--surface2);
+  }
+
+  .distortion-table td:first-child {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    color: var(--stated);
+    font-size: 13px;
+    width: 220px;
+  }
+
+  .distortion-table td:last-child {
+    color: var(--actual);
+    font-size: 11.5px;
+  }
+
+  @media (max-width: 800px) {
+    .masthead { grid-template-columns: 1fr; }
+    .masthead-right { display: none; }
+    .page { padding: 32px 20px; }
+    .reason-header { grid-template-columns: 48px 1fr; }
+    .reason-freq { display: none; }
+    .reason-body { grid-template-columns: 1fr; }
+    .findings-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-left">
+    <div class="masthead-label">Principal Resolution — PRV3 Research // Experiment 1 of 7</div>
+    <h1>Exit Interview<br><strong>Pattern Analysis</strong></h1>
+    <p class="masthead-sub">Working through both layers of exit interview data — the stated reason and the condition underneath it. Exit interviews are what people say when someone is listening but probably won't act. The gap between stated and actual reasons is itself a diagnostic signal.</p>
+  </div>
+  <div class="masthead-right">
+    <div class="distortion-note">
+      The Distortion Problem<br><br>
+      Exit interview stated reasons and actual reasons diverge systematically. "Better opportunity" conceals prior departure. "Compensation" masks recognition failure. "Personal reasons" almost always has an organizational cause.<br><br>
+      This experiment works through both layers.
+    </div>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="stat-n">10</div><div class="stat-l">Stated Reasons</div></div>
+      <div class="stat-cell"><div class="stat-n">14</div><div class="stat-l">New Candidates</div></div>
+      <div class="stat-cell"><div class="stat-n">5</div><div class="stat-l">States Confirmed</div></div>
+      <div class="stat-cell"><div class="stat-n">6</div><div class="stat-l">States Extended</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="key-insight">
+    <div class="key-insight-label">Central Finding</div>
+    <div class="key-insight-text">Exit interviews are systematically less honest than Glassdoor reviews — but more precise about the moment of departure. The stated reason is the exit mechanism. The actual condition is what made the person available to leave. The diagnostic must reach the second layer to be useful.</div>
+  </div>
+
+  <!-- The stated vs actual distortion table -->
+  <table class="distortion-table">
+    <thead>
+      <tr>
+        <th>Stated Reason</th>
+        <th>Actual Frequency vs. Stated</th>
+        <th>Primary Condition Underneath</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>"Better opportunity / career advancement"</td>
+        <td>Stated as #1 reason in ~45% of exits. Actual primary driver in ~15%. The rest had already mentally departed.</td>
+        <td>Advancement Ceiling, Manager Investment Failure, or prior trust collapse</td>
+      </tr>
+      <tr>
+        <td>"Compensation"</td>
+        <td>Stated in ~40% of exits. Primary driver in ~15-20%. Usually true but incomplete.</td>
+        <td>Recognition Deficit, Market Exposure, or Compensation Indifference</td>
+      </tr>
+      <tr>
+        <td>"Management / my manager"</td>
+        <td>Stated in ~20-30% of exits. Actual driver in ~50-70% per Gallup research.</td>
+        <td>The Unformed Leader, The Untouchable, Relational Exhaustion, or The Overloaded Manager</td>
+      </tr>
+      <tr>
+        <td>"Work-life balance / burnout"</td>
+        <td>Stated in ~25% of exits post-2020. Often honest but describes symptom not cause.</td>
+        <td>Structural Overload, Culture Driven Burnout, or Invisible Burnout</td>
+      </tr>
+      <tr>
+        <td>"Lack of recognition"</td>
+        <td>Stated in ~15%. Actual driver in ~35-40% when measured anonymously.</td>
+        <td>Recognition Deficit or Contribution Invisibility</td>
+      </tr>
+      <tr>
+        <td>"Company direction / leadership"</td>
+        <td>Stated in ~20%. Correlates strongly with specific events.</td>
+        <td>Strategic Credibility Loss, Trust Collapse, or Post-Restructuring Flight</td>
+      </tr>
+      <tr>
+        <td>"Culture fit / culture change"</td>
+        <td>Stated in ~15%. Two distinct presentations with different root conditions.</td>
+        <td>Culture Drift or Values Misrepresentation</td>
+      </tr>
+      <tr>
+        <td>"Stress / mental health"</td>
+        <td>Stated in ~10-15% and rising rapidly post-2020.</td>
+        <td>Psychological Safety Collapse or Impossible Standard</td>
+      </tr>
+      <tr>
+        <td>"Lack of autonomy / micromanagement"</td>
+        <td>Stated in ~15%. Clusters with manager and culture reasons.</td>
+        <td>The Unformed Leader, The Control Culture, or Seniority-Role Mismatch</td>
+      </tr>
+      <tr>
+        <td>"Reorganization / restructuring"</td>
+        <td>Stated in ~10%. Event-triggered but conceals prior conditions.</td>
+        <td>Post-Restructuring Flight, Role Identity Loss, or Informal Network Severance</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- REASON CARDS -->
+
+  <div class="reason-card">
+    <div class="reason-header">
+      <div class="reason-num">01</div>
+      <div class="reason-title-cell">
+        <div class="reason-stated">Stated Reason</div>
+        <div class="reason-title">"Better opportunity / career advancement elsewhere"</div>
+      </div>
+      <div class="reason-freq">
+        <div class="freq-label">Stated / Actual</div>
+        <div class="freq-val">45% stated<br>~15% actual primary driver</div>
+      </div>
+    </div>
+    <div class="reason-body">
+      <div class="stated-block">
+        <div class="block-label">What Was Said</div>
+        <div class="block-text">I found a role with better growth potential, more responsibility, a clearer path forward. The opportunity was too good to pass up.</div>
+      </div>
+      <div class="actual-block">
+        <div class="block-label">What Was Underneath</div>
+        <div class="block-text">In most cases, the employee had already mentally departed before the other opportunity appeared. The external offer was the exit mechanism, not the exit cause. The employee had already stopped believing advancement was available, or that their manager was invested in their growth.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="condition-items">
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Advancement Ceiling</div>
+          <div class="ci-desc">The organization structurally doesn't have the roles or trajectory this person needs. Different from Development Infrastructure Absence (no system) and Favoritism Architecture (politics). The ceiling is real and structural.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Manager Investment Failure</div>
+          <div class="ci-desc">The manager knows how to develop people and chooses not to — usually because they're overloaded, politically focused, or protecting their headcount. Different from The Unformed Leader, who lacks the skill.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qdp-section">
+      <div class="qdp-box">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">Looking back, did you believe there was a realistic path to the next role you wanted within this organization — yes, possibly, or no? Follow-up: was that belief based on what leadership told you or on what you observed?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-header">
+      <div class="reason-num">02</div>
+      <div class="reason-title-cell">
+        <div class="reason-stated">Stated Reason</div>
+        <div class="reason-title">"Compensation"</div>
+      </div>
+      <div class="reason-freq">
+        <div class="freq-label">Stated / Actual</div>
+        <div class="freq-val">40% stated<br>~15-20% actual primary</div>
+      </div>
+    </div>
+    <div class="reason-body">
+      <div class="stated-block">
+        <div class="block-label">What Was Said</div>
+        <div class="block-text">I was offered significantly more money elsewhere and the organization couldn't or wouldn't match it. The compensation wasn't competitive.</div>
+      </div>
+      <div class="actual-block">
+        <div class="block-label">What Was Underneath</div>
+        <div class="block-text">Compensation ranks third or fourth in anonymous follow-up surveys. The financial gap is often real, but it's the vehicle — not the cause. The cause is usually recognition failure, market positioning choice, or knowledge that the organization is aware of the gap and has decided not to close it.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="condition-items">
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Recognition Deficit</div>
+          <div class="ci-desc">Not about money. About whether the organization's response to contribution matches the employee's sense of their own value. Gallup: adequately recognized employees are 45% less likely to leave within two years.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Market Exposure</div>
+          <div class="ci-desc">Pay is internally coherent but externally uncompetitive in specific talent segments. A positioning choice, not an information gap. Distinct from Compensation Incoherence.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qdp-section">
+      <div class="qdp-box">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">Was the compensation issue primarily that pay was below internal peers in similar roles, below the external market for similar roles, or that it didn't reflect the contribution you were making? Three options, three different diagnostic signals.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-header">
+      <div class="reason-num">03</div>
+      <div class="reason-title-cell">
+        <div class="reason-stated">Stated Reason</div>
+        <div class="reason-title">"Management / my manager"</div>
+      </div>
+      <div class="reason-freq">
+        <div class="freq-label">Stated / Actual</div>
+        <div class="freq-val">20-30% stated<br>50-70% actual (Gallup)</div>
+      </div>
+    </div>
+    <div class="reason-body">
+      <div class="stated-block">
+        <div class="block-label">What Was Said</div>
+        <div class="block-text">I had a difficult relationship with my direct manager or with leadership more broadly. The management style wasn't a fit for how I work.</div>
+      </div>
+      <div class="actual-block">
+        <div class="block-label">What Was Underneath</div>
+        <div class="block-text">The most understated exit reason. People leave managers, not companies — at a rate of 50-70% of voluntary turnover per Gallup — and systematically underreport it because they need references. Four distinct conditions present with identical manager complaint language.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="condition-items">
+        <div class="condition-item ci-confirm">
+          <div class="ci-badge">Confirms Existing</div>
+          <div class="ci-name">The Unformed Leader</div>
+          <div class="ci-desc">Confirmed again. The manager lacks foundational human skills. Formation debt, not choice.</div>
+        </div>
+        <div class="condition-item ci-confirm">
+          <div class="ci-badge">Confirms Existing</div>
+          <div class="ci-name">The Untouchable</div>
+          <div class="ci-desc">Confirmed again. Behavior known, reported, and protected. Employee leaves because accountability mechanism failed.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Relational Exhaustion</div>
+          <div class="ci-desc">The manager has the skills. The employee isn't untouchable. But the specific chemistry produced accumulated friction neither party could resolve. Not formation, not politics — relational fit failure with no organizational mechanism to detect or address it.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">The Overloaded Manager</div>
+          <div class="ci-desc">This manager could develop people, give feedback, hold accountability. They don't have time. Span of control too wide, personal workload unsustainable. Looks identical to The Unformed Leader from the employee's experience. Categorically different cause and resolution path.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qdp-section">
+      <div class="qdp-box">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">Thinking about your relationship with your direct manager, which best describes what made it difficult: they didn't have the skills to manage people well, they had the skills but weren't available enough, their behavior was known and nothing was done about it, or it was a poor fit neither could resolve? Four options, four different states.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-header">
+      <div class="reason-num">04</div>
+      <div class="reason-title-cell">
+        <div class="reason-stated">Stated Reason</div>
+        <div class="reason-title">"Work-life balance / burnout"</div>
+      </div>
+      <div class="reason-freq">
+        <div class="freq-label">Stated / Actual</div>
+        <div class="freq-val">25% stated<br>Often honest, describes symptom</div>
+      </div>
+    </div>
+    <div class="reason-body">
+      <div class="stated-block">
+        <div class="block-label">What Was Said</div>
+        <div class="block-text">The demands of the role were unsustainable and the organization didn't acknowledge or address it. I needed to leave to protect my health.</div>
+      </div>
+      <div class="actual-block">
+        <div class="block-label">What Was Underneath</div>
+        <div class="block-text">Burnout as an exit driver has increased dramatically since 2020. But burnout is almost never a primary cause in isolation — it is the downstream effect of one or more other conditions that crossed a threshold for this individual. The diagnostic value is in identifying which upstream condition produced it.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="condition-items">
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Structural Overload</div>
+          <div class="ci-desc">The role is genuinely impossible at its current scope. Not a management failure or culture failure — the job design is wrong. Often in organizations that reduced headcount without reducing scope, or grew faster than roles could absorb.</div>
+        </div>
+        <div class="condition-item ci-confirm">
+          <div class="ci-badge">Confirms Existing Candidate</div>
+          <div class="ci-name">Culture Driven Burnout</div>
+          <div class="ci-desc">Confirmed from Glassdoor experiment. The organization rewards overwork. Sustainability is penalized by culture even when individual managers might prefer otherwise.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Invisible Burnout</div>
+          <div class="ci-desc">High performers mask burnout effectively until departure is sudden and surprising. The organization has no mechanism for detecting the invisible variant. Output still being delivered; cost at which it's being delivered is hidden. These departures produce the most organizational shock.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qdp-section">
+      <div class="qdp-box">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">The workload demands that contributed to your departure — which best describes your experience: the role required more than any person could do sustainably, the culture expected overwork regardless of actual workload, or you were managing the demand but at a personal cost the organization never saw?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-header">
+      <div class="reason-num">05</div>
+      <div class="reason-title-cell">
+        <div class="reason-stated">Stated Reason</div>
+        <div class="reason-title">"Lack of recognition / not feeling valued"</div>
+      </div>
+      <div class="reason-freq">
+        <div class="freq-label">Stated / Actual</div>
+        <div class="freq-val">15% stated<br>35-40% actual (anonymous)</div>
+      </div>
+    </div>
+    <div class="reason-body">
+      <div class="stated-block">
+        <div class="block-label">What Was Said</div>
+        <div class="block-text">My contributions weren't acknowledged. I didn't feel like the organization valued what I brought. The effort I put in wasn't recognized.</div>
+      </div>
+      <div class="actual-block">
+        <div class="block-label">What Was Underneath</div>
+        <div class="block-text">Consistently among the top three actual reasons for voluntary departure even when it ranks lower as a stated reason. The gap between its stated and actual frequency is one of the clearest signals that people manage what they say in exit interviews. Recognition failure is deeply personal and rarely articulated in formal settings.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="condition-items">
+        <div class="condition-item ci-confirm">
+          <div class="ci-badge">Confirms New Candidate</div>
+          <div class="ci-name">Recognition Deficit</div>
+          <div class="ci-desc">Confirmed here in its primary presentation rather than as the condition behind compensation language. High frequency. Strong financial consequence narrative.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Contribution Invisibility</div>
+          <div class="ci-desc">The employee's work was genuinely valuable, delivered, and invisible to the people whose recognition would have mattered. Not a manager failure. The work happened in a domain the organization doesn't know how to see — collaborative work in individually-metered systems, cross-functional effort in siloed incentive structures.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qdp-section">
+      <div class="qdp-box">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">Was the recognition gap about quantity (not enough acknowledgment), source (the people whose recognition would have mattered didn't give it), or type (the kind of work you did wasn't something the organization measured or rewarded)? Three signals, three different conditions.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-header">
+      <div class="reason-num">06</div>
+      <div class="reason-title-cell">
+        <div class="reason-stated">Stated Reason</div>
+        <div class="reason-title">"Company direction / leadership decisions"</div>
+      </div>
+      <div class="reason-freq">
+        <div class="freq-label">Stated / Actual</div>
+        <div class="freq-val">20% stated<br>Correlates with specific events</div>
+      </div>
+    </div>
+    <div class="reason-body">
+      <div class="stated-block">
+        <div class="block-label">What Was Said</div>
+        <div class="block-text">I lost confidence in where the organization is headed or in the judgment of its leadership. I don't believe in the direction anymore.</div>
+      </div>
+      <div class="actual-block">
+        <div class="block-label">What Was Underneath</div>
+        <div class="block-text">Correlates strongly with specific events — restructurings, pivots, leadership changes, acquisitions — and with gradual trust erosion over time. The stated reason is accurate but describes the threshold that was crossed, not the accumulated conditions that made it crossable.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="condition-items">
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Strategic Credibility Loss</div>
+          <div class="ci-desc">Enough poor or unexplained strategic decisions that employees with options no longer believe the organization will be successful. Different from Change Absorption Failure — a judgment of trajectory, not change management capability.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Trust Collapse</div>
+          <div class="ci-desc">Accumulated across multiple small violations — broken promises, inconsistent decisions, values violations — until a threshold is crossed. No single event is the cause. Produces the calmest departures: resolved, without anger. The employee has simply concluded the organization's leadership cannot be trusted.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Post-Restructuring Flight</div>
+          <div class="ci-desc">Survivors of a reduction who conclude the organization will restructure again. Leave to find stability before being managed into another reduction. Voluntary turnover increases 20-30% in the 12 months following a RIF; highest-quality employees leave first because they have the most options.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qdp-section">
+      <div class="qdp-box">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">Your confidence in this organization's leadership over the past 12 months — which best describes the trajectory: remained strong, gradually declined, declined sharply after a specific event, or was never strong enough to sustain you through difficulty?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-header">
+      <div class="reason-num">07</div>
+      <div class="reason-title-cell">
+        <div class="reason-stated">Stated Reason</div>
+        <div class="reason-title">"Culture fit / culture change"</div>
+      </div>
+      <div class="reason-freq">
+        <div class="freq-label">Stated / Actual</div>
+        <div class="freq-val">15% stated<br>Two distinct presentations</div>
+      </div>
+    </div>
+    <div class="reason-body">
+      <div class="stated-block">
+        <div class="block-label">What Was Said</div>
+        <div class="block-text">The culture changed in ways I couldn't follow, or I discovered the culture wasn't what I expected when I joined.</div>
+      </div>
+      <div class="actual-block">
+        <div class="block-label">What Was Underneath</div>
+        <div class="block-text">Two distinct exit experiences present as one stated reason. Culture change is a departure from a culture that existed and shifted. Culture discovery is the realization that the culture described in recruiting was never the actual culture. The first is about drift. The second is about misrepresentation. Different conditions, different organizational culpability.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="condition-items">
+        <div class="condition-item ci-confirm">
+          <div class="ci-badge">Confirms New Candidate</div>
+          <div class="ci-name">Culture Drift</div>
+          <div class="ci-desc">Confirmed across all three experiments now. The organization's culture shifted gradually. Employees who joined a different culture couldn't follow the drift.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Values Misrepresentation</div>
+          <div class="ci-desc">The organization's recruiting and onboarding communication described a culture that doesn't exist in practice. The employee didn't join a culture that changed. They joined a culture that was misrepresented from the start. Distinct from Psychological Contract Violation — this is cultural, not role-specific.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qdp-section">
+      <div class="qdp-box">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">The culture you experienced — compared to what you understood before joining — was it what you expected, different in ways that developed over time after you joined, or different from what you were led to believe from the start?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-header">
+      <div class="reason-num">08</div>
+      <div class="reason-title-cell">
+        <div class="reason-stated">Stated Reason</div>
+        <div class="reason-title">"Stress / mental health"</div>
+      </div>
+      <div class="reason-freq">
+        <div class="freq-label">Stated / Actual</div>
+        <div class="freq-val">10-15% stated<br>Rising rapidly post-2020</div>
+      </div>
+    </div>
+    <div class="reason-body">
+      <div class="stated-block">
+        <div class="block-label">What Was Said</div>
+        <div class="block-text">The environment was harmful to my mental health. I needed to leave to protect myself.</div>
+      </div>
+      <div class="actual-block">
+        <div class="block-label">What Was Underneath</div>
+        <div class="block-text">Mental health as an exit reason is almost never a primary cause in isolation — it is the downstream effect of one or more other conditions that crossed a threshold for this individual. The diagnostic value is in identifying which upstream condition produced it. The most common upstream conditions are psychological safety failure and impossible performance standards.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="condition-items">
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Psychological Safety Collapse</div>
+          <div class="ci-desc">An environment where raising concerns, challenging decisions, or being honest about experience produces consequences. The information the organization needs to self-correct is being systematically suppressed. Edmondson research establishes causal links between psychological safety and team performance, innovation, and retention.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Impossible Standard</div>
+          <div class="ci-desc">The performance standard is genuinely unachievable or inconsistently applied in ways the employee cannot navigate. Produces anxiety, rumination, and eventually departure. Distinct from Structural Overload — this is about expectations, not volume. Can exist in roles with manageable workloads.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qdp-section">
+      <div class="qdp-box">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">Which best describes the primary experience: the workload was more than any person could handle, you couldn't be honest about concerns without negative consequences, or the expectations weren't clear or consistent enough to meet? Three options, three different upstream conditions.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-header">
+      <div class="reason-num">09</div>
+      <div class="reason-title-cell">
+        <div class="reason-stated">Stated Reason</div>
+        <div class="reason-title">"Lack of autonomy / micromanagement"</div>
+      </div>
+      <div class="reason-freq">
+        <div class="freq-label">Stated / Actual</div>
+        <div class="freq-val">15% stated<br>Clusters with manager reasons</div>
+      </div>
+    </div>
+    <div class="reason-body">
+      <div class="stated-block">
+        <div class="block-label">What Was Said</div>
+        <div class="block-text">I wasn't trusted to do my job without excessive oversight. There was no autonomy to make decisions within my role.</div>
+      </div>
+      <div class="actual-block">
+        <div class="block-label">What Was Underneath</div>
+        <div class="block-text">Clusters with manager and culture reasons in roughly equal proportions. Three distinct conditions present with identical autonomy complaint language — and the resolution path diverges significantly depending on which of the three is actually present.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="condition-items">
+        <div class="condition-item ci-confirm">
+          <div class="ci-badge">Confirms Existing</div>
+          <div class="ci-name">The Unformed Leader</div>
+          <div class="ci-desc">Confirmed. The manager lacks judgment to calibrate oversight to capability and trust. Formation debt.</div>
+        </div>
+        <div class="condition-item ci-confirm">
+          <div class="ci-badge">Confirms New Candidate</div>
+          <div class="ci-name">The Control Culture</div>
+          <div class="ci-desc">Confirmed from Glassdoor experiment. Distributed organizational micromanagement rather than individual manager failure.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Seniority-Role Mismatch</div>
+          <div class="ci-desc">The employee's experience, capability, and expectation of autonomy significantly exceeds what the role requires or the organization can support. Not a formation problem, not a culture problem — a hiring decision problem. The employee experiences micromanagement. The organization experiences someone who doesn't fit the role's operating model. Neither is wrong.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qdp-section">
+      <div class="qdp-box">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">The autonomy issue in your role — was it specific to your manager, consistent across the organization regardless of manager, or a mismatch between the level of independence you expected and what the role actually required? Three options, three different conditions.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reason-card">
+    <div class="reason-header">
+      <div class="reason-num">10</div>
+      <div class="reason-title-cell">
+        <div class="reason-stated">Stated Reason</div>
+        <div class="reason-title">"Reorganization / restructuring"</div>
+      </div>
+      <div class="reason-freq">
+        <div class="freq-label">Stated / Actual</div>
+        <div class="freq-val">10% stated<br>Event-triggered, conceals prior conditions</div>
+      </div>
+    </div>
+    <div class="reason-body">
+      <div class="stated-block">
+        <div class="block-label">What Was Said</div>
+        <div class="block-text">The restructuring changed my role, my team, or my reporting relationship in ways I didn't want to stay for.</div>
+      </div>
+      <div class="actual-block">
+        <div class="block-label">What Was Underneath</div>
+        <div class="block-text">The restructuring is the trigger. The underlying condition is what made the restructuring the last straw. Organizations often interpret restructuring-related departures as collateral damage from necessary change. They usually aren't. They're departures that would have happened eventually, accelerated by an event that made the calculation clear.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="condition-items">
+        <div class="condition-item ci-confirm">
+          <div class="ci-badge">Confirms New Candidate</div>
+          <div class="ci-name">Post-Restructuring Flight</div>
+          <div class="ci-desc">Confirmed from Reason 6. Survivors conclude the organization will restructure again and find stability before the next event.</div>
+        </div>
+        <div class="condition-item ci-new">
+          <div class="ci-badge">New Candidate</div>
+          <div class="ci-name">Role Identity Loss</div>
+          <div class="ci-desc">The restructuring changed the role so significantly that the employee no longer recognizes what they were hired to do. Particularly prevalent in technology and professional services where role scope and team composition are central to work identity. The organization restructured the function. The employee lost the job they actually wanted.</div>
+        </div>
+        <div class="condition-item ci-extend">
+          <div class="ci-badge">Extends Existing Candidate</div>
+          <div class="ci-name">Informal Network Severance</div>
+          <div class="ci-desc">The restructuring severed relationships and informal connections central to the employee's effectiveness. The org chart changed. The network that made the work meaningful was destroyed. Extends Invisible Influence Architecture rather than a new state.</div>
+        </div>
+      </div>
+    </div>
+    <div class="qdp-section">
+      <div class="qdp-box">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">The restructuring that contributed to your departure — which best describes its impact: it changed your role in ways that no longer matched what you wanted to do, it made you concerned about the organization's future stability, or it eliminated relationships and working arrangements that were central to your effectiveness?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-section">
+    <div class="summary-head">
+      <div class="summary-title">New State Candidates — Experiment 1</div>
+      <div class="summary-count">14 new candidates across 10 stated reasons</div>
+    </div>
+
+    <div class="new-candidates-grid">
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 01</div>
+        <div class="nc-name">Advancement Ceiling</div>
+        <div class="nc-desc">The organization structurally doesn't have the roles or trajectory certain employees need. Not politics, not lack of development — the ceiling is real and structural.</div>
+        <div class="nc-dim">Authority — Structural / Aptitude — Formation</div>
+        <div class="nc-financial">External hiring costs 1.7x internal development on average; organizations that consistently ceiling-out high performers pay this cost repeatedly.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 02</div>
+        <div class="nc-name">Manager Investment Failure</div>
+        <div class="nc-desc">The manager has the skills to develop people and chooses not to — overloaded, politically focused, or protecting headcount. Different from The Unformed Leader who lacks the skill entirely.</div>
+        <div class="nc-dim">Attitude — Leadership / Alliance — Vertical</div>
+        <div class="nc-financial">Distinguishable from The Unformed Leader in financial consequence: training won't solve this. The resolution is behavioral accountability, not formation.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 03</div>
+        <div class="nc-name">Recognition Deficit</div>
+        <div class="nc-desc">The organization's response to contribution doesn't match the employee's sense of their own value. Not about money. About being seen.</div>
+        <div class="nc-dim">Attitude — Leadership / Alliance — Vertical</div>
+        <div class="nc-financial">Gallup: adequately recognized employees are 45% less likely to leave within two years. Recognition programs that don't address this deficit spend money without solving the condition.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 04</div>
+        <div class="nc-name">Market Exposure</div>
+        <div class="nc-desc">Pay is internally coherent but externally uncompetitive in specific talent segments. A deliberate positioning choice, not an information gap. Distinct from Compensation Incoherence.</div>
+        <div class="nc-dim">Authority — Structural / Aptitude — Systemic</div>
+        <div class="nc-financial">Organizations that consistently underprice specific roles lose those roles' incumbents to better-positioned competitors at a predictable rate.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 05</div>
+        <div class="nc-name">Relational Exhaustion</div>
+        <div class="nc-desc">The manager has skills. The employee isn't protected. But specific chemistry produced accumulated friction neither could resolve. A fit failure with no organizational detection mechanism.</div>
+        <div class="nc-dim">Alliance — Vertical / Attitude — Individual</div>
+        <div class="nc-financial">Relational fit failures are preventable with better manager-team matching and earlier intervention. Post-departure replacement costs are identical to any other attrition.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 06</div>
+        <div class="nc-name">The Overloaded Manager</div>
+        <div class="nc-desc">This manager could develop people and hold accountability. They don't have time. Span of control too wide, personal workload unsustainable. Looks identical to The Unformed Leader from the employee's experience — categorically different cause.</div>
+        <div class="nc-dim">Authority — Structural / Aptitude — Formation</div>
+        <div class="nc-financial">Research: managers with spans above 12 direct reports produce measurably lower engagement scores regardless of individual capability. The solution is structural, not developmental.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 07</div>
+        <div class="nc-name">Structural Overload</div>
+        <div class="nc-desc">The role is genuinely impossible at its current scope. Not a management or culture failure — the job design is wrong. Often follows headcount reduction without scope reduction.</div>
+        <div class="nc-dim">Authority — Structural / Aptitude — Systemic</div>
+        <div class="nc-financial">Roles designed beyond sustainable capacity produce consistent attrition until the scope is corrected. Each replacement hire inherits the same impossible role.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 08</div>
+        <div class="nc-name">Invisible Burnout</div>
+        <div class="nc-desc">High performers mask burnout until departure is sudden and surprising. No mechanism exists to detect the invisible variant because monitoring tools capture output, not the cost at which it's delivered.</div>
+        <div class="nc-dim">Attitude — Individual / Alliance — Vertical</div>
+        <div class="nc-financial">These departures produce disproportionate output loss. The organization loses its highest producers before it can respond, and is left with whoever had the most visible burnout signals — often the least productive employees.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 09</div>
+        <div class="nc-name">Contribution Invisibility</div>
+        <div class="nc-desc">Work was genuinely valuable, genuinely delivered, and invisible to the people whose recognition would have mattered. Collaborative work in individually-metered systems. Cross-functional effort in siloed incentive structures.</div>
+        <div class="nc-dim">Alliance — Structural / Attitude — Systemic</div>
+        <div class="nc-financial">Silosolation financially reinforces this condition. The organization loses its best collaborators — the people most valuable for cross-functional work — precisely because its measurement architecture can't see their contribution.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 10</div>
+        <div class="nc-name">Strategic Credibility Loss</div>
+        <div class="nc-desc">Enough poor or unexplained decisions that employees with options no longer believe the organization will be successful. A judgment of trajectory, not change management capability.</div>
+        <div class="nc-dim">Attitude — Systemic / Alliance — Vertical</div>
+        <div class="nc-financial">Strategic credibility loss accelerates departure of the most mobile employees — the highest performers with the most options — precisely when the organization needs their capability most to recover.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 11</div>
+        <div class="nc-name">Trust Collapse</div>
+        <div class="nc-desc">Accumulated across multiple small violations until a threshold is crossed. No single cause. Produces the calmest departures — resolved, without anger. The employee has concluded the organization's leadership cannot be trusted.</div>
+        <div class="nc-dim">Attitude — Systemic / Alliance — Vertical</div>
+        <div class="nc-financial">Trust collapse is the most expensive attrition pattern because it is invisible until the threshold is crossed, produces clusters of departures, and is largely irreversible once it becomes the dominant organizational narrative.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 12</div>
+        <div class="nc-name">Values Misrepresentation</div>
+        <div class="nc-desc">The culture described in recruiting doesn't exist in practice. The employee joined a misrepresented culture, not a changed one. Distinct from Culture Drift and from Psychological Contract Violation.</div>
+        <div class="nc-dim">Attitude — Systemic / Alliance — Formation</div>
+        <div class="nc-financial">Values misrepresentation produces early attrition — typically in the first 6-18 months — which maximizes the cost of recruitment and minimizes the return on onboarding investment.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 13</div>
+        <div class="nc-name">Psychological Safety Collapse</div>
+        <div class="nc-desc">An environment where raising concerns, challenging decisions, or being honest produces consequences. The information the organization needs to self-correct is being systematically suppressed.</div>
+        <div class="nc-dim">Attitude — Systemic / Alliance — Structural</div>
+        <div class="nc-financial">Edmondson research establishes causal links between psychological safety and team performance. Teams with low psychological safety make more errors, catch fewer of them, and innovate less — producing compounding financial impact before attrition begins.</div>
+      </div>
+
+      <div class="nc-card">
+        <div class="nc-num">CANDIDATE 14</div>
+        <div class="nc-name">Role Identity Loss</div>
+        <div class="nc-desc">Restructuring changed the role so significantly the employee no longer recognizes what they were hired to do. The organization restructured the function. The employee lost the job they actually wanted.</div>
+        <div class="nc-dim">Aptitude — Transition / Alliance — Structural</div>
+        <div class="nc-financial">Roles restructured without preserving the elements that made them attractive produce departures of the people who chose those roles specifically. The people who stay are those with fewer options or less attachment to the original role design.</div>
+      </div>
+
+    </div>
+
+    <!-- KEY FINDINGS -->
+    <div class="summary-head">
+      <div class="summary-title">Key Findings for PRV3</div>
+    </div>
+
+    <div class="findings-grid">
+      <div class="finding">
+        <div class="finding-title">The manager attrition gap is the most significant distortion in exit data</div>
+        <div class="finding-text">Managers drive 50-70% of voluntary attrition by Gallup's measurement. Exit interviews report them in 20-30% of cases. The four conditions that present as manager complaints — The Unformed Leader, The Untouchable, Relational Exhaustion, and The Overloaded Manager — are categorically different and require different resolution paths. The diagnostic must distinguish them precisely because the intervention is completely different for each.</div>
+      </div>
+      <div class="finding">
+        <div class="finding-title">Several conditions pair with identical surface complaints</div>
+        <div class="finding-text">Exit interviews produce consistent language that conceals divergent root conditions. "Better opportunity" conceals Advancement Ceiling or Manager Investment Failure. "Compensation" conceals Recognition Deficit or Market Exposure. "Culture" conceals Culture Drift or Values Misrepresentation. The PRV3 instrument must be designed to distinguish these pairs — the question design has to see past the surface complaint to the condition underneath.</div>
+      </div>
+      <div class="finding">
+        <div class="finding-title">Invisible Burnout is a priority detection problem</div>
+        <div class="finding-text">The conditions that produce the most surprising departures — Invisible Burnout, Trust Collapse, Post-Restructuring Flight — are the ones the organization has the least signal about before they produce exits. The diagnostic instrument is most valuable for the conditions the organization can't already see. These three are the clearest cases where early diagnosis produces the most significant return.</div>
+      </div>
+      <div class="finding">
+        <div class="finding-title">Post-Restructuring Flight confirms The Uninitiated's financial consequence narrative</div>
+        <div class="finding-text">The research is consistent: voluntary turnover increases 20-30% in the 12 months following a reduction in force, and the highest-quality employees leave first. This means The Uninitiated's financial consequence narrative should include not just the cost of executing the reduction poorly — but the attrition cost among survivors that follows regardless of execution quality when the organization hasn't prepared its culture for the aftermath.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:48px; padding:20px 24px; background:var(--ink); color:#4a4440; font-size:11px; line-height:1.8; display:flex; justify-content:space-between; align-items:center;">
+    <span><span style="color:var(--gold); font-weight:500;">PRINCIPAL RESOLUTION</span> &nbsp;—&nbsp; Experiment 1 of 7: Exit Interview Pattern Analysis &nbsp;|&nbsp; PRV3 State Taxonomy Research &nbsp;|&nbsp; April 2026</span>
+    <span style="color:#3a3430;">Internal Document</span>
+  </div>
+
+</div>
+</body>
+</html>

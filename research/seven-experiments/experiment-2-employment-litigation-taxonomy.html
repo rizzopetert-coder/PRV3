@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 2 — Employment Litigation Taxonomy</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Space+Grotesk:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f1ec;
+    --surface: #fdfcfa;
+    --surface2: #f0ede7;
+    --border: #ddd8d0;
+    --border-dark: #b8b0a4;
+    --ink: #1a1714;
+    --muted: #6a6460;
+    --dim: #a09890;
+    --red: #8b1a1a;
+    --red-light: #fdf0f0;
+    --red-border: #d49090;
+    --amber: #8b5a1a;
+    --amber-light: #fdf6ec;
+    --amber-border: #d4b070;
+    --new: #1a4d2d;
+    --new-bg: #eef7f1;
+    --new-border: #88c8a0;
+    --confirm: #1a2d5c;
+    --confirm-bg: #eef1f8;
+    --confirm-border: #88a8d0;
+    --gold: #b8882c;
+  }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    background: var(--ink);
+    padding: 56px 64px 48px;
+    border-bottom: 3px solid var(--red);
+  }
+
+  .eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #4a4440;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'Spectral', serif;
+    font-size: clamp(34px, 4.5vw, 58px);
+    font-weight: 300;
+    line-height: 1.05;
+    color: #f0ece4;
+    margin-bottom: 20px;
+  }
+
+  h1 strong { font-weight: 700; color: #c84040; }
+
+  .masthead-sub {
+    font-size: 13px;
+    color: #504c48;
+    font-weight: 300;
+    line-height: 1.8;
+    max-width: 680px;
+    margin-bottom: 40px;
+  }
+
+  .masthead-warning {
+    background: rgba(139,26,26,0.15);
+    border: 1px solid rgba(139,26,26,0.3);
+    padding: 14px 18px;
+    margin-bottom: 36px;
+    max-width: 680px;
+    font-size: 12px;
+    color: #c84040;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .masthead-stats {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    padding-top: 32px;
+    border-top: 1px solid #2a2820;
+  }
+
+  .ms { display: flex; flex-direction: column; gap: 4px; }
+  .ms-n {
+    font-family: 'Spectral', serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .ms-l {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #3a3830;
+    font-weight: 600;
+  }
+
+  /* PAGE */
+  .page { max-width: 1120px; margin: 0 auto; padding: 52px 64px 80px; }
+
+  /* CLAIM CARDS */
+  .claim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .claim-header {
+    display: grid;
+    grid-template-columns: 56px 1fr 200px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .claim-num {
+    background: var(--red);
+    color: #fdf0f0;
+    font-family: 'Spectral', serif;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .claim-title-cell {
+    padding: 16px 20px;
+    border-right: 1px solid var(--border);
+  }
+
+  .claim-category-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .claim-title {
+    font-family: 'Spectral', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .claim-data {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .data-item { display: flex; flex-direction: column; gap: 2px; }
+  .data-label {
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+  }
+  .data-val {
+    font-size: 11px;
+    color: var(--amber);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .claim-body {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .litigation-block {
+    background: var(--red-light);
+    border: 1px solid var(--red-border);
+    border-left: 3px solid var(--red);
+    padding: 16px;
+  }
+
+  .condition-block {
+    background: var(--amber-light);
+    border: 1px solid var(--amber-border);
+    border-left: 3px solid var(--amber);
+    padding: 16px;
+  }
+
+  .block-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .litigation-block .block-label { color: var(--red); }
+  .condition-block .block-label { color: var(--amber); }
+
+  .block-text {
+    font-size: 12.5px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .litigation-block .block-text { color: #5c1010; }
+  .condition-block .block-text { color: #5c3a10; }
+
+  .financial-block {
+    margin: 0 24px 0;
+    padding: 14px 16px;
+    background: #fdf8f0;
+    border: 1px solid var(--amber-border);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .financial-label {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber);
+    font-weight: 600;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .financial-text {
+    font-size: 12px;
+    color: #5c3a10;
+    line-height: 1.6;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  .conditions-section {
+    padding: 16px 24px 24px;
+    border-top: 1px solid var(--border);
+    margin-top: 16px;
+  }
+
+  .conditions-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .conditions-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+  }
+
+  .cond {
+    padding: 12px 14px;
+    border: 1px solid;
+    border-left-width: 3px;
+  }
+
+  .cond-new { border-color: var(--new-border); background: var(--new-bg); border-left-color: var(--new); }
+  .cond-confirm { border-color: var(--confirm-border); background: var(--confirm-bg); border-left-color: var(--confirm); }
+
+  .cond-badge {
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .cond-new .cond-badge { color: var(--new); }
+  .cond-confirm .cond-badge { color: var(--confirm); }
+
+  .cond-name {
+    font-family: 'Spectral', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 5px;
+    line-height: 1.2;
+  }
+
+  .cond-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.55;
+    font-weight: 300;
+  }
+
+  /* SUMMARY */
+  .summary-rule {
+    border: none;
+    border-top: 2px solid var(--red);
+    margin: 56px 0 32px;
+  }
+
+  .summary-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+  }
+
+  .summary-title {
+    font-family: 'Spectral', serif;
+    font-size: 30px;
+    font-weight: 700;
+  }
+
+  .summary-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* FINANCIAL CONSEQUENCE TABLE */
+  .financial-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+    font-size: 12px;
+  }
+
+  .financial-table thead th {
+    background: var(--red);
+    color: #fdf0f0;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .financial-table tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+    font-weight: 300;
+    color: var(--muted);
+  }
+
+  .financial-table tbody td:first-child {
+    font-family: 'Spectral', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    width: 210px;
+  }
+
+  .financial-table tbody td:nth-child(3) {
+    color: var(--red);
+    font-weight: 500;
+    font-size: 11px;
+    width: 160px;
+  }
+
+  .financial-table tbody tr:nth-child(even) td {
+    background: var(--surface2);
+  }
+
+  /* NEW CANDIDATES GRID */
+  .candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .nc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--new);
+    padding: 20px;
+  }
+
+  .nc-num {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    color: var(--new);
+    margin-bottom: 8px;
+    opacity: 0.7;
+    font-weight: 600;
+  }
+
+  .nc-name {
+    font-family: 'Spectral', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .nc-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+
+  .nc-financial {
+    padding: 8px 10px;
+    background: var(--red-light);
+    border: 1px solid var(--red-border);
+    font-size: 11px;
+    color: var(--red);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* FINDINGS */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 22px;
+  }
+
+  .finding-title {
+    font-family: 'Spectral', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--red);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .finding-text {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .hammer-index-note {
+    background: var(--amber-light);
+    border: 1px solid var(--amber-border);
+    padding: 20px 24px;
+    margin-bottom: 32px;
+  }
+
+  .hammer-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .hammer-text {
+    font-size: 13px;
+    color: #5c3a10;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  @media (max-width: 800px) {
+    .masthead { padding: 40px 20px; }
+    .page { padding: 32px 20px; }
+    .claim-header { grid-template-columns: 48px 1fr; }
+    .claim-data { display: none; }
+    .claim-body { grid-template-columns: 1fr; }
+    .findings-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">Principal Resolution — PRV3 Research // Experiment 2 of 7</div>
+  <h1>Employment<br><strong>Litigation Taxonomy</strong></h1>
+  <p class="masthead-sub">The most financially precise lens in the series. Litigation categories aren't opinions or survey responses — they are organizational conditions that a court, a regulator, or a plaintiff's attorney has already named, documented, and attached a dollar value to. The causal chain from organizational condition to financial consequence is established by law, not inferred from research.</p>
+  <div class="masthead-warning">This experiment surfaces conditions the organization was most motivated to conceal. Reviews describe what employees were willing to say publicly. Exit interviews describe what employees were willing to say on record. Litigation describes what the organization did when nobody was supposed to find out — and did anyway.</div>
+  <div class="masthead-stats">
+    <div class="ms"><span class="ms-n">10</span><span class="ms-l">Claim Categories</span></div>
+    <div class="ms"><span class="ms-n">8</span><span class="ms-l">New Candidates</span></div>
+    <div class="ms"><span class="ms-n">12</span><span class="ms-l">States Confirmed</span></div>
+    <div class="ms"><span class="ms-n">$50B+</span><span class="ms-l">Annual Wage Theft</span></div>
+    <div class="ms"><span class="ms-n">$513M</span><span class="ms-l">EEOC Recovery FY2023</span></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- CLAIM CARDS -->
+
+  <div class="claim-card">
+    <div class="claim-header">
+      <div class="claim-num">01</div>
+      <div class="claim-title-cell">
+        <div class="claim-category-label">Claim Category</div>
+        <div class="claim-title">Harassment and Hostile Work Environment</div>
+      </div>
+      <div class="claim-data">
+        <div class="data-item"><div class="data-label">EEOC Volume</div><div class="data-val">~35% of all filings</div></div>
+        <div class="data-item"><div class="data-label">Avg Settlement</div><div class="data-val">$75K–$125K direct</div></div>
+        <div class="data-item"><div class="data-label">Total Cost Multiplier</div><div class="data-val">1.5–2x (SHRM)</div></div>
+      </div>
+    </div>
+    <div class="claim-body">
+      <div class="litigation-block">
+        <div class="block-label">What the Litigation Reveals</div>
+        <div class="block-text">Harassment claims cluster in organizations with three structural characteristics: management trained in prevention without infrastructure to detect or respond; a reporting process employees don't trust; and a cultural norm where the behavior has been present long enough to be normalized. New employees observe it, conclude it's acceptable, and the organization loses the ability to self-correct.</div>
+      </div>
+      <div class="condition-block">
+        <div class="block-label">Organizational Condition Underneath</div>
+        <div class="block-text">Normalization Creep — the gradual drift in what the organization treats as acceptable. Behavior challenged in year one, tolerated in year three, invisible in year seven. By the time litigation surfaces it, the behavior has been present long enough that multiple managers, HR representatives, and senior leaders have encountered it without acting. The litigation names the behavior. The condition is the accumulated tolerance that made it possible.</div>
+      </div>
+    </div>
+    <div class="financial-block">
+      <div class="financial-label">Financial Consequence</div>
+      <div class="financial-text">$75K–$125K average direct settlement plus $100K–$300K legal fees before verdict. SHRM research estimates total organizational cost at 1.5–2x direct legal cost when reputational and cultural damage are included. Reputational damage — measured by Glassdoor rating decline, employer brand impact on recruiting costs, and voluntary attrition in aftermath — adds a multiplier the direct cost doesn't capture.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Normalization Creep</div>
+          <div class="cond-desc">Gradual drift in organizational tolerance. Behavior challenged in year one is tolerated in year three and invisible in year seven. The condition is accumulated tolerance, not sudden failure.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">Misconduct Infrastructure Absence</div>
+          <div class="cond-desc">Confirmed across Glassdoor, exit interview, and litigation data. Three independent experiments. High-priority state candidate.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">HR Capture</div>
+          <div class="cond-desc">Confirmed. The reporting process employees don't trust is almost always one that routes complaints to people aligned with the subject of the complaint.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="claim-card">
+    <div class="claim-header">
+      <div class="claim-num">02</div>
+      <div class="claim-title-cell">
+        <div class="claim-category-label">Claim Category</div>
+        <div class="claim-title">Discrimination — Hiring, Promotion, and Termination</div>
+      </div>
+      <div class="claim-data">
+        <div class="data-item"><div class="data-label">EEOC Recovery</div><div class="data-val">$513M FY2023 (record)</div></div>
+        <div class="data-item"><div class="data-label">Largest Settlements</div><div class="data-val">$17.5M–$175M (class)</div></div>
+        <div class="data-item"><div class="data-label">Legal Mechanism</div><div class="data-val">Disparate impact</div></div>
+      </div>
+    </div>
+    <div class="claim-body">
+      <div class="litigation-block">
+        <div class="block-label">What the Litigation Reveals</div>
+        <div class="block-text">Discrimination claims in hiring cluster in organizations without structured interview frameworks, documented selection criteria, or diverse interview panels. Promotion claims cluster where advancement criteria are subjective, undocumented, and applied inconsistently. Termination claims cluster in three patterns: following protected activity, with absent documentation, and in reductions where selection criteria produce demographic disparate impact.</div>
+      </div>
+      <div class="condition-block">
+        <div class="block-label">Organizational Condition Underneath</div>
+        <div class="block-text">Disparate Impact Architecture — facially neutral policies that produce systematically discriminatory outcomes through their operation rather than individual intent. Promotion criteria, performance rating systems, and reduction selection matrices designed without disparate impact analysis. The organization doesn't intend discrimination. The design produces it. Under Title VII, intent is not required — the outcome and the absence of business necessity are sufficient.</div>
+      </div>
+    </div>
+    <div class="financial-block">
+      <div class="financial-label">Financial Consequence</div>
+      <div class="financial-text">EEOC recovered $513M for discrimination claimants in FY2023 — the highest in agency history. Class action disparate impact cases produce the largest individual values: Boeing age discrimination ($38M), Novartis gender discrimination ($175M), Allstate race discrimination ($17.5M). Systematic Disparate Impact Architecture produces class action exposure — the entire affected population becomes the claim.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Disparate Impact Architecture</div>
+          <div class="cond-desc">Organizational systems designed without disparate impact analysis that produce discriminatory outcomes through their operation. The strongest financial consequence narrative in the taxonomy — class action exposure with no statutory cap.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">Hiring Bias & Selection Inconsistency</div>
+          <div class="cond-desc">Confirmed by litigation data. The absence of structured selection infrastructure is the single strongest predictor of adverse selection outcomes courts treat as evidence of intent.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">Unmanaged Underperformance</div>
+          <div class="cond-desc">Confirmed. Documentation failures in performance management produce the indefensible termination decisions that discrimination claims exploit.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="claim-card">
+    <div class="claim-header">
+      <div class="claim-num">03</div>
+      <div class="claim-title-cell">
+        <div class="claim-category-label">Claim Category</div>
+        <div class="claim-title">Wage and Hour Violations</div>
+      </div>
+      <div class="claim-data">
+        <div class="data-item"><div class="data-label">DOL Recovery</div><div class="data-val">$274M FY2023</div></div>
+        <div class="data-item"><div class="data-label">Cost Multiplier</div><div class="data-val">3–4x back wages</div></div>
+        <div class="data-item"><div class="data-label">Discovery Method</div><div class="data-val">Rarely internal</div></div>
+      </div>
+    </div>
+    <div class="claim-body">
+      <div class="litigation-block">
+        <div class="block-label">What the Litigation Reveals</div>
+        <div class="block-text">Wage and hour claims cluster around FLSA misclassification, off-the-clock work, and meal and rest break violations. The critical diagnostic characteristic: violations are almost never discovered internally. They surface through employee complaints, DOL audits, or class action attorneys who specialize in identifying industries with systematic violations. By the time litigation begins, violations typically span years and affect hundreds or thousands of employees.</div>
+      </div>
+      <div class="condition-block">
+        <div class="block-label">Organizational Condition Underneath</div>
+        <div class="block-text">Compliance Normalization — illegal practices present long enough to become the operational norm. Not ignorance of the law — often the organization knows the practice is technically non-compliant but has made an implicit calculation that the risk is manageable. The off-the-clock work is tolerated. The misclassification was reviewed once and left in place. The break policy exists on paper and is routinely violated in practice.</div>
+      </div>
+    </div>
+    <div class="financial-block">
+      <div class="financial-label">Financial Consequence</div>
+      <div class="financial-text">DOL recovered $274M in back wages in FY2023. Wage and hour class actions add liquidated damages equal to back wages owed, plus attorney fees — effective multiplier of 3–4x underlying back wages. California's PAGA adds a further multiplier, producing settlements in the tens of millions for organizations with systematic violations. The condition is highly prevalent and the discovery mechanism (class action attorneys) is highly efficient.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Compliance Normalization</div>
+          <div class="cond-desc">Illegal practices normalized through extended tolerance. Not ignorance — an implicit calculation that the risk is manageable. The organization knows. It continues. The liability accumulates silently until external discovery.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">Regulatory Exposure</div>
+          <div class="cond-desc">Confirmed and extended. Compliance Normalization is the specific mechanism that produces chronic Regulatory Exposure in wage and hour law.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="claim-card">
+    <div class="claim-header">
+      <div class="claim-num">04</div>
+      <div class="claim-title-cell">
+        <div class="claim-category-label">Claim Category</div>
+        <div class="claim-title">Retaliation</div>
+      </div>
+      <div class="claim-data">
+        <div class="data-item"><div class="data-label">EEOC Volume</div><div class="data-val">56% of all charges FY2023</div></div>
+        <div class="data-item"><div class="data-label">Verdict Profile</div><div class="data-val">Highest in employment law</div></div>
+        <div class="data-item"><div class="data-label">Punitive Exposure</div><div class="data-val">Elevated — perceived intent</div></div>
+      </div>
+    </div>
+    <div class="claim-body">
+      <div class="litigation-block">
+        <div class="block-label">What the Litigation Reveals</div>
+        <div class="block-text">Retaliation claims arise from a sequence of decisions, not a single bad one. The complaint, the investigation, the outcome, and the treatment of the complainant after. Most common sequence: employee complains → HR concludes unsubstantiated → complainant subsequently passed over for promotion, receives negative review, or included in RIF. The organization treats each decision as independent. The court treats the sequence as retaliation.</div>
+      </div>
+      <div class="condition-block">
+        <div class="block-label">Organizational Condition Underneath</div>
+        <div class="block-text">Sequential Decision Blindness — individual decision-makers act in isolation without awareness of how their decisions appear in sequence. The promotion decision-maker doesn't know about the complaint. The review manager doesn't know about the promotion decision. The RIF selector doesn't connect to the prior complaint. No individual acted with retaliatory intent. The sequence constitutes retaliation. The absence of a coordinated oversight mechanism makes this structurally inevitable.</div>
+      </div>
+    </div>
+    <div class="financial-block">
+      <div class="financial-label">Financial Consequence</div>
+      <div class="financial-text">Retaliation verdicts are consistently the highest in employment law. Publix retaliation verdict: $6.85M. AutoZone retaliation settlement: $185M class action. Punitive damage exposure is higher than in underlying discrimination cases because juries perceive retaliation as deliberate — even when it results from Sequential Decision Blindness rather than intent. The organization pays for intent it didn't have.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Sequential Decision Blindness</div>
+          <div class="cond-desc">Individual decisions made in isolation that constitute retaliation in sequence. No individual acts with retaliatory intent. The absence of coordinated oversight makes the sequence structurally inevitable. The organization pays for intent it didn't have.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">HR Capture</div>
+          <div class="cond-desc">Confirmed. The investigation that concludes "unsubstantiated" in an HR Capture condition is the first link in the retaliation sequence.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">The Untouchable</div>
+          <div class="cond-desc">Confirmed. The subject of the complaint whose protection produces the retaliation sequence is the specific individual the Untouchable condition describes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="claim-card">
+    <div class="claim-header">
+      <div class="claim-num">05</div>
+      <div class="claim-title-cell">
+        <div class="claim-category-label">Claim Category</div>
+        <div class="claim-title">FMLA and ADA Interference and Retaliation</div>
+      </div>
+      <div class="claim-data">
+        <div class="data-item"><div class="data-label">ADA Charges FY2023</div><div class="data-val">26,000+</div></div>
+        <div class="data-item"><div class="data-label">Cost Multiplier</div><div class="data-val">3–4x economic loss</div></div>
+        <div class="data-item"><div class="data-label">Root Cause</div><div class="data-val">Manager-level decisions</div></div>
+      </div>
+    </div>
+    <div class="claim-body">
+      <div class="litigation-block">
+        <div class="block-label">What the Litigation Reveals</div>
+        <div class="block-text">FMLA and ADA claims cluster in organizations where leave administration is handled by direct managers rather than HR — producing inconsistent and legally indefensible decisions. The most diagnostic characteristic: organizations producing these claims at elevated rates are almost always those where managers make leave and accommodation decisions independently, because HR infrastructure is absent, captured, or inaccessible. The decisions are individually understandable and collectively catastrophic.</div>
+      </div>
+      <div class="condition-block">
+        <div class="block-label">Organizational Condition Underneath</div>
+        <div class="block-text">Manager Legal Overreach — direct managers routinely making employment decisions that legally require HR involvement, legal review, or a structured interactive process. FMLA designation, ADA accommodation, termination during protected leave, performance management of employees with disclosed disabilities — all require processes that managers bypass because they don't know the process exists, HR isn't available, or the culture normalizes manager autonomy in legally constrained decisions.</div>
+      </div>
+    </div>
+    <div class="financial-block">
+      <div class="financial-label">Financial Consequence</div>
+      <div class="financial-text">Average ADA settlement: $75K–$150K. FMLA violations produce back pay, liquidated damages equal to back pay, and attorney fees — typically 3–4x the underlying economic loss. The condition — managers making legally constrained decisions independently — is both highly prevalent and highly preventable, making the financial consequence narrative particularly direct: the cost of legal training and HR process access is a fraction of the cost of a single ADA or FMLA claim.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Manager Legal Overreach</div>
+          <div class="cond-desc">Direct managers making legally constrained employment decisions independently. Not malicious — they don't know the process exists or HR is unavailable. The decisions feel reasonable. They're legally indefensible.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">The Unformed Leader</div>
+          <div class="cond-desc">Confirmed. The manager who makes FMLA and ADA decisions without understanding the legal framework is The Unformed Leader in its most legally consequential presentation.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">The Exposed</div>
+          <div class="cond-desc">Confirmed. FMLA and ADA claims spike in The Exposed condition — the HR absence produces leave administration failures as an acute consequence.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="claim-card">
+    <div class="claim-header">
+      <div class="claim-num">06</div>
+      <div class="claim-title-cell">
+        <div class="claim-category-label">Claim Category</div>
+        <div class="claim-title">Wrongful Termination</div>
+      </div>
+      <div class="claim-data">
+        <div class="data-item"><div class="data-label">Settlement Range</div><div class="data-val">$50K–Several million</div></div>
+        <div class="data-item"><div class="data-label">Primary Weakness</div><div class="data-val">Documentation deficit</div></div>
+        <div class="data-item"><div class="data-label">High-Risk Jurisdictions</div><div class="data-val">CA, NY, NJ</div></div>
+      </div>
+    </div>
+    <div class="claim-body">
+      <div class="litigation-block">
+        <div class="block-label">What the Litigation Reveals</div>
+        <div class="block-text">Wrongful termination claims cluster around two structural failures: documentation deficit (termination for performance without the documentation trail establishing the problem, notice, and opportunity to improve) and selection inconsistency (termination criteria applied inconsistently across demographic groups). The most consistent finding at deposition: the manager genuinely believes the termination is justified. The file doesn't support the belief.</div>
+      </div>
+      <div class="condition-block">
+        <div class="block-label">Organizational Condition Underneath</div>
+        <div class="block-text">Invisible Performance Management — performance expectations, feedback, and consequences communicated verbally and managed relationally rather than documented formally. The manager knows who is performing and who isn't. The file doesn't reflect it. The termination decision is accurate. The documentation is indefensible. Distinct from Unmanaged Underperformance — that's tolerance of performance problems. This is managing performance in a way that produces legally indefensible decisions even when the underlying judgment is correct.</div>
+      </div>
+    </div>
+    <div class="financial-block">
+      <div class="financial-label">Financial Consequence</div>
+      <div class="financial-text">Wrongful termination settlements range from $50K to several million depending on jurisdiction, protected class involved, and egregiousness. California, New York, and New Jersey produce the highest values. Plaintiffs' attorneys selectively pursue cases with strong documentation deficits — the cases where Invisible Performance Management is most evident. Organizations with this condition are disproportionately targeted because they're disproportionately winnable.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Invisible Performance Management</div>
+          <div class="cond-desc">Performance managed through relationship and conversation rather than documentation. The manager's judgment is accurate. The file doesn't support it. The termination is legally indefensible not because it's wrong but because it's undocumented.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">Unmanaged Underperformance</div>
+          <div class="cond-desc">Confirmed and extended. Invisible Performance Management is the condition that makes eventual termination indefensible. Unmanaged Underperformance is the condition that precedes it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="claim-card">
+    <div class="claim-header">
+      <div class="claim-num">07</div>
+      <div class="claim-title-cell">
+        <div class="claim-category-label">Claim Category</div>
+        <div class="claim-title">Whistleblower and Retaliation for Protected Activity</div>
+      </div>
+      <div class="claim-data">
+        <div class="data-item"><div class="data-label">SEC Awards Since 2012</div><div class="data-val">$1.9B+ total</div></div>
+        <div class="data-item"><div class="data-label">Largest Single Award</div><div class="data-val">$279M</div></div>
+        <div class="data-item"><div class="data-label">Statutory Cap</div><div class="data-val">None (Dodd-Frank)</div></div>
+      </div>
+    </div>
+    <div class="claim-body">
+      <div class="litigation-block">
+        <div class="block-label">What the Litigation Reveals</div>
+        <div class="block-text">Whistleblower claims arise almost exclusively in organizations where the internal reporting infrastructure failed first. The employee who goes to the SEC, the DOL, or the state attorney general almost always went to HR or management first. The external report is the response to an internal failure. By the time the external report arrives, the organization has both the underlying violation and the retaliatory response to the internal report.</div>
+      </div>
+      <div class="condition-block">
+        <div class="block-label">Organizational Condition Underneath</div>
+        <div class="block-text">Internal Reporting Failure — the internal reporting mechanism exists, employees use it, and it fails to produce either remediation or protection for the reporter. Distinct from Misconduct Infrastructure Absence (mechanism doesn't exist) and HR Capture (mechanism is compromised). This is specifically a mechanism that functions well enough to receive reports and fails at remediation and protection. The employee's experience: I reported. The report was taken seriously. Nothing changed. I faced consequences. I have no choice but to go external.</div>
+      </div>
+    </div>
+    <div class="financial-block">
+      <div class="financial-label">Financial Consequence</div>
+      <div class="financial-text">SEC whistleblower awards have no statutory cap — Dodd-Frank pays 10–30% of sanctions over $1M. Largest individual award: $279M. For the organization, the SEC investigation triggered by a whistleblower report produces sanctions, remediation costs, and reputational damage that dwarf any cost of fixing the underlying condition. Internal Reporting Failure is the most extreme financial consequence narrative in the taxonomy — the gap between the cost of fixing the internal mechanism and the cost of external exposure is orders of magnitude.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate — Highest Priority</div>
+          <div class="cond-name">Internal Reporting Failure</div>
+          <div class="cond-desc">The reporting mechanism exists, receives reports, and fails at remediation and protection. Not absence, not capture — functional receipt with failed response. Produces the external reports that trigger regulatory investigations with no statutory cap on exposure.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">HR Capture</div>
+          <div class="cond-desc">Confirmed. The internal report that produces no remediation and subsequent retaliation is almost always routed through a captured HR function.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">Sequential Decision Blindness</div>
+          <div class="cond-desc">Confirmed. The retaliation sequence that follows internal reporting is typically produced by Sequential Decision Blindness — not coordinated retaliation.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="claim-card">
+    <div class="claim-header">
+      <div class="claim-num">08</div>
+      <div class="claim-title-cell">
+        <div class="claim-category-label">Claim Category</div>
+        <div class="claim-title">NLRA Violations and Union Activity</div>
+      </div>
+      <div class="claim-data">
+        <div class="data-item"><div class="data-label">NLRB Trajectory</div><div class="data-val">Charges increasing</div></div>
+        <div class="data-item"><div class="data-label">Primary Risk</div><div class="data-val">Organizing success</div></div>
+        <div class="data-item"><div class="data-label">Root Cause</div><div class="data-val">Manager suppression</div></div>
+      </div>
+    </div>
+    <div class="claim-body">
+      <div class="litigation-block">
+        <div class="block-label">What the Litigation Reveals</div>
+        <div class="block-text">NLRA violations cluster in organizations where managers treat discussion of wages, working conditions, and organizing as insubordination — violating Section 7 protected activity rights that cover these conversations. The diagnostic characteristic: organizations producing NLRA violations at elevated rates have almost always trained managers to suppress rather than address employee concerns. The underlying concerns are legitimate. The response is illegal.</div>
+      </div>
+      <div class="condition-block">
+        <div class="block-label">Organizational Condition Underneath</div>
+        <div class="block-text">Organizing Trigger Blindness — management doesn't understand that specific employee concerns about workload, compensation, and management behavior are protected discussions under the NLRA, and responds to them in ways that constitute interference with protected activity. Distinct from a deliberate anti-union campaign — this condition is about acting illegally because management doesn't know the legal framework governing its response to employee concerns.</div>
+      </div>
+    </div>
+    <div class="financial-block">
+      <div class="financial-label">Financial Consequence</div>
+      <div class="financial-text">NLRB violations produce back pay, reinstatement orders, and remedial posting requirements. More significantly, organizations that mishandle organizing activity often produce the organizing success they were trying to prevent — the mishandling becomes organizing fuel. The cost of a unionized workforce in an industry where competitors are non-union is organization-specific but consistently significant. The financial consequence of Organizing Trigger Blindness is the organizing outcome it accelerates.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Organizing Trigger Blindness</div>
+          <div class="cond-desc">Management acts illegally in response to organizing activity because it doesn't understand the legal framework governing its response. Not deliberate anti-union strategy — ignorance of protected activity rights producing illegal interference.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">Organizational Deafness</div>
+          <div class="cond-desc">Confirmed. The underlying employee concerns that drive organizing — workload, compensation, management behavior — are the conditions Organizational Deafness fails to detect and address before they become organizing motivation.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="claim-card">
+    <div class="claim-header">
+      <div class="claim-num">09</div>
+      <div class="claim-title-cell">
+        <div class="claim-category-label">Claim Category</div>
+        <div class="claim-title">AI Bias and Algorithmic Discrimination</div>
+      </div>
+      <div class="claim-data">
+        <div class="data-item"><div class="data-label">Status</div><div class="data-val">Emerging — first class actions</div></div>
+        <div class="data-item"><div class="data-label">NYC LL144 Fines</div><div class="data-val">$500–$1,500/violation</div></div>
+        <div class="data-item"><div class="data-label">Class Action Trajectory</div><div class="data-val">Rapidly increasing</div></div>
+      </div>
+    </div>
+    <div class="claim-body">
+      <div class="litigation-block">
+        <div class="block-label">What the Litigation Reveals</div>
+        <div class="block-text">AI bias claims cluster in organizations that deployed AI tools in hiring, performance, or workforce planning without understanding that the tools' outputs constitute employment decisions for legal purposes. The organization believes it's using a tool. The law treats it as making an employment decision. The EEOC has made clear that Title VII applies to AI-assisted decisions. The first class action AI bias claims in employment are working through the courts.</div>
+      </div>
+      <div class="condition-block">
+        <div class="block-label">Organizational Condition Underneath</div>
+        <div class="block-text">Algorithmic Accountability Gap — the organization can't explain its own AI-assisted decisions to the employees or candidates those decisions affected. The tool was deployed, produces outputs, and the decision-making process inside the tool is opaque to the organization that deployed it. This is the specific organizational condition that makes AI bias claims legally actionable — not just biased outputs, but the inability to demonstrate what the algorithm did and whether the organization took steps to assess bias.</div>
+      </div>
+    </div>
+    <div class="financial-block">
+      <div class="financial-label">Financial Consequence</div>
+      <div class="financial-text">NYC LL144 fines are currently modest but the class action exposure for organizations without bias audits on AI hiring tools is significant and growing. The EEOC has signaled it will treat AI bias as equivalent to intentional discrimination when the organization can't demonstrate bias assessment steps. This is the condition whose financial consequence narrative is growing fastest in the taxonomy — the regulatory and litigation trajectory is clear and accelerating.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Conference Experiment</div>
+          <div class="cond-name">AI Governance Failure</div>
+          <div class="cond-desc">Confirmed by actual and emerging litigation. The conference data identified the practitioner worry. The litigation data confirms the financial consequence.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Conference Experiment</div>
+          <div class="cond-name">Algorithmic Accountability Gap</div>
+          <div class="cond-desc">Confirmed. The specific organizational condition that makes AI bias legally actionable — inability to explain AI-assisted decisions — is now confirmed by litigation as well as regulatory guidance.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="claim-card">
+    <div class="claim-header">
+      <div class="claim-num">10</div>
+      <div class="claim-title-cell">
+        <div class="claim-category-label">Claim Category</div>
+        <div class="claim-title">Wage Theft and Off-the-Clock Work</div>
+      </div>
+      <div class="claim-data">
+        <div class="data-item"><div class="data-label">Annual Scale</div><div class="data-val">$50B+ (EPI estimate)</div></div>
+        <div class="data-item"><div class="data-label">vs. Property Crime</div><div class="data-val">More than all combined</div></div>
+        <div class="data-item"><div class="data-label">Mechanism</div><div class="data-val">Cultural pressure, not instruction</div></div>
+      </div>
+    </div>
+    <div class="claim-body">
+      <div class="litigation-block">
+        <div class="block-label">What the Litigation Reveals</div>
+        <div class="block-text">Off-the-clock work claims cluster in organizations with a specific cultural dynamic: the operational expectation has expanded beyond the paid workday without the organization acknowledging it. Managers don't explicitly require off-the-clock work. They reward employees who do it and implicitly penalize employees who don't. The cultural expectation is the mechanism. Individual manager behavior is the delivery system. The organization has a compliant timekeeping policy. The culture ignores it.</div>
+      </div>
+      <div class="condition-block">
+        <div class="block-label">Organizational Condition Underneath</div>
+        <div class="block-text">Cultural Overtime — operational expectations produce compensable work outside paid hours through cultural pressure rather than explicit instruction. The organization has a compliant policy. The culture ignores it. Managers don't instruct employees to work off the clock. They create the conditions where not working off the clock produces visible performance consequences. The policy is legal. The culture is not. Distinct from Structural Overload — that's too much work. Cultural Overtime is too much expected availability.</div>
+      </div>
+    </div>
+    <div class="financial-block">
+      <div class="financial-label">Financial Consequence</div>
+      <div class="financial-text">Economic Policy Institute estimates $50B+ in annual wage theft — more than all property crime combined. Class action wage theft litigation in California and New York produces settlements in the tens of millions for large employers with systematic Cultural Overtime. The multiplier — back wages plus liquidated damages plus attorney fees — produces 3–4x the underlying back wages as the effective organizational cost. The condition is highly prevalent; the discovery mechanism (class action attorneys) is highly efficient at finding it.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Cultural Overtime</div>
+          <div class="cond-desc">Compensable work produced outside paid hours through cultural pressure rather than explicit instruction. The policy is compliant. The culture creates the liability. Distinct from Structural Overload — this is about expected availability, not volume.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Existing</div>
+          <div class="cond-name">Culture Driven Burnout</div>
+          <div class="cond-desc">Confirmed and extended. Cultural Overtime is the legal liability version of Culture Driven Burnout — the same organizational condition produces both the human cost and the financial exposure.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <hr class="summary-rule">
+
+  <div class="hammer-index-note">
+    <div class="hammer-label">Hammer Index Relevance</div>
+    <div class="hammer-text">The 109 Hammer Index citations are the source library for the financial consequence narratives this experiment produces. The EEOC recovery data, DOL enforcement figures, NLRB charge statistics, SEC whistleblower award totals, and EPI wage theft estimates are all citations the Hammer Index would contain. This experiment has identified the specific organizational conditions those citations should be attached to in the PRV3 output architecture — each condition now has a documented financial consequence narrative sourced from the research canon.</div>
+  </div>
+
+  <div class="summary-head">
+    <div class="summary-title">New State Candidates — Experiment 2</div>
+    <div class="summary-sub">8 new candidates with specific financial consequence values attached</div>
+  </div>
+
+  <div class="candidates-grid">
+
+    <div class="nc">
+      <div class="nc-num">CANDIDATE 01</div>
+      <div class="nc-name">Normalization Creep</div>
+      <div class="nc-desc">Gradual drift in organizational tolerance for harmful behavior. Behavior challenged in year one, tolerated in year three, invisible in year seven. The condition is the accumulated tolerance — not the behavior itself.</div>
+      <div class="nc-financial">SHRM: total organizational cost of a harassment incident = 1.5–2x direct legal settlement when reputational and cultural damage included. Average direct settlement: $75K–$125K.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">CANDIDATE 02</div>
+      <div class="nc-name">Disparate Impact Architecture</div>
+      <div class="nc-desc">Organizational systems designed without disparate impact analysis that produce discriminatory outcomes through operation rather than intent. The most serious financial consequence narrative in the taxonomy — class action exposure with no practical cap.</div>
+      <div class="nc-financial">EEOC recovered $513M in FY2023. Representative class action settlements: Boeing ($38M), Novartis ($175M), Allstate ($17.5M). System-level discrimination produces system-level liability.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">CANDIDATE 03</div>
+      <div class="nc-name">Compliance Normalization</div>
+      <div class="nc-desc">Illegal practices normalized through extended tolerance. Not ignorance — an implicit organizational calculation that the risk is manageable. The liability accumulates silently until external discovery.</div>
+      <div class="nc-financial">DOL recovered $274M in back wages FY2023. Class action multiplier: 3–4x back wages owed in liquidated damages and attorney fees. California PAGA adds further exposure.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">CANDIDATE 04</div>
+      <div class="nc-name">Sequential Decision Blindness</div>
+      <div class="nc-desc">Individual decisions made in isolation that constitute retaliation in sequence. No individual acts with retaliatory intent. The absence of coordinated oversight makes the sequence structurally inevitable.</div>
+      <div class="nc-financial">Retaliation verdicts consistently highest in employment law. AutoZone: $185M class action. Publix: $6.85M individual verdict. Punitive exposure elevated because juries perceive intent the organization didn't have.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">CANDIDATE 05</div>
+      <div class="nc-name">Manager Legal Overreach</div>
+      <div class="nc-desc">Direct managers making legally constrained employment decisions independently. They don't know the process exists or HR is unavailable. The decisions feel reasonable. They're legally indefensible.</div>
+      <div class="nc-financial">Average ADA settlement: $75K–$150K. FMLA violations: 3–4x economic loss in back pay, liquidated damages, and attorney fees. Preventable — legal training and HR access cost a fraction of a single claim.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">CANDIDATE 06</div>
+      <div class="nc-name">Invisible Performance Management</div>
+      <div class="nc-desc">Performance managed through relationship and conversation rather than documentation. The manager's judgment is accurate. The file doesn't support it. The termination is legally indefensible not because it's wrong but because it's undocumented.</div>
+      <div class="nc-financial">Wrongful termination settlements: $50K to several million depending on jurisdiction and protected class. Plaintiffs' attorneys selectively pursue documentation deficit cases — organizations with this condition are disproportionately targeted because they're disproportionately winnable.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">CANDIDATE 07 — HIGHEST PRIORITY</div>
+      <div class="nc-name">Internal Reporting Failure</div>
+      <div class="nc-desc">The reporting mechanism exists, receives reports, and fails at remediation and protection. Not absence (Misconduct Infrastructure Absence), not compromise (HR Capture) — functional receipt with failed response. Produces external reports triggering unlimited regulatory exposure.</div>
+      <div class="nc-financial">SEC has awarded $1.9B+ to whistleblowers since 2012. Largest single award: $279M. No statutory cap. The gap between the cost of fixing the internal mechanism and the cost of external regulatory exposure is orders of magnitude. The most extreme financial consequence narrative in the taxonomy.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">CANDIDATE 08</div>
+      <div class="nc-name">Cultural Overtime</div>
+      <div class="nc-desc">Compensable work produced outside paid hours through cultural pressure rather than explicit instruction. The policy is compliant. The culture creates the liability. Expected availability, not volume.</div>
+      <div class="nc-financial">EPI estimates $50B+ in annual wage theft — more than all property crime combined. Class action settlements in the tens of millions for large employers. 3–4x multiplier on underlying back wages through liquidated damages and attorney fees.</div>
+    </div>
+
+  </div>
+
+  <!-- FINANCIAL CONSEQUENCE REFERENCE TABLE -->
+  <div class="summary-head">
+    <div class="summary-title">Financial Consequence Reference</div>
+    <div class="summary-sub">Litigation-sourced values for PRV3 output architecture</div>
+  </div>
+
+  <table class="financial-table">
+    <thead>
+      <tr>
+        <th>Condition / State</th>
+        <th>Legal Mechanism</th>
+        <th>Financial Range</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Normalization Creep</td>
+        <td>Title VII harassment / hostile work environment. SHRM multiplier applies to direct settlement for total cost including reputational damage and attrition.</td>
+        <td>$113K–$550K total per incident</td>
+      </tr>
+      <tr>
+        <td>Disparate Impact Architecture</td>
+        <td>Title VII disparate impact — no intent required. Class action exposure when the population affected is large. EEOC can pursue simultaneously with private litigation.</td>
+        <td>$17.5M–$175M (class action)</td>
+      </tr>
+      <tr>
+        <td>Compliance Normalization</td>
+        <td>FLSA / state wage and hour. Liquidated damages equal back wages. PAGA adds per-employee penalties in California. Class action attorneys work on contingency.</td>
+        <td>3–4x back wages (class)</td>
+      </tr>
+      <tr>
+        <td>Sequential Decision Blindness</td>
+        <td>Title VII retaliation — most frequently charged EEOC basis at 56% of all charges. Punitive damages available. Jury perception of intent elevates exposure.</td>
+        <td>$6.85M–$185M (documented)</td>
+      </tr>
+      <tr>
+        <td>Manager Legal Overreach</td>
+        <td>ADA interference and retaliation / FMLA interference and retaliation. Liquidated damages double the underlying economic loss. Attorney fees shift to employer.</td>
+        <td>$75K–$450K per claim</td>
+      </tr>
+      <tr>
+        <td>Invisible Performance Management</td>
+        <td>Wrongful termination — public policy exception, implied contract, or statutory protection (FMLA, ADA, NLRA). Documentation deficit is primary trial liability.</td>
+        <td>$50K–several million</td>
+      </tr>
+      <tr>
+        <td>Internal Reporting Failure</td>
+        <td>Dodd-Frank / SOX / OSHA whistleblower. SEC awards 10–30% of sanctions over $1M. No statutory cap. Investigation costs and remediation add to award exposure.</td>
+        <td>$1M–$279M+ (no cap)</td>
+      </tr>
+      <tr>
+        <td>Cultural Overtime</td>
+        <td>FLSA off-the-clock / state wage theft statutes. Class action mechanism highly efficient — plaintiffs' firms specialize in identifying industries with systematic violations.</td>
+        <td>Tens of millions (class)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- KEY FINDINGS -->
+  <div class="summary-head">
+    <div class="summary-title">Key Findings for PRV3</div>
+  </div>
+
+  <div class="findings-grid">
+    <div class="finding">
+      <div class="finding-title">This experiment produces the financial consequence narratives directly</div>
+      <div class="finding-text">Every other experiment required inference to reach financial consequence — this behavior produces this outcome, which costs approximately this much based on research. Litigation data skips the inference. The EEOC recovered $513 million. The DOL recovered $274 million. The SEC has awarded $1.9 billion. These are the numbers the Patterned Consequence Logic uses. The 109 Hammer Index citations are the source library. This experiment identified which conditions each citation belongs to.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">Internal Reporting Failure has the most extreme consequence narrative</div>
+      <div class="finding-text">The gap between the cost of fixing the internal reporting mechanism and the cost of external regulatory exposure is orders of magnitude. This condition produces the largest uncapped financial exposure in the taxonomy. It should be treated as a high-priority state with a financial consequence narrative that makes the cost-of-inaction case more powerfully than any other condition. The SEC's largest single award was $279 million — paid because the internal mechanism failed to work.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">Sequential Decision Blindness is the most structurally invisible condition</div>
+      <div class="finding-text">No individual in the organization intends to retaliate. The sequence constitutes retaliation. The organization pays for intent it didn't have. This condition is invisible to every standard diagnostic tool — no survey, no exit interview, no culture assessment surfaces it. The PRV3 diagnostic is uniquely positioned to detect Sequential Decision Blindness because the instrument looks at the governance architecture rather than individual behavior. This is the clearest case where the diagnostic produces value that no other tool can.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">Twelve existing conditions confirmed by litigation data</div>
+      <div class="finding-text">The Unformed Leader, The Untouchable, The Exposed, HR Capture, Misconduct Infrastructure Absence, Organizational Deafness, Hiring Bias and Selection Inconsistency, Unmanaged Underperformance, Regulatory Exposure, Culture Driven Burnout, AI Governance Failure, and Structural Overload are all confirmed by litigation data. Every confirmation adds a specific financial consequence value to the existing condition profile — the litigation data is the most authoritative financial evidence available.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px; padding:18px 24px; background:var(--ink); color:#3a3428; font-size:11px; line-height:1.8; display:flex; justify-content:space-between; border-top:3px solid var(--red);">
+    <span><span style="color:var(--gold); font-weight:600; letter-spacing:0.05em;">PRINCIPAL RESOLUTION</span> &nbsp;·&nbsp; Experiment 2 of 7: Employment Litigation Taxonomy &nbsp;·&nbsp; PRV3 State Taxonomy Research &nbsp;·&nbsp; April 2026</span>
+    <span>Internal Document</span>
+  </div>
+
+</div>
+</body>
+</html>

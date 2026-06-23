@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 7 — Organizational Psychology Literature Review</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f5f0;
+    --surface: #fdfcf9;
+    --surface2: #f0ede6;
+    --border: #ddd8ce;
+    --border-dark: #b8b0a0;
+    --ink: #1a1710;
+    --muted: #6a6050;
+    --dim: #a09880;
+    --indigo: #2d2d6a;
+    --indigo-light: #f0f0fa;
+    --indigo-border: #9090d0;
+    --violet: #4a1a6a;
+    --violet-light: #f5f0fa;
+    --violet-border: #b090d0;
+    --new: #1a4d2d;
+    --new-bg: #eef7f0;
+    --new-border: #80c890;
+    --confirm: #2d2d6a;
+    --confirm-bg: #f0f0fa;
+    --confirm-border: #9090d0;
+    --gold: #8b7020;
+    --gold-light: #faf6e0;
+    --gold-border: #c8b060;
+    --sienna: #6a2d1a;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .masthead {
+    background: var(--indigo);
+    padding: 60px 64px 52px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .masthead::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.02);
+    pointer-events: none;
+  }
+
+  .eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #4a4a8a;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'EB Garamond', serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 500;
+    line-height: 1.05;
+    color: #e8e8f8;
+    margin-bottom: 20px;
+  }
+
+  h1 em { font-style: italic; color: #a0a0e8; }
+
+  .masthead-sub {
+    font-size: 13px;
+    color: #3a3a7a;
+    font-weight: 300;
+    line-height: 1.8;
+    max-width: 680px;
+    margin-bottom: 28px;
+  }
+
+  .discipline-note {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-left: 3px solid #8080d0;
+    padding: 14px 18px;
+    max-width: 680px;
+    margin-bottom: 36px;
+    font-size: 12px;
+    color: #8080d0;
+    line-height: 1.7;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  .masthead-stats {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .ms { display: flex; flex-direction: column; gap: 4px; }
+  .ms-n {
+    font-family: 'EB Garamond', serif;
+    font-size: 40px;
+    font-weight: 600;
+    color: #a0a0e8;
+    line-height: 1;
+  }
+  .ms-l {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #2a2a5a;
+    font-weight: 600;
+  }
+
+  .page { max-width: 1120px; margin: 0 auto; padding: 52px 64px 80px; }
+
+  .significance-note {
+    background: var(--indigo-light);
+    border: 1px solid var(--indigo-border);
+    border-left: 4px solid var(--indigo);
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+
+  .sig-label {
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--indigo);
+    font-weight: 600;
+    margin-bottom: 10px;
+    opacity: 0.7;
+  }
+
+  .sig-text {
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    color: var(--indigo);
+    line-height: 1.65;
+    font-weight: 500;
+  }
+
+  .construct-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .construct-header {
+    display: grid;
+    grid-template-columns: 56px 1fr 240px;
+    border-bottom: 1px solid var(--border);
+    min-height: 80px;
+  }
+
+  .construct-num {
+    background: var(--indigo);
+    color: #a0a0e8;
+    font-family: 'EB Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .construct-title-cell {
+    padding: 18px 22px;
+    border-right: 1px solid var(--border);
+  }
+
+  .construct-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--indigo);
+    font-weight: 600;
+    margin-bottom: 6px;
+    opacity: 0.7;
+  }
+
+  .construct-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .construct-meta {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .meta-label {
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+  }
+  .meta-val {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.4;
+  }
+
+  .construct-body {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .research-block {
+    background: var(--indigo-light);
+    border: 1px solid var(--indigo-border);
+    border-left: 3px solid var(--indigo);
+    padding: 16px;
+  }
+
+  .mechanism-block {
+    background: var(--violet-light);
+    border: 1px solid var(--violet-border);
+    border-left: 3px solid var(--violet);
+    padding: 16px;
+  }
+
+  .block-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .research-block .block-label { color: var(--indigo); }
+  .mechanism-block .block-label { color: var(--violet); }
+
+  .block-text {
+    font-size: 12.5px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .research-block .block-text { color: #1a1a5c; }
+  .mechanism-block .block-text { color: #3a1a5c; }
+
+  .evidence-bar {
+    padding: 0 24px;
+    margin-bottom: 0;
+  }
+
+  .evidence-box {
+    background: var(--gold-light);
+    border: 1px solid var(--gold-border);
+    padding: 12px 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .evidence-label {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .evidence-text {
+    font-size: 12px;
+    color: #5c4010;
+    line-height: 1.6;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  .conditions-section {
+    padding: 16px 24px 24px;
+    border-top: 1px solid var(--border);
+    margin-top: 16px;
+  }
+
+  .conditions-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .conditions-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 10px;
+  }
+
+  .cond {
+    padding: 14px 16px;
+    border: 1px solid;
+    border-left-width: 3px;
+  }
+
+  .cond-new { border-color: var(--new-border); background: var(--new-bg); border-left-color: var(--new); }
+  .cond-confirm { border-color: var(--confirm-border); background: var(--confirm-bg); border-left-color: var(--confirm); }
+
+  .cond-badge {
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .cond-new .cond-badge { color: var(--new); }
+  .cond-confirm .cond-badge { color: var(--confirm); }
+
+  .cond-name {
+    font-family: 'EB Garamond', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .cond-desc {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .prv3-implication {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: rgba(45,45,106,0.06);
+    border: 1px solid rgba(45,45,106,0.15);
+    font-size: 10.5px;
+    color: var(--indigo);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .synthesis-rule { border: none; border-top: 2px solid var(--indigo); margin: 56px 0 32px; }
+
+  .synthesis-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+  }
+
+  .synthesis-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 32px;
+    font-weight: 600;
+  }
+
+  .synthesis-sub { font-size: 11px; color: var(--muted); }
+
+  .explanatory-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+    font-size: 12px;
+  }
+
+  .explanatory-table thead th {
+    background: var(--indigo);
+    color: #a0a0e8;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .explanatory-table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.55;
+    font-weight: 300;
+    color: var(--muted);
+  }
+
+  .explanatory-table tbody td:first-child {
+    font-family: 'EB Garamond', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    width: 200px;
+  }
+
+  .explanatory-table tbody td:last-child {
+    font-style: italic;
+    color: var(--indigo);
+    font-size: 11.5px;
+    width: 200px;
+  }
+
+  .explanatory-table tbody tr:nth-child(even) td { background: var(--surface2); }
+
+  .candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .nc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--new);
+    padding: 20px;
+  }
+
+  .nc-num {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    color: var(--new);
+    margin-bottom: 8px;
+    opacity: 0.7;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .nc-construct {
+    font-size: 9px;
+    color: var(--indigo);
+    margin-bottom: 6px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .nc-name {
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .nc-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+
+  .nc-prv3 {
+    padding: 8px 10px;
+    background: var(--indigo-light);
+    border: 1px solid var(--indigo-border);
+    font-size: 11px;
+    color: var(--indigo);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .findings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 22px;
+  }
+
+  .finding-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--indigo);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .finding-text {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .validation-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--indigo);
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+
+  .validation-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--indigo);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .validation-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .validation-item {
+    border-left: 2px solid var(--indigo-border);
+    padding-left: 14px;
+  }
+
+  .vi-count {
+    font-family: 'EB Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--indigo);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .vi-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 800px) {
+    .masthead { padding: 40px 20px; }
+    .page { padding: 32px 20px; }
+    .construct-header { grid-template-columns: 48px 1fr; }
+    .construct-meta { display: none; }
+    .construct-body { grid-template-columns: 1fr; }
+    .findings-grid { grid-template-columns: 1fr; }
+    .validation-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">Principal Resolution — PRV3 Research // Experiment 7 of 7</div>
+  <h1>Organizational Psychology<br><em>Literature Review</em></h1>
+  <p class="masthead-sub">The final experiment. Five decades of organizational psychology research analyzed for what it establishes about the conditions that produce organizational dysfunction — through what mechanism, and with what measurable effect. The explanatory layer that makes the taxonomy a diagnostic rather than a catalog.</p>
+  <div class="discipline-note">This experiment is different in kind from the six that preceded it. The others produced conditions that are recognizable — a leader can read the description and think "that's us." The organizational psychology literature produces conditions that are explanatory — they tell you why the recognizable condition exists and persists. That explanatory layer is what makes the private output more than a diagnosis. It's what makes it a verdict.</div>
+  <div class="masthead-stats">
+    <div class="ms"><span class="ms-n">10</span><span class="ms-l">Research Constructs</span></div>
+    <div class="ms"><span class="ms-n">10</span><span class="ms-l">New Candidates</span></div>
+    <div class="ms"><span class="ms-n">18</span><span class="ms-l">Existing Confirmed</span></div>
+    <div class="ms"><span class="ms-n">50+</span><span class="ms-l">Years of Research</span></div>
+    <div class="ms"><span class="ms-n">Meta</span><span class="ms-l">Analytic Evidence</span></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="significance-note">
+    <div class="sig-label">Why This Experiment Is Different</div>
+    <div class="sig-text">The previous experiments identified what the conditions look like from outside — from employees, from litigants, from practitioners, from actuaries. This experiment establishes what produces the conditions from inside — the causal mechanisms that make organizational dysfunction stable, self-reinforcing, and resistant to the interventions organizations most commonly attempt.</div>
+  </div>
+
+  <div class="construct-card">
+    <div class="construct-header">
+      <div class="construct-num">1</div>
+      <div class="construct-title-cell">
+        <div class="construct-label">Research Construct</div>
+        <div class="construct-title">Role Ambiguity and Role Conflict</div>
+      </div>
+      <div class="construct-meta">
+        <div class="meta-item"><div class="meta-label">Foundational Research</div><div class="meta-val">Kahn et al. (1964)</div></div>
+        <div class="meta-item"><div class="meta-label">Meta-Analysis</div><div class="meta-val">Gilboa et al. (2008), n=169 studies</div></div>
+        <div class="meta-item"><div class="meta-label">Effect Size</div><div class="meta-val">Among largest in org psych literature</div></div>
+      </div>
+    </div>
+    <div class="construct-body">
+      <div class="research-block">
+        <div class="block-label">What the Research Establishes</div>
+        <div class="block-text">Role ambiguity — the absence of clear information about what a role requires — and role conflict — incompatible demands within a role — are the two strongest predictors of job performance decline, ahead of workload, interpersonal conflict, and physical working conditions. The meta-analytic evidence across 169 studies confirms this finding across industries, cultures, and organizational types.</div>
+      </div>
+      <div class="mechanism-block">
+        <div class="block-label">The Mechanism</div>
+        <div class="block-text">Role ambiguity is not a personal failing — it is produced by specific structural failures: unclear job descriptions, absent performance criteria, inadequate onboarding, restructuring without role redefinition, and managers who define expectations verbally rather than documenting them. Role conflict is produced by matrix reporting structures, cultures where stated values conflict with operational demands, and performance systems that reward behaviors conflicting with stated priorities.</div>
+      </div>
+    </div>
+    <div class="evidence-bar" style="padding:0 24px 16px;">
+      <div class="evidence-box">
+        <div class="evidence-label">PRV3 Evidence</div>
+        <div class="evidence-text">Gilboa et al. established that role ambiguity reduces performance by an average of 12–15% across the affected population. For 500 managers experiencing moderate role ambiguity, the performance cost is quantifiable before any attrition or claim calculation — a direct input to the Patterned Consequence Logic.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Role Clarity Deficit</div>
+          <div class="cond-desc">Neither the employee nor their manager can specify with precision what the employee is supposed to do, how performance will be evaluated, or what authority they have to act. Systemic condition produced by organizations that restructure without redefining roles, promote into expanded scope without updating expectations, or add responsibilities without removing others.</div>
+          <div class="prv3-implication">Mechanism for The Unformed Leader — the formation debt produces role ambiguity in the employee below, not just ineffective management above. The cascade is documented in the research literature.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Decision Paralysis</div>
+          <div class="cond-desc">Confirmed. Role conflict from competing decision-making authorities is the mechanism underneath Decision Paralysis — incompatible demands from multiple authority structures produce the paralysis the condition describes.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Misaligned Incentives</div>
+          <div class="cond-desc">Confirmed. Role conflict between stated organizational values and rewarded behaviors is the specific mechanism Misaligned Incentives creates at scale.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="construct-card">
+    <div class="construct-header">
+      <div class="construct-num">2</div>
+      <div class="construct-title-cell">
+        <div class="construct-label">Research Construct</div>
+        <div class="construct-title">Psychological Safety</div>
+      </div>
+      <div class="construct-meta">
+        <div class="meta-item"><div class="meta-label">Foundational Research</div><div class="meta-val">Edmondson (1999)</div></div>
+        <div class="meta-item"><div class="meta-label">Major Validation</div><div class="meta-val">Google Project Aristotle (2016), n=180 teams</div></div>
+        <div class="meta-item"><div class="meta-label">Finding</div><div class="meta-val">Strongest predictor of high-performing teams</div></div>
+      </div>
+    </div>
+    <div class="construct-body">
+      <div class="research-block">
+        <div class="block-label">What the Research Establishes</div>
+        <div class="block-text">Psychological safety — the shared belief that the team is safe for interpersonal risk-taking — is the single strongest predictor of team performance, stronger than team composition, individual talent, or technical expertise. The mechanism is informational, not attitudinal: psychologically unsafe environments suppress information, which degrades decision quality, error detection, and learning speed.</div>
+      </div>
+      <div class="mechanism-block">
+        <div class="block-label">The Mechanism</div>
+        <div class="block-text">Psychological safety is a team-level phenomenon produced almost entirely by leader behavior. One leader who consistently responds to concerns with defensiveness or punishment creates an unsafe environment for their entire team within weeks. The condition spreads through the organization as leaders model the behavior for their reports. The contagion pattern is downward and rapid. Recovery is slow because it requires consistent counter-evidence over extended time.</div>
+      </div>
+    </div>
+    <div class="evidence-bar" style="padding:0 24px 16px;">
+      <div class="evidence-box">
+        <div class="evidence-label">PRV3 Evidence</div>
+        <div class="evidence-text">Psychological safety can be measured with Edmondson's validated seven-item instrument. The items are situational rather than self-referential — respondents answer about their team's behavior, not their own feelings. This means the diagnostic can detect psychological safety levels without the user recognizing what is being measured. The P-03 principle is directly satisfied.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Information Suppression Cascade</div>
+          <div class="cond-desc">Low psychological safety has propagated upward through the management hierarchy so that information reaching senior leadership is systematically filtered. Not deliberate deception — each layer has learned not to surface problems. The Executive Reality Gap is the senior leadership experience of this condition.</div>
+          <div class="prv3-implication">Connects the Executive Reality Gap (conference experiment) to its root mechanism. The research establishes that information suppression cascades are produced by specific leader behaviors — which means the diagnostic question set can identify the cascade from observable signals without requiring the leader to self-report the filtering.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Psychological Safety Collapse</div>
+          <div class="cond-desc">Confirmed across exit interview, Glassdoor, and conference experiments. Now explained: the mechanism is informational, not emotional. The private output should lead with the information quality argument. The organization is making decisions on systematically incomplete data.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="construct-card">
+    <div class="construct-header">
+      <div class="construct-num">3</div>
+      <div class="construct-title-cell">
+        <div class="construct-label">Research Construct</div>
+        <div class="construct-title">Organizational Justice</div>
+      </div>
+      <div class="construct-meta">
+        <div class="meta-item"><div class="meta-label">Foundational Research</div><div class="meta-val">Greenberg (1987)</div></div>
+        <div class="meta-item"><div class="meta-label">Meta-Analysis</div><div class="meta-val">Cohen-Charash & Spector (2001), n=190 studies</div></div>
+        <div class="meta-item"><div class="meta-label">Key Finding</div><div class="meta-val">Injustice predicts turnover more strongly than job satisfaction</div></div>
+      </div>
+    </div>
+    <div class="construct-body">
+      <div class="research-block">
+        <div class="block-label">What the Research Establishes</div>
+        <div class="block-text">Organizational justice has three components: distributive (are outcomes fairly distributed), procedural (are the processes for making decisions fair), and interactional (are people treated with dignity in those processes). Injustice perceptions predict turnover intention more strongly than job satisfaction, pay satisfaction, or role clarity. The effect is consistent across cultures, industries, and organizational types.</div>
+      </div>
+      <div class="mechanism-block">
+        <div class="block-label">The Critical Insight</div>
+        <div class="block-text">Employees who receive fair outcomes through unfair processes report lower organizational commitment than employees who receive unfavorable outcomes through fair processes. An employee who loses a promotion through a transparent, well-documented process is more committed than an employee who receives a promotion through an opaque, arbitrary one. The process matters more than the outcome — which is the opposite of what most organizations believe.</div>
+      </div>
+    </div>
+    <div class="evidence-bar" style="padding:0 24px 16px;">
+      <div class="evidence-box">
+        <div class="evidence-label">PRV3 Evidence</div>
+        <div class="evidence-text">Cohen-Charash and Spector (2001) meta-analysis across 190 studies: organizational injustice predicts turnover intention more strongly than job satisfaction, pay satisfaction, or role clarity. The effect size is among the largest in the turnover prediction literature. This is the financial consequence mechanism for Process Justice Failure.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Process Justice Failure</div>
+          <div class="cond-desc">Employment decisions made through processes that employees perceive as arbitrary, opaque, or inconsistently applied. Distinct from outcome injustice — the organization may make correct decisions through indefensible processes. The research establishes that process justice failure produces organizational commitment decline and turnover intention independent of whether outcomes are actually fair.</div>
+          <div class="prv3-implication">This condition is invisible to standard engagement measurement, which asks about satisfaction with outcomes rather than confidence in processes. The PRV3 diagnostic is positioned to detect it specifically because process perception is measurable through situational questions.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Favoritism Architecture</div>
+          <div class="cond-desc">Confirmed. Procedural injustice is the research mechanism underneath Favoritism Architecture — the perception that advancement processes are not transparent or consistently applied is precisely what the organizational justice literature predicts and measures.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="construct-card">
+    <div class="construct-header">
+      <div class="construct-num">4</div>
+      <div class="construct-title-cell">
+        <div class="construct-label">Research Construct</div>
+        <div class="construct-title">Conservation of Resources Theory</div>
+      </div>
+      <div class="construct-meta">
+        <div class="meta-item"><div class="meta-label">Foundational Research</div><div class="meta-val">Hobfoll (1989)</div></div>
+        <div class="meta-item"><div class="meta-label">Key Principle</div><div class="meta-val">Resource loss spirals — loss begets loss</div></div>
+        <div class="meta-item"><div class="meta-label">One of the most cited</div><div class="meta-val">frameworks in org stress research</div></div>
+      </div>
+    </div>
+    <div class="construct-body">
+      <div class="research-block">
+        <div class="block-label">What the Research Establishes</div>
+        <div class="block-text">People strive to obtain, retain, protect, and foster resources — physical, psychological, social, and material. Resource loss is disproportionately stressful relative to equivalent resource gain. When resource loss occurs, people become more vulnerable to future resource loss because the defensive behaviors they adopt consume additional resources. Loss spirals are self-reinforcing: each loss makes the next loss more likely.</div>
+      </div>
+      <div class="mechanism-block">
+        <div class="block-label">The Mechanism in Organizations</div>
+        <div class="block-text">High performers who are losing resources invisibly adopt high-resource-consuming compensation strategies — working longer, covering for others, masking the cost — that accelerate the resource loss while maintaining visible output. The spiral ends in departure or disability. COR theory predicts that high performers leave first during resource depletion: they have the most options when their resources become unrecoverable.</div>
+      </div>
+    </div>
+    <div class="evidence-bar" style="padding:0 24px 16px;">
+      <div class="evidence-box">
+        <div class="evidence-label">PRV3 Evidence</div>
+        <div class="evidence-text">COR theory predicts that the organization progressively loses its highest performers first during resource depletion conditions — leaving it progressively dependent on employees with fewer alternatives and lower performance ceilings. This is the financial consequence mechanism for Resource Depletion Architecture: not immediate attrition cost, but systematic degradation of the talent pool.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Resource Depletion Architecture</div>
+          <div class="cond-desc">An organizational design that systematically depletes employee resources faster than the organization replenishes them. Not about individual overload or specific bad managers — a fundamentally extractive organizational structure. Roles expand without narrowing. Expectations increase without resource increases. The organization consumes its human capital faster than it generates it.</div>
+          <div class="prv3-implication">Explains why The Squeeze (conference experiment) and Invisible Burnout (exit interview experiment) are not random — they are the predictable outcomes of Resource Depletion Architecture. The research gives the diagnostic the causal explanation the practitioner-facing evidence couldn't provide.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Invisible Burnout</div>
+          <div class="cond-desc">Confirmed. COR theory is the mechanism: high performers adopt high-resource-consuming compensation strategies that maintain visible output while accelerating the underlying resource loss. The compensation strategy is what makes the burnout invisible.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">The Squeeze</div>
+          <div class="cond-desc">Confirmed. COR theory predicts that simultaneous role expansion without resource addition produces a resource loss spiral by structural design — withdrawal from high-risk activities, defensive compliance, eventual departure.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="construct-card">
+    <div class="construct-header">
+      <div class="construct-num">5</div>
+      <div class="construct-title-cell">
+        <div class="construct-label">Research Construct</div>
+        <div class="construct-title">Self-Determination Theory</div>
+      </div>
+      <div class="construct-meta">
+        <div class="meta-item"><div class="meta-label">Foundational Research</div><div class="meta-val">Deci & Ryan (1985)</div></div>
+        <div class="meta-item"><div class="meta-label">Meta-Analysis</div><div class="meta-val">Van den Broeck et al. (2016), n=99 studies</div></div>
+        <div class="meta-item"><div class="meta-label">Three Basic Needs</div><div class="meta-val">Autonomy, Competence, Relatedness</div></div>
+      </div>
+    </div>
+    <div class="construct-body">
+      <div class="research-block">
+        <div class="block-label">What the Research Establishes</div>
+        <div class="block-text">Human motivation and wellbeing depend on satisfaction of three basic psychological needs: autonomy (volitional control), competence (felt effectiveness), and relatedness (connection). Need frustration — the active blocking of these needs — produces burnout, turnover intention, and counterproductive work behavior beyond the effects of need dissatisfaction alone. The distinction between frustration and dissatisfaction is critical for PRV3.</div>
+      </div>
+      <div class="mechanism-block">
+        <div class="block-label">The Mechanism</div>
+        <div class="block-text">Competence frustration — arbitrary or inconsistent performance feedback — shifts motivation from autonomous (I want to do this) to controlled (I have to do this to avoid punishment) to amotivated (I don't believe my effort matters). The amotivated employee is present, delivering minimum required output, and consuming organizational resources without contributing discretionary effort. This shift is stable and self-reinforcing.</div>
+      </div>
+    </div>
+    <div class="evidence-bar" style="padding:0 24px 16px;">
+      <div class="evidence-box">
+        <div class="evidence-label">PRV3 Evidence</div>
+        <div class="evidence-text">SDT research establishes that controlled motivation produces systematically lower performance, creativity, and organizational citizenship behavior than autonomous motivation — even when the controlled and autonomously motivated employees are producing the same observable output. The performance gap is in discretionary effort and innovation, which are unmeasured by most organizational performance systems.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Motivational Architecture Failure</div>
+          <div class="cond-desc">Reward, recognition, and performance management systems have produced a predominantly controlled or amotivated workforce. Not low engagement — a specific psychological condition where the majority of employees either perform to avoid punishment or have stopped believing their effort affects outcomes. Self-reinforcing: organizations with controlled motivation produce more controlling management.</div>
+          <div class="prv3-implication">Explains why engagement survey scores and productivity metrics can look acceptable while the organization is experiencing significant undisclosed performance degradation. The loss is in discretionary effort and innovation — unmeasured by conventional performance systems and therefore invisible until it produces a crisis.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">The Control Culture</div>
+          <div class="cond-desc">Confirmed. SDT establishes that controlling management cultures produce autonomy frustration at scale — the mechanism underneath The Control Culture's organizational outcomes.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Impossible Standard</div>
+          <div class="cond-desc">Confirmed. Competence frustration through inconsistent or arbitrary performance standards is the SDT mechanism that produces amotivation — the endpoint of the Impossible Standard condition.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="construct-card">
+    <div class="construct-header">
+      <div class="construct-num">6</div>
+      <div class="construct-title-cell">
+        <div class="construct-label">Research Construct</div>
+        <div class="construct-title">Social Identity Theory and Organizational Identification</div>
+      </div>
+      <div class="construct-meta">
+        <div class="meta-item"><div class="meta-label">Foundational Research</div><div class="meta-val">Tajfel & Turner (1979)</div></div>
+        <div class="meta-item"><div class="meta-label">Key Insight</div><div class="meta-val">Organizational identity is a source of self-concept</div></div>
+        <div class="meta-item"><div class="meta-label">Implication</div><div class="meta-val">Culture change is identity threat</div></div>
+      </div>
+    </div>
+    <div class="construct-body">
+      <div class="research-block">
+        <div class="block-label">What the Research Establishes</div>
+        <div class="block-text">People derive part of their identity from group memberships and act to maintain positive distinctiveness of those groups. Organizational identification — the degree to which employees define themselves through their organizational membership — predicts organizational citizenship behavior, commitment, and resistance to organizational change. Organizational identification is produced and destroyed by organizational conditions — it is not a stable individual trait.</div>
+      </div>
+      <div class="mechanism-block">
+        <div class="block-label">The Mechanism</div>
+        <div class="block-text">Organizational changes that appear to threaten the organizational identity reduce identification and produce resistance that is rational from the employee's perspective — they are protecting a source of their self-concept. Culture Drift is not just a behavioral change — it is an identity threat. Post-acquisition resistance is not irrational — it is identity-protective behavior. The resistance to change that organizations label as irrational is often a predictable identity-protection response.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Identity Erosion</div>
+          <div class="cond-desc">The organizational identity that employees joined and identified with has changed substantially enough that current employees no longer recognize themselves in the organization's stated identity. Not Culture Drift (behavioral norms) — specifically the core organizational identity: what the organization is for, what it stands for, who it serves. The employees who leave are not just disengaged — they are deidentified.</div>
+          <div class="prv3-implication">Explains the specific mechanism of post-pivot attrition: employees who joined a mission-driven organization that has become commercially-driven are not leaving because of dissatisfaction — they are leaving because the organization no longer provides the identity resource they joined it for. The private output for this condition should name this mechanism directly.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">The Second Close</div>
+          <div class="cond-desc">Confirmed. Social identity research explains why integration efforts that acknowledge and honor the acquired organization's identity succeed more often than those that don't — reducing the identity threat reduces the resistance that produces integration failure.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Change Absorption Failure</div>
+          <div class="cond-desc">Confirmed. The resistance to organizational change that organizations label as irrational is often identity-protective behavior — which means change management that acknowledges identity threat will be more successful than change management that treats resistance as ignorance.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="construct-card">
+    <div class="construct-header">
+      <div class="construct-num">7</div>
+      <div class="construct-title-cell">
+        <div class="construct-label">Research Construct</div>
+        <div class="construct-title">Moral Disengagement</div>
+      </div>
+      <div class="construct-meta">
+        <div class="meta-item"><div class="meta-label">Foundational Research</div><div class="meta-val">Bandura (1999)</div></div>
+        <div class="meta-item"><div class="meta-label">Eight Mechanisms</div><div class="meta-val">Including euphemistic labeling, diffusion of responsibility, dehumanization</div></div>
+        <div class="meta-item"><div class="meta-label">Key Insight</div><div class="meta-val">Produced by organizational conditions, not individual pathology</div></div>
+      </div>
+    </div>
+    <div class="construct-body">
+      <div class="research-block">
+        <div class="block-label">What the Research Establishes</div>
+        <div class="block-text">Moral disengagement comprises eight mechanisms through which individuals disable the self-regulatory processes that normally keep behavior aligned with moral standards. These mechanisms are not individual pathologies — they are produced by organizational conditions. Organizations that structure accountability diffusely, use euphemistic language for harmful practices, and create competitive pressure that makes harmful behavior seem necessary systematically produce moral disengagement across their workforce.</div>
+      </div>
+      <div class="mechanism-block">
+        <div class="block-label">The Mechanism in Organizations</div>
+        <div class="block-text">Sequential Decision Blindness (from the litigation experiment) is explained by the diffusion and displacement of responsibility mechanisms — each decision-maker believes someone else holds the accountability. Normalization Creep is explained by euphemistic labeling and advantageous comparison — harmful behavior is relabeled and compared favorably to worse behavior until it becomes morally invisible. The organizational conditions produce the mechanism; the mechanism produces the behavior.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Organizational Moral Drift</div>
+          <div class="cond-desc">Moral disengagement mechanisms embedded in the organizational culture. The language of the organization has shifted to euphemistically label harmful practices. Responsibility for consequences has been diffused across enough decision-makers that no individual feels accountable. Competitive comparison justifies practices that would otherwise be recognized as harmful. Distinct from Normalization Creep — this is systemic, not behavior-specific.</div>
+          <div class="prv3-implication">The most severe presentation of this condition produces the organizational environment in which whistleblower events, regulatory investigations, and public scandals become inevitable — because the internal moral regulation mechanism has been disabled at the organizational level. Internal Reporting Failure (litigation experiment) is the specific consequence of Organizational Moral Drift at the governance layer.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Sequential Decision Blindness</div>
+          <div class="cond-desc">Confirmed. The diffusion and displacement of responsibility mechanisms explain why no individual in the organization acts with retaliatory intent while the sequence constitutes retaliation. The mechanism is structural, not individual.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Normalization Creep</div>
+          <div class="cond-desc">Confirmed. Euphemistic labeling and advantageous comparison are the Bandura mechanisms that make harmful behavior morally invisible over time — the gradual process the Normalization Creep condition describes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="construct-card">
+    <div class="construct-header">
+      <div class="construct-num">8</div>
+      <div class="construct-title-cell">
+        <div class="construct-label">Research Construct</div>
+        <div class="construct-title">Psychological Contract Theory</div>
+      </div>
+      <div class="construct-meta">
+        <div class="meta-item"><div class="meta-label">Foundational Research</div><div class="meta-val">Rousseau (1989)</div></div>
+        <div class="meta-item"><div class="meta-label">Meta-Analysis</div><div class="meta-val">Zhao et al. (2007), n=51 studies</div></div>
+        <div class="meta-item"><div class="meta-label">Critical Distinction</div><div class="meta-val">Breach (cognitive) vs. violation (emotional)</div></div>
+      </div>
+    </div>
+    <div class="construct-body">
+      <div class="research-block">
+        <div class="block-label">What the Research Establishes</div>
+        <div class="block-text">The psychological contract — the individual employee's beliefs about the terms of the reciprocal exchange with their employer — produces more severe responses when violated than formal contract violations, because the violation involves perceived betrayal rather than legal dispute. Psychological contract breach predicts organizational citizenship behavior decline, job satisfaction decline, and organizational commitment decline.</div>
+      </div>
+      <div class="mechanism-block">
+        <div class="block-label">The Critical Distinction for PRV3</div>
+        <div class="block-text">The research distinguishes breach (cognitive recognition that a promise hasn't been kept) from violation (emotional experience of betrayal). Organizations that acknowledge breach produce breach without violation. Organizations that are silent about unmet commitments produce violation. The most damaging psychological contract violations are not the largest breaches but the unacknowledged ones — because silence converts breach into violation. An organization that acknowledges and explains produces breach. Silence produces violation.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Unacknowledged Breach</div>
+          <div class="cond-desc">Promises that haven't been kept are not acknowledged by the organization. Not deliberate deception — the organization doesn't have a mechanism for recognizing when it has made commitments it isn't fulfilling, or for communicating proactively when circumstances prevent fulfillment. Silence converts breach into violation. The most damaging psychological contract violations are not the largest breaches but the unacknowledged ones.</div>
+          <div class="prv3-implication">Explains why organizations that are "doing their best" in difficult circumstances still lose employees to trust collapse. The employees are experiencing violation, not breach — because the organization hasn't acknowledged what it couldn't deliver. The private output for this condition should distinguish the two: what you did isn't necessarily what damaged the relationship. What you didn't say is.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Psychological Contract Violation</div>
+          <div class="cond-desc">Confirmed across exit interview and Glassdoor experiments. The research adds the mechanism: felt violation (emotional betrayal) is the mediating variable — not the size of the breach but the organization's response to it.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Trust Collapse</div>
+          <div class="cond-desc">Confirmed. Trust Collapse is the accumulated endpoint of repeated Unacknowledged Breach — each silence compounds until the threshold where cognitive reassessment of the relationship produces the calm, resolved departure the exit interview experiment described.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="construct-card">
+    <div class="construct-header">
+      <div class="construct-num">9</div>
+      <div class="construct-title-cell">
+        <div class="construct-label">Research Construct</div>
+        <div class="construct-title">Organizational Learning and Deutero-Learning</div>
+      </div>
+      <div class="construct-meta">
+        <div class="meta-item"><div class="meta-label">Foundational Research</div><div class="meta-val">Argyris & Schön (1978)</div></div>
+        <div class="meta-item"><div class="meta-label">Key Distinction</div><div class="meta-val">Single-loop vs. double-loop vs. deutero-learning</div></div>
+        <div class="meta-item"><div class="meta-label">Implication</div><div class="meta-val">Framework errors require double-loop correction</div></div>
+      </div>
+    </div>
+    <div class="construct-body">
+      <div class="research-block">
+        <div class="block-label">What the Research Establishes</div>
+        <div class="block-text">Single-loop learning detects and corrects errors within existing frameworks. Double-loop learning questions the frameworks themselves when error-correction fails. Organizations incapable of double-loop learning cannot resolve fundamental dysfunctions — because fundamental dysfunctions are the product of the frameworks themselves. The organization keeps applying the same wrong solution because it cannot question the framework producing the need for a solution.</div>
+      </div>
+      <div class="mechanism-block">
+        <div class="block-label">The Mechanism</div>
+        <div class="block-text">Organizations that can only single-loop learn produce a specific observable pattern: persistent organizational problems that are recognized, addressed, and re-emerge unchanged. Each intervention is within the framework that generates the problem — so the problem recurs. The organization experiences this as implementation failure. It is actually framework failure. The distinction matters enormously for the resolution path: framework problems require framework change, not better implementation of the existing framework.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Learning Architecture Failure</div>
+          <div class="cond-desc">The organization has no reliable mechanism for questioning its own frameworks when those frameworks produce persistent failure. It can correct errors (single-loop). It cannot question whether the framework producing the errors should be changed (double-loop). Produces persistent organizational problems that are recognized, addressed, and re-emerge unchanged — because each solution is within the framework generating the problem.</div>
+          <div class="prv3-implication">This condition explains why many organizations that know they have a problem cannot resolve it. The resolution path isn't "try harder" or "implement better" — it's "change the framework." The PRV3 diagnostic is positioned to name this distinction explicitly in the private output, which most consulting interventions fail to do.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Change Absorption Failure</div>
+          <div class="cond-desc">Confirmed and extended. Change Absorption Failure may be a single-loop learning problem (the change management approach is wrong) or a double-loop learning problem (the framework for organizational change is wrong). The distinction determines the resolution path. Argyris and Schön give the diagnostic the precision to tell them apart.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Recidivism Risk</div>
+          <div class="cond-desc">Confirmed. Recidivism Risk is a specific manifestation of single-loop learning failure — the organization corrected the claim outcome (settled) without questioning the framework (organizational culture, HR practices, management accountability) that produced the claim.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="construct-card">
+    <div class="construct-header">
+      <div class="construct-num">10</div>
+      <div class="construct-title-cell">
+        <div class="construct-label">Research Construct</div>
+        <div class="construct-title">Organizational Resilience and High Reliability</div>
+      </div>
+      <div class="construct-meta">
+        <div class="meta-item"><div class="meta-label">Foundational Research</div><div class="meta-val">Weick & Sutcliffe (2001)</div></div>
+        <div class="meta-item"><div class="meta-label">Source Organizations</div><div class="meta-val">Nuclear plants, aircraft carriers, air traffic control</div></div>
+        <div class="meta-item"><div class="meta-label">Five HRO Characteristics</div><div class="meta-val">Preoccupation with failure, reluctance to simplify, sensitivity to operations, commitment to resilience, deference to expertise</div></div>
+      </div>
+    </div>
+    <div class="construct-body">
+      <div class="research-block">
+        <div class="block-label">What the Research Establishes</div>
+        <div class="block-text">High Reliability Organizations operate with minimal failure despite high complexity and high risk because of five specific characteristics. The absence of each characteristic maps to specific organizational conditions already in the PRV3 taxonomy: Preoccupation with failure absent → Normalization Creep. Reluctance to simplify absent → Strategic Credibility Loss. Sensitivity to operations absent → Executive Reality Gap. Deference to expertise absent → The Founder's Grip.</div>
+      </div>
+      <div class="mechanism-block">
+        <div class="block-label">The Mechanism</div>
+        <div class="block-text">Organizations that don't treat near-misses as seriously as failures accumulate risk silently — the near-misses that would have triggered corrective action go unaddressed until they produce the full failure event. Organizations that simplify complex situations apply simple solutions to problems that require nuanced responses. The HRO framework describes the specific organizational architecture that prevents failure propagation — and its absence describes the architecture that allows it.</div>
+      </div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Resilience Architecture Gap</div>
+          <div class="cond-desc">The organization has no reliable mechanism for detecting, containing, and recovering from failure before it becomes catastrophic. It recovers from each failure. It doesn't learn from them in ways that reduce future failure probability. Each recovery is a complete reconstruction from zero. The financial consequence is compounding: organizations pay the full cost of each failure rather than the reduced cost of a system designed to contain and learn from failure.</div>
+          <div class="prv3-implication">This condition explains why some organizations are perpetually in crisis — not because their leaders are incompetent but because the organization lacks the architectural capacity to convert failure experience into failure prevention. The distinction between an organization that is unlucky and one that has a Resilience Architecture Gap is detectable through the PRV3 instrument's governance and process questions.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Across Multiple States</div>
+          <div class="cond-name">HRO Absence Maps to Existing States</div>
+          <div class="cond-desc">Preoccupation with failure absent → Normalization Creep and Recidivism Risk confirmed. Sensitivity to operations absent → Executive Reality Gap and Information Suppression Cascade confirmed. Deference to expertise absent → The Founder's Grip confirmed. Reluctance to simplify absent → Strategic Credibility Loss and Learning Architecture Failure confirmed.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="synthesis-rule">
+
+  <div class="validation-section">
+    <div class="validation-label">Cross-Experiment Validation — Final Summary</div>
+    <div class="validation-grid">
+      <div class="validation-item">
+        <div class="vi-count">8</div>
+        <div class="vi-label">Original PRV3 states confirmed by research literature — every existing state has a research mechanism that explains why it persists</div>
+      </div>
+      <div class="validation-item">
+        <div class="vi-count">72+</div>
+        <div class="vi-label">New state candidates surfaced across all seven experiments — now reduced through consolidation to approximately 35-40 distinct conditions</div>
+      </div>
+      <div class="validation-item">
+        <div class="vi-count">5</div>
+        <div class="vi-label">Conditions confirmed by four or more independent experiments: AI Governance Failure, Performative Equity, The Inclusion Gap, Organizational Deafness, Psychological Safety Collapse</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="synthesis-head">
+    <div class="synthesis-title">New State Candidates — Experiment 7</div>
+    <div class="synthesis-sub">10 new candidates — each with a research-established causal mechanism</div>
+  </div>
+
+  <div class="candidates-grid">
+
+    <div class="nc">
+      <div class="nc-num">Candidate 01</div>
+      <div class="nc-construct">From: Role Ambiguity and Role Conflict</div>
+      <div class="nc-name">Role Clarity Deficit</div>
+      <div class="nc-desc">Neither the employee nor their manager can specify with precision what the employee is supposed to do, how performance will be evaluated, or what authority they have to act. Systemic — produced by restructuring without role redefinition.</div>
+      <div class="nc-prv3">Research basis: Gilboa et al. (2008) — role ambiguity reduces performance by 12–15% across the affected population. Quantifiable without organizational self-reporting.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 02</div>
+      <div class="nc-construct">From: Psychological Safety</div>
+      <div class="nc-name">Information Suppression Cascade</div>
+      <div class="nc-desc">Low psychological safety has propagated upward through the management hierarchy so that information reaching senior leadership is systematically filtered. Each layer has learned not to surface problems. The Executive Reality Gap is the senior leadership experience of this condition.</div>
+      <div class="nc-prv3">Research basis: Edmondson (1999) — psychological safety is produced by leader behavior and spreads through contagion. The cascade is a measurable organizational phenomenon, not a vague culture problem.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 03</div>
+      <div class="nc-construct">From: Organizational Justice</div>
+      <div class="nc-name">Process Justice Failure</div>
+      <div class="nc-desc">Employment decisions made through processes that employees perceive as arbitrary, opaque, or inconsistently applied. Distinct from outcome injustice — the organization may make correct decisions through indefensible processes. Process perception predicts commitment more strongly than outcome fairness.</div>
+      <div class="nc-prv3">Research basis: Cohen-Charash & Spector (2001) — injustice predicts turnover intention more strongly than job satisfaction or pay satisfaction across 190 studies. Process justice failure is invisible to standard engagement measurement.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 04</div>
+      <div class="nc-construct">From: Conservation of Resources Theory</div>
+      <div class="nc-name">Resource Depletion Architecture</div>
+      <div class="nc-desc">An organizational design that systematically depletes employee resources faster than the organization replenishes them. Roles expand without narrowing. Expectations increase without resource increases. A fundamentally extractive organizational structure.</div>
+      <div class="nc-prv3">Research basis: Hobfoll (1989) — COR theory predicts that high performers leave first during resource depletion, leaving the organization progressively dependent on employees with fewer alternatives and lower performance ceilings.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 05</div>
+      <div class="nc-construct">From: Self-Determination Theory</div>
+      <div class="nc-name">Motivational Architecture Failure</div>
+      <div class="nc-desc">Reward, recognition, and performance management systems have produced a predominantly controlled or amotivated workforce. Not low engagement — a specific psychological condition where most employees either perform to avoid punishment or have stopped believing their effort affects outcomes.</div>
+      <div class="nc-prv3">Research basis: Van den Broeck et al. (2016) — need frustration predicts burnout and counterproductive behavior beyond the effects of need dissatisfaction. The performance loss is in discretionary effort and innovation — unmeasured by conventional performance systems.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 06</div>
+      <div class="nc-construct">From: Social Identity Theory</div>
+      <div class="nc-name">Identity Erosion</div>
+      <div class="nc-desc">The organizational identity that employees joined and identified with has changed substantially enough that current employees no longer recognize themselves in the organization's stated identity. The employees who leave are deidentified, not disengaged — a meaningful distinction for the resolution path.</div>
+      <div class="nc-prv3">Research basis: Tajfel & Turner (1979) — organizational identification is produced and destroyed by organizational conditions. Deidentification produces the specific attrition pattern of calm, resolved departure without anger — the Trust Collapse exit profile.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 07</div>
+      <div class="nc-construct">From: Moral Disengagement</div>
+      <div class="nc-name">Organizational Moral Drift</div>
+      <div class="nc-desc">Moral disengagement mechanisms embedded in the organizational culture. Euphemistic language. Diffused responsibility. Advantageous comparison. The organization's decision-making culture has incorporated moral disengagement as its operating mode. Distinct from Normalization Creep — this is systemic, not behavior-specific.</div>
+      <div class="nc-prv3">Research basis: Bandura (1999) — moral disengagement is produced by organizational conditions, not individual pathology. Organizations that structure accountability diffusely systematically produce it. Internal Reporting Failure is its governance-layer consequence.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 08</div>
+      <div class="nc-construct">From: Psychological Contract Theory</div>
+      <div class="nc-name">Unacknowledged Breach</div>
+      <div class="nc-desc">Promises that haven't been kept are not acknowledged. The organization doesn't have a mechanism for recognizing commitments it isn't fulfilling or communicating proactively when circumstances prevent fulfillment. Silence converts breach into violation. The most damaging violations are not the largest breaches but the unacknowledged ones.</div>
+      <div class="nc-prv3">Research basis: Rousseau (1989), Zhao et al. (2007) — felt violation (emotional betrayal) mediates the relationship between breach and organizational outcomes. The organization can produce Trust Collapse without malicious intent simply through the absence of acknowledgment.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 09</div>
+      <div class="nc-construct">From: Organizational Learning</div>
+      <div class="nc-name">Learning Architecture Failure</div>
+      <div class="nc-desc">The organization can correct errors (single-loop learning) but cannot question whether the framework producing the errors should be changed (double-loop learning). Produces persistent organizational problems that are recognized, addressed, and re-emerge unchanged — because each solution is within the framework generating the problem.</div>
+      <div class="nc-prv3">Research basis: Argyris & Schön (1978) — framework problems require framework change, not better implementation. This condition explains why organizations that know they have a problem cannot resolve it — they keep implementing solutions within the wrong framework.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 10</div>
+      <div class="nc-construct">From: High Reliability Organizations</div>
+      <div class="nc-name">Resilience Architecture Gap</div>
+      <div class="nc-desc">The organization has no reliable mechanism for detecting, containing, and recovering from failure before it becomes catastrophic. Each recovery is a complete reconstruction from zero rather than an improvement on a resilient system. The financial consequence compounds: full cost of each failure rather than the reduced cost of a failure-containing system.</div>
+      <div class="nc-prv3">Research basis: Weick & Sutcliffe (2001) — the five HRO characteristics are specific and measurable organizational design features. Their absence is detectable through the PRV3 instrument's governance and process questions without requiring self-report of failure history.</div>
+    </div>
+
+  </div>
+
+  <div class="synthesis-head">
+    <div class="synthesis-title">The Explanatory Layer</div>
+    <div class="synthesis-sub">Research mechanisms that explain why existing conditions persist</div>
+  </div>
+
+  <table class="explanatory-table">
+    <thead>
+      <tr>
+        <th>Existing State / Condition</th>
+        <th>Why It Persists — Research Mechanism</th>
+        <th>Research Basis</th>
+        <th>PRV3 Implication</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>The Unformed Leader</td>
+        <td>Role clarity deficit cascades downward — the unformed leader produces role ambiguity in the employee below, not just ineffective management above. The condition reproduces itself.</td>
+        <td>Kahn et al. (1964) role ambiguity cascade</td>
+        <td>The resolution path must address both the formation deficit and the downstream role clarity deficit it produced</td>
+      </tr>
+      <tr>
+        <td>The Untouchable</td>
+        <td>Moral disengagement through displacement of responsibility — the organization collectively displaces accountability for the untouchable's behavior. Psychological safety collapse makes naming the condition dangerous.</td>
+        <td>Bandura (1999), Edmondson (1999)</td>
+        <td>The private output should name both mechanisms — the political protection and the psychological safety condition that makes challenging it costly</td>
+      </tr>
+      <tr>
+        <td>Silosolation</td>
+        <td>Role conflict between competing organizational identities — each silo has developed a distinct organizational identity. Integration efforts threaten that identity, producing resistance that social identity theory predicts and explains.</td>
+        <td>Tajfel & Turner (1979), Misaligned incentives research</td>
+        <td>Silosolation resolution that doesn't address the identity dimension of siloed functions will fail — the resistance is identity-protective, not merely self-interested</td>
+      </tr>
+      <tr>
+        <td>The Founder's Grip</td>
+        <td>Deference to expertise absent by design — authority concentrated by rank rather than expertise. Single-loop learning only — the framework (founder authority) cannot be questioned without the double-loop capacity that founder governance systematically prevents.</td>
+        <td>Weick & Sutcliffe (2001), Argyris & Schön (1978)</td>
+        <td>Succession planning for Founder's Grip must include double-loop learning capacity — otherwise the successor inherits the framework without the learning architecture to change it</td>
+      </tr>
+      <tr>
+        <td>Change Absorption Failure</td>
+        <td>Identity threat produces identity-protective resistance. Single-loop implementation of double-loop framework problems. Psychological contract breach accumulates with each failed initiative.</td>
+        <td>Tajfel & Turner (1979), Argyris & Schön (1978), Rousseau (1989)</td>
+        <td>The private output should distinguish whether this is an implementation problem (single-loop) or a framework problem (double-loop) — the resolution path is categorically different</td>
+      </tr>
+      <tr>
+        <td>Culture Drift</td>
+        <td>Identity erosion — the behavioral drift is also an identity drift. Employees who joined a specific organizational identity experience culture drift as deidentification, not just dissatisfaction. The emotional response is more severe than engagement models predict.</td>
+        <td>Tajfel & Turner (1979)</td>
+        <td>Culture restoration efforts that don't acknowledge the identity dimension will address the behavioral symptoms without resolving the underlying deidentification</td>
+      </tr>
+      <tr>
+        <td>The Exposed</td>
+        <td>Resource depletion cascade — the HR absence depletes the resources of adjacent functions who absorb the work, who then become more vulnerable to their own resource depletion events.</td>
+        <td>Hobfoll (1989) COR theory</td>
+        <td>The resolution for The Exposed must include monitoring the resource depletion in adjacent functions — the financial cost extends beyond the HR function itself</td>
+      </tr>
+      <tr>
+        <td>Trust Collapse</td>
+        <td>Accumulated unacknowledged breach — the threshold is crossed by the weight of unaddressed violations, not by a single large event. Silence converts breach into violation; violation accumulates until the psychological reassessment of the relationship produces deidentification.</td>
+        <td>Rousseau (1989), Zhao et al. (2007)</td>
+        <td>Trust Collapse is preceded by Unacknowledged Breach — the diagnostic should detect the precursor state before the threshold is crossed</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="synthesis-head">
+    <div class="synthesis-title">Key Findings for PRV3</div>
+  </div>
+
+  <div class="findings-grid">
+    <div class="finding">
+      <div class="finding-title">The research literature provides the "why" that makes the private output a verdict</div>
+      <div class="finding-text">Every other experiment produced observable conditions. This experiment produced explanatory mechanisms — the causal architecture underneath the observable conditions. The private output that says "here is what's happening" is a diagnosis. The private output that says "here is what's happening, here is why it persists, and here is what it will cost if it continues" is a verdict. The organizational psychology literature gives PRV3 the explanatory layer that produces verdicts rather than diagnoses.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">The distinction between breach and violation is the most precise finding for output design</div>
+      <div class="finding-text">Rousseau's research on psychological contract theory produces a distinction with direct output design implications: organizations that acknowledge what they haven't delivered produce breach. Organizations that are silent produce violation. The private output for Unacknowledged Breach should make this explicit — the injury is not what you didn't do, it's what you didn't say. This is the most precise finding in the series for the magnanimous but unflinching voice.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">Single-loop vs. double-loop learning explains the most frustrating organizational pattern</div>
+      <div class="finding-text">Organizations that know they have a problem and cannot resolve it are almost always applying single-loop solutions to double-loop problems. They keep implementing better versions of the wrong approach. The Learning Architecture Failure condition and the Argyris and Schön framework give the PRV3 diagnostic the precision to name this specifically — which is the most valuable thing the private output can do for a leader who has already tried and failed to fix the condition.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">Five conditions are now confirmed by four or more independent experiments</div>
+      <div class="finding-text">AI Governance Failure, Performative Equity, The Inclusion Gap, Organizational Deafness, and Psychological Safety Collapse have been confirmed independently by tool analysis, Glassdoor reviews, exit interviews, conference themes, litigation data, insurance underwriting, and organizational psychology research. These five conditions have the strongest multi-methodology validation in the taxonomy. They should be the first to receive complete dimensional profiles, severity specifications, and financial consequence narratives for the PRV3 output architecture.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px; padding:18px 24px; background:var(--indigo); color:#1a1a4a; font-size:11px; line-height:1.8; display:flex; justify-content:space-between; align-items:center;">
+    <span><span style="color:#a0a0e8; font-weight:600; letter-spacing:0.05em;">PRINCIPAL RESOLUTION</span> &nbsp;·&nbsp; Experiment 7 of 7: Organizational Psychology Literature Review &nbsp;·&nbsp; PRV3 State Taxonomy Research &nbsp;·&nbsp; April 2026</span>
+    <span style="color:#2a2a6a;">Final Experiment — Series Complete</span>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 5 — Insurance Claims and Risk Data</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f0f4f0;
+    --surface: #fafcfa;
+    --surface2: #edf1ed;
+    --border: #d4dbd4;
+    --border-dark: #a8b8a8;
+    --ink: #141a14;
+    --muted: #5a6a5a;
+    --dim: #90a090;
+    --teal: #1a4d40;
+    --teal-light: #edf7f4;
+    --teal-border: #80c8b8;
+    --navy: #1a2d4d;
+    --navy-light: #edf1f8;
+    --navy-border: #80a0c8;
+    --new: #2d4d1a;
+    --new-bg: #f0f7e8;
+    --new-border: #90c870;
+    --confirm: #1a3060;
+    --confirm-bg: #e8f0f8;
+    --confirm-border: #80a8d0;
+    --gold: #8b7020;
+    --gold-light: #faf6e0;
+    --gold-border: #c8b060;
+    --amber: #7a4010;
+    --actuarial: #2d4a3a;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    background: var(--ink);
+    padding: 56px 64px 48px;
+    position: relative;
+  }
+
+  .masthead-stripe {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--teal) 0%, #2d8060 50%, var(--teal) 100%);
+  }
+
+  .eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #3a4a3a;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 54px);
+    font-weight: 700;
+    line-height: 1.05;
+    color: #e8f0e8;
+    margin-bottom: 20px;
+  }
+
+  h1 em { font-style: italic; color: #60c890; }
+
+  .masthead-sub {
+    font-size: 13px;
+    color: #4a5a4a;
+    font-weight: 300;
+    line-height: 1.8;
+    max-width: 680px;
+    margin-bottom: 32px;
+  }
+
+  .actuarial-note {
+    background: rgba(26,77,64,0.2);
+    border: 1px solid rgba(26,77,64,0.4);
+    border-left: 3px solid #40c880;
+    padding: 12px 16px;
+    max-width: 680px;
+    margin-bottom: 36px;
+    font-size: 12px;
+    color: #60c890;
+    line-height: 1.6;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  .masthead-stats {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    padding-top: 28px;
+    border-top: 1px solid #202820;
+  }
+
+  .ms { display: flex; flex-direction: column; gap: 4px; }
+  .ms-n {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 700;
+    color: #60c890;
+    line-height: 1;
+  }
+  .ms-l {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #2a3a2a;
+    font-weight: 600;
+  }
+
+  /* PAGE */
+  .page { max-width: 1120px; margin: 0 auto; padding: 52px 64px 80px; }
+
+  /* INSURANCE LINE CARDS */
+  .line-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .line-header {
+    display: grid;
+    grid-template-columns: 8px 1fr 220px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    min-height: 80px;
+  }
+
+  .line-stripe { background: var(--teal); }
+
+  .line-title-cell {
+    padding: 18px 22px;
+    border-right: 1px solid var(--border);
+  }
+
+  .line-label {
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--teal);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .line-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .line-market {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .market-item { display: flex; flex-direction: column; gap: 2px; }
+  .market-label {
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+  }
+  .market-val {
+    font-size: 12px;
+    color: var(--teal);
+    font-weight: 500;
+  }
+
+  .line-body {
+    padding: 24px;
+  }
+
+  .underwriting-note {
+    background: var(--teal-light);
+    border: 1px solid var(--teal-border);
+    border-left: 3px solid var(--teal);
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 12.5px;
+    color: var(--teal);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .underwriting-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--teal);
+    font-weight: 600;
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+
+  /* RISK FACTOR BLOCKS */
+  .risk-factors {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .risk-factor {
+    background: #f8fcf8;
+    border: 1px solid var(--border);
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 200px 1fr 160px;
+    gap: 16px;
+  }
+
+  .rf-factor {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .rf-condition {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .rf-premium {
+    font-size: 11px;
+    color: var(--amber);
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: right;
+  }
+
+  .rf-header {
+    background: var(--ink);
+    display: grid;
+    grid-template-columns: 200px 1fr 160px;
+    gap: 16px;
+    padding: 8px 16px;
+    margin-bottom: 2px;
+  }
+
+  .rfh-cell {
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #404840;
+    font-weight: 600;
+  }
+
+  .rfh-cell:last-child { text-align: right; }
+
+  /* CONDITIONS SURFACED */
+  .conditions-section {
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+    margin-top: 4px;
+  }
+
+  .conditions-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .conditions-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+  }
+
+  .cond {
+    padding: 12px 14px;
+    border: 1px solid;
+    border-left-width: 3px;
+  }
+
+  .cond-new { border-color: var(--new-border); background: var(--new-bg); border-left-color: var(--new); }
+  .cond-confirm { border-color: var(--confirm-border); background: var(--confirm-bg); border-left-color: var(--confirm); }
+
+  .cond-badge {
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  .cond-new .cond-badge { color: var(--new); }
+  .cond-confirm .cond-badge { color: var(--confirm); }
+
+  .cond-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 5px;
+    line-height: 1.2;
+  }
+
+  .cond-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.55;
+    font-weight: 300;
+  }
+
+  /* CROSS-LINE SECTION */
+  .cross-line {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--teal);
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+
+  .cross-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--teal);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .cross-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .cross-item {
+    border-left: 2px solid var(--teal-border);
+    padding-left: 16px;
+  }
+
+  .cross-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .cross-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* SUMMARY */
+  .summary-rule { border: none; border-top: 2px solid var(--teal); margin: 52px 0 32px; }
+
+  .summary-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 28px;
+  }
+
+  .summary-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .summary-sub { font-size: 11px; color: var(--muted); }
+
+  .candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .nc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--new);
+    padding: 20px;
+  }
+
+  .nc-num {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    color: var(--new);
+    margin-bottom: 8px;
+    opacity: 0.7;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .nc-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .nc-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+
+  .nc-dim {
+    font-size: 9px;
+    color: var(--dim);
+    margin-bottom: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .nc-premium {
+    padding: 8px 10px;
+    background: var(--gold-light);
+    border: 1px solid var(--gold-border);
+    font-size: 11px;
+    color: var(--amber);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* PREMIUM IMPACT TABLE */
+  .premium-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 36px;
+    font-size: 12px;
+  }
+
+  .premium-table thead th {
+    background: var(--teal);
+    color: var(--teal-light);
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .premium-table tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+    font-weight: 300;
+    color: var(--muted);
+  }
+
+  .premium-table tbody td:first-child {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    width: 220px;
+  }
+
+  .premium-table tbody td:last-child {
+    color: var(--teal);
+    font-weight: 500;
+    font-size: 11px;
+    width: 160px;
+  }
+
+  .premium-table tbody tr:nth-child(even) td { background: var(--surface2); }
+
+  /* FINDINGS */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 22px;
+  }
+
+  .finding-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .finding-text {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  @media (max-width: 800px) {
+    .masthead { padding: 40px 20px; }
+    .page { padding: 32px 20px; }
+    .line-header { grid-template-columns: 6px 1fr; }
+    .line-market { display: none; }
+    .risk-factor { grid-template-columns: 1fr; }
+    .rf-header { display: none; }
+    .cross-grid { grid-template-columns: 1fr; }
+    .findings-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-stripe"></div>
+  <div class="eyebrow">Principal Resolution — PRV3 Research // Experiment 5 of 7</div>
+  <h1>Insurance Claims<br>&amp; <em>Risk Data</em></h1>
+  <p class="masthead-sub">The actuarial lens. Where litigation data tells you what happened after the organization failed, insurance data tells you what the industry has calculated will happen — probability, frequency, and severity assessed across thousands of organizations and millions of claim events. Actuaries don't have opinions. They have loss ratios.</p>
+  <div class="actuarial-note">If a risk category exists in the underwriting framework, it's because enough organizations with that condition produced enough losses to make the category financially meaningful. Insurance underwriting criteria are the most forward-looking diagnostic lens in the series — they identify conditions the organization has now that will produce claims later.</div>
+  <div class="masthead-stats">
+    <div class="ms"><span class="ms-n">5</span><span class="ms-l">Insurance Lines</span></div>
+    <div class="ms"><span class="ms-n">10</span><span class="ms-l">New Candidates</span></div>
+    <div class="ms"><span class="ms-n">14</span><span class="ms-l">States Confirmed</span></div>
+    <div class="ms"><span class="ms-n">$4B+</span><span class="ms-l">EPLI Annual Premium</span></div>
+    <div class="ms"><span class="ms-n">$20B</span><span class="ms-l">D&O Global Premium</span></div>
+    <div class="ms"><span class="ms-n">$50B</span><span class="ms-l">Workers Comp Annual</span></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- LINE 1: EPLI -->
+  <div class="line-card">
+    <div class="line-header">
+      <div class="line-stripe"></div>
+      <div class="line-title-cell">
+        <div class="line-label">Insurance Line 01</div>
+        <div class="line-title">Employment Practices Liability Insurance (EPLI)</div>
+      </div>
+      <div class="line-market">
+        <div class="market-item"><div class="market-label">Annual Premium (US)</div><div class="market-val">$4B+ (2023)</div></div>
+        <div class="market-item"><div class="market-label">Growth 2010–2023</div><div class="market-val">$1.5B → $4B+</div></div>
+        <div class="market-item"><div class="market-label">Coverage Scope</div><div class="market-val">Discrimination, harassment, wrongful termination, retaliation</div></div>
+      </div>
+    </div>
+    <div class="line-body">
+      <div class="underwriting-note">
+        <div class="underwriting-label">Actuarial Significance</div>
+        EPLI underwriters assess risk across standard factors refined through decades of claims experience. The factors producing the highest premium loads are confirmed predictors of claim frequency and severity — not assumptions, but observed correlations across thousands of organizations. What underwriters charge for, organizations have proven they should be charged for.
+      </div>
+
+      <div class="rf-header">
+        <div class="rfh-cell">Underwriting Risk Factor</div>
+        <div class="rfh-cell">Organizational Condition Underneath</div>
+        <div class="rfh-cell">Premium Impact</div>
+      </div>
+      <div class="risk-factors">
+        <div class="risk-factor">
+          <div class="rf-factor">Employee handbook currency — outdated or not reviewed by employment counsel</div>
+          <div class="rf-condition">Policy Currency Gap — employment policies that were once compliant and have drifted as the legal environment evolved around them. The organization didn't decide to become non-compliant. It just stopped updating.</div>
+          <div class="rf-premium">Significant load — evidence of non-monitoring of compliance obligations</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">Supervisor training frequency — no documented annual training on employment law</div>
+          <div class="rf-condition">Confirms The Unformed Leader and Manager Legal Overreach — both already in the taxonomy. The absence of training documentation is the actuarial signal that manager-level decisions are being made without legal framework.</div>
+          <div class="rf-premium">Moderate load — supervisor decisions are the primary claim generator</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">Prior claims history — one or more EPLI claims in the past 5 years</div>
+          <div class="rf-condition">Recidivism Risk — the root cause of a prior claim was not addressed after resolution. The manager who created the environment was not removed. The system that produced the claim was not changed. Prior claims predict future claims because the condition persists.</div>
+          <div class="rf-premium">Dramatic load — strongest single predictor of future claims</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">Separation process documentation — no termination checklists or RIF protocols</div>
+          <div class="rf-condition">Confirms The Uninitiated and Invisible Performance Management. Absence of documented separation protocols is the actuarial signal that terminations will be indefensible when challenged.</div>
+          <div class="rf-premium">Moderate load — separations without process produce the majority of wrongful termination claims</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">Voluntary turnover rate above industry benchmark</div>
+          <div class="rf-condition">Attrition as Risk Signal — high voluntary turnover is a leading indicator for EPLI claims. The conditions producing the departures are the same conditions producing the claims. Turnover is not just an operational cost; it is an actuarially confirmed risk signal.</div>
+          <div class="rf-premium">Load applied — actuarial correlation between above-benchmark turnover and claim frequency confirmed across portfolio</div>
+        </div>
+      </div>
+
+      <div class="conditions-section">
+        <div class="conditions-label">New Conditions Surfaced</div>
+        <div class="conditions-row">
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Policy Currency Gap</div>
+            <div class="cond-desc">Employment policies compliant at creation and drifted as law changed around them. Not Compliance Normalization (knowing tolerance) — this is organizational neglect of the monitoring obligation.</div>
+          </div>
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Recidivism Risk</div>
+            <div class="cond-desc">Root cause of a prior claim not addressed after resolution. The strongest single actuarial predictor of future claims. The organization settled. The condition persists. The next claim is already forming.</div>
+          </div>
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Attrition as Risk Signal</div>
+            <div class="cond-desc">Above-benchmark voluntary turnover as an actuarially confirmed predictor of EPLI claim frequency. Not just an operational cost — a risk indicator that the employment relationship conditions are claim-producing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINE 2: D&O -->
+  <div class="line-card">
+    <div class="line-header">
+      <div class="line-stripe" style="background:#1a2d4d;"></div>
+      <div class="line-title-cell">
+        <div class="line-label" style="color:#1a2d4d;">Insurance Line 02</div>
+        <div class="line-title">Directors and Officers Liability (D&O)</div>
+      </div>
+      <div class="line-market">
+        <div class="market-item"><div class="market-label">Global Annual Premium</div><div class="market-val">~$20B (2023)</div></div>
+        <div class="market-item"><div class="market-label">Growth Driver</div><div class="market-val">ESG / DEI commitment claims</div></div>
+        <div class="market-item"><div class="market-label">New Risk Category</div><div class="market-val">Commitment-outcome gap</div></div>
+      </div>
+    </div>
+    <div class="line-body">
+      <div class="underwriting-note" style="background:var(--navy-light); border-color:var(--navy-border); border-left-color:var(--navy); color:var(--navy);">
+        <div class="underwriting-label" style="color:var(--navy);">Actuarial Significance</div>
+        D&O underwriters conduct governance reviews as part of underwriting. The factors producing elevated premiums have been validated across decades of claims experience — they are not theoretical risk factors but observed predictors of director and officer liability events. The newest and fastest-growing D&O risk category: public commitments that organizational performance doesn't match.
+      </div>
+
+      <div class="rf-header">
+        <div class="rfh-cell">Underwriting Risk Factor</div>
+        <div class="rfh-cell">Organizational Condition Underneath</div>
+        <div class="rfh-cell">Premium Impact</div>
+      </div>
+      <div class="risk-factors">
+        <div class="risk-factor">
+          <div class="rf-factor">Governance structure quality — weak board oversight, absent audit committees, unclear executive authority</div>
+          <div class="rf-condition">Governance Architecture Failure — the board and executive oversight structure doesn't match the organization's size, complexity, or risk profile. Distinct from Decision Paralysis — this is board-level oversight structure failure, not operational decision-making failure.</div>
+          <div class="rf-premium">Significant load — governance gaps are the primary predictor of D&O liability events</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">ESG and DEI commitment monitoring — public commitments without documented progress tracking</div>
+          <div class="rf-condition">Commitment-Outcome Gap — extends DEI Accountability Collapse to the board governance level. Public commitments that organizational performance doesn't match create D&O exposure from shareholder derivative suits. The gap between commitment and outcome is increasingly treated as a governance failure.</div>
+          <div class="rf-premium">Rapidly growing load — shareholder derivative suits on DEI commitments are an emerging and confirmed claims category</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">Post-acquisition integration governance — M&A without integration oversight framework</div>
+          <div class="rf-condition">Confirms The Second Close. Acquisitions without governance oversight of integration produce D&O liability when deal value isn't realized and investors pursue derivative claims against directors who approved the transaction without adequate integration planning.</div>
+          <div class="rf-premium">Moderate load — M&A governance gaps correlate with integration failure claims</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">Public narrative alignment — investor and regulatory communications not calibrated against internal reality</div>
+          <div class="rf-condition">Disclosure Misalignment — what the organization tells investors and regulators about its employment practices, culture, and risk management doesn't match what's actually happening internally. Not fraud — a coordination gap between communications and operations that produces D&O liability when investors rely on the public narrative and the internal reality surfaces.</div>
+          <div class="rf-premium">Significant load — securities fraud allegations from disclosure misalignment are among the highest-severity D&O claims</div>
+        </div>
+      </div>
+
+      <div class="conditions-section">
+        <div class="conditions-label">New Conditions Surfaced</div>
+        <div class="conditions-row">
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Governance Architecture Failure</div>
+            <div class="cond-desc">Board and executive oversight structure doesn't match organizational size, complexity, or risk profile. The oversight mechanism that should catch executive failures before they become liability events is absent or inadequate.</div>
+          </div>
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Disclosure Misalignment</div>
+            <div class="cond-desc">Public-facing narrative managed by communications; internal reality managed by operations; insufficient coordination between them. The gap produces D&O liability when investors rely on the narrative and the reality surfaces. Not fraud — a structural coordination failure.</div>
+          </div>
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate — Extends Existing</div>
+            <div class="cond-name">Commitment-Outcome Gap</div>
+            <div class="cond-desc">Extends DEI Accountability Collapse to board governance level. Public DEI commitments without documented progress tracking create shareholder derivative suit exposure. The governance failure is the absence of the monitoring architecture, not the DEI commitment itself.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINE 3: WORKERS COMP -->
+  <div class="line-card">
+    <div class="line-header">
+      <div class="line-stripe" style="background:#4d3a1a;"></div>
+      <div class="line-title-cell">
+        <div class="line-label" style="color:#4d3a1a;">Insurance Line 03</div>
+        <div class="line-title">Workers Compensation and Occupational Health</div>
+      </div>
+      <div class="line-market">
+        <div class="market-item"><div class="market-label">Annual Premium (US)</div><div class="market-val">~$50B</div></div>
+        <div class="market-item"><div class="market-label">Fastest-Growing Category</div><div class="market-val">Occupational stress claims</div></div>
+        <div class="market-item"><div class="market-label">Management Correlation</div><div class="market-val">Confirmed across portfolio</div></div>
+      </div>
+    </div>
+    <div class="line-body">
+      <div class="underwriting-note" style="background:#fdf8f0; border-color:#d4b070; border-left-color:#8b5a1a; color:#5c3a10;">
+        <div class="underwriting-label" style="color:#8b5a1a;">Actuarial Significance</div>
+        Workers comp actuaries have established through large-sample claims analysis that injury rates correlate with management quality. Organizations with lower manager effectiveness scores have higher injury rates — not because managers cause physical injuries, but because management quality affects the organizational culture around safety reporting, near-miss documentation, and hazard identification.
+      </div>
+
+      <div class="rf-header">
+        <div class="rfh-cell">Underwriting Risk Factor</div>
+        <div class="rfh-cell">Organizational Condition Underneath</div>
+        <div class="rfh-cell">Premium Impact</div>
+      </div>
+      <div class="risk-factors">
+        <div class="risk-factor">
+          <div class="rf-factor">Occupational stress claims frequency — above-benchmark mental health claim rates</div>
+          <div class="rf-condition">Confirms Structural Overload, Culture Driven Burnout, The Squeeze, and Invisible Burnout — all already in the taxonomy. Workers comp data adds specific financial consequences: medical costs, temporary disability payments, permanent disability awards, and premium surcharges that persist for years after the claim.</div>
+          <div class="rf-premium">Significant and growing load — fastest-growing claim category in most states</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">Manager effectiveness correlation — manager quality scores predict injury rates</div>
+          <div class="rf-condition">Safety Culture Deficit — management culture produces under-reporting of safety concerns and hazards, which produces higher injury rates, which produces higher workers comp costs. The mechanism is cultural: employees in low-safety-culture organizations don't report near-misses because reporting is not rewarded or is actively discouraged.</div>
+          <div class="rf-premium">Underwriting factor — confirmed predictor of injury frequency across large portfolio</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">Proactive ergonomic program absence — no documented ergonomic assessment process</div>
+          <div class="rf-condition">Reactive Ergonomics — the organization addresses ergonomic hazards after they produce claims rather than before. Actuarial data is consistent: organizations with proactive programs have significantly lower repetitive stress claim rates. The absence of the program converts a preventable cost into a certain one.</div>
+          <div class="rf-premium">Moderate load — repetitive stress is a stable and large claim category</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">Extended workload documentation — evidence of sustained above-capacity demands</div>
+          <div class="rf-condition">Workload-Induced Disability — the organizational condition where workload demands sustained at a level that produces compensable occupational disability. Not burnout that produces departure — burnout that produces a workers comp claim with medical costs, disability payments, and legal obligations around return-to-work accommodation.</div>
+          <div class="rf-premium">Significant load where sustained overload is documented — creates ongoing disability liability</div>
+        </div>
+      </div>
+
+      <div class="conditions-section">
+        <div class="conditions-label">New Conditions Surfaced</div>
+        <div class="conditions-row">
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Safety Culture Deficit</div>
+            <div class="cond-desc">Management culture produces under-reporting of safety concerns and hazards. Employees don't report near-misses because reporting is not rewarded or is discouraged. Higher injury rates follow — not from the hazards themselves but from the reporting culture that leaves them unaddressed.</div>
+          </div>
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Workload-Induced Disability</div>
+            <div class="cond-desc">Sustained workload demands at a level that produces compensable occupational disability. Burnout that produces a workers comp claim rather than a departure. Creates ongoing medical costs, disability payments, and return-to-work accommodation obligations.</div>
+          </div>
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Reactive Ergonomics</div>
+            <div class="cond-desc">Ergonomic hazards addressed after they produce claims rather than before. Actuarially confirmed: proactive programs produce significantly lower claim rates. The absence of the program converts a preventable cost into a certain one — repeatedly.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINE 4: EMPLOYEE BENEFITS -->
+  <div class="line-card">
+    <div class="line-header">
+      <div class="line-stripe" style="background:#2d1a4d;"></div>
+      <div class="line-title-cell">
+        <div class="line-label" style="color:#2d1a4d;">Insurance Line 04</div>
+        <div class="line-title">Employee Benefits Liability</div>
+      </div>
+      <div class="line-market">
+        <div class="market-item"><div class="market-label">EBSA Recovery FY2023</div><div class="market-val">$1.4B for participants</div></div>
+        <div class="market-item"><div class="market-label">Primary Claim Type</div><div class="market-val">Administration errors</div></div>
+        <div class="market-item"><div class="market-label">Key Regulations</div><div class="market-val">ERISA, ACA, COBRA</div></div>
+      </div>
+    </div>
+    <div class="line-body">
+      <div class="underwriting-note" style="background:#f5f0fa; border-color:#b090d0; border-left-color:#4d2d8a; color:#3a1a6a;">
+        <div class="underwriting-label" style="color:#4d2d8a;">Actuarial Significance</div>
+        Benefits liability claims cluster almost exclusively in organizations where benefits administration complexity exceeds administrative capability. The DOL EBSA recovered $1.4 billion for plan participants in FY2023 — largely from administration errors rather than intentional violations. The condition is structural mismatch, not bad faith.
+      </div>
+
+      <div class="conditions-section" style="border-top:none; padding-top:0;">
+        <div class="conditions-label">New Conditions Surfaced</div>
+        <div class="conditions-row">
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Benefits Administration Gap</div>
+            <div class="cond-desc">The complexity of benefit plans offered exceeds the administrative capability of the people managing them. A technical domain variant of Aptitude — Absence. ERISA, ACA, and COBRA obligations missed not from indifference but from capability mismatch.</div>
+          </div>
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Open Enrollment Failure</div>
+            <div class="cond-desc">The Uninitiated applied to benefits administration. A foreseeable high-stakes annual event — open enrollment — occurring without adequate communication, system infrastructure, or administrative support. Produces ERISA liability for enrollment errors, employee harm from coverage gaps, and state insurance regulatory exposure.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINE 5: CYBER / AI -->
+  <div class="line-card">
+    <div class="line-header">
+      <div class="line-stripe" style="background:#1a3d4d;"></div>
+      <div class="line-title-cell">
+        <div class="line-label" style="color:#1a3d4d;">Insurance Line 05</div>
+        <div class="line-title">Cyber Liability and Emerging AI Liability</div>
+      </div>
+      <div class="line-market">
+        <div class="market-item"><div class="market-label">Cyber Premium (2023)</div><div class="market-val">$15B+ (from $2B in 2015)</div></div>
+        <div class="market-item"><div class="market-label">Largest Claim Category</div><div class="market-val">Social engineering / insider</div></div>
+        <div class="market-item"><div class="market-label">AI Liability Status</div><div class="market-val">Emerging separate line</div></div>
+      </div>
+    </div>
+    <div class="line-body">
+      <div class="underwriting-note" style="background:#eef4f8; border-color:#80b0c8; border-left-color:#1a3d4d; color:#1a3d4d;">
+        <div class="underwriting-label" style="color:#1a3d4d;">Actuarial Significance</div>
+        The largest and fastest-growing cyber claim category is not technical — it's human. Phishing, business email compromise, and social engineering account for the majority of cyber losses by dollar value. The organizational condition cyber underwriters assess is cultural, not technical: employee security awareness and the organizational culture around security protocol compliance.
+      </div>
+
+      <div class="rf-header">
+        <div class="rfh-cell">Underwriting Risk Factor</div>
+        <div class="rfh-cell">Organizational Condition Underneath</div>
+        <div class="rfh-cell">Premium Impact</div>
+      </div>
+      <div class="risk-factors">
+        <div class="risk-factor">
+          <div class="rf-factor">Employee security awareness and protocol compliance</div>
+          <div class="rf-condition">Security Culture Gap — security protocols exist and employees don't follow them. The security team built the controls. The organizational culture hasn't internalized the behaviors the controls require. Not a technical failure — a culture failure. Distinct from AI Governance Failure which is about governance infrastructure.</div>
+          <div class="rf-premium">Significant load — human behavior is the primary cyber loss driver regardless of technical infrastructure investment</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">Vendor risk assessment documentation — no formal third-party security review process</div>
+          <div class="rf-condition">Vendor Risk Blindness — risk exposure extends through vendor relationships in ways the organization hasn't mapped or managed. Third-party data breaches are the fastest-growing cyber loss category. The organization outsourced the function without outsourcing accountability for its security.</div>
+          <div class="rf-premium">Growing load — third-party breach frequency increasing as vendor dependencies expand</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">AI governance framework and bias audit documentation</div>
+          <div class="rf-condition">Confirms AI Governance Failure and Algorithmic Accountability Gap from conference and litigation experiments. Now confirmed across three independent experiments — tool analysis, conference themes, employment litigation, and insurance underwriting.</div>
+          <div class="rf-premium">Emerging load — AI-specific underwriting criteria being formalized across major carriers in 2024-2025</div>
+        </div>
+        <div class="risk-factor">
+          <div class="rf-factor">AI operational dependency — AI systems integrated into critical processes without manual fallback</div>
+          <div class="rf-condition">Single Point of AI Failure — the organization has integrated AI tools into critical operational processes without redundancy or manual fallback protocols. When the AI system fails — outage, bias incident, regulatory shutdown — the organization has no alternative process. The Unguarded Function applied to AI-dependent operations.</div>
+          <div class="rf-premium">Emerging and significant load — business interruption from AI dependency is a new and growing claim category</div>
+        </div>
+      </div>
+
+      <div class="conditions-section">
+        <div class="conditions-label">New Conditions Surfaced</div>
+        <div class="conditions-row">
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Security Culture Gap</div>
+            <div class="cond-desc">Security protocols exist; employees don't follow them. The controls are built; the culture hasn't internalized the behaviors the controls require. The largest cyber loss driver is human, not technical.</div>
+          </div>
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Vendor Risk Blindness</div>
+            <div class="cond-desc">Risk exposure extending through vendor relationships in ways the organization hasn't mapped. Functions outsourced without accountability for their security. Third-party breach is the fastest-growing cyber loss category.</div>
+          </div>
+          <div class="cond cond-new">
+            <div class="cond-badge">New Candidate</div>
+            <div class="cond-name">Single Point of AI Failure</div>
+            <div class="cond-desc">AI tools integrated into critical operational processes without redundancy or manual fallback. When the system fails — outage, bias incident, regulatory shutdown — the organization has no alternative process. The Unguarded Function applied to AI-dependent operations.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CROSS-LINE FINDINGS -->
+  <div class="cross-line">
+    <div class="cross-label">Cross-Line Actuarial Findings — What Insurance Data Reveals That Litigation Data Doesn't</div>
+    <div class="cross-grid">
+      <div class="cross-item">
+        <div class="cross-title">Frequency before severity</div>
+        <div class="cross-text">Litigation data captures claims that reached resolution — large enough or clear enough to pursue. Insurance data captures the full distribution including small claims, settled claims, and near-misses. Policy Currency Gap, Recidivism Risk, and Benefits Administration Gap all produce frequent small losses individually not worth litigating but collectively representing significant organizational cost. The actuarial view is more complete.</div>
+      </div>
+      <div class="cross-item">
+        <div class="cross-title">Leading indicators before outcomes</div>
+        <div class="cross-text">Underwriters price risk based on organizational characteristics that precede claims — not on claims already occurred. The factors that predict EPLI claims (handbook currency, training frequency, turnover rate) are organizational conditions that exist before any claim is filed. Insurance underwriting criteria are the most forward-looking diagnostic lens in the series — they identify conditions the organization has now that will produce claims later.</div>
+      </div>
+      <div class="cross-item">
+        <div class="cross-title">Premium cost as certain financial consequence</div>
+        <div class="cross-text">Every organizational condition in insurance underwriting criteria has a premium cost attached — not just a potential claim cost. An organization with inadequate supervisor training pays elevated EPLI premiums every year, regardless of whether a claim materializes. The ongoing premium cost of organizational risk conditions is part of the Patterned Consequence Logic — not just the potential claim value, but the certain annual premium cost the condition produces.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <hr class="summary-rule">
+
+  <div class="summary-head">
+    <div class="summary-title">New State Candidates — Experiment 5</div>
+    <div class="summary-sub">10 new candidates across 5 insurance lines</div>
+  </div>
+
+  <div class="candidates-grid">
+
+    <div class="nc">
+      <div class="nc-num">Candidate 01 — EPLI</div>
+      <div class="nc-name">Policy Currency Gap</div>
+      <div class="nc-desc">Employment policies compliant at creation and drifted as law changed around them. Distinct from Compliance Normalization — this is neglect of the monitoring obligation, not tolerance of known violations.</div>
+      <div class="nc-dim">Authority — Structural / Aptitude — Absence</div>
+      <div class="nc-premium">EPLI premium load: significant. Signal to underwriters that the organization isn't monitoring its own compliance obligations — the same signal that predicts claims.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 02 — EPLI</div>
+      <div class="nc-name">Recidivism Risk</div>
+      <div class="nc-desc">Root cause of a prior claim not addressed after resolution. The strongest single actuarial predictor of future claims. The organization settled. The condition persists. The next claim is already forming.</div>
+      <div class="nc-dim">Attitude — Systemic / Authority — Structural</div>
+      <div class="nc-premium">EPLI premium load: dramatic — strongest single predictor in underwriting models. Prior claim plus unaddressed root cause is the highest-risk combination in the portfolio.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 03 — EPLI</div>
+      <div class="nc-name">Attrition as Risk Signal</div>
+      <div class="nc-desc">Above-benchmark voluntary turnover as an actuarially confirmed predictor of EPLI claim frequency. Not just an operational cost — a risk signal that the employment relationship conditions are claim-producing.</div>
+      <div class="nc-dim">Attitude — Systemic / Alliance — Structural</div>
+      <div class="nc-premium">EPLI premium load: applied on above-benchmark turnover. The operational cost of attrition and the insurance cost of the underlying condition are both direct financial consequences.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 04 — D&O</div>
+      <div class="nc-name">Governance Architecture Failure</div>
+      <div class="nc-desc">Board and executive oversight structure doesn't match organizational size, complexity, or risk profile. The board-level oversight mechanism that should catch executive failures before they become liability events is absent or inadequate.</div>
+      <div class="nc-dim">Authority — Structural</div>
+      <div class="nc-premium">D&O premium load: significant — governance gaps are the primary predictor of director and officer liability events across the portfolio.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 05 — D&O</div>
+      <div class="nc-name">Disclosure Misalignment</div>
+      <div class="nc-desc">Public-facing narrative managed by communications; internal reality managed by operations; insufficient coordination between them. The gap produces D&O liability when investors rely on the narrative and the internal reality surfaces.</div>
+      <div class="nc-dim">Authority — Structural / Attitude — Systemic</div>
+      <div class="nc-premium">D&O premium load: significant — securities fraud allegations from disclosure misalignment are among the highest-severity D&O claims. No fraud required — a coordination gap is sufficient.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 06 — Workers Comp</div>
+      <div class="nc-name">Safety Culture Deficit</div>
+      <div class="nc-desc">Management culture produces under-reporting of safety concerns and hazards. Employees don't report near-misses because reporting is not rewarded or actively discouraged. Higher injury rates follow — not from hazards themselves but from the culture that leaves them unaddressed.</div>
+      <div class="nc-dim">Attitude — Systemic / Alliance — Structural</div>
+      <div class="nc-premium">Workers comp premium load: confirmed actuarial predictor. Experience modification factor increases for organizations with above-benchmark injury rates driven by safety culture gaps.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 07 — Workers Comp</div>
+      <div class="nc-name">Workload-Induced Disability</div>
+      <div class="nc-desc">Sustained workload demands at a level that produces compensable occupational disability. Burnout that produces a workers comp claim rather than a departure — with ongoing medical costs, disability payments, and return-to-work accommodation obligations.</div>
+      <div class="nc-dim">Authority — Structural / Aptitude — Systemic</div>
+      <div class="nc-premium">Workers comp premium load: significant where sustained overload is documented. Creates ongoing disability liability plus experience modification factor increase for subsequent years.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 08 — Benefits</div>
+      <div class="nc-name">Benefits Administration Gap</div>
+      <div class="nc-desc">The complexity of benefit plans offered exceeds the administrative capability of the people managing them. ERISA, ACA, and COBRA obligations missed not from indifference but from structural capability mismatch.</div>
+      <div class="nc-dim">Aptitude — Absence / Authority — Structural</div>
+      <div class="nc-premium">EBSA recovered $1.4B for plan participants in FY2023 — largely from administration errors. Benefits liability premium load applied where documentation of administrative protocols is absent.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 09 — Cyber</div>
+      <div class="nc-name">Security Culture Gap</div>
+      <div class="nc-desc">Security protocols exist; employees don't follow them. The controls are built; the culture hasn't internalized the behaviors the controls require. The largest cyber loss driver is human, not technical.</div>
+      <div class="nc-dim">Attitude — Systemic / Alliance — Structural</div>
+      <div class="nc-premium">Cyber premium load: significant — human behavior is the primary loss driver. Security technology investment without culture investment produces the loss pattern underwriters charge for.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 10 — Cyber / AI</div>
+      <div class="nc-name">Single Point of AI Failure</div>
+      <div class="nc-desc">AI tools integrated into critical operational processes without redundancy or manual fallback. When the system fails — outage, bias incident, regulatory shutdown — the organization has no alternative process. The Unguarded Function for AI-dependent operations.</div>
+      <div class="nc-dim">Authority — Structural / Aptitude — Systemic</div>
+      <div class="nc-premium">Emerging cyber and AI liability premium load — business interruption from AI dependency is a new and growing claim category being priced by major carriers in 2024-2025.</div>
+    </div>
+
+  </div>
+
+  <!-- PREMIUM IMPACT TABLE -->
+  <div class="summary-head">
+    <div class="summary-title">Premium Impact Reference</div>
+    <div class="summary-sub">Insurance cost as ongoing annual financial consequence of organizational conditions</div>
+  </div>
+
+  <table class="premium-table">
+    <thead>
+      <tr>
+        <th>Condition</th>
+        <th>Insurance Line</th>
+        <th>Premium Mechanism</th>
+        <th>Annual Cost Implication</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Policy Currency Gap</td>
+        <td>EPLI</td>
+        <td>Premium load applied at underwriting. Handbook currency is a standard underwriting question — documented gap produces load regardless of claim history.</td>
+        <td>5–15% premium increase above base rate</td>
+      </tr>
+      <tr>
+        <td>Recidivism Risk</td>
+        <td>EPLI</td>
+        <td>Prior claims history is the strongest premium predictor. Each prior claim elevates subsequent renewal premium significantly and persists for 3–5 years.</td>
+        <td>25–100%+ premium increase per prior claim</td>
+      </tr>
+      <tr>
+        <td>Attrition as Risk Signal</td>
+        <td>EPLI</td>
+        <td>Above-benchmark turnover rates applied as risk factor at underwriting. The actuarial correlation between turnover and claim frequency is confirmed across portfolio.</td>
+        <td>Load applied — specific rate organization-dependent</td>
+      </tr>
+      <tr>
+        <td>Governance Architecture Failure</td>
+        <td>D&O</td>
+        <td>Governance review is standard D&O underwriting. Weak governance structure — undefined board oversight, absent audit committees — produces the highest D&O premium loads.</td>
+        <td>Significant load — D&O premiums range from $5K to $1M+ depending on organization size and governance quality</td>
+      </tr>
+      <tr>
+        <td>Safety Culture Deficit</td>
+        <td>Workers Comp</td>
+        <td>Experience modification factor (MOD) increases for organizations with above-benchmark injury rates. MOD directly multiplies base premium — a 1.5 MOD increases premium 50%.</td>
+        <td>MOD surcharge persists 3 years — 10–50%+ premium increase</td>
+      </tr>
+      <tr>
+        <td>Benefits Administration Gap</td>
+        <td>Employee Benefits Liability</td>
+        <td>Premium reflects documented administrative protocol quality. ERISA fiduciary liability coverage rates correlate with documented administration infrastructure.</td>
+        <td>Load applied — benefits liability premium is modest but ERISA correction costs are not</td>
+      </tr>
+      <tr>
+        <td>Security Culture Gap</td>
+        <td>Cyber</td>
+        <td>Employee security awareness assessment is a primary cyber underwriting factor. Organizations without documented security awareness programs pay elevated premiums and face coverage restrictions.</td>
+        <td>15–30% premium increase — plus potential coverage exclusions for social engineering without awareness program documentation</td>
+      </tr>
+      <tr>
+        <td>AI Governance Failure</td>
+        <td>Cyber / AI Liability</td>
+        <td>AI governance documentation is a 2024–2025 emerging underwriting requirement. Organizations without documented AI governance frameworks face emerging coverage restrictions and premium loads.</td>
+        <td>Emerging — loads being established. Coverage may be unavailable without documented governance framework.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- KEY FINDINGS -->
+  <div class="summary-head">
+    <div class="summary-title">Key Findings for PRV3</div>
+  </div>
+
+  <div class="findings-grid">
+    <div class="finding">
+      <div class="finding-title">Insurance adds the certain annual cost to the potential claim cost</div>
+      <div class="finding-text">Previous experiments produced potential financial consequences — what a claim might cost when it materializes. Insurance data produces certain annual financial consequences — what the condition costs in elevated premiums every year, regardless of whether a claim materializes. The Patterned Consequence Logic should include both: the ongoing premium cost the condition produces annually and the claim cost it produces eventually. The combination makes the cost-of-inaction case more complete than either alone.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">Recidivism Risk is the most actionable finding for PRV3's core use case</div>
+      <div class="finding-text">An organization that has had a prior EPLI claim and not addressed the root condition is the highest-risk organization in the underwriting portfolio. It's also exactly the organization that Principal Resolution is most likely to engage with — an organization that has already experienced a consequence and hasn't resolved the condition underneath. The private output for Recidivism Risk should be the most direct in the taxonomy: you have already paid for this condition once. You are paying again in your current premium. The next payment will be larger.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">AI conditions are now confirmed across four independent experiments</div>
+      <div class="finding-text">AI Governance Failure and Algorithmic Accountability Gap have been confirmed by the tool experiment, the conference experiment, the litigation experiment, and now the insurance experiment. Four independent methodologies pointing to the same conditions. This is the strongest cross-validation the series has produced for any single new candidate. Both conditions should be prioritized for full dimensional profiling and severity specification.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">Turnover rate is an actuarially confirmed risk signal — not just an operational cost</div>
+      <div class="finding-text">The Attrition as Risk Signal finding has specific implications for PRV3's financial consequence architecture. Organizations should understand that above-benchmark voluntary turnover doesn't just cost them replacement costs and lost productivity — it costs them in EPLI premium every year, because underwriters have confirmed that the conditions producing the attrition are the same conditions producing the claims. The turnover rate is a leading indicator for EPLI exposure. This is a financial consequence narrative that no other consulting tool has made explicit.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px; padding:18px 24px; background:var(--ink); color:#2a3a2a; font-size:11px; line-height:1.8; display:flex; justify-content:space-between; border-top:4px solid var(--teal);">
+    <span><span style="color:#60c890; font-weight:600; letter-spacing:0.05em;">PRINCIPAL RESOLUTION</span> &nbsp;·&nbsp; Experiment 5 of 7: Insurance Claims &amp; Risk Data &nbsp;·&nbsp; PRV3 State Taxonomy Research &nbsp;·&nbsp; April 2026</span>
+    <span>Internal Document</span>
+  </div>
+
+</div>
+</body>
+</html>

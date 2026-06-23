@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 4 — Consulting Engagement Postmortem Analysis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Mulish:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f0eb;
+    --surface: #fdfaf7;
+    --surface2: #ede8e2;
+    --border: #d8d0c8;
+    --border-dark: #b0a898;
+    --ink: #1c1610;
+    --muted: #6a5e52;
+    --dim: #a09080;
+    --rust: #8b3a1a;
+    --rust-light: #fdf0eb;
+    --rust-border: #d48868;
+    --brown: #5c3a1a;
+    --brown-light: #fdf5ed;
+    --brown-border: #c8a060;
+    --new: #1a4d28;
+    --new-bg: #eef7f0;
+    --new-border: #80c890;
+    --confirm: #1a2d5c;
+    --confirm-bg: #eef1f8;
+    --confirm-border: #80a0c8;
+    --gold: #8b7020;
+    --gold-light: #faf6e0;
+    --gold-border: #c8b060;
+    --prv3: #2d1a5c;
+    --prv3-light: #f5f0fa;
+    --prv3-border: #b090d0;
+  }
+
+  body {
+    font-family: 'Mulish', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    background: var(--ink);
+    padding: 56px 64px 48px;
+    border-bottom: 3px solid var(--rust);
+  }
+
+  .eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #3a2e24;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(32px, 4.5vw, 58px);
+    font-weight: 400;
+    line-height: 1.05;
+    color: #f0e8e0;
+    margin-bottom: 20px;
+  }
+
+  h1 strong { font-weight: 700; color: #d4907a; }
+
+  .masthead-sub {
+    font-size: 13px;
+    color: #4a3e34;
+    font-weight: 300;
+    line-height: 1.8;
+    max-width: 700px;
+    margin-bottom: 28px;
+  }
+
+  .central-premise {
+    background: rgba(139,58,26,0.12);
+    border: 1px solid rgba(139,58,26,0.25);
+    border-left: 3px solid var(--rust);
+    padding: 14px 18px;
+    max-width: 700px;
+    margin-bottom: 36px;
+    font-size: 13px;
+    color: #c07060;
+    line-height: 1.7;
+    font-weight: 300;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+  }
+
+  .masthead-stats {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    padding-top: 28px;
+    border-top: 1px solid #2a2018;
+  }
+
+  .ms { display: flex; flex-direction: column; gap: 4px; }
+  .ms-n {
+    font-family: 'Fraunces', serif;
+    font-size: 38px;
+    font-weight: 700;
+    color: #d4907a;
+    line-height: 1;
+  }
+  .ms-l {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #2a2018;
+    font-weight: 600;
+  }
+
+  /* PAGE */
+  .page { max-width: 1120px; margin: 0 auto; padding: 52px 64px 80px; }
+
+  /* FAILURE PATTERN CARDS */
+  .pattern-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .pattern-header {
+    display: grid;
+    grid-template-columns: 56px 1fr 200px;
+    border-bottom: 1px solid var(--border);
+    min-height: 80px;
+    background: var(--surface2);
+  }
+
+  .pattern-num {
+    background: var(--rust);
+    color: #fdf0eb;
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pattern-title-cell {
+    padding: 18px 22px;
+    border-right: 1px solid var(--border);
+  }
+
+  .pattern-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    font-weight: 600;
+    margin-bottom: 6px;
+    opacity: 0.8;
+  }
+
+  .pattern-title {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .pattern-meta {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .pm-item { display: flex; flex-direction: column; gap: 2px; }
+  .pm-label { font-size: 7px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--dim); font-weight: 600; }
+  .pm-val { font-size: 11px; color: var(--muted); font-weight: 300; line-height: 1.4; }
+
+  .pattern-body {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .failure-block {
+    background: var(--rust-light);
+    border: 1px solid var(--rust-border);
+    border-left: 3px solid var(--rust);
+    padding: 16px;
+  }
+
+  .reveal-block {
+    background: var(--brown-light);
+    border: 1px solid var(--brown-border);
+    border-left: 3px solid var(--brown);
+    padding: 16px;
+  }
+
+  .block-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .failure-block .block-label { color: var(--rust); }
+  .reveal-block .block-label { color: var(--brown); }
+
+  .block-text {
+    font-size: 12.5px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .failure-block .block-text { color: #5c1a10; }
+  .reveal-block .block-text { color: #4a2a10; }
+
+  .prv3-block {
+    margin: 0 24px 16px;
+    padding: 12px 16px;
+    background: var(--prv3-light);
+    border: 1px solid var(--prv3-border);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .prv3-label {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--prv3);
+    font-weight: 600;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .prv3-text {
+    font-size: 12px;
+    color: var(--prv3);
+    line-height: 1.6;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  .conditions-section {
+    padding: 16px 24px 24px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+
+  .conditions-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .conditions-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+  }
+
+  .cond {
+    padding: 14px 16px;
+    border: 1px solid;
+    border-left-width: 3px;
+  }
+
+  .cond-new { border-color: var(--new-border); background: var(--new-bg); border-left-color: var(--new); }
+  .cond-confirm { border-color: var(--confirm-border); background: var(--confirm-bg); border-left-color: var(--confirm); }
+  .cond-prv3 { border-color: var(--prv3-border); background: var(--prv3-light); border-left-color: var(--prv3); }
+
+  .cond-badge {
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .cond-new .cond-badge { color: var(--new); }
+  .cond-confirm .cond-badge { color: var(--confirm); }
+  .cond-prv3 .cond-badge { color: var(--prv3); }
+
+  .cond-name {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .cond-desc {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* SUMMARY */
+  .summary-rule { border: none; border-top: 2px solid var(--rust); margin: 56px 0 32px; }
+
+  .summary-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 28px;
+  }
+
+  .summary-title {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 700;
+  }
+
+  .summary-sub { font-size: 11px; color: var(--muted); }
+
+  /* POSITIONING SECTION */
+  .positioning-section {
+    background: var(--ink);
+    padding: 32px;
+    margin-bottom: 32px;
+    border-top: 3px solid var(--rust);
+  }
+
+  .pos-label {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #3a2e24;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .pos-title {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: #f0e8e0;
+    line-height: 1.3;
+    margin-bottom: 16px;
+  }
+
+  .pos-title strong { font-weight: 700; color: #d4907a; }
+
+  .pos-text {
+    font-size: 13px;
+    color: #4a3e34;
+    line-height: 1.8;
+    font-weight: 300;
+    max-width: 800px;
+  }
+
+  /* NEW CANDIDATES */
+  .candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .nc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--new);
+    padding: 20px;
+  }
+
+  .nc-priority {
+    border-top-color: var(--prv3);
+  }
+
+  .nc-num {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    color: var(--new);
+    margin-bottom: 6px;
+    opacity: 0.7;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .nc-priority .nc-num { color: var(--prv3); }
+
+  .nc-pattern {
+    font-size: 9px;
+    color: var(--rust);
+    margin-bottom: 6px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .nc-name {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .nc-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+
+  .nc-prv3 {
+    padding: 8px 10px;
+    background: var(--prv3-light);
+    border: 1px solid var(--prv3-border);
+    font-size: 11px;
+    color: var(--prv3);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* SERIES COMPLETE SUMMARY */
+  .series-complete {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+
+  .sc-label {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .sc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .sc-stat { display: flex; flex-direction: column; gap: 6px; }
+
+  .sc-num {
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .sc-label-text {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .sc-note {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+
+  /* FINDINGS */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 22px;
+  }
+
+  .finding-title {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--rust);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .finding-text {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  @media (max-width: 800px) {
+    .masthead { padding: 40px 20px; }
+    .page { padding: 32px 20px; }
+    .pattern-header { grid-template-columns: 48px 1fr; }
+    .pattern-meta { display: none; }
+    .pattern-body { grid-template-columns: 1fr; }
+    .sc-grid { grid-template-columns: 1fr 1fr; }
+    .findings-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">Principal Resolution — PRV3 Research // Experiment 4 of 7 — Final Experiment</div>
+  <h1>Consulting Engagement<br><strong>Postmortem Analysis</strong></h1>
+  <p class="masthead-sub">The most self-referential experiment in the series — and the most directly relevant to Principal Resolution's positioning. Where the other experiments asked "what conditions exist in organizations," this experiment asks "what conditions make organizations unable to resolve their own conditions even with outside help." That's a different question. And the answer is what separates a diagnostic that produces a report from a diagnostic that produces change.</p>
+  <div class="central-premise">If a consulting engagement fails, the reason is almost never that the recommendations were wrong. The reasons are organizational. Understanding those conditions is the most direct path to PRV3's positioning — because the diagnostic that identifies the conditions that block resolution before the engagement begins is worth more than the engagement itself.</div>
+  <div class="masthead-stats">
+    <div class="ms"><span class="ms-n">6</span><span class="ms-l">Failure Patterns</span></div>
+    <div class="ms"><span class="ms-n">12</span><span class="ms-l">New Candidates</span></div>
+    <div class="ms"><span class="ms-n">8</span><span class="ms-l">Existing Confirmed</span></div>
+    <div class="ms"><span class="ms-n">1</span><span class="ms-l">Core PRV3 Value Proposition Named</span></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- PATTERN 1 -->
+  <div class="pattern-card">
+    <div class="pattern-header">
+      <div class="pattern-num">1</div>
+      <div class="pattern-title-cell">
+        <div class="pattern-label">Failure Pattern</div>
+        <div class="pattern-title">The Engagement That Produces a Report Nobody Acts On</div>
+      </div>
+      <div class="pattern-meta">
+        <div class="pm-item"><div class="pm-label">Frequency</div><div class="pm-val">Most common consulting failure mode</div></div>
+        <div class="pm-item"><div class="pm-label">Surface Reason</div><div class="pm-val">"Priorities shifted" / "timing wasn't right"</div></div>
+        <div class="pm-item"><div class="pm-label">Actual Conditions</div><div class="pm-val">3 distinct organizational conditions</div></div>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="failure-block">
+        <div class="block-label">How the Failure Presents</div>
+        <div class="block-text">The engagement is conducted thoroughly. Findings are accurate. Recommendations are sound. The report is delivered. Nothing changes. This failure mode is so common it has produced an entire consulting sub-industry — implementation consulting — whose existence confirms that the gap between recommendation and action is a reliable organizational condition, not an occasional oversight.</div>
+      </div>
+      <div class="reveal-block">
+        <div class="block-label">What It Reveals</div>
+        <div class="block-text">The report-to-action gap almost never results from disagreement with recommendations. In post-engagement interviews, leaders who didn't implement recommendations almost always agree they were right. The gap results from one of three organizational conditions — each distinct, each requiring a different resolution path, each visible to a sufficiently precise diagnostic.</div>
+      </div>
+    </div>
+    <div class="prv3-block">
+      <div class="prv3-label">PRV3 Implication</div>
+      <div class="prv3-text">The PRV3 diagnostic should surface all three conditions before an engagement recommendation is made — because an engagement delivered to an organization in Implementation Courage Deficit will produce the same outcome as every prior engagement they haven't implemented. The diagnostic earns its value before the engagement begins.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Decision Authority Ambiguity</div>
+          <div class="cond-desc">Authority is clear within functions and absent across them. The recommendation requires cross-functional action. Nobody has authority across domains. The recommendation doesn't fail to get decided — it fails to find an owner who can implement it. Distinct from Decision Paralysis — this is cross-functional mandate gap, not general authority ambiguity.</div>
+        </div>
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Recommendation Absorption Deficit</div>
+          <div class="cond-desc">The organization lacks internal capacity to implement the recommendation without continued external involvement. The authority exists. The capability doesn't. Organizations that chronically produce this pattern have substituted external expertise for internal capability development — using consulting to produce outputs they should generate internally.</div>
+        </div>
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate — High Priority</div>
+          <div class="cond-name">Implementation Courage Deficit</div>
+          <div class="cond-desc">The recommendation requires doing something politically difficult or culturally contrary. Leadership knows it. They won't act on it because acting requires confronting something the organization has invested in avoiding. The most common consulting failure mode that practitioners discuss least openly — because it implicates the client rather than the engagement.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATTERN 2 -->
+  <div class="pattern-card">
+    <div class="pattern-header">
+      <div class="pattern-num">2</div>
+      <div class="pattern-title-cell">
+        <div class="pattern-label">Failure Pattern</div>
+        <div class="pattern-title">The Engagement That Gets Cancelled or Descoped</div>
+      </div>
+      <div class="pattern-meta">
+        <div class="pm-item"><div class="pm-label">Surface Reason</div><div class="pm-val">"Budget constraints"</div></div>
+        <div class="pm-item"><div class="pm-label">Timing Signal</div><div class="pm-val">Cancellation follows specific diagnostic event</div></div>
+        <div class="pm-item"><div class="pm-label">Actual Conditions</div><div class="pm-val">3 distinct organizational conditions</div></div>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="failure-block">
+        <div class="block-label">How the Failure Presents</div>
+        <div class="block-text">The engagement begins with broad mandate and genuine organizational commitment. Midway through, scope is reduced, timeline is compressed, or the engagement is terminated before findings are delivered. Budget is the stated reason. The organizational condition is almost never budget alone. The timing of the budget constraint — almost always following a specific diagnostic event — is the signal.</div>
+      </div>
+      <div class="reveal-block">
+        <div class="block-label">What It Reveals</div>
+        <div class="block-text">Cancellation or descoping follows a specific pattern: a difficult interview, an unexpected finding in early data, a preliminary readout that produces discomfort. The budget constraint materializes immediately after that event. This is not coincidence — it is the organization's self-protective response to a diagnostic process that is surfacing something it wasn't prepared to see.</div>
+      </div>
+    </div>
+    <div class="prv3-block">
+      <div class="prv3-label">PRV3 Implication</div>
+      <div class="prv3-text">Anxiety Threshold Breach is the organizational condition that the PRV3 instrument's framing must navigate. A diagnostic that announces its depth of investigation produces higher Anxiety Threshold risk than one that allows the verdict to emerge from the user's own responses. The P-03 principle — questions that observe, users that recognize — is specifically designed to reduce Anxiety Threshold Breach by making the diagnostic feel less threatening than it is.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Anxiety Threshold Breach</div>
+          <div class="cond-desc">The diagnostic process surfaces something the organization wasn't prepared to see. The organization stops the process before findings are formally delivered — to prevent them from becoming organizational knowledge. Distinct from Implementation Courage Deficit (which occurs after delivery) — this occurs before delivery, when the organization senses what the findings will be.</div>
+        </div>
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Leadership Continuity Risk in Change Initiatives</div>
+          <div class="cond-desc">Change initiatives dependent on specific individual champions whose departure terminates the initiative. The organization can start change. It can't sustain change through leadership transition. The new leader inherits an engagement they didn't commission, investigating questions they didn't ask, likely to produce findings that implicate the predecessor.</div>
+        </div>
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Stakeholder Capture</div>
+          <div class="cond-desc">Engagement scope progressively narrowed by stakeholders who perceive findings as threatening. The engagement begins investigating the system; it ends investigating a narrow symptom that doesn't implicate any current power structure. The findings are accurate within their narrowed scope and irrelevant to the actual condition.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATTERN 3 -->
+  <div class="pattern-card">
+    <div class="pattern-header">
+      <div class="pattern-num">3</div>
+      <div class="pattern-title-cell">
+        <div class="pattern-label">Failure Pattern</div>
+        <div class="pattern-title">The Engagement That Produces Change That Doesn't Stick</div>
+      </div>
+      <div class="pattern-meta">
+        <div class="pm-item"><div class="pm-label">Timeline</div><div class="pm-val">Regression at 6–18 months post-engagement</div></div>
+        <div class="pm-item"><div class="pm-label">Surface Reason</div><div class="pm-val">"Leadership attention shifted"</div></div>
+        <div class="pm-item"><div class="pm-label">Most Important Finding</div><div class="pm-val">Structural Reassertion — explains most change failure</div></div>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="failure-block">
+        <div class="block-label">How the Failure Presents</div>
+        <div class="block-text">The engagement is completed. Recommendations are implemented. Behavior changes in the short term. Six to eighteen months later, the organization has returned to its prior condition. Leadership attributes this to implementation failure, consultant quality, or employee resistance. Almost none of these attributions are accurate. The failure is almost always structural.</div>
+      </div>
+      <div class="reveal-block">
+        <div class="block-label">What It Reveals</div>
+        <div class="block-text">Change that doesn't stick fails at one of three layers: the structural layer (systems that govern behavior weren't changed), the cultural layer (norms that govern acceptability weren't changed), or the accountability layer (mechanisms that sustain change weren't built). Of the three, the structural layer is the most common and the least recognized — because structural systems are invisible compared to behavioral change, which is visible and attributable.</div>
+      </div>
+    </div>
+    <div class="prv3-block">
+      <div class="prv3-label">PRV3 Implication</div>
+      <div class="prv3-text">Structural Reassertion explains why most consulting engagements that address behavioral conditions produce temporary results. The PRV3 private output for any condition should include the structural systems that sustain it — not just because this is honest diagnosis, but because naming the structural layer is what makes the resolution path specific enough to produce lasting change.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate — Most Important Finding</div>
+          <div class="cond-name">Structural Reassertion</div>
+          <div class="cond-desc">Organizational systems — performance management, compensation, role design, reporting structures — designed to produce the behaviors the organization is attempting to change. The systems win over time. Without changing the systems, behavioral interventions produce temporary change that the systems absorb and reverse. The mechanism underneath Training-Behavior Gap and Development Without Stakes.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Training-Behavior Gap</div>
+          <div class="cond-desc">Confirmed. The gap exists because structural systems reassert the behaviors they were designed to produce. Coaching operates at the behavioral layer. Structural Reassertion operates at the systems layer. The systems layer always wins over time.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Explains</div>
+          <div class="cond-name">Development Without Stakes</div>
+          <div class="cond-desc">Confirmed. Development without stakes is the specific accountability layer failure — the structural mechanism that would sustain behavior change (consequences for non-change) was never built into the organizational system.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATTERN 4 -->
+  <div class="pattern-card">
+    <div class="pattern-header">
+      <div class="pattern-num">4</div>
+      <div class="pattern-title-cell">
+        <div class="pattern-label">Failure Pattern</div>
+        <div class="pattern-title">The Engagement Where the Findings Are Rejected</div>
+      </div>
+      <div class="pattern-meta">
+        <div class="pm-item"><div class="pm-label">Frequency</div><div class="pm-val">Less common, more instructive</div></div>
+        <div class="pm-item"><div class="pm-label">Surface Reason</div><div class="pm-val">"Methodology was flawed"</div></div>
+        <div class="pm-item"><div class="pm-label">Actual Conditions</div><div class="pm-val">3 distinct organizational conditions</div></div>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="failure-block">
+        <div class="block-label">How the Failure Presents</div>
+        <div class="block-text">The engagement is completed. Findings are delivered. The client organization rejects the findings as inaccurate, biased, or methodologically unsound. Rarely results from actual methodological problems. Findings are rejected when they conflict with the organization's existing understanding of itself — its narrative, its identity, or the self-perception of its leaders.</div>
+      </div>
+      <div class="reveal-block">
+        <div class="block-label">What It Reveals</div>
+        <div class="block-text">The rejection mechanism is the organizational psychology single-loop learning failure — the organization can accept findings that fit the existing narrative; it cannot accept findings that require the narrative to change. Double-loop learning would require questioning the narrative itself. The organization hasn't developed that capacity. The findings arrive into a narrative that is stronger than the evidence.</div>
+      </div>
+    </div>
+    <div class="prv3-block">
+      <div class="prv3-label">PRV3 Implication</div>
+      <div class="prv3-text">The PRV3 instrument's design specifically reduces Narrative Lock risk — because the user supplies the situational responses and the engine infers the verdict, the user cannot easily reject findings as externally imposed. The verdict emerges from the user's own language embedded precisely in the output. This is the P-02 principle — a verdict the user was circling without landing on — working as a defense against Narrative Lock.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Narrative Lock</div>
+          <div class="cond-desc">The organization's dominant internal narrative about its own culture, leadership quality, and organizational health is too strongly held to be updated by contradicting evidence. The findings don't change the narrative — the narrative absorbs the findings as a methodology artifact. Single-loop self-perception applied to organizational identity.</div>
+        </div>
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Diagnostic Fatigue</div>
+          <div class="cond-desc">Sufficient prior diagnostic and consulting processes without outcomes have produced a cultural immune response. The findings arrive into a culture that has learned findings don't produce action. The cultural expectation becomes self-fulfilling. Recidivism Risk expressed as a cultural condition rather than a claims pattern.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms and Extends</div>
+          <div class="cond-name">The Untouchable (as Leader Fragility)</div>
+          <div class="cond-desc">Confirmed. When findings implicate a specific leader with sufficient organizational standing to reject them without consequence, The Untouchable condition is operating at the diagnostic level — the same political insulation that protects behavior protects against accountability for that behavior when named externally.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATTERN 5 -->
+  <div class="pattern-card">
+    <div class="pattern-header">
+      <div class="pattern-num">5</div>
+      <div class="pattern-title-cell">
+        <div class="pattern-label">Failure Pattern</div>
+        <div class="pattern-title">The Engagement That Succeeds in the Wrong Place</div>
+      </div>
+      <div class="pattern-meta">
+        <div class="pm-item"><div class="pm-label">Recognition</div><div class="pm-val">Least recognized as a failure</div></div>
+        <div class="pm-item"><div class="pm-label">Most Important Finding</div><div class="pm-val">Presenting Complaint Displacement — names PRV3's core value</div></div>
+        <div class="pm-item"><div class="pm-label">PRV3 Relevance</div><div class="pm-val">Highest of any failure pattern</div></div>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="failure-block">
+        <div class="block-label">How the Failure Presents</div>
+        <div class="block-text">The engagement produces change in the area investigated and misses the actual condition the organization needed to address. The organization presents with a leadership problem; the root condition is structural. The engagement addresses the leadership. The structure continues producing leadership failures. New leaders exhibit the same behaviors as their predecessors. The organization concludes it hired wrong again.</div>
+      </div>
+      <div class="reveal-block">
+        <div class="block-label">What It Reveals</div>
+        <div class="block-text">The presenting complaint and the root condition are in different locations. The displacement follows predictable patterns: organizations present with leadership problems when the root condition is structural; they present with culture problems when the root condition is incentive misalignment; they present with communication problems when the root condition is psychological safety collapse. The pattern is not random — it is systematic.</div>
+      </div>
+    </div>
+    <div class="prv3-block">
+      <div class="prv3-label">PRV3 Core Value Proposition</div>
+      <div class="prv3-text">The PRV3 diagnostic is specifically designed to resolve Presenting Complaint Displacement — to reach the root condition rather than the presenting complaint. Every other consulting service addresses the presenting complaint. PRV3 addresses the condition underneath it. This is the most precise statement of PRV3's positioning advantage that the series has produced.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-prv3">
+          <div class="cond-badge">PRV3 Core Value — New Candidate</div>
+          <div class="cond-name">Presenting Complaint Displacement</div>
+          <div class="cond-desc">The presenting complaint that brings an organization to seek help is systematically displaced from the root condition producing it. The organization has correctly identified that something is wrong. It has incorrectly identified what that thing is. The displacement follows predictable patterns: leadership problems mask structural conditions; culture problems mask incentive misalignment; communication problems mask psychological safety collapse.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms Across Multiple States</div>
+          <div class="cond-name">Displacement Patterns Confirmed</div>
+          <div class="cond-desc">The Unformed Leader is frequently the presenting complaint when Structural Reassertion is the root condition. Silosolation is frequently the presenting complaint when Misaligned Incentives is the root condition. The Fracture is frequently the presenting complaint when Organizational Moral Drift is the root condition. The taxonomy now has both the presenting complaint and the root condition for each pattern.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATTERN 6 -->
+  <div class="pattern-card">
+    <div class="pattern-header">
+      <div class="pattern-num">6</div>
+      <div class="pattern-title-cell">
+        <div class="pattern-label">Failure Pattern</div>
+        <div class="pattern-title">The Engagement That Succeeds and Produces No Lasting Organizational Learning</div>
+      </div>
+      <div class="pattern-meta">
+        <div class="pm-item"><div class="pm-label">Recognition</div><div class="pm-val">Recognized as success — isn't</div></div>
+        <div class="pm-item"><div class="pm-label">Long-term Outcome</div><div class="pm-val">Same or related condition reproduced in time</div></div>
+        <div class="pm-item"><div class="pm-label">PRV3 Positioning</div><div class="pm-val">Diagnostic Dependency names the opportunity</div></div>
+      </div>
+    </div>
+    <div class="pattern-body">
+      <div class="failure-block">
+        <div class="block-label">How the Failure Presents</div>
+        <div class="block-text">The engagement succeeds. The presenting condition is resolved. The organization returns to its prior operating mode and, in time, reproduces the same or a related condition. The organization commissions another engagement. The cycle repeats. Each engagement addresses a symptom. The organizational condition that produces the symptoms — the absence of internal diagnostic capability — is never addressed because it is never named.</div>
+      </div>
+      <div class="reveal-block">
+        <div class="block-label">What It Reveals</div>
+        <div class="block-text">Engagements that succeed without producing organizational learning share one characteristic: the organization outsourced the diagnostic work rather than developing internal diagnostic capability. The condition was resolved by an external party. The organization didn't develop the capacity to detect the condition earlier, address it with its own resources, or prevent its recurrence. The engagement produced a solution. It didn't produce a learning architecture.</div>
+      </div>
+    </div>
+    <div class="prv3-block">
+      <div class="prv3-label">PRV3 Long-term Positioning</div>
+      <div class="prv3-text">The PRV3 diagnostic, properly understood, is the instrument that begins to resolve Diagnostic Dependency — not by replacing consulting but by giving the organization a more precise understanding of its own condition than it would have developed without the instrument. The diagnostic that helps an organization understand itself more precisely is worth more over time than the diagnostic that produces a one-time report. The instrument's long-term value compounds as the organization's self-diagnostic capability improves.</div>
+    </div>
+    <div class="conditions-section">
+      <div class="conditions-label">Conditions Surfaced</div>
+      <div class="conditions-row">
+        <div class="cond cond-new">
+          <div class="cond-badge">New Candidate</div>
+          <div class="cond-name">Diagnostic Dependency</div>
+          <div class="cond-desc">The organization has become dependent on external diagnosis to understand its own organizational health. Not because internal capability doesn't exist — because it has never been developed. Every prior diagnostic process was outsourced. The organization has no mechanism for generating the organizational self-knowledge that would make external diagnosis less necessary — and less expensive.</div>
+        </div>
+        <div class="cond cond-confirm">
+          <div class="cond-badge">Confirms from Org Psych Experiment</div>
+          <div class="cond-name">Learning Architecture Failure</div>
+          <div class="cond-desc">Confirmed. Diagnostic Dependency is Learning Architecture Failure applied specifically to organizational health diagnosis. The organization lacks the double-loop learning capacity to develop internal diagnostic capability from its consulting engagement experiences.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POSITIONING SECTION -->
+  <div class="positioning-section">
+    <div class="pos-label">The Core PRV3 Value Proposition — Named</div>
+    <div class="pos-title">Every other consulting service addresses<br>the <strong>presenting complaint.</strong><br>PRV3 addresses the <strong>condition underneath it.</strong></div>
+    <div class="pos-text">This statement emerges directly from the Presenting Complaint Displacement finding. Organizations present with leadership problems when the root condition is structural. They present with culture problems when the root condition is incentive misalignment. They present with communication problems when the root condition is psychological safety collapse. The presenting complaint is what they can see and name. The root condition is what the PRV3 diagnostic reaches.<br><br>The consulting engagement that addresses the presenting complaint produces improvement that doesn't last — because the root condition continues producing presenting complaints. The diagnostic that names the root condition produces a resolution path that the organization can pursue with confidence that they are addressing the right thing. That is the value PRV3 produces that no other instrument in the market produces with the same precision.</div>
+  </div>
+
+  <!-- SERIES COMPLETE -->
+  <hr class="summary-rule">
+
+  <div class="series-complete">
+    <div class="sc-label">Seven Experiments Complete — Series Summary</div>
+    <div class="sc-grid">
+      <div class="sc-stat">
+        <div class="sc-num">7</div>
+        <div class="sc-label-text">Experiments completed across independent methodological lenses</div>
+      </div>
+      <div class="sc-stat">
+        <div class="sc-num">8</div>
+        <div class="sc-label-text">Original PRV3 states confirmed by multiple independent experiments</div>
+      </div>
+      <div class="sc-stat">
+        <div class="sc-num">~80</div>
+        <div class="sc-label-text">New state candidates surfaced across all seven experiments before consolidation</div>
+      </div>
+      <div class="sc-stat">
+        <div class="sc-num">5</div>
+        <div class="sc-label-text">Conditions confirmed by four or more independent experiments — the highest-confidence new candidates</div>
+      </div>
+    </div>
+    <div class="sc-note">The seven experiments covered: HR Strategic Tool Analysis (bottom-up signal vocabulary), Glassdoor & Indeed Review Clustering (employee voice at departure), Exit Interview Pattern Analysis (the distortion layer), Employment Litigation Taxonomy (financial consequence precision), Insurance Claims & Risk Data (actuarial leading indicators), HR Conference Theme Analysis (practitioner concerns), and Organizational Psychology Literature Review (causal mechanisms). Each experiment produced independent evidence. Together they form the most comprehensive organizational condition taxonomy in the PRV3 development record. The next step is consolidation — reducing approximately 80 raw candidates to a working taxonomy of 20-30 named states with dimensional profiles, severity specifications, and financial consequence narratives.</div>
+  </div>
+
+  <!-- NEW CANDIDATES -->
+  <div class="summary-head">
+    <div class="summary-title">New State Candidates — Experiment 4</div>
+    <div class="summary-sub">12 new candidates from 6 failure patterns</div>
+  </div>
+
+  <div class="candidates-grid">
+
+    <div class="nc">
+      <div class="nc-num">Candidate 01</div>
+      <div class="nc-pattern">From: Report Nobody Acts On</div>
+      <div class="nc-name">Decision Authority Ambiguity</div>
+      <div class="nc-desc">Authority clear within functions, absent across them. Cross-functional recommendations fail to find an owner who can implement them. Distinct from Decision Paralysis — this is cross-functional mandate gap, not general authority ambiguity.</div>
+      <div class="nc-prv3">PRV3 diagnostic question design: "When a recommendation requires action from multiple functions simultaneously, who is responsible for coordinating that action?" The answer locates the condition precisely.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 02</div>
+      <div class="nc-pattern">From: Report Nobody Acts On</div>
+      <div class="nc-name">Recommendation Absorption Deficit</div>
+      <div class="nc-desc">The organization lacks internal capacity to implement external recommendations without continued external involvement. The authority exists. The capability doesn't. Organizations that chronically produce this pattern have substituted external expertise for internal capability development.</div>
+      <div class="nc-prv3">Financial consequence: organizations with this condition pay full consulting fees repeatedly for conditions they could address internally if they had developed the capability. The ongoing consulting spend is the measurable annual cost.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 03 — High Priority</div>
+      <div class="nc-pattern">From: Report Nobody Acts On</div>
+      <div class="nc-name">Implementation Courage Deficit</div>
+      <div class="nc-desc">The recommendation requires doing something politically difficult or culturally contrary. Leadership knows it. They won't act because acting requires confronting something the organization has invested in avoiding. The most common consulting failure mode that practitioners discuss least openly.</div>
+      <div class="nc-prv3">The private output for this condition must be the most direct in the taxonomy. The leader already knows what needs to be done. The diagnostic's job is to name the avoidance, not the action.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 04</div>
+      <div class="nc-pattern">From: Cancelled or Descoped</div>
+      <div class="nc-name">Anxiety Threshold Breach</div>
+      <div class="nc-desc">The diagnostic process surfaces something the organization wasn't prepared to see — and the organization stops the process before findings become organizational knowledge. Distinct from Implementation Courage Deficit: this occurs before delivery, when the organization senses what the findings will be.</div>
+      <div class="nc-prv3">PRV3's P-03 principle — questions that observe, users that recognize — is specifically designed to reduce Anxiety Threshold Breach by making the diagnostic feel less threatening than it is.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 05</div>
+      <div class="nc-pattern">From: Cancelled or Descoped</div>
+      <div class="nc-name">Leadership Continuity Risk in Change Initiatives</div>
+      <div class="nc-desc">Change initiatives dependent on specific individual champions whose departure terminates the initiative. The organization can start change. It cannot sustain it through leadership transition. Distinct from the broader Leadership Continuity Risk — specifically about change initiative dependency.</div>
+      <div class="nc-prv3">The diagnostic should identify whether the organization's commitment to resolution is institutional or individual — because individual commitment produces Engagement Pattern 2 when that individual departs.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 06</div>
+      <div class="nc-pattern">From: Cancelled or Descoped</div>
+      <div class="nc-name">Stakeholder Capture</div>
+      <div class="nc-desc">Engagement scope progressively narrowed by stakeholders who perceive findings as threatening to their position, function, or decision history. The engagement begins investigating the system; ends investigating a symptom. Accurate within narrowed scope; irrelevant to actual condition.</div>
+      <div class="nc-prv3">The PRV3 instrument's structured format is a defense against Stakeholder Capture — the scope of the diagnostic is defined by the instrument, not by the stakeholders whose interests would narrow it.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 07 — Most Important</div>
+      <div class="nc-pattern">From: Change That Doesn't Stick</div>
+      <div class="nc-name">Structural Reassertion</div>
+      <div class="nc-desc">Organizational systems — performance management, compensation, role design, reporting structures — designed to produce the behaviors the organization is attempting to change. The systems win over time. Behavioral interventions produce temporary change that structural systems absorb and reverse. The mechanism underneath most consulting change failure.</div>
+      <div class="nc-prv3">Every PRV3 condition's private output should name the structural systems that sustain it — because resolution without addressing the structural layer will produce the same temporary change that most consulting engagements produce. Naming the structural layer is what makes PRV3's resolution path specific enough to last.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 08</div>
+      <div class="nc-pattern">From: Findings Rejected</div>
+      <div class="nc-name">Narrative Lock</div>
+      <div class="nc-desc">The organization's dominant internal narrative about its culture, leadership quality, and organizational health is too strongly held to be updated by contradicting evidence. Findings are absorbed as methodology artifacts rather than organizational truth. Single-loop self-perception applied to organizational identity.</div>
+      <div class="nc-prv3">PRV3's instrument design specifically reduces Narrative Lock risk — the verdict emerges from the user's own responses, making it harder to reject as externally imposed. P-02: a verdict the user was circling without landing on.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 09</div>
+      <div class="nc-pattern">From: Findings Rejected</div>
+      <div class="nc-name">Diagnostic Fatigue</div>
+      <div class="nc-desc">Prior diagnostic and consulting processes without outcomes have produced cultural immunity to diagnostic findings. The findings arrive into a culture that has learned findings don't produce action. The expectation becomes self-fulfilling. Recidivism Risk expressed as a cultural condition rather than a claims pattern.</div>
+      <div class="nc-prv3">The PRV3 private output for organizations with Diagnostic Fatigue should acknowledge the pattern explicitly: "This is not the first time this has been named. The question is why it persists despite being recognized." Magnanimous but unflinching.</div>
+    </div>
+
+    <div class="nc nc-priority">
+      <div class="nc-num">Candidate 10 — Core Value Proposition</div>
+      <div class="nc-pattern">From: Succeeds in Wrong Place</div>
+      <div class="nc-name">Presenting Complaint Displacement</div>
+      <div class="nc-desc">The presenting complaint that brings an organization to seek help is systematically displaced from the root condition producing it. The organization correctly identified that something is wrong. It incorrectly identified what. The displacement follows predictable patterns: leadership problems mask structural conditions; culture problems mask incentive misalignment; communication problems mask psychological safety collapse.</div>
+      <div class="nc-prv3">This is the organizational condition that PRV3's diagnostic architecture is specifically designed to resolve. Every other consulting service addresses the presenting complaint. PRV3 addresses the condition underneath it. This is the most precise statement of PRV3's positioning advantage the series has produced.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 11</div>
+      <div class="nc-pattern">From: No Lasting Learning</div>
+      <div class="nc-name">Diagnostic Dependency</div>
+      <div class="nc-desc">The organization has become dependent on external diagnosis to understand its own organizational health. Not because internal capability doesn't exist — because it has never been developed. Every prior diagnostic process was outsourced. No mechanism exists for generating organizational self-knowledge that would make external diagnosis less necessary.</div>
+      <div class="nc-prv3">The PRV3 diagnostic begins to resolve Diagnostic Dependency — not by replacing consulting but by giving the organization a more precise understanding of its own condition. The instrument's long-term value compounds as organizational self-diagnostic capability improves.</div>
+    </div>
+
+    <div class="nc">
+      <div class="nc-num">Candidate 12</div>
+      <div class="nc-pattern">From: Change That Doesn't Stick</div>
+      <div class="nc-name">Accountability Architecture Gap</div>
+      <div class="nc-desc">Change was implemented without the accountability mechanisms that sustain it. The initiative had energy and leadership attention during implementation. When attention shifted, accountability for sustaining the change evaporated. Change requires ongoing accountability — not just the initial impetus. Distinct from Structural Reassertion — this is the accountability layer failure, not the systems layer failure.</div>
+      <div class="nc-prv3">The Resolution Scope component of the PRV3 shareable output should specify accountability mechanisms alongside the resolution path — because a resolution path without accountability architecture will produce Engagement Pattern 3 regardless of quality.</div>
+    </div>
+
+  </div>
+
+  <!-- KEY FINDINGS -->
+  <div class="summary-head">
+    <div class="summary-title">Key Findings for PRV3</div>
+  </div>
+
+  <div class="findings-grid">
+    <div class="finding">
+      <div class="finding-title">Structural Reassertion is the most important mechanism the series has surfaced</div>
+      <div class="finding-text">Every consulting engagement that produces temporary change and then watches the organization return to its prior condition is encountering Structural Reassertion. The structural systems — performance management, compensation, role design, reporting structures — were designed to produce the behaviors the organization is attempting to change. They are more powerful than any behavioral intervention that doesn't also change the systems. This is the mechanism underneath Training-Behavior Gap, Development Without Stakes, and most change initiative failure. The PRV3 private output for any condition should name the structural systems sustaining it.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">Presenting Complaint Displacement is the most precise statement of PRV3's value</div>
+      <div class="finding-text">The finding that presenting complaints are systematically displaced from root conditions — and that the displacement follows predictable patterns — is the most direct articulation of what PRV3 does that other instruments don't. The organization that presents with a leadership problem and receives leadership coaching is not wrong to want the coaching. It is wrong to expect the coaching to resolve a structural condition. PRV3's value is naming the structural condition before the coaching is commissioned — or before the next engagement is commissioned into the wrong place.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">Implementation Courage Deficit is the condition practitioners discuss least and encounter most</div>
+      <div class="finding-text">The organizational condition where leaders know what needs to be done and don't have the will to do it is the most common consulting failure mode and the least openly discussed — because it implicates the client. The PRV3 private output for this condition must be the most direct in the taxonomy. The leader already knows. The diagnostic's job is to name the avoidance and its cost. This is the magnanimous but unflinching voice doing its defining work.</div>
+    </div>
+    <div class="finding">
+      <div class="finding-title">The series is complete — consolidation is the next step</div>
+      <div class="finding-text">Seven experiments. Approximately 80 raw state candidates before consolidation. Eight original states confirmed by multiple independent methodologies. Five conditions confirmed by four or more experiments. The taxonomy now has the breadth, the financial consequence evidence, the causal mechanisms, and the cross-validation to produce a working set of named states with dimensional profiles and severity specifications. The next session's work is consolidation — reducing the raw candidates to the final taxonomy.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px; padding:18px 24px; background:var(--ink); color:#2a2018; font-size:11px; line-height:1.8; display:flex; justify-content:space-between; border-top:3px solid var(--rust);">
+    <span><span style="color:#d4907a; font-weight:600; letter-spacing:0.05em;">PRINCIPAL RESOLUTION</span> &nbsp;·&nbsp; Experiment 4 of 7: Consulting Engagement Postmortem Analysis &nbsp;·&nbsp; PRV3 State Taxonomy Research &nbsp;·&nbsp; April 2026 &nbsp;·&nbsp; Series Complete</span>
+    <span>Internal Document</span>
+  </div>
+
+</div>
+</body>
+</html>

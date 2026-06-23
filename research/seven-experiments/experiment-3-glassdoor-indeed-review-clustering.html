@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 3 — Glassdoor Review Clustering</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Karla:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #faf8f5;
+    --surface: #ffffff;
+    --border: #e8e3dc;
+    --border-dark: #c8c0b4;
+    --ink: #1c1814;
+    --muted: #6b6560;
+    --dim: #a09890;
+    --new: #2d5a3d;
+    --new-bg: #f0f7f2;
+    --new-border: #a8d4b4;
+    --confirm: #1a3a5c;
+    --confirm-bg: #f0f4f8;
+    --confirm-border: #a0b8d0;
+    --partial: #5c3d1a;
+    --partial-bg: #fdf5ec;
+    --partial-border: #d4a870;
+    --quote-bg: #f5f2ee;
+    --accent: #8b2e1a;
+  }
+
+  body {
+    font-family: 'Karla', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .masthead {
+    background: var(--ink);
+    color: #f5f2ee;
+    padding: 56px 64px 48px;
+  }
+
+  .masthead-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #a09880;
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    color: #f5f2ee;
+  }
+
+  h1 em { font-style: italic; color: #d4a870; }
+
+  .masthead-sub {
+    font-size: 14px;
+    color: #a09880;
+    font-weight: 300;
+    line-height: 1.7;
+    max-width: 680px;
+    margin-bottom: 36px;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    padding-top: 32px;
+    border-top: 1px solid #2e2a24;
+  }
+
+  .stat { display: flex; flex-direction: column; gap: 4px; }
+  .stat-n {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #d4a870;
+    line-height: 1;
+  }
+  .stat-l {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #6b6560;
+    font-weight: 500;
+  }
+
+  .page { max-width: 1100px; margin: 0 auto; padding: 56px 64px 80px; }
+
+  .theme-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .theme-header {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .theme-num {
+    background: var(--ink);
+    color: #d4a870;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    letter-spacing: 0.1em;
+    padding: 20px 0;
+  }
+
+  .theme-title-block {
+    padding: 20px 24px;
+  }
+
+  .theme-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .theme-freq {
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .theme-body { padding: 24px; }
+
+  .quotes-block {
+    background: var(--quote-bg);
+    border-left: 3px solid var(--border-dark);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+
+  .quotes-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .quote-item {
+    font-family: 'Libre Baskerville', serif;
+    font-style: italic;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+
+  .quote-item:last-child { margin-bottom: 0; }
+
+  .condition-block {
+    margin-bottom: 20px;
+  }
+
+  .condition-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .condition-text {
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .verdict-block {
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    border-left: 3px solid;
+  }
+
+  .verdict-new {
+    background: var(--new-bg);
+    border-color: var(--new);
+  }
+
+  .verdict-confirm {
+    background: var(--confirm-bg);
+    border-color: var(--confirm);
+  }
+
+  .verdict-partial {
+    background: var(--partial-bg);
+    border-color: var(--partial);
+  }
+
+  .verdict-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .verdict-new .verdict-label { color: var(--new); }
+  .verdict-confirm .verdict-label { color: var(--confirm); }
+  .verdict-partial .verdict-label { color: var(--partial); }
+
+  .verdict-text {
+    font-size: 12.5px;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .verdict-new .verdict-text { color: var(--new); }
+  .verdict-confirm .verdict-text { color: var(--confirm); }
+  .verdict-partial .verdict-text { color: var(--partial); }
+
+  .name-candidates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .name-tag {
+    padding: 5px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border-dark);
+    font-family: 'Libre Baskerville', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink);
+  }
+
+  .qdp-block {
+    background: #fdf8f2;
+    border: 1px solid #e8d4b0;
+    padding: 14px 16px;
+  }
+
+  .qdp-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #8b6030;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .qdp-text {
+    font-size: 12.5px;
+    color: #5c3d1a;
+    line-height: 1.65;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  /* Summary section */
+  .summary-head {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 16px;
+    margin: 56px 0 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .summary-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 26px;
+    font-weight: 700;
+  }
+
+  .summary-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .summary-card {
+    padding: 24px;
+    border: 1px solid var(--border);
+  }
+
+  .summary-card-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--dim);
+  }
+
+  .summary-card-count {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .summary-card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .new-states-list {
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .new-state-row {
+    display: grid;
+    grid-template-columns: 40px 200px 1fr 140px;
+    border-bottom: 1px solid var(--border);
+    min-height: 52px;
+  }
+
+  .new-state-row:last-child { border-bottom: none; }
+
+  .nsr-num {
+    background: var(--ink);
+    color: #d4a870;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nsr-name {
+    padding: 14px 16px;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+
+  .nsr-desc {
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    font-weight: 300;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+
+  .nsr-dim {
+    padding: 14px 16px;
+    font-size: 10px;
+    color: var(--dim);
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+  }
+
+  .table-header-row {
+    display: grid;
+    grid-template-columns: 40px 200px 1fr 140px;
+    background: var(--ink);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .thr-cell {
+    padding: 10px 16px;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6b6560;
+    font-weight: 600;
+  }
+
+  .finding-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+
+  .finding-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--accent);
+  }
+
+  .finding-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  @media (max-width: 800px) {
+    .page { padding: 32px 20px; }
+    .masthead { padding: 40px 20px; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .new-state-row { grid-template-columns: 1fr; }
+    .table-header-row { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-label">Principal Resolution — PRV3 Research // Experiment 3 of 7</div>
+  <h1>Glassdoor & Indeed<br><em>Review Clustering</em></h1>
+  <p class="masthead-sub">Aggregated employee review language, clustered by the organizational condition the language describes rather than the surface complaint. The unfiltered voice of employees at the moment they stopped caring what the organization thought of them.</p>
+  <div class="stat-row">
+    <div class="stat"><span class="stat-n">14</span><span class="stat-l">Themes Analyzed</span></div>
+    <div class="stat"><span class="stat-n">10</span><span class="stat-l">New State Candidates</span></div>
+    <div class="stat"><span class="stat-n">4</span><span class="stat-l">Existing States Confirmed</span></div>
+    <div class="stat"><span class="stat-n">3</span><span class="stat-l">Partial Matches</span></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- THEME 1 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">01</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"Management doesn't listen"</div>
+        <div class="theme-freq">Frequency: Extremely High — top 3 theme across all industries</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"Leadership is out of touch."</div>
+        <div class="quote-item">"Feedback goes into a black hole."</div>
+        <div class="quote-item">"Town halls are performative."</div>
+        <div class="quote-item">"Nothing ever changes after the survey."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">The organization has built listening infrastructure — surveys, town halls, open door policies — that produces the appearance of listening without the substance of it. The gap between signal collected and signal acted on is the condition. The listening theater is often worse than silence because it creates the expectation of response that is then violated repeatedly.</div>
+      </div>
+      <div class="verdict-block verdict-new">
+        <div class="verdict-label">Taxonomy Verdict — New Candidate</div>
+        <div class="verdict-text">Confirms Organizational Deafness. Distinct from The Untouchable — this is systemic, not concentrated in specific leaders. An organization can have no untouchable individuals and still be organizationally deaf.</div>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">Does your organization regularly collect employee feedback? When it does, how often do you observe visible changes resulting from it? The user recognizes the pattern without knowing what's being measured.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 2 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">02</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"Favoritism and politics over performance"</div>
+        <div class="theme-freq">Frequency: Extremely High — top 5 theme across all industries</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"Who you know matters more than what you do."</div>
+        <div class="quote-item">"Promotions are based on visibility not results."</div>
+        <div class="quote-item">"If you're not in the inner circle you're invisible."</div>
+        <div class="quote-item">"The same people get everything regardless of performance."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">The promotion and recognition architecture has decoupled from performance. Advancement is governed by relationship proximity, visibility to specific decision-makers, and political alignment rather than demonstrated capability or contribution. People who understand this adapt — optimizing for visibility over output. People who don't eventually leave.</div>
+      </div>
+      <div class="verdict-block verdict-new">
+        <div class="verdict-label">Taxonomy Verdict — New Candidate</div>
+        <div class="verdict-text">Partially overlaps with The Founder's Grip (favoritism concentrated around one person) and The Untouchable (political insulation of specific leaders). But favoritism as a systemic promotion architecture — distributed across the leadership layer, not concentrated — is a distinct condition with a different resolution path.</div>
+      </div>
+      <div class="name-candidates">
+        <span class="name-tag">The Invisible Meritocracy</span>
+        <span class="name-tag">The Political Ladder</span>
+        <span class="name-tag">The Insider Track</span>
+        <span class="name-tag">The Visibility Game</span>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">When someone is promoted in your organization, what do colleagues typically attribute the decision to — performance, relationships, visibility, or a combination? The attribution pattern is the diagnostic signal.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 3 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">03</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"No growth or development opportunities"</div>
+        <div class="theme-freq">Frequency: Very High — top exit reason across most industries</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"Dead end job."</div>
+        <div class="quote-item">"Promised development that never materialized."</div>
+        <div class="quote-item">"Managers hoard their best people instead of developing them."</div>
+        <div class="quote-item">"I learned nothing in two years."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition — Two Distinct Sub-Conditions</div>
+        <div class="condition-text">Development Infrastructure Absence — the organization genuinely has no systematic approach to building capability. And Development Promise Violation — the organization described development opportunities in recruiting that don't exist in practice. The second produces faster and more bitter attrition because it involves a broken agreement, not just an absence.</div>
+      </div>
+      <div class="verdict-block verdict-confirm">
+        <div class="verdict-label">Taxonomy Verdict — Confirms Existing + New Candidate</div>
+        <div class="verdict-text">Development Infrastructure Absence confirmed from tool experiment. Development Promise Violation is a new candidate — a trust condition with a specific mechanism, distinct from the structural absence of development. Same surface complaint, different root condition, different resolution path.</div>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">Has your organization made specific commitments to your development that have not been delivered? Was this discussed before you joined or after? The timing is the diagnostic signal — before joining is promise violation, after joining is infrastructure failure.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 4 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">04</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"Work-life balance is nonexistent"</div>
+        <div class="theme-freq">Frequency: Very High — accelerated post-2020</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"They say they value balance but reward overwork."</div>
+        <div class="quote-item">"Heroes are celebrated, sustainability is penalized."</div>
+        <div class="quote-item">"The workload is impossible and nobody acknowledges it."</div>
+        <div class="quote-item">"Burnout is the culture."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">The organization has a stated culture of balance and an operational culture of overwork that coexist without resolution — because the people who model overwork are the people who get promoted. The condition is not the workload. It is the gap between the stated value and the rewarded behavior, specifically around sustainability. This is Culture Drift applied to a specific dimension with enough frequency to warrant its own state.</div>
+      </div>
+      <div class="verdict-block verdict-partial">
+        <div class="verdict-label">Taxonomy Verdict — Partial Match / Extends Existing</div>
+        <div class="verdict-text">Confirms Culture Drift as a new candidate. Also surfaces Sustainability Theater as a specific sub-condition — the organization performs concern for wellbeing while systematically rewarding the opposite. May be a severity variant of Culture Drift or a distinct state in its own right.</div>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">How does your organization respond to leaders who consistently work unsustainable hours — celebrated, cautioned, or treated as neutral? The answer locates the organization on the Culture Drift severity spectrum precisely.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 5 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">05</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"Poor communication from leadership"</div>
+        <div class="theme-freq">Frequency: Very High — consistent across all organization sizes</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"We find out about changes from the rumor mill."</div>
+        <div class="quote-item">"Leadership makes decisions and announces them without explanation."</div>
+        <div class="quote-item">"Strategy is a mystery to everyone below director level."</div>
+        <div class="quote-item">"We're treated like children who can't handle information."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">Information architecture failure. The organization has no systematic approach to communicating decisions, strategy, or change to the people who have to implement them. Distinct from Organizational Deafness — that's downward signal going unheard. This is downward communication going undelivered. Leaders believe they've communicated. Employees experience an information vacuum. The perception gap itself is the diagnostic signal.</div>
+      </div>
+      <div class="verdict-block verdict-new">
+        <div class="verdict-label">Taxonomy Verdict — New Candidate</div>
+        <div class="verdict-text">Distinct from Change Absorption Failure — that condition is about adoption failure. This is about information failure that precedes adoption. An organization can fail at communication without initiating change, and can fail at adoption despite good communication. Two different conditions with overlapping symptoms.</div>
+      </div>
+      <div class="name-candidates">
+        <span class="name-tag">The Information Gap</span>
+        <span class="name-tag">The Closed Door</span>
+        <span class="name-tag">The Vacuum</span>
+        <span class="name-tag">The Rumor Mill</span>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">When your organization makes a significant decision affecting your team, how do you typically learn about it — formal leadership communication, your manager, or informal channels? The routing of information is the diagnostic signal.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 6 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">06</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"Toxic culture / toxic manager"</div>
+        <div class="theme-freq">Frequency: High — most emotionally intense reviews</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"Hostile work environment."</div>
+        <div class="quote-item">"Walking on eggshells."</div>
+        <div class="quote-item">"Bullying is tolerated."</div>
+        <div class="quote-item">"HR did nothing when I reported it."</div>
+        <div class="quote-item">"The culture protects the wrong people."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition — Two Distinct Sub-Conditions</div>
+        <div class="condition-text">Individual toxic leadership — a specific manager whose behavior is harmful and tolerated. And systemic toxicity — harmful behavior distributed across the culture and normalized. The critical diagnostic distinction: "HR did nothing when I reported it" moves this from individual leadership failure to organizational systems failure. That phrase is the signal that separates The Untouchable from something deeper — an organization where protection of bad actors is structural.</div>
+      </div>
+      <div class="verdict-block verdict-partial">
+        <div class="verdict-label">Taxonomy Verdict — Partial Match + New Candidate</div>
+        <div class="verdict-text">Partially confirms The Untouchable. But "HR did nothing" surfaces a distinct new candidate: an organization where accountability infrastructure exists and actively fails — not because it's absent but because it protects the wrong people. This is Misconduct Infrastructure Absence at its most specific presentation.</div>
+      </div>
+      <div class="name-candidates">
+        <span class="name-tag">The Protected Class</span>
+        <span class="name-tag">The Closed System</span>
+        <span class="name-tag">The Captured Function</span>
+        <span class="name-tag">The Silent Partner</span>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">When misconduct or inappropriate behavior is reported in your organization, what typically happens — addressed promptly, addressed inconsistently, rarely addressed, or never addressed? The answer locates the organization on the spectrum between The Untouchable and HR Capture precisely.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 7 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">07</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"Constant change and instability"</div>
+        <div class="theme-freq">Frequency: High — elevated in technology, healthcare, and retail</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"Reorganized every six months."</div>
+        <div class="quote-item">"Strategy changes constantly."</div>
+        <div class="quote-item">"Change fatigue is real — nobody believes anything will stick."</div>
+        <div class="quote-item">"We just implemented this and they're already changing it."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">Change Absorption Failure at its most severe presentation — where accumulated failure of previous change initiatives has produced organizational cynicism so deep that new initiatives fail before they begin. The employees are not resistant to this change. They're responding rationally to a pattern of changes that didn't stick. The condition is not instability — it's the organization's loss of credibility as a change agent with its own people.</div>
+      </div>
+      <div class="verdict-block verdict-new">
+        <div class="verdict-label">Taxonomy Verdict — Confirms New Candidate</div>
+        <div class="verdict-text">Confirms Change Absorption Failure as a distinct state candidate from the tool experiment. The severity spectrum is clear: Emerging is change failing at adoption. Entrenched is burned credibility across multiple initiatives. Endemic is a workforce that has stopped engaging with change as a category — any announcement produces preemptive disengagement.</div>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">When your organization announces a significant new initiative or direction, what is the typical initial reaction from employees — cautious optimism, skeptical wait-and-see, or immediate disengagement? The answer locates the severity tier directly without the user understanding what it's measuring.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 8 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">08</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"Underpaid / not valued"</div>
+        <div class="theme-freq">Frequency: Very High — #1 stated exit reason in most surveys</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"Below market pay."</div>
+        <div class="quote-item">"Discovered my colleagues are paid significantly more for the same work."</div>
+        <div class="quote-item">"They know I'm underpaid and don't care."</div>
+        <div class="quote-item">"The raises are insulting."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">Compensation Incoherence in its most interpersonally experienced form. The financial gap is real. But "they know I'm underpaid and don't care" reveals something more specific: the organization is aware of the inequity and has chosen not to address it. The financial gap is the evidence. The indifference is the injury. These are two different conditions requiring two different diagnoses.</div>
+      </div>
+      <div class="verdict-block verdict-confirm">
+        <div class="verdict-label">Taxonomy Verdict — Confirms Existing + Extends</div>
+        <div class="verdict-text">Confirms Compensation Incoherence from the tool experiment. Also surfaces Compensation Indifference as a distinct Attitude liability condition dressed in compensation language. The diagnostic must distinguish between organizations that don't know they're inequitable and organizations that do know and have not acted. Different states, different resolution paths.</div>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">Has your organization ever acknowledged that your compensation is below market or below peers in similar roles? If yes, what action followed that acknowledgment? The follow-up is more diagnostic than the initial question.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 9 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">09</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"No accountability for poor performers or bad managers"</div>
+        <div class="theme-freq">Frequency: High — strongest predictor of high-performer attrition</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"Mediocre people stay forever."</div>
+        <div class="quote-item">"High performers carry poor performers."</div>
+        <div class="quote-item">"Nothing happens to bad managers."</div>
+        <div class="quote-item">"The same people underperform year after year."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">Unmanaged Underperformance — a distinct condition from The Untouchable. The Untouchable is about leaders politically insulated from accountability for their leadership behavior. This condition is about organizations that systematically fail to manage performance at any level. The accountability mechanism is broken organizationally, not just for specific individuals. The result: high performers carry underperformers, resent the organization for tolerating it, and leave.</div>
+      </div>
+      <div class="verdict-block verdict-new">
+        <div class="verdict-label">Taxonomy Verdict — New Candidate</div>
+        <div class="verdict-text">Partially overlaps with The Untouchable and The Unformed Leader but distinct. Unmanaged Underperformance as a systemic organizational condition — where the performance management architecture has collapsed — produces different observable signals and requires a different resolution path than either existing state.</div>
+      </div>
+      <div class="name-candidates">
+        <span class="name-tag">The Unchecked Floor</span>
+        <span class="name-tag">The Tolerance Norm</span>
+        <span class="name-tag">The Performance Amnesty</span>
+        <span class="name-tag">The Soft Landing</span>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">In your organization, when someone consistently underperforms in their role, what typically happens — active management toward improvement, informal tolerance, or no visible response? The option selected produces the diagnostic signal without revealing the scoring logic.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 10 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">10</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"Micromanagement"</div>
+        <div class="theme-freq">Frequency: High — top 10 theme across all organization sizes</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"Managers don't trust their teams."</div>
+        <div class="quote-item">"No autonomy whatsoever."</div>
+        <div class="quote-item">"Treated like a child."</div>
+        <div class="quote-item">"Manager wants to be CC'd on everything."</div>
+        <div class="quote-item">"Great work means nothing if you didn't follow the exact process."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition — Two Distinct Sub-Conditions</div>
+        <div class="condition-text">Individual manager control behavior — a specific manager whose need for control produces micromanagement regardless of organizational context. And organizational micromanagement culture — where the authority architecture is so centralized that managers can't delegate even when they want to. The first is a leadership formation problem. The second is a structural authority problem. Identical surface complaint, categorically different root conditions.</div>
+      </div>
+      <div class="verdict-block verdict-partial">
+        <div class="verdict-label">Taxonomy Verdict — Maps to Existing + New Candidate</div>
+        <div class="verdict-text">Individual case maps to The Unformed Leader. Structural case maps to The Founder's Grip or Decision Paralysis. But micromanagement as a distributed cultural norm — not concentrated in one person or structure — may be a distinct state. The Trust Deficit condition describes an organization that has institutionalized distrust as its operating model.</div>
+      </div>
+      <div class="name-candidates">
+        <span class="name-tag">The Control Culture</span>
+        <span class="name-tag">The Permission Organization</span>
+        <span class="name-tag">The Trust Deficit</span>
+        <span class="name-tag">The Approval Chain</span>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">When you make a decision within what you understand to be your role, how often does it require approval from someone above you — never, sometimes, usually, or always? The frequency locates the condition between individual manager failure and structural authority failure.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 11 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">11</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"DEI is performative"</div>
+        <div class="theme-freq">Frequency: High and rising — most acute in post-2020 reviews</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"Diversity initiatives are window dressing."</div>
+        <div class="quote-item">"Hired for optics, not for real inclusion."</div>
+        <div class="quote-item">"Diverse candidates hired at entry level, never promoted."</div>
+        <div class="quote-item">"The leadership team looks nothing like the workforce."</div>
+        <div class="quote-item">"We celebrate heritage months and ignore actual equity issues."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">Performative Equity — where the organization has invested in the symbols of DEI without the systems that would produce its substance. The pipeline is diverse. The leadership isn't. The reason is structural — the promotion architecture, sponsorship networks, performance criteria, and compensation systems haven't changed. The DEI investment is at the awareness layer. The barrier is at the systems layer. The gap between the two is the condition.</div>
+      </div>
+      <div class="verdict-block verdict-new">
+        <div class="verdict-label">Taxonomy Verdict — New Candidate</div>
+        <div class="verdict-text">Distinct from Hiring Bias (selection layer failure) — this condition is at the advancement layer. The organization hires diverse talent and fails to advance it. Significant financial consequence: organizations that fail at inclusion lose diverse talent at elevated rates and face growing regulatory exposure under OFCCP and expanding state-level requirements.</div>
+      </div>
+      <div class="name-candidates">
+        <span class="name-tag">The Inclusion Gap</span>
+        <span class="name-tag">The Pipeline Paradox</span>
+        <span class="name-tag">The Symbolic Ceiling</span>
+        <span class="name-tag">The Equity Facade</span>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">At what level of your organization does demographic diversity become noticeably less represented — entry level, mid-level management, senior leadership, or executive? The answer locates the barrier in the advancement architecture precisely.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 12 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">12</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"Senior leadership is disconnected"</div>
+        <div class="theme-freq">Frequency: High — most prevalent in mid-size and enterprise organizations</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"Executives live in a different reality."</div>
+        <div class="quote-item">"They have no idea what it's like on the ground."</div>
+        <div class="quote-item">"Strategy makes sense in the boardroom and falls apart in execution."</div>
+        <div class="quote-item">"They give motivational speeches but have no idea what we actually do."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">The Executive Reality Gap — distinct from The Untouchable. The executives may be held accountable. They're just not informed. The condition is perceptual and informational, not behavioral. Good intentions, bad information. The structural filters that surround senior roles — prepared briefings, curated updates, optimistic reporting chains — systematically insulate leadership from operational reality. The gap between what leadership believes is true and what employees experience as true is the condition.</div>
+      </div>
+      <div class="verdict-block verdict-new">
+        <div class="verdict-label">Taxonomy Verdict — New Candidate</div>
+        <div class="verdict-text">Partially overlaps with The Untouchable but meaningfully distinct. The Untouchable is indifferent by choice or inertia. The Executive Reality Gap is uninformed by structure. Different cause, different resolution path. Coaching and accountability won't fix an information architecture problem.</div>
+      </div>
+      <div class="name-candidates">
+        <span class="name-tag">The Altitude Problem</span>
+        <span class="name-tag">The Filter Layer</span>
+        <span class="name-tag">The Executive Bubble</span>
+        <span class="name-tag">The Ground Floor Gap</span>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">When your senior leadership makes decisions affecting your day-to-day work, how often do those decisions reflect an accurate understanding of operational reality — consistently, sometimes, rarely, or almost never? The answer distinguishes the disconnected executive from the indifferent one.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 13 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">13</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"Promises made, promises broken"</div>
+        <div class="theme-freq">Frequency: High — most damaging to employer brand reviews</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"They said there would be a path to promotion."</div>
+        <div class="quote-item">"Was told the role would evolve — it didn't."</div>
+        <div class="quote-item">"They described a culture that doesn't exist."</div>
+        <div class="quote-item">"What they said in the interview and what I found are different organizations."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">Psychological Contract Violation — where the implicit and explicit agreements made during recruiting and onboarding are not honored in practice. The injury is not just the specific broken promise. It's the trust infrastructure the organization relies on for engagement, discretionary effort, and retention. A violated psychological contract produces disengagement that looks like attitude or motivation failure but is actually a rational response to broken agreements.</div>
+      </div>
+      <div class="verdict-block verdict-new">
+        <div class="verdict-label">Taxonomy Verdict — New Candidate</div>
+        <div class="verdict-text">Well-documented in organizational psychology research with measurable effects on engagement, performance, and retention. Distinct from Culture Drift — that's a gradual divergence between stated and lived values. Psychological Contract Violation is a specific broken agreement at a specific moment. The financial consequence narrative is direct: research consistently finds that violated psychological contracts reduce discretionary effort by 30-40%.</div>
+      </div>
+      <div class="name-candidates">
+        <span class="name-tag">The Broken Contract</span>
+        <span class="name-tag">The Misrepresented Organization</span>
+        <span class="name-tag">The Gap Between Offer and Reality</span>
+        <span class="name-tag">The Bait and Switch</span>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">Thinking about what you understood about this organization before you joined versus what you've experienced since — how accurately was the organization represented to you? The gap between expectation and experience is the diagnostic signal, and the size of the gap determines severity.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME 14 -->
+  <div class="theme-card">
+    <div class="theme-header">
+      <div class="theme-num">14</div>
+      <div class="theme-title-block">
+        <div class="theme-title">"HR is useless / HR protects the company not employees"</div>
+        <div class="theme-freq">Frequency: High — present in every industry, most acute in manufacturing, hospitality, retail</div>
+      </div>
+    </div>
+    <div class="theme-body">
+      <div class="quotes-block">
+        <div class="quotes-label">Representative Language</div>
+        <div class="quote-item">"HR is there to protect the company, not you."</div>
+        <div class="quote-item">"Don't bother going to HR."</div>
+        <div class="quote-item">"Reported to HR, nothing happened, then I was managed out."</div>
+        <div class="quote-item">"HR is a rubber stamp for whatever management wants."</div>
+      </div>
+      <div class="condition-block">
+        <div class="condition-label">Underlying Condition</div>
+        <div class="condition-text">HR Capture — where the HR function has lost its independence and operates as an extension of management rather than as an organizational conscience. Distinct from Misconduct Infrastructure Absence — in that condition, the infrastructure simply doesn't exist. HR Capture is when the infrastructure exists and has been compromised. The function is present, credentialed, and staffed. It is not independent. You can't fix this by adding HR resources. You fix it by restoring the function's independence — which is a governance problem, not a staffing problem.</div>
+      </div>
+      <div class="verdict-block verdict-new">
+        <div class="verdict-label">Taxonomy Verdict — New Candidate</div>
+        <div class="verdict-text">High financial consequence — a captured HR function produces exactly the liability environment that employment litigation thrives in. It's also the condition most likely to produce the news coverage that destroys employer brands. The organizational condition underneath every major workplace misconduct headline is usually HR Capture. This is a high-priority new candidate.</div>
+      </div>
+      <div class="name-candidates">
+        <span class="name-tag">The Captured Function</span>
+        <span class="name-tag">The Company HR</span>
+        <span class="name-tag">The Compromised Partner</span>
+        <span class="name-tag">The Silent Watchdog</span>
+      </div>
+      <div class="qdp-block">
+        <div class="qdp-label">Question Design Language</div>
+        <div class="qdp-text">When an employee has a concern about their manager or leadership, how would you describe your HR department's likely response — employee advocate, neutral mediator, management-aligned, or unclear? The framing of the question reveals the employee's model of HR's role, which is the diagnostic signal.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-head">
+    <div class="summary-title">Experiment 3 — Taxonomy Reconciliation</div>
+    <div class="summary-sub">14 themes → 17 distinct conditions → reconciled against existing taxonomy</div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-card-label">New Candidates Surfaced</div>
+      <div class="summary-card-count" style="color:var(--new)">10</div>
+      <div class="summary-card-desc">Organizational Deafness, Favoritism Architecture, Development Promise Violation, Information Architecture Failure, HR Capture, Change Absorption Failure (confirmed), Unmanaged Underperformance, Performative Equity, Executive Reality Gap, Psychological Contract Violation</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Existing States Confirmed</div>
+      <div class="summary-card-count" style="color:var(--confirm)">4</div>
+      <div class="summary-card-desc">The Untouchable, The Unformed Leader, Culture Drift (from Tool Experiment), Compensation Incoherence (from Tool Experiment). All four confirmed by multiple distinct themes independently.</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Partial Matches / Extensions</div>
+      <div class="summary-card-count" style="color:var(--partial)">3</div>
+      <div class="summary-card-desc">Sustainability Theater (extends Culture Drift), Compensation Indifference (extends Compensation Incoherence), Trust Deficit / Micromanagement Culture (extends The Unformed Leader and Decision Paralysis)</div>
+    </div>
+  </div>
+
+  <div class="new-states-list">
+    <div class="table-header-row">
+      <div class="thr-cell">#</div>
+      <div class="thr-cell">Condition Name</div>
+      <div class="thr-cell">Root Condition</div>
+      <div class="thr-cell">Primary Dimension</div>
+    </div>
+    <div class="new-state-row">
+      <div class="nsr-num">01</div>
+      <div class="nsr-name">Organizational Deafness</div>
+      <div class="nsr-desc">Listening infrastructure exists; signal is not acted on. Leadership consistently surprised by what its people already knew.</div>
+      <div class="nsr-dim">Attitude — Leadership / Alliance — Vertical</div>
+    </div>
+    <div class="new-state-row">
+      <div class="nsr-num">02</div>
+      <div class="nsr-name">Favoritism Architecture</div>
+      <div class="nsr-desc">Promotion and recognition decoupled from performance. Political proximity governs advancement systemically, not individually.</div>
+      <div class="nsr-dim">Attitude — Systemic / Authority — Structural</div>
+    </div>
+    <div class="new-state-row">
+      <div class="nsr-num">03</div>
+      <div class="nsr-name">Development Promise Violation</div>
+      <div class="nsr-desc">Specific development commitments made during recruiting or onboarding were not honored. Trust condition, not infrastructure condition.</div>
+      <div class="nsr-dim">Attitude — Leadership / Alliance — Vertical</div>
+    </div>
+    <div class="new-state-row">
+      <div class="nsr-num">04</div>
+      <div class="nsr-name">Information Architecture Failure</div>
+      <div class="nsr-desc">Decisions made without systematic communication to implementers. Leaders believe they've communicated; employees experience a vacuum.</div>
+      <div class="nsr-dim">Alliance — Vertical / Authority — Structural</div>
+    </div>
+    <div class="new-state-row">
+      <div class="nsr-num">05</div>
+      <div class="nsr-name">HR Capture</div>
+      <div class="nsr-desc">HR function exists but has lost independence. Operates as management extension rather than organizational conscience. Governance problem, not staffing problem.</div>
+      <div class="nsr-dim">Authority — Structural / Attitude — Systemic</div>
+    </div>
+    <div class="new-state-row">
+      <div class="nsr-num">06</div>
+      <div class="nsr-name">Change Absorption Failure</div>
+      <div class="nsr-desc">Accumulated initiative failure has produced organizational cynicism. New initiatives fail before they begin. The organization has lost credibility as a change agent with its own people.</div>
+      <div class="nsr-dim">Attitude — Systemic / Alliance — Structural</div>
+    </div>
+    <div class="new-state-row">
+      <div class="nsr-num">07</div>
+      <div class="nsr-name">Unmanaged Underperformance</div>
+      <div class="nsr-desc">Performance management architecture has collapsed systemically. High performers carry underperformers, resent the organization, and leave.</div>
+      <div class="nsr-dim">Authority — Structural / Aptitude — Systemic</div>
+    </div>
+    <div class="new-state-row">
+      <div class="nsr-num">08</div>
+      <div class="nsr-name">Performative Equity</div>
+      <div class="nsr-desc">DEI investment at the awareness layer; advancement barriers intact at the systems layer. Diverse talent hired, not advanced.</div>
+      <div class="nsr-dim">Attitude — Systemic / Authority — Structural</div>
+    </div>
+    <div class="new-state-row">
+      <div class="nsr-num">09</div>
+      <div class="nsr-name">Executive Reality Gap</div>
+      <div class="nsr-desc">Senior leadership structurally insulated from operational reality. Good intentions, bad information. Information architecture problem, not behavioral problem.</div>
+      <div class="nsr-dim">Alliance — Vertical / Authority — Structural</div>
+    </div>
+    <div class="new-state-row">
+      <div class="nsr-num">10</div>
+      <div class="nsr-name">Psychological Contract Violation</div>
+      <div class="nsr-desc">Implicit and explicit recruiting/onboarding agreements not honored in practice. Produces disengagement that mimics attitude failure but is actually a rational response to broken agreements.</div>
+      <div class="nsr-dim">Attitude — Systemic / Alliance — Vertical</div>
+    </div>
+  </div>
+
+  <!-- KEY FINDINGS -->
+  <div class="summary-head" style="margin-top:48px;">
+    <div class="summary-title">Key Findings for PRV3</div>
+  </div>
+
+  <div class="finding-block">
+    <div class="finding-title">The taxonomy is growing in the right direction</div>
+    <div class="finding-text">The top-down approach surfaced conditions a consultant walks into. The review clustering surfaced conditions employees experience before anyone calls a consultant. Together they cover the full diagnostic landscape — the presenting complaint layer and the underlying condition layer simultaneously. The instrument needs to be able to reach both.</div>
+  </div>
+
+  <div class="finding-block">
+    <div class="finding-title">HR Capture is the highest-priority new candidate</div>
+    <div class="finding-text">An organization with a captured HR function is pre-disposed to every other liability condition in the taxonomy. It's the condition that makes The Untouchable possible, that allows The Unformed Leader to persist, that lets Misconduct Infrastructure Absence go unaddressed. HR Capture is upstream of more states than any other new candidate surfaced so far. It deserves early placement in the taxonomy and a prominent financial consequence narrative anchored to employment litigation data.</div>
+  </div>
+
+  <div class="finding-block">
+    <div class="finding-title">The instrument needs to distinguish sub-conditions with identical surface language</div>
+    <div class="finding-text">Multiple themes produced two distinct underlying conditions beneath a single surface complaint. "No growth opportunities" is either infrastructure failure or promise violation. "Toxic manager" is either individual leadership failure or systemic protection of bad actors. "Micromanagement" is either formation failure or structural authority failure. The question design must be precise enough to distinguish these pairs — because the resolution path diverges significantly for each.</div>
+  </div>
+
+  <div class="finding-block">
+    <div class="finding-title">The Executive Reality Gap is not The Untouchable</div>
+    <div class="finding-text">This distinction matters for the private output. An executive who is politically insulated from accountability needs a confrontation. An executive who is structurally insulated from operational reality needs better information architecture and closer proximity to the work. Coaching and accountability will not fix an information problem. These are different states requiring different interventions — and the diagnostic must be precise enough to tell them apart.</div>
+  </div>
+
+  <div style="margin-top:40px; padding:20px 24px; background:var(--ink); color:#6b6560; font-size:11px; line-height:1.8;">
+    <span style="color:#d4a870; font-weight:500; letter-spacing:0.1em;">PRINCIPAL RESOLUTION</span> &nbsp;—&nbsp; Experiment 3 of 7: Glassdoor & Indeed Review Clustering &nbsp;|&nbsp; PRV3 State Taxonomy Research &nbsp;|&nbsp; April 2026 &nbsp;|&nbsp; Internal
+  </div>
+
+</div>
+</body>
+</html>
