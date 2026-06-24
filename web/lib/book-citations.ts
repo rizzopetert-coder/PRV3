@@ -48,4 +48,11 @@ export const bookCitations: Record<string, BookCitation> = {
     urlStatus: "verified",
     severity: 2,
   },
+  "HC-103": {
+    id: "HC-103",
+    text: "Keltner's research on power and social cognition finds that elevated status systematically impairs the neural processes underlying social attentiveness — people with power become less accurate at reading emotions, less likely to take others' perspectives, and less responsive to social feedback over time.",
+    source: "Keltner, Dacher. The Power Paradox. Penguin Press, 2016.",
+    urlStatus: "verified",
+    severity: 3,
+  },
 };

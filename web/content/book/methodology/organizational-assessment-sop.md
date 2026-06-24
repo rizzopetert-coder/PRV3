@@ -1,3 +1,21 @@
+<!--
+  PARKED — NOT FOR PUBLICATION
+
+  This document was written for a PRV2-era licensing-out model: training
+  peer practitioners to run the methodology independently. That model is
+  not part of PRV3's current scope. The practitioner tier is a holdover
+  with no active audience behind it.
+
+  The file is preserved intentionally, not by oversight. Its strongest
+  content (the Circumstance Guidance judgment calls) was repurposed into
+  organizational-assessment-methodology.md as evidence of rigor for
+  client-facing readers.
+
+  If the licensing model comes back into scope, the relevant decision
+  context is in the /book Session 48/49 closeout handoff and the
+  2026-06-22 session conversation (the session that parked this file).
+-->
+
 ## What This Document Is
 
 This is the master SOP for a People Tactics and Strategy engagement scoped to organizational assessment. It covers the full engagement sequence, the judgment that connects the phases, and the circumstances that require a different approach. Each phase has its own dedicated SOP. This document is what you read before those — and what you return to when something in the engagement doesn't fit the expected pattern.

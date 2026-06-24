@@ -12,7 +12,7 @@ export interface BookPiece {
   citationIds?: string[];
   relatedSlug?: string;
   author: "Principal Resolution";
-  status: "draft" | "published";
+  status: "draft" | "published" | "parked";
 }
 
 export const bookManifest: BookPiece[] = [
@@ -189,7 +189,7 @@ export const bookManifest: BookPiece[] = [
     title: "Organizational Assessment: Engagement SOP",
     teaser: "The full engagement sequence for an organizational assessment — five phases, none compressible — with guidance for the circumstances where something in the engagement doesn't fit the expected pattern.",
     author: "Principal Resolution",
-    status: "draft",
+    status: "parked",
   },
   {
     id: "FTA-03",
@@ -258,6 +258,7 @@ export const bookManifest: BookPiece[] = [
     voice: "from_the_author",
     title: "Leadership Deafness",
     teaser: "The leader who talks about transparency and shuts down the moment someone tests it. The feedback that stopped reaching them years ago. The gap between who they think they are and what the room experiences.",
+    citationIds: ["HC-103"],
     author: "Principal Resolution",
     status: "draft",
   },
