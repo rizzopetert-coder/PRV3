@@ -1,0 +1,1 @@
+- 2026-06-27: 12 claims checked — no material changes
