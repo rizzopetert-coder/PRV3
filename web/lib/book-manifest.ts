@@ -530,4 +530,15 @@ export const bookManifest: BookPiece[] = [
     author: "Principal Resolution",
     status: "draft",
   },
+  {
+    id: "LIB-051",
+    slug: "why-blaming-the-person-almost-never-fixes-the-problem",
+    contentType: "methodology",
+    voice: "standard",
+    title: "Why Blaming the Person Almost Never Fixes the Problem",
+    teaser: "The impulse to look for a person before looking for a structure is not a leadership failing. It is a well-documented cognitive default — and acting on it without checking first produces a specific kind of waste that organizations pay for, on a delay, in the next hire.",
+    citationIds: ["HC-ROSS-1977", "HC-SWIFT-2013", "HC-GREEN-1979", "HC-REASON-1990", "HC-SENGE-1990", "HC-SAKS-2006"],
+    author: "Principal Resolution",
+    status: "draft",
+  },
 ];
