@@ -24,8 +24,11 @@ Run the test suite (or equivalent). Report pass/fail. Flag any failures before p
 
 ### Step 3a — Research Integration Check
 Run `gh pr list --label research-refresh --state open` to check for unreviewed refresh PRs.
-Read `research/refresh-log/pending-integration.json` and report any entries with
-`"status": "proposed"` — these are merged findings whose content edit has not yet been applied.
+Read `research/refresh-log/pending-integration.json` and report:
+- Entries with `"status": "proposed"` — these require attention; merged findings whose content
+  edit has not yet been applied. Flag to Pete and treat as a candidate top-priority item.
+- Entries with `"status": "deferred"` — contextual awareness only; no action required unless
+  Pete decides to advance them. Note `revisit_by_date` if set.
 Report both counts in Step 4. Do not attempt to resolve either automatically — flag to Pete.
 
 ### Step 4 — Status Report
@@ -131,7 +134,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.23 |
+| MOB version | v4.24 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 47 (locked) |

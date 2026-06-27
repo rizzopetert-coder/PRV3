@@ -8,6 +8,10 @@ on:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write       # branch push + direct audit-history.md commit (Path B)
+      pull-requests: write  # create-pull-request@v6 (Path A)
+      issues: write         # gh label create (GitHub treats labels as Issues API)
 
     steps:
       - uses: actions/checkout@v4
@@ -19,14 +23,23 @@ jobs:
       - name: Install dependencies
         run: pip install anthropic
 
+      - name: Set month tag
+        id: month
+        run: echo "tag=$(date +%Y-%m)" >> $GITHUB_OUTPUT
+
       - name: Run research refresh
         id: refresh
         # ANTHROPIC_API_KEY must be the dedicated PRV3_REFRESH key — not a shared key.
-        # Create it in Console, set an $8/month spending limit, then add it as a repo secret.
+        # Create it in Console, set an $8/month spending limit, then add it as a repo secret
+        # named ANTHROPIC_API_KEY_REFRESH. Reusing a key tied to other purposes defeats the
+        # spending isolation this design depends on.
+        #
+        # Budget notification: if run_refresh.py exits with code 1 (budget limit hit),
+        # GitHub Actions sends its default failed-workflow email automatically. No additional
+        # notification step is needed here.
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY_REFRESH }}
         run: python research/refresh-log/run_refresh.py
-        # Exit code 1 means budget limit was hit — still create the PR so Pete sees the report.
         continue-on-error: true
 
       - name: Create research-refresh label if missing
@@ -39,12 +52,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Path A: material changes or errors found — open a PR for human review
       - name: Open PR with findings
+        if: steps.refresh.outputs.needs_pr == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "research: monthly refresh — automated"
-          title: "${{ steps.refresh.outputs.pr_title_prefix }}Research refresh: ${{ github.run_id }}"
+          title: "${{ steps.refresh.outputs.pr_title_prefix }}Research refresh: ${{ steps.month.outputs.tag }}"
           body: |
             Automated monthly research currency check. Review each claim's findings before merging.
 
@@ -52,18 +67,34 @@ jobs:
             modify `web/lib/book-citations.ts`, `web/data/taxonomy.ts`, `/book` content, or any
             other live content file. The `add-paths` scope enforces this boundary.
 
+            **Suggested direction note:** Any drafted replacement text is labeled
+            `SUGGESTED DIRECTION (rewrite required, not drop-in)`. These are starting points
+            for human rewrite — not clean replacements. Do not apply them verbatim.
+
             **After merging:** Update `research/refresh-log/pending-integration.json` for each
-            material finding — set `status` to `applied` (with `applied_commit`) or `rejected`
-            (with `rejected_reason`). This is the one piece of manual bookkeeping that makes the
-            startup integration-check reliable. Do not leave entries at `status: "proposed"`
-            indefinitely — that is the state both CLAUDE.md Step 3a and the Engage Protocol
-            Step 2a watch for as a signal that a finding was never integrated.
+            material finding. Valid status values: `proposed` (requires attention), `applied`
+            (edit applied — record `applied_commit`), `rejected` (record `rejected_reason`),
+            `deferred` (contextual awareness only — record `revisit_by_date` and `deferred_reason`).
+
+            Do not leave entries at `status: "proposed"` indefinitely — that is the state both
+            CLAUDE.md Step 3a and the Engage Protocol Step 2a watch for as a signal that a
+            finding was never integrated.
 
             **Human review checklist:**
             - [ ] Read each claim under "Requires Review"
-            - [ ] For any NEEDS REVIEW claim, evaluate the proposed edits
+            - [ ] For any NEEDS REVIEW claim, evaluate the suggested direction
             - [ ] Apply approved edits via normal workflow (Claude.ai analysis, Gemini if structural, Claude Code execution)
             - [ ] Update pending-integration.json status after each decision
-          branch: research-refresh-${{ github.run_id }}
+          branch: automation/research-refresh-${{ steps.month.outputs.tag }}
           add-paths: research/refresh-log/*
           labels: research-refresh
+
+      # Path B: no material changes, no errors — commit audit entry directly to main
+      - name: Commit no-change audit entry
+        if: steps.refresh.outputs.needs_pr == 'false'
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/refresh-log/audit-history.md
+          git diff --staged --quiet || git commit -m "research: monthly refresh — no changes (${{ steps.month.outputs.tag }})"
+          git push

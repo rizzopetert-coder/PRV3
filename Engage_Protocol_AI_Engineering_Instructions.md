@@ -30,27 +30,27 @@ The Principal Brief governs. The MOB supplements it. When they conflict, ask Pet
 
 ## Step 2a — Check Research Integration Status
 
-Claude.ai cannot run `gh` commands or read the live repo state directly. Use one of these
-two methods to check:
+Ask Pete directly at the start of every session:
 
-**Method A (preferred):** Ask Pete directly — "Are there any open research-refresh PRs, or any
-pending-integration entries with status 'proposed' that haven't been applied yet?"
+> "Before we begin — are there any pending integration items from the latest Research Refresh
+> I should know about? I can't check the live ledger directly from here."
 
-**Method B (if Pete has uploaded the file):** Search project knowledge for
-`pending-integration.json` and look for any entry where `"status": "proposed"`. Any such
-entry represents a merged PR whose proposed content edit has not yet been applied to the
-live files.
+**If Pete confirms pending items exist:**
 
-**If Pete confirms open entries exist:** Treat resolving them — drafting the actual content
-edit, or confirming a rejection — as a candidate top-priority item for this session, alongside
-whatever Pete originally opened the session to do. Do not silently proceed past an unintegrated
-finding.
+- Entries with `status: "proposed"` require attention — these are merged findings whose content
+  edit has not yet been applied. Treat resolving them (drafting the actual content edit, or
+  confirming a rejection) as a candidate top-priority item for this session, alongside whatever
+  Pete opened the session to do.
+- Entries with `status: "deferred"` are contextual awareness only — no action required unless
+  Pete decides to advance them. Check whether `revisit_by_date` is set and note it if so.
 
-**Important asymmetry:** Claude Code's check is authoritative. It can actually run
-`gh pr list --label research-refresh --state open` and read the live ledger. Claude.ai's check
-depends on Pete relaying the answer or the ledger file being in project knowledge. This is a
-known limitation of the Claude.ai surface — do not imply the check is equivalent. If in doubt,
-ask Pete whether Claude Code has already confirmed the ledger state this session.
+Do not silently proceed past an unintegrated `proposed` finding.
+
+**Important asymmetry:** Claude Code's check is authoritative — it reads the live
+`pending-integration.json` ledger directly and can run `gh pr list --label research-refresh`.
+Claude.ai has no automated check for this. The absence is compensated for by always asking
+explicitly. Do not describe this as a weaker version of Claude Code's check — there is no
+automated check here at all, only a direct question to Pete.
 
 ---
 
