@@ -1,0 +1,69 @@
+name: Monthly Research Refresh
+
+on:
+  schedule:
+    - cron: '0 14 1 * *'  # 1st of each month, 14:00 UTC
+  workflow_dispatch: {}   # manual trigger — run this to test before relying on the schedule
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic
+
+      - name: Run research refresh
+        id: refresh
+        # ANTHROPIC_API_KEY must be the dedicated PRV3_REFRESH key — not a shared key.
+        # Create it in Console, set an $8/month spending limit, then add it as a repo secret.
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY_REFRESH }}
+        run: python research/refresh-log/run_refresh.py
+        # Exit code 1 means budget limit was hit — still create the PR so Pete sees the report.
+        continue-on-error: true
+
+      - name: Create research-refresh label if missing
+        # The label is required for `gh pr list --label research-refresh` in CLAUDE.md Step 3a.
+        run: |
+          gh label create research-refresh \
+            --description "Monthly automated research currency check" \
+            --color "0075ca" \
+            || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Open PR with findings
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "research: monthly refresh — automated"
+          title: "${{ steps.refresh.outputs.pr_title_prefix }}Research refresh: ${{ github.run_id }}"
+          body: |
+            Automated monthly research currency check. Review each claim's findings before merging.
+
+            **Scope:** This PR only adds/updates files under `research/refresh-log/`. It does not
+            modify `web/lib/book-citations.ts`, `web/data/taxonomy.ts`, `/book` content, or any
+            other live content file. The `add-paths` scope enforces this boundary.
+
+            **After merging:** Update `research/refresh-log/pending-integration.json` for each
+            material finding — set `status` to `applied` (with `applied_commit`) or `rejected`
+            (with `rejected_reason`). This is the one piece of manual bookkeeping that makes the
+            startup integration-check reliable. Do not leave entries at `status: "proposed"`
+            indefinitely — that is the state both CLAUDE.md Step 3a and the Engage Protocol
+            Step 2a watch for as a signal that a finding was never integrated.
+
+            **Human review checklist:**
+            - [ ] Read each claim under "Requires Review"
+            - [ ] For any NEEDS REVIEW claim, evaluate the proposed edits
+            - [ ] Apply approved edits via normal workflow (Claude.ai analysis, Gemini if structural, Claude Code execution)
+            - [ ] Update pending-integration.json status after each decision
+          branch: research-refresh-${{ github.run_id }}
+          add-paths: research/refresh-log/*
+          labels: research-refresh

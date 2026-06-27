@@ -1,0 +1,139 @@
+[
+  {
+    "claim_id": "eeoc-enforcement-total",
+    "description": "EEOC total enforcement recovery, most recent fiscal year, broken into pre-litigation vs. litigation",
+    "last_verified": "2026-06 (FY2025: $660M total, $528M pre-litigation, $27M litigation — highest pre-litigation total in 60-year EEOC history, +12% YoY)",
+    "source_pattern": "EEOC.gov press releases, EEOC annual performance report",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-2-employment-litigation-taxonomy.html"
+    ],
+    "search_terms": ["$660M", "$528M", "$660 million", "$528 million", "EEOC enforcement"]
+  },
+  {
+    "claim_id": "sec-enforcement-total",
+    "description": "SEC annual enforcement total — gross headline figure vs. adjusted/comparable figure, with explicit check for any single-case distortion (precedent: 2009 Stanford Ponzi judgment inflated FY2025 headline by $14.9B)",
+    "last_verified": "2026-06 (FY2025: $17.9B gross headline, distorted by $14.9B Stanford Ponzi judgment + $232M deemed-satisfied; $2.7B is the correct adjusted comparison figure, -25% YoY)",
+    "source_pattern": "SEC.gov press releases, SEC annual enforcement results",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-2-employment-litigation-taxonomy.html"
+    ],
+    "search_terms": ["$17.9B", "$2.7B", "$14.9B", "SEC enforcement", "Stanford Ponzi"]
+  },
+  {
+    "claim_id": "dol-back-wages-and-mechanism",
+    "description": "DOL Wage and Hour Division back-wages total, plus any mechanism changes to pre-litigation administrative settlement structure (precedent: liquidated damages eliminated from pre-litigation settlements effective June/July 2025)",
+    "last_verified": "2026-06 ($259M FY2025, +28% YoY, highest since 2019; liquidated damages eliminated from pre-litigation administrative settlements effective June/July 2025 — mechanism shift, not just a number update)",
+    "source_pattern": "DOL.gov WHD enforcement data, PAID program updates",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-2-employment-litigation-taxonomy.html"
+    ],
+    "search_terms": ["$259M", "$259 million", "liquidated damages", "DOL back wages", "Wage and Hour", "PAID program"]
+  },
+  {
+    "claim_id": "ebsa-recoveries",
+    "description": "EBSA (Employee Benefits Security Administration) annual recoveries total",
+    "last_verified": "2026-06 ($1.4B FY2025, confirmed stable)",
+    "source_pattern": "DOL.gov EBSA fact sheets",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-2-employment-litigation-taxonomy.html"
+    ],
+    "search_terms": ["$1.4B", "$1.4 billion", "EBSA", "Employee Benefits Security"]
+  },
+  {
+    "claim_id": "epli-market-size",
+    "description": "EPLI (Employment Practices Liability Insurance) market size and trend",
+    "last_verified": "2026-06 ($4.68B 2023, flat-to-+5% entering 2026)",
+    "source_pattern": "Insurance industry reports (Gallagher Re, Allianz Commercial, AM Best, NAIC)",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-5-insurance-claims-and-risk-data.html"
+    ],
+    "search_terms": ["$4.68B", "EPLI market", "Employment Practices Liability Insurance market"]
+  },
+  {
+    "claim_id": "do-market-size",
+    "description": "D&O insurance market size and trend (soft/hard market status, insolvency pressure)",
+    "last_verified": "2026-06 ($22.4B 2025, soft market ending on rising insolvencies)",
+    "source_pattern": "Insurance industry reports (Gallagher Re, Allianz Commercial)",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-5-insurance-claims-and-risk-data.html"
+    ],
+    "search_terms": ["$22.4B", "D&O market", "Directors and Officers insurance market", "soft market"]
+  },
+  {
+    "claim_id": "workers-comp-market",
+    "description": "Workers Comp total market size, frequency/severity decoupling trend",
+    "last_verified": "2026-06 ($45.6B total, frequency down 2%/severity up 4% — decoupling pattern)",
+    "source_pattern": "NCCI reports, insurance industry data",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-5-insurance-claims-and-risk-data.html"
+    ],
+    "search_terms": ["$45.6B", "Workers Comp market", "workers compensation market size"]
+  },
+  {
+    "claim_id": "cyber-insurance-market",
+    "description": "Cyber insurance market size, US-specific trend (precedent: first-ever US market decline in 2024 then rebound in 2025)",
+    "last_verified": "2026-06 ($15.3B global; US $9.14B 2024 -7%, then +11% rebound 2025 — volume-driven)",
+    "source_pattern": "Insurance industry reports (Gallagher Re, Allianz Commercial)",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-5-insurance-claims-and-risk-data.html"
+    ],
+    "search_terms": ["$15.3B", "$9.14B", "cyber insurance market", "cyber market size"]
+  },
+  {
+    "claim_id": "silent-ai-liability-gap",
+    "description": "Coverage-gap status for algorithmic bias/automated-decision liability under standard cyber and EPLI policies — check for any new insurer products specifically closing this gap",
+    "last_verified": "2026-06 (gap confirmed per Gallagher Re, Allianz 2026 — no dedicated coverage found; reframe The Unexamined Algorithm state from IT-issue to enterprise EPLI/D&O exposure per audit finding)",
+    "source_pattern": "Insurance industry reports, insurtech coverage announcements",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-5-insurance-claims-and-risk-data.html",
+      "web/data/taxonomy.ts"
+    ],
+    "search_terms": ["algorithmic bias liability", "Silent AI", "automated decision liability", "AI employment insurance", "EPLI AI coverage"]
+  },
+  {
+    "claim_id": "ai-employment-regulation",
+    "description": "AI-in-employment regulatory landscape: NYC Local Law 144, EU AI Act employment provisions, state-level AI hiring laws (CA, CO, IL and others). Fastest-moving tracked claim — check for new laws enacted, new enforcement actions, or significant rule changes.",
+    "last_verified": "2026-06 (NYC Local Law 144 active audit requirement; EU AI Act employment provisions in force; CA/CO/IL bills progressing; landscape rapidly expanding)",
+    "source_pattern": "State legislature tracking, EU AI Act official updates, NYC DCWP",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-5-insurance-claims-and-risk-data.html",
+      "research/seven-experiments/experiment-6-hr-conference-theme-analysis.html",
+      "web/data/taxonomy.ts"
+    ],
+    "search_terms": ["NYC Local Law 144", "EU AI Act employment", "AI hiring law", "AI employment regulation", "DCWP AI audit"],
+    "note": "Highest-priority claim for catching genuinely new developments, not just figure updates."
+  },
+  {
+    "claim_id": "academic-citations-retraction-check",
+    "description": "Retraction/replication-failure check across all 14 foundational academic citations confirmed in Session 51 audit: Kahn (1990), Edmondson (1999), Hobfoll (1989), Deci & Ryan, Tajfel & Turner, Bandura, Rousseau, Argyris & Schon, Weick & Sutcliffe, Cohen-Charash & Spector, Gilboa et al., Van den Broeck et al., Zhao et al., plus Keltner (HC-103)",
+    "last_verified": "2026-06 (all 14 confirmed, no retractions — supplementary 2026 Gallup engagement data identified)",
+    "source_pattern": "Retraction Watch, journal correction notices, Google Scholar citation tracking",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-7-organizational-psychology-literature-review.html",
+      "web/lib/book-citations.ts"
+    ],
+    "search_terms": ["Edmondson retraction", "Kahn 1990 retraction", "HC-007", "HC-068", "HC-103", "psychological safety retraction"]
+  },
+  {
+    "claim_id": "change-management-failure-rate",
+    "description": "Verify current standing of the informal '70% of change programs fail' figure referenced in existing /book content — check primary source, contestation, and whether more recent research has revised it",
+    "last_verified": "not yet independently verified — flagged in Session 51 citation audit as pending; E4 consulting postmortem essay references this figure",
+    "source_pattern": "McKinsey original source, academic change-management literature (Kotter, Beer & Nohria)",
+    "check_frequency": "monthly",
+    "used_in": [
+      "research/seven-experiments/experiment-4-consulting-engagement-postmortem-analysis.html"
+    ],
+    "search_terms": ["70% change programs fail", "change management failure rate", "Beer Nohria 70 percent", "Kotter change failure"]
+  }
+]

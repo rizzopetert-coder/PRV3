@@ -22,11 +22,18 @@ Read `tools/_mob.txt` with the Read tool. If missing or empty, stop immediately 
 ### Step 3 — Engine State Check
 Run the test suite (or equivalent). Report pass/fail. Flag any failures before proceeding.
 
+### Step 3a — Research Integration Check
+Run `gh pr list --label research-refresh --state open` to check for unreviewed refresh PRs.
+Read `research/refresh-log/pending-integration.json` and report any entries with
+`"status": "proposed"` — these are merged findings whose content edit has not yet been applied.
+Report both counts in Step 4. Do not attempt to resolve either automatically — flag to Pete.
+
 ### Step 4 — Status Report
 Report to Pete:
 - Open items from diary not yet in MOB
 - Any retrieval gaps
 - Test suite status
+- Open research-refresh PRs and unintegrated findings (Step 3a)
 - Uncommitted files (`git status`)
 - Go / no-go
 
@@ -124,7 +131,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.22 |
+| MOB version | v4.23 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 47 (locked) |
