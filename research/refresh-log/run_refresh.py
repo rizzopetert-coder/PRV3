@@ -139,7 +139,7 @@ def parse_domain_response(text: str, claims: list) -> list:
     for claim in claims:
         cid = claim["claim_id"]
         section_text = section_map.get(
-            cid, f"[No section found for {cid} in domain response — check API output]"
+            cid, f"### {cid}\n\n[No section found for {cid} in domain response — check API output]"
         )
         needs_review = "NEEDS REVIEW" in section_text.upper()
         results.append({
@@ -305,7 +305,6 @@ def write_report(
         f.write(f"## Requires Review ({len(action_items)})\n\n")
         if action_items:
             for r in action_items:
-                f.write(f"### {r['claim_id']}\n\n")
                 f.write(r["text"].strip())
                 if r.get("unlisted_hits"):
                     f.write(
@@ -331,7 +330,6 @@ def write_report(
             "No action required. Included for audit trail and job-health confirmation.\n\n"
         )
         for r in no_change:
-            f.write(f"### {r['claim_id']}\n\n")
             f.write(r["text"].strip())
             if r.get("unlisted_hits"):
                 f.write(
