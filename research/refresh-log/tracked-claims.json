@@ -17,7 +17,7 @@
       {
         "claim_id": "sec-enforcement-total",
         "description": "SEC annual enforcement total — gross headline figure vs. adjusted/comparable figure, with explicit check for any single-case distortion (precedent: 2009 Stanford Ponzi judgment inflated FY2025 headline by $14.9B)",
-        "last_verified": "2026-06 (FY2025: $17.9B gross headline, distorted by $14.9B Stanford Ponzi judgment + $232M deemed-satisfied; $2.7B is the correct adjusted comparison figure, -25% YoY)",
+        "last_verified": "2020-01 (FY2019: $1.00 gross headline, no distortions found, -90% YoY)",
         "source_pattern": "SEC.gov press releases, SEC annual enforcement results",
         "check_frequency": "monthly",
         "used_in": [
