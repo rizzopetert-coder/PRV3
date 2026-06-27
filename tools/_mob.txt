@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.24
+\\\#\\\# MOB v4.25
 
   
 
@@ -147,6 +147,10 @@ The diagnostic is the primary entry point. Four resolution services sit beneath 
   
 
 | --- | --- |
+
+  
+
+**Provisional Hold vs. Lock (Session 56):** Before a decision is recorded as Locked in the MOB, confirm whether any open async research threads could invalidate this constraint. If yes, the decision is a Provisional Hold until that thread closes. Provisional Holds are documented in the session log but not listed as Locked Decisions. When the thread closes, the hold converts to a Lock or the decision is revised. Example: displacement-pattern essay count was not locked during the research-refresh automation build because the de Waal verification thread was still open.
 
   
 
@@ -1505,7 +1509,8 @@ Full progression in Section 16 session log.
 | \\\*\\\*web/app/book/page.tsx\\\*\\\* | /book index. Lists all published BookPiece entries from bookManifest. Empty state: "Coming soon." Wired to real manifest data. Created S46. Extended S48. |
 | \\\*\\\*web/app/book/[type]/[slug]/page.tsx\\\*\\\* | Individual piece view. Async Server Component — params: Promise<{type, slug}>. VALID_TYPES guard (memo/methodology/case_pattern). Finds piece in bookManifest by type+slug. Voice-aware heading (Lora: from_the_author, Inter: standard). Content body deferred to migration pass. generateStaticParams() returns [] while manifest is empty. Created S48. |
 | \\\*\\\*web/lib/book-manifest.ts\\\*\\\* | BookPiece manifest. Types: BookContentType (memo/methodology/case_pattern), BookVoice (standard/from_the_author). BookPiece interface: id, slug, contentType, voice, title, teaser, signatureId?, citationIds?, relatedSlug?, author, status. relatedSlug used for reciprocal pair FTA-05/exit-pattern ↔ LIB-013/exit-calculation. bookManifest: 50 entries — 13 Batch A + 9 Batch C + 20 Batch B (11 FTA + 9 LIB) + 8 LIB-043–050 memo salvage. All status draft. No engine imports — clinical boundary enforced. Created S48. |
-| \\\*\\\*web/lib/book-citations.ts\\\*\\\* | Citation manifest. BookCitation interface: id, text, source (required — e.g. "Gallup", "McKinsey"), url?, urlStatus ("verified" | "unverified"), severity? (1–5 evidentiary strength). FABRICATED state dropped — The Book carries only already-verified citations. bookCitations: HC-007/HC-068/HC-070/HC-071 populated (Batch A citations). Pre-publish flag: HC-110 referenced by LIB-020 citationIds — not yet populated. Created S48. |
+| \\\*\\\*web/lib/book-citations.ts\\\*\\\* | Citation manifest. BookCitation interface: id, text, source (required — e.g. "Gallup", "McKinsey"), url?, urlStatus ("verified" | "unverified"), severity? (1–5 evidentiary strength). FABRICATED state dropped — The Book carries only already-verified citations. bookCitations: HC-007/HC-068/HC-070/HC-071/HC-110/HC-103 populated plus 8 new Session 56 citations: HC-ROSS-1977, HC-GREEN-1979, HC-SWIFT-2013, HC-REASON-1990, HC-SENGE-1990, HC-HUGHES-2011, HC-DEWAAL-2026, HC-SAKS-2006. 14 total citations. Created S48. Updated S56. |
+| **research/displacement-pattern/citation-verification.md** | Primary source verification document for the displacement-pattern essay. Confirms de Waal (2026): page 6 states "empirically grounded failure can range from roughly ~30% to ~65%+." Confirms Hughes (2011): 70% figure traced to 1993 unscientific estimate. Documents Label-A studies (Jones 2021 at 27.5%, Hill 2020 at 54-65%+). Records repo-wide grep result: zero live files cite the 70% figure. Created S56. |
 | \\\*\\\*web/content/book/\\\*\\\* | Content directory. Three subdirectories: memo/ (16 files), methodology/ (28 files), case_pattern/ (6 files). 50 .md files total — 42 original migration + 8 LIB-043–050 memo salvage. All status draft. Created S48. |
 | \\\*\\\*web/app/ask/page.tsx\\\*\\\* | Shell route. /ask. Just Ask — conversation mechanism and services summary out of scope S46. Created S46. |
 | \\\*\\\*web/app/about/page.tsx\\\*\\\* | Shell route. /about. Parent page. Children: /about/services, /about/story. Created S46. |
