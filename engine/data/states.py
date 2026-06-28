@@ -895,7 +895,7 @@ _reg(_profile(
     cluster_id=None,
     liability_axes=["Legal & Compliance", "Governance & Authority", "Financial & Economic"],
     asset_axes=["Governance Discipline", "Accountability Architecture"],
-    sev_min="Entrenched", sev_max="Entrenched",  # Fixed tier
+    sev_min="Emerging", sev_max="Entrenched",
     # Inferred from profiles doc: Sequential Decision Blindness
     resolution_family="Intervention + Executive Counsel",
 ))
