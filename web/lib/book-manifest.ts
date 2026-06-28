@@ -13,6 +13,9 @@ export interface BookPiece {
   relatedSlug?: string;
   author: "Principal Resolution";
   status: "draft" | "published" | "parked";
+  scheduledWeek?: number;
+  scheduledDay?: "Tue" | "Thu" | "Fri";
+  contentPillar?: "Reframe" | "Pattern Named" | "Case Composited" | "Underneath" | "Foundation";
 }
 
 export const bookManifest: BookPiece[] = [
@@ -26,6 +29,9 @@ export const bookManifest: BookPiece[] = [
     citationIds: ["HC-007", "HC-110"],
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 1,
+    scheduledDay: "Thu",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-021",
@@ -36,6 +42,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Organizations present with symptoms. The instrument diagnoses states. Understanding why those are different things — and why treating one without identifying the other produces recurrence — is foundational to how Principal Resolution works.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 8,
+    scheduledDay: "Tue",
+    contentPillar: "Underneath",
   },
   {
     id: "LIB-025",
@@ -47,6 +56,9 @@ export const bookManifest: BookPiece[] = [
     citationIds: ["HC-068", "HC-070"],
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 2,
+    scheduledDay: "Tue",
+    contentPillar: "Underneath",
   },
   {
     id: "LIB-026",
@@ -58,6 +70,9 @@ export const bookManifest: BookPiece[] = [
     citationIds: ["HC-071"],
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 3,
+    scheduledDay: "Thu",
+    contentPillar: "Underneath",
   },
   {
     id: "LIB-027",
@@ -68,6 +83,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Every organization that hires a practitioner believes it is ready to change. Learning to distinguish genuine readiness from its performance — before the engagement is half over — is one of the most valuable skills in the work.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 4,
+    scheduledDay: "Fri",
+    contentPillar: "Underneath",
   },
   {
     id: "LIB-028",
@@ -78,6 +96,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Resistance is not the end of an engagement's productive life. It is often the beginning of it. What the organization is pushing back against tells you more about where the work needs to go than anything it has said directly.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 6,
+    scheduledDay: "Fri",
+    contentPillar: "Underneath",
   },
   {
     id: "LIB-030",
@@ -88,6 +109,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Effectiveness in a hard conversation is never assumed and never forced — it is earned through a disciplined sequence. This piece explains the framework and what the four practice debrief dimensions are actually measuring.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 13,
+    scheduledDay: "Fri",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-034",
@@ -98,6 +122,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Most practitioners know how to be direct. Fewer know how to be direct in a way that produces change rather than defense. The gap between those two outcomes is not a matter of courage or clarity — it is a matter of sequence.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 15,
+    scheduledDay: "Tue",
+    contentPillar: "Pattern Named",
   },
   {
     id: "FTA-17",
@@ -108,6 +135,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The Anchor is the rarest finding in the diagnostic system — not because healthy organizations are rare, but because they don't usually go looking. What you built is real, it's valuable, and it's more fragile than it looks.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 17,
+    scheduledDay: "Thu",
+    contentPillar: "Reframe",
   },
   {
     id: "LIB-014",
@@ -118,6 +148,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Anchor is the state that names what happens when a role, a person, or a structure that once worked has not been updated to match what the organization has become. The drag compounds quietly — and adaptation is not resolution.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 2,
+    scheduledDay: "Fri",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-013",
@@ -129,6 +162,9 @@ export const bookManifest: BookPiece[] = [
     relatedSlug: "exit-pattern",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 4,
+    scheduledDay: "Tue",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-015",
@@ -139,6 +175,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The corporate feedback apparatus has become extraordinarily sophisticated at creating the appearance of feedback without producing the substance of it. The problem is not the tools — we confused delivery infrastructure with candor.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 6,
+    scheduledDay: "Tue",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-016",
@@ -150,6 +189,9 @@ export const bookManifest: BookPiece[] = [
     citationIds: ["HC-068"],
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 7,
+    scheduledDay: "Thu",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-017",
@@ -160,6 +202,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The 'seat at the table' argument was always asking for the wrong thing. HR is not seeking entry into a room where decisions are being made. HR is the architecture that makes the room possible.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 8,
+    scheduledDay: "Fri",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-035",
@@ -170,6 +215,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "An organizational assessment sends someone in with no position in the organization, no relationships to protect, and no stake in what the findings turn out to be. What it produces is a diagnosis — not a set of recommendations designed to be palatable.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 12,
+    scheduledDay: "Thu",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-036",
@@ -180,6 +228,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Most consulting engagements begin with a hypothesis — and the investigation confirms it. Three principles that correct for this: look without an agenda, report what you actually found, and deliver something specific enough to act on.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 13,
+    scheduledDay: "Tue",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-037",
@@ -200,6 +251,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The difference between a succession plan and a succession wish — and what organizational continuity actually requires you to be able to answer.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 3,
+    scheduledDay: "Fri",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-06",
@@ -210,6 +264,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Business cases aren't predictions. They're arguments optimized for approval — and the system that rewards the confident version over the accurate one keeps producing the same outcomes.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 8,
+    scheduledDay: "Thu",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-10",
@@ -220,6 +277,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Accountability doesn't collapse all at once. It erodes through exceptions — each one defensible in isolation, accumulating into a permission structure that everyone can see and no one has addressed.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 12,
+    scheduledDay: "Tue",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-11",
@@ -230,6 +290,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The matrix doesn't eliminate reporting conflict. It relocates it downward — to the person with the least power to resolve it — and calls that structure.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 12,
+    scheduledDay: "Fri",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-12",
@@ -240,6 +303,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Toxic cultures don't announce themselves. They teach you the rules the old-fashioned way — by making examples — and become stable long before anyone decides to address them.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 13,
+    scheduledDay: "Thu",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-01",
@@ -250,6 +316,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "You know exactly who it is. You've done the math on what it's costing. Leadership has done the math too — and decided the answer is to keep waiting. That calculation is almost always wrong.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 1,
+    scheduledDay: "Tue",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-02",
@@ -261,6 +330,9 @@ export const bookManifest: BookPiece[] = [
     citationIds: ["HC-103"],
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 2,
+    scheduledDay: "Thu",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-04",
@@ -271,6 +343,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "You already know it's bad. The buffer is gone. The people who could help you fix this are the ones who have already left. The window is real — and it is not going to stay open while you think about it.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 5,
+    scheduledDay: "Fri",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-05",
@@ -282,6 +357,9 @@ export const bookManifest: BookPiece[] = [
     relatedSlug: "exit-calculation",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 7,
+    scheduledDay: "Tue",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-07",
@@ -292,6 +370,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Everyone knows. Nobody says anything. The organization decided, without ever really deciding, that avoiding conflict is more important than solving problems. The cost is invisible until it isn't.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 9,
+    scheduledDay: "Thu",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-08",
@@ -302,6 +383,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The organization has fractured into self-contained units that have learned to function without each other. Each team is doing fine on their own. The whole is producing less than the sum of its parts — and the gap between the two is where your best people are slowly burning out.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 10,
+    scheduledDay: "Fri",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-09",
@@ -312,6 +396,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The offsite was great. Everyone left feeling aligned. That was three months ago. Since then, the same agreed strategy has been interpreted six different ways — and nobody has acknowledged the contradiction because acknowledging it would require having the conversation that nobody wants to have.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 11,
+    scheduledDay: "Thu",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-13",
@@ -322,6 +409,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The meeting moves. The agenda advances. Everyone nods. You walk out and realize nothing was actually decided. Again. This is not professionalism — it is the language of thoughtfulness deployed in the service of permanent deferral.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 14,
+    scheduledDay: "Tue",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-14",
@@ -332,6 +422,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The org chart you drew at twenty people does not work at eighty. The roles blurred in motion, the workarounds became the system, and the people who absorbed the gap are now the first ones running the math on how much longer they can sustain it.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 15,
+    scheduledDay: "Thu",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-15",
@@ -342,6 +435,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "You are not failing because you are bad at your job. You are failing because you are running today's operations on infrastructure built for a different organization. The process was good once. That organization no longer exists.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 16,
+    scheduledDay: "Tue",
+    contentPillar: "Reframe",
   },
   {
     id: "FTA-16",
@@ -352,6 +448,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "You are not sure what is wrong. You are sure something is. The signals are present but have not formed a pattern yet. That ambiguity is frustrating — and it is also the most valuable moment to be paying attention.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 16,
+    scheduledDay: "Fri",
+    contentPillar: "Reframe",
   },
   {
     id: "LIB-018",
@@ -362,6 +461,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "You have started preparing for conversations that should take five minutes. Feedback stopped being a tool and became a risk — not because anyone decided that, but through small, accumulated signals that added up to something legible: raising difficult things here costs more than staying quiet.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 10,
+    scheduledDay: "Thu",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-019",
@@ -372,6 +474,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Your meetings go smoothly. Proposals land well. Nobody raises objections you haven't already thought of. A room that never pushes back is not a room full of people who agree with you — it is a room full of people who have decided that disagreeing with you costs more than it returns.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 11,
+    scheduledDay: "Tue",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-022",
@@ -382,6 +487,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "A director. A CEO friendship. An HR function without standing. Two women who followed the process exactly as designed — and found out what the process was built to protect. The complaint worked. That was the problem.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 1,
+    scheduledDay: "Fri",
+    contentPillar: "Case Composited",
   },
   {
     id: "LIB-023",
@@ -392,6 +500,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "She had been there six years. When she resigned, the executive director said it was a loss but that he understood. What he did not do — what nobody did — was ask her what she had been watching for the last eighteen months.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 3,
+    scheduledDay: "Tue",
+    contentPillar: "Case Composited",
   },
   {
     id: "LIB-024",
@@ -402,6 +513,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "You put a real question to your senior team — one where you genuinely expected the table to split — and instead you got unanimous agreement. You are left wondering whether you just got consensus or whether you got a performance of it. Those are not the same thing.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 11,
+    scheduledDay: "Fri",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-029",
@@ -412,6 +526,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "She had been there eleven years — long enough to become the person who keeps an organization functioning in ways nobody thought to measure. The restructuring disrupted something invisible. She raised it in March. She resigned in April. What the transition checklist could not capture left with her.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 4,
+    scheduledDay: "Thu",
+    contentPillar: "Case Composited",
   },
   {
     id: "LIB-031",
@@ -422,6 +539,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "She was not excluded. She was simply not included at the moment when inclusion would have changed something. That distinction matters — because the first version of the problem is about intent, and the second is about structure. Intent is easy to defend. Structure is what actually determines what information reaches a decision.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 6,
+    scheduledDay: "Thu",
+    contentPillar: "Case Composited",
   },
   {
     id: "LIB-032",
@@ -432,6 +552,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The strategy was real. The exceptions were reasonable. By the fourth exception, no one was calling them exceptions anymore. Drift is not a single decision — it is the product of many reasonable decisions that no one ever accounted for together.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 7,
+    scheduledDay: "Fri",
+    contentPillar: "Case Composited",
   },
   {
     id: "LIB-033",
@@ -442,6 +565,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "He had not been wrong often. Over thirty years, that accumulated into something that looked like wisdom and functioned like a wall. He did not construct the architecture deliberately. He maintained it passively, one comfortable hire at a time.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 9,
+    scheduledDay: "Tue",
+    contentPillar: "Case Composited",
   },
   {
     id: "LIB-043",
@@ -453,6 +579,9 @@ export const bookManifest: BookPiece[] = [
     relatedSlug: "the-basement-standard",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 15,
+    scheduledDay: "Fri",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-044",
@@ -464,6 +593,9 @@ export const bookManifest: BookPiece[] = [
     relatedSlug: "silosolation",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 16,
+    scheduledDay: "Thu",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-045",
@@ -475,6 +607,9 @@ export const bookManifest: BookPiece[] = [
     relatedSlug: "the-broken-compass",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 17,
+    scheduledDay: "Tue",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-046",
@@ -486,6 +621,9 @@ export const bookManifest: BookPiece[] = [
     relatedSlug: "the-policy-lag",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 17,
+    scheduledDay: "Fri",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-047",
@@ -497,6 +635,9 @@ export const bookManifest: BookPiece[] = [
     relatedSlug: "decision-paralysis",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 18,
+    scheduledDay: "Tue",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-048",
@@ -508,6 +649,9 @@ export const bookManifest: BookPiece[] = [
     relatedSlug: "the-undefined-role",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 18,
+    scheduledDay: "Thu",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-049",
@@ -519,6 +663,9 @@ export const bookManifest: BookPiece[] = [
     relatedSlug: "leadership-deafness",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 18,
+    scheduledDay: "Fri",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-050",
@@ -529,6 +676,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The organizations that call at this stage have usually been building toward it for longer than they know. What the work looks like when an organization is already in structural collapse — and why the instinct to tighten control is exactly wrong.",
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 19,
+    scheduledDay: "Tue",
+    contentPillar: "Pattern Named",
   },
   {
     id: "LIB-051",
@@ -540,5 +690,8 @@ export const bookManifest: BookPiece[] = [
     citationIds: ["HC-ROSS-1977", "HC-SWIFT-2013", "HC-GREEN-1979", "HC-REASON-1990", "HC-SENGE-1990", "HC-SAKS-2006"],
     author: "Principal Resolution",
     status: "draft",
+    scheduledWeek: 19,
+    scheduledDay: "Fri",
+    contentPillar: "Foundation",
   },
 ];
