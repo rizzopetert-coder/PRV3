@@ -2,7 +2,7 @@
 
 The first time leadership announced something was going to change and it didn't, people had an explanation ready. Timing. Resourcing. A reasonable setback nobody could have predicted. That explanation held, because one unmet commitment is just one unmet commitment, and most workforces extend leadership the benefit of the doubt at least once.
 
-The second time, the explanation got harder to offer in good faith, and people started offering it anyway, a little less convinced. By now, whatever number of times "by now" actually is, the explanations have stopped working, not because they got worse, but because the workforce stopped needing them. Nobody's debating anymore whether leadership's commitments are reliable. They've already concluded the answer and adjusted their attention accordingly. The next announcement about what's going to be different will land in a room that has already decided not to believe it.
+The second time, the explanation got harder to offer in good faith, and people started offering it anyway. A little less convinced, a lot less convincing. By now, the explanations have stopped working because the workforce stopped needing them. Nobody's debating anymore whether leadership's commitments are reliable. They've already concluded the answer and adjusted their attention accordingly. The next announcement about what's going to be different will land in a room that has already decided its incredulity.
 
 ---
 
@@ -18,7 +18,7 @@ Credibility works like a currency leadership spends every time it asks people to
 
 What makes the condition expensive in a very specific, very avoidable way is this: it's not that people will openly resist the next change effort. It's that they'll quietly decline to invest in it.
 
-An initiative that needs belief to succeed — a culture push, a new strategic direction, a transformation effort that depends on people changing behavior because they trust it's going somewhere — runs on exactly the resource that's been depleted. People will show up. They'll nod in the all-hands. They will not give it the discretionary effort that separates an initiative that actually changes something from one that quietly fades after the launch energy wears off, because giving that effort requires believing this time is different, and that belief is precisely what's gone. The initiative isn't failing because the plan is bad. It's failing before it starts, because it's spending currency the organization doesn't have anymore.
+An initiative that needs belief to succeed — a culture push, a new strategic direction, a transformation effort that depends on people changing behavior because they trust it's going somewhere — runs on exactly the resource that's been depleted. People will show up. They'll nod in the all-hands. They will not give it the discretionary effort that separates a strong initiative from a failed one, because giving that effort requires believing it leads somewhere, and that belief is what's gone. The initiative isn't failing because the plan is bad. It's failing before it starts, because it's spending currency the organization doesn't have anymore.
 
 ---
 
