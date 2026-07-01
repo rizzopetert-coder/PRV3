@@ -1,1 +1,79 @@
-[]
+[
+  {
+    "claim_id": "ebsa-recoveries",
+    "refresh_report": "research/refresh-log/2026-07-01.md",
+    "proposed_at": "2026-07-01",
+    "pr_merged_at": null,
+    "status": "proposed",
+    "proposed_edit_summary": "Material change detected. See research/refresh-log/2026-07-01.md for current finding and suggested direction.",
+    "target_files": [
+      "research/seven-experiments/experiment-2-employment-litigation-taxonomy.html"
+    ],
+    "applied_commit": null,
+    "rejected_reason": null,
+    "revisit_by_date": null,
+    "deferred_reason": null
+  },
+  {
+    "claim_id": "epli-market-size",
+    "refresh_report": "research/refresh-log/2026-07-01.md",
+    "proposed_at": "2026-07-01",
+    "pr_merged_at": null,
+    "status": "proposed",
+    "proposed_edit_summary": "Material change detected. See research/refresh-log/2026-07-01.md for current finding and suggested direction.",
+    "target_files": [
+      "research/seven-experiments/experiment-5-insurance-claims-and-risk-data.html"
+    ],
+    "applied_commit": null,
+    "rejected_reason": null,
+    "revisit_by_date": null,
+    "deferred_reason": null
+  },
+  {
+    "claim_id": "workers-comp-market",
+    "refresh_report": "research/refresh-log/2026-07-01.md",
+    "proposed_at": "2026-07-01",
+    "pr_merged_at": null,
+    "status": "proposed",
+    "proposed_edit_summary": "Material change detected. See research/refresh-log/2026-07-01.md for current finding and suggested direction.",
+    "target_files": [
+      "research/seven-experiments/experiment-5-insurance-claims-and-risk-data.html"
+    ],
+    "applied_commit": null,
+    "rejected_reason": null,
+    "revisit_by_date": null,
+    "deferred_reason": null
+  },
+  {
+    "claim_id": "ai-employment-regulation",
+    "refresh_report": "research/refresh-log/2026-07-01.md",
+    "proposed_at": "2026-07-01",
+    "pr_merged_at": null,
+    "status": "proposed",
+    "proposed_edit_summary": "Material change detected. See research/refresh-log/2026-07-01.md for current finding and suggested direction.",
+    "target_files": [
+      "research/seven-experiments/experiment-5-insurance-claims-and-risk-data.html",
+      "research/seven-experiments/experiment-6-hr-conference-theme-analysis.html",
+      "web/data/taxonomy.ts"
+    ],
+    "applied_commit": null,
+    "rejected_reason": null,
+    "revisit_by_date": null,
+    "deferred_reason": null
+  },
+  {
+    "claim_id": "change-management-failure-rate",
+    "refresh_report": "research/refresh-log/2026-07-01.md",
+    "proposed_at": "2026-07-01",
+    "pr_merged_at": null,
+    "status": "proposed",
+    "proposed_edit_summary": "Material change detected. See research/refresh-log/2026-07-01.md for current finding and suggested direction.",
+    "target_files": [
+      "research/seven-experiments/experiment-4-consulting-engagement-postmortem-analysis.html"
+    ],
+    "applied_commit": null,
+    "rejected_reason": null,
+    "revisit_by_date": null,
+    "deferred_reason": null
+  }
+]
