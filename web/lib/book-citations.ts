@@ -188,4 +188,20 @@ export const bookCitations: Record<string, BookCitation> = {
     urlStatus: "verified",
     severity: 1,
   },
+  "HC-NYCLL144-2023": {
+    id: "HC-NYCLL144-2023",
+    text: "NYC Local Law 144 requires employers using automated employment decision tools (AEDTs) to substantially assist or replace hiring or promotion decisions to commission an independent bias audit within the prior year and publicly post a summary before use, with penalties of $500 to $1,500 per violation per day.",
+    source: "NYC Local Law 144 (2021), enforced by the NYC Department of Consumer and Worker Protection, effective July 2023.",
+    url: "https://www.osc.ny.gov/state-agencies/audits/2025/12/02/enforcement-local-law-144-automated-employment-decision-tools",
+    urlStatus: "verified",
+    severity: 2,
+  },
+  "HC-MOBLEY-2024": {
+    id: "HC-MOBLEY-2024",
+    text: "Mobley v. Workday allowed the claim that an AI hiring vendor can be directly liable as an 'agent' of the employers using its screening tools to survive motion to dismiss — establishing that AI-vendor liability theories can proceed to discovery, not that liability has been found on the merits. The case remains in active litigation as of mid-2026, with claims proceeding under FEHA, the ADA, and a certified nationwide ADEA collective action.",
+    source: "Mobley v. Workday, Inc., No. 3:23-cv-00770 (N.D. Cal.)",
+    url: "https://www.courtlistener.com/docket/66831340/175/mobley-v-workday-inc/",
+    urlStatus: "verified",
+    severity: 1,
+  },
 };

@@ -2,7 +2,7 @@ Tracy Keogh was the Chief Human Resources Officer at HP when someone walked up t
 
 She said, "HR is the table."
 
-Wendi Safstrom, President of the SHRM Foundation, shared that exchange on The Talent War Podcast. She said she has loved it ever since. So have the people she has told it to. The quote travels because it names something that most organizations understand intellectually but have not yet built into how they actually operate.
+The story surfaced on The Talent War Podcast, when the host — who had worked alongside Keogh at HP — shared it before interviewing that episode's guest. The quote travels because it names something that most organizations understand intellectually but have not yet built into how they actually operate.
 
 This is an attempt to say what that means in practice — not as a declaration about the importance of HR, but as a manifesto about what organizations that have figured this out actually look like, and what the ones that have not are quietly paying for not knowing.
 
