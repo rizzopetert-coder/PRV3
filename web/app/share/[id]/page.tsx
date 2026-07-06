@@ -34,7 +34,7 @@ export default async function SharePage({ params }: SharePageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10 md:px-10 md:py-14">
+    <main className="min-h-screen bg-paper px-6 py-10 md:px-10 md:py-14">
       <ShareableOutput payload={payload} />
     </main>
   );

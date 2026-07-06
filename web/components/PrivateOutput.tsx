@@ -63,7 +63,7 @@ export default function PrivateOutput({
 
       {/* Block 2 — Liability condition */}
       <div className="py-4">
-        <p className="text-sm leading-[1.65] text-gray-900">
+        <p className="text-sm leading-[1.65] text-charcoal">
           {liabilityText || payload.resolution_routing}
         </p>
       </div>
@@ -84,7 +84,7 @@ export default function PrivateOutput({
         <p className="text-[11px] uppercase tracking-wide text-gray-400">
           Resolution pathway
         </p>
-        <p className="text-[13px] font-medium text-gray-900">
+        <p className="text-[13px] font-medium text-charcoal">
           {payload.resolution_family}
         </p>
         {resolutionFramingText ? (

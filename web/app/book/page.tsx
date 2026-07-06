@@ -6,7 +6,7 @@ export default function BookPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-16">
-      <h1 className="font-display text-3xl text-gray-900 mb-4">The Book</h1>
+      <h1 className="font-display text-3xl text-charcoal mb-4">The Book</h1>
       <p className="font-ui text-base text-gray-600 mb-12">
         Explore the research and thinking behind the work.
       </p>
@@ -20,8 +20,8 @@ export default function BookPage() {
                 <h2
                   className={
                     piece.voice === "from_the_author"
-                      ? "font-display text-xl text-gray-900 mb-2"
-                      : "font-ui text-xl font-medium text-gray-900 mb-2"
+                      ? "font-display text-xl text-charcoal mb-2"
+                      : "font-ui text-xl font-medium text-charcoal mb-2"
                   }
                 >
                   {piece.title}

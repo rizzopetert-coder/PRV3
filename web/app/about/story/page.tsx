@@ -6,13 +6,13 @@ export const metadata: Metadata = {
 
 export default function StoryPage() {
   return (
-    <main className="bg-gray-50 min-h-screen">
+    <main className="bg-paper min-h-screen">
       <div className="max-w-3xl mx-auto px-6 py-16 md:py-24">
         <div className="divide-y divide-gray-100">
 
           <section className="pb-16">
             <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Work</p>
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 mb-8">Telling the Truth</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-8">Telling the Truth</h2>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
               In almost every organization I&apos;ve worked with, the people who can see a problem most clearly are usually the ones with the most to lose by saying so. The manager who&apos;d have to call out a peer. The board member who&apos;s known the founder for twenty years. The HR director who already raised this once and watched what happened to the next person who raised it twice.
             </p>
@@ -29,7 +29,7 @@ export default function StoryPage() {
 
           <section className="py-16">
             <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Practice</p>
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 mb-8">Twenty-Five Years</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-8">Twenty-Five Years</h2>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
               There&apos;s twenty-five years behind this, split between conference rooms and forest trails.
             </p>
@@ -52,7 +52,7 @@ export default function StoryPage() {
 
           <section className="py-16">
             <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Method</p>
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 mb-8">How This Works</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-8">How This Works</h2>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
               Most firms do one of two things. They hand you a framework before they&apos;ve heard your actual situation, because the framework is what they&apos;re selling. Or they sell you an associate&apos;s time on the engagement and a partner&apos;s name on the proposal, and you spend the first month re-explaining yourself to whoever actually shows up.
             </p>
@@ -69,7 +69,7 @@ export default function StoryPage() {
 
           <section className="py-16">
             <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Relationship</p>
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 mb-8">What Compounds</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-8">What Compounds</h2>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
               A single engagement is worth something on its own — a problem gets named, a plan gets built, something expensive gets resolved.
             </p>
@@ -89,7 +89,7 @@ export default function StoryPage() {
 
           <section className="pt-16">
             <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Standard</p>
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 mb-8">What to Expect</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-8">What to Expect</h2>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
               I spent years as a teambuilding professional, which taught me the real value of experiential learning. A shared experience can be a kind of catalyst — breaking down barriers, strengthening communication and trust, in a way conversation alone rarely manages.
             </p>

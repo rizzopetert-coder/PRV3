@@ -55,7 +55,7 @@ export default function ShareButton({ selectedStateIds, intake }: ShareButtonPro
         </p>
         <button
           onClick={handleCreateShare}
-          className="w-full border border-gray-900 text-gray-900 text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+          className="w-full border border-charcoal text-charcoal text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-100 transition-colors"
         >
           Try again
         </button>
@@ -69,11 +69,11 @@ export default function ShareButton({ selectedStateIds, intake }: ShareButtonPro
         <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
           Shareable link
         </p>
-        <div className="flex items-center gap-3 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg">
+        <div className="flex items-center gap-3 px-3 py-2.5 bg-paper border border-gray-200 rounded-lg">
           <p className="text-[13px] text-gray-600 flex-1 truncate">{shareUrl}</p>
           <button
             onClick={handleCopy}
-            className="text-[13px] font-medium text-gray-900 whitespace-nowrap hover:text-gray-500 transition-colors"
+            className="text-[13px] font-medium text-charcoal whitespace-nowrap hover:text-gray-500 transition-colors"
           >
             {copied ? "Copied" : "Copy"}
           </button>
@@ -86,7 +86,7 @@ export default function ShareButton({ selectedStateIds, intake }: ShareButtonPro
     <button
       onClick={handleCreateShare}
       disabled={shareState === "creating"}
-      className="w-full bg-gray-900 text-white text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+      className="w-full bg-charcoal text-white text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
     >
       {shareState === "creating" ? "Creating..." : "Create shareable version"}
     </button>

@@ -2,16 +2,16 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-paper">
       <div className="max-w-2xl mx-auto px-6 py-16 md:px-10 md:py-24">
 
         {/* Section 1 — Opening statements */}
         <section className="mb-16">
-          <p className="font-display text-3xl md:text-5xl leading-tight text-gray-900 my-8 md:my-12">
+          <p className="font-display text-3xl md:text-5xl leading-tight text-charcoal my-8 md:my-12">
             We don&apos;t arrive with a methodology and fit you into it. We start
             with you.
           </p>
-          <p className="font-display text-3xl md:text-5xl leading-tight text-gray-900 my-8 md:my-12">
+          <p className="font-display text-3xl md:text-5xl leading-tight text-charcoal my-8 md:my-12">
             We don&apos;t fix people problems. We change the conditions that
             produce them.
           </p>
@@ -26,7 +26,7 @@ export default function Home() {
 
           {/* Path 1 — primary */}
           <div className="space-y-2">
-            <h2 className="font-display text-xl font-bold text-gray-900">
+            <h2 className="font-display text-xl font-bold text-charcoal">
               Start with the diagnostic.
             </h2>
             <p className="font-ui text-base text-gray-600">
@@ -36,7 +36,7 @@ export default function Home() {
             <div className="pt-2">
               <Link
                 href="/diagnostic"
-                className="inline-block bg-gray-900 text-white font-ui text-sm font-medium px-6 py-3 hover:bg-gray-700 transition-colors"
+                className="inline-block bg-charcoal text-white font-ui text-sm font-medium px-6 py-3 hover:bg-gray-700 transition-colors"
               >
                 Begin the diagnostic →
               </Link>
@@ -45,7 +45,7 @@ export default function Home() {
 
           {/* Path 2 — secondary */}
           <div className="space-y-2">
-            <h3 className="font-ui text-lg font-semibold text-gray-900">
+            <h3 className="font-ui text-lg font-semibold text-charcoal">
               Start by recognizing what&apos;s familiar.
             </h3>
             <p className="font-ui text-sm text-gray-600">
@@ -55,7 +55,7 @@ export default function Home() {
             <div className="pt-1">
               <Link
                 href="/diagnostic"
-                className="inline-block border border-gray-900 text-gray-900 font-ui text-sm font-medium px-5 py-2 hover:bg-gray-100 transition-colors"
+                className="inline-block border border-charcoal text-charcoal font-ui text-sm font-medium px-5 py-2 hover:bg-gray-100 transition-colors"
               >
                 Explore the conditions →
               </Link>
@@ -64,7 +64,7 @@ export default function Home() {
 
           {/* Path 3 — secondary */}
           <div className="space-y-2">
-            <h3 className="font-ui text-lg font-semibold text-gray-900">
+            <h3 className="font-ui text-lg font-semibold text-charcoal">
               Come with a specific situation.
             </h3>
             <p className="font-ui text-sm text-gray-600">
@@ -74,7 +74,7 @@ export default function Home() {
             <div className="pt-1">
               <Link
                 href="/ask"
-                className="inline-block border border-gray-900 text-gray-900 font-ui text-sm font-medium px-5 py-2 hover:bg-gray-100 transition-colors"
+                className="inline-block border border-charcoal text-charcoal font-ui text-sm font-medium px-5 py-2 hover:bg-gray-100 transition-colors"
               >
                 Just ask →
               </Link>
@@ -85,7 +85,7 @@ export default function Home() {
           <div className="pt-2">
             <Link
               href="/book"
-              className="font-ui text-sm text-gray-500 hover:text-gray-900 transition-colors"
+              className="font-ui text-sm text-gray-500 hover:text-charcoal transition-colors"
             >
               Explore the research and thinking behind the work. →
             </Link>

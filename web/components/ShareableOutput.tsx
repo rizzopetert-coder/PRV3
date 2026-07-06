@@ -42,7 +42,7 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
 
       {/* Block 1 — Header bar */}
       <div className="flex items-center justify-between pb-3">
-        <span className="text-[12px] font-medium text-gray-900">
+        <span className="text-[12px] font-medium text-charcoal">
           Principal Resolution
         </span>
         <span className="text-[11px] text-gray-400">{clientIdentifier}</span>
@@ -67,7 +67,7 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
 
       {/* Block 3 — Framing text */}
       <div className="py-4">
-        <p className="text-sm leading-[1.65] text-gray-900">
+        <p className="text-sm leading-[1.65] text-charcoal">
           {payload.synthesis.framing_text}
         </p>
       </div>
@@ -98,7 +98,7 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
         <p className="text-[11px] uppercase tracking-wide text-gray-400">
           Resolution pathway
         </p>
-        <p className="text-[13px] font-medium text-gray-900">
+        <p className="text-[13px] font-medium text-charcoal">
           {payload.resolution_family}
         </p>
         {payload.synthesis.resolution_framing_text && (

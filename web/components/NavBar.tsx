@@ -22,14 +22,14 @@ export function NavBar() {
     <nav className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-white">
       <Link
         href="/"
-        className="font-ui text-sm font-semibold text-gray-900 hover:text-gray-600 transition-colors"
+        className="font-ui text-sm font-semibold text-charcoal hover:text-gray-600 transition-colors"
       >
         Principal Resolution
       </Link>
       <div className="flex items-center gap-6">
         <Link
           href="/book"
-          className="font-ui text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          className="font-ui text-sm text-gray-600 hover:text-charcoal transition-colors"
         >
           The Book
         </Link>
@@ -40,7 +40,7 @@ export function NavBar() {
           onMouseLeave={() => setAboutOpen(false)}
         >
           <button
-            className="font-ui text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            className="font-ui text-sm text-gray-600 hover:text-charcoal transition-colors"
             aria-haspopup="true"
             aria-expanded={aboutOpen}
             onClick={() => setAboutOpen((o) => !o)}
@@ -59,14 +59,14 @@ export function NavBar() {
               <div className="bg-white border border-gray-100 shadow-sm py-2 min-w-[160px]">
                 <Link
                   href="/about/story"
-                  className="block px-4 py-2 font-ui text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                  className="block px-4 py-2 font-ui text-sm text-gray-600 hover:text-charcoal hover:bg-paper transition-colors"
                   onClick={() => setAboutOpen(false)}
                 >
                   The Story
                 </Link>
                 <Link
                   href="/about/services"
-                  className="block px-4 py-2 font-ui text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                  className="block px-4 py-2 font-ui text-sm text-gray-600 hover:text-charcoal hover:bg-paper transition-colors"
                   onClick={() => setAboutOpen(false)}
                 >
                   The Services

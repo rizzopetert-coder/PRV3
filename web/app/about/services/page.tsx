@@ -6,7 +6,7 @@ export const metadata: Metadata = {
 
 export default function ServicesPage() {
   return (
-    <main className="bg-gray-50 min-h-screen">
+    <main className="bg-paper min-h-screen">
       <div className="max-w-3xl mx-auto px-6 py-16 md:py-24">
 
         <p className="font-ui text-base text-gray-600 leading-relaxed mb-12">
@@ -16,7 +16,7 @@ export default function ServicesPage() {
         <div className="divide-y divide-gray-100">
 
           <section className="pb-12">
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 mb-3">People Tactics and Strategy</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-3">People Tactics and Strategy</h2>
             <p className="font-ui text-sm text-gray-500 italic mb-6">Org assessment, people strategy, and the tactical HR work required to act on it. Not just structure on paper — the actual decisions about how people are organized, managed, and supported, and the hands-on work to make those decisions real.</p>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
               Some problems live in how the organization is built, not in the people inside it. People Tactics and Strategy starts with an honest look at your structure, your roles, and your people decisions, then does the tactical work to fix what&apos;s not working. Org charts that don&apos;t match how work actually happens. Roles with no clear owner. Decisions that get made twice because nobody agreed who makes them the first time.
@@ -27,7 +27,7 @@ export default function ServicesPage() {
           </section>
 
           <section className="py-12">
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 mb-3">Training &amp; Development</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-3">Training &amp; Development</h2>
             <p className="font-ui text-sm text-gray-500 italic mb-6">Leadership development, team coaching, and teambuilding, built around what your people actually need rather than a packaged program.</p>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
               Training &amp; Development covers what most firms split into four different vendors: leadership development, coaching, teambuilding, and skills training. Here it&apos;s one service, built around the specific gap the diagnostic found, not a course catalog.
@@ -38,7 +38,7 @@ export default function ServicesPage() {
           </section>
 
           <section className="py-12">
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 mb-3">Intervention</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-3">Intervention</h2>
             <p className="font-ui text-sm text-gray-500 italic mb-6">Immediate, in-the-room expertise for a situation that&apos;s live right now.</p>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
               Some situations can&apos;t wait for a plan. Intervention means someone in the room, with the standing and the expertise to move a live situation, for as long as it takes to resolve.
@@ -49,7 +49,7 @@ export default function ServicesPage() {
           </section>
 
           <section className="pt-12">
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 mb-3">Executive Advisory</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-3">Executive Advisory</h2>
             <p className="font-ui text-sm text-gray-500 italic mb-6">A confidential, ongoing relationship for the decisions that can&apos;t be discussed with anyone inside the organization.</p>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
               Yes, it&apos;s what it sounds like. Executive Advisory is a standing, confidential relationship with someone who has no stake in the outcome except getting it right. Available before you need it urgently, and especially valuable once you do.

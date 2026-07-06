@@ -38,18 +38,18 @@ export default function SignatureCard({ signature }: SignatureCardProps) {
         pulse ? "animate-card-pulse" : ""
       } ${
         isSelected
-          ? "border-gray-900 bg-[#EFEDE8]"
+          ? "border-slate bg-paper"
           : "border-gray-200 bg-white"
       }`}
     >
       {/* Card header — cluster select affordance top-right */}
       <div className="px-5 pt-5 pb-4 flex justify-between items-start gap-3">
-        <h3 className="font-display text-xl font-bold text-gray-900 leading-snug">
+        <h3 className="font-display text-xl font-bold text-charcoal leading-snug">
           {signature.name}
         </h3>
         <button
           onClick={handleClusterToggle}
-          className="font-ui text-xs text-gray-500 hover:text-gray-900 transition-colors shrink-0 mt-1"
+          className="font-ui text-xs text-gray-500 hover:text-charcoal transition-colors shrink-0 mt-1"
           aria-label={
             isClusterSelected
               ? `Deselect all conditions in ${signature.name}`
@@ -69,7 +69,7 @@ export default function SignatureCard({ signature }: SignatureCardProps) {
       <div className="px-5 pb-5">
         <button
           onClick={() => setActiveSheet(signature.id)}
-          className="font-ui text-sm text-gray-500 hover:text-gray-900 transition-colors text-left"
+          className="font-ui text-sm text-gray-500 hover:text-charcoal transition-colors text-left"
         >
           See the conditions inside →
         </button>

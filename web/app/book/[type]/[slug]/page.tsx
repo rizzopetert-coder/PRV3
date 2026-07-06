@@ -28,8 +28,8 @@ export default async function BookPiecePage({ params }: Props) {
 
   const headingClass =
     piece.voice === "from_the_author"
-      ? "font-display text-3xl text-gray-900 mb-4"
-      : "font-ui text-3xl font-medium text-gray-900 mb-4";
+      ? "font-display text-3xl text-charcoal mb-4"
+      : "font-ui text-3xl font-medium text-charcoal mb-4";
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-16">

@@ -24,12 +24,12 @@ export function StateDrawer({ signature }: StateDrawerProps) {
         }`}
       >
         <div className="flex justify-between items-center p-4 border-b border-gray-100">
-          <span className="font-display text-base font-semibold text-gray-900">
+          <span className="font-display text-base font-semibold text-charcoal">
             {signature.name}
           </span>
           <button
             onClick={() => setActiveSheet(null)}
-            className="text-gray-400 hover:text-gray-900 transition-colors"
+            className="text-gray-400 hover:text-charcoal transition-colors"
             aria-label="Close"
           >
             ✕
@@ -44,7 +44,7 @@ export function StateDrawer({ signature }: StateDrawerProps) {
                 onClick={() => toggleState(state.id, signature.id)}
                 className={`w-full text-left p-3 rounded border transition-all duration-150 ${
                   isSelected
-                    ? "border-gray-900 bg-gray-50 font-semibold text-gray-900"
+                    ? "border-charcoal bg-paper font-semibold text-charcoal"
                     : "border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-700"
                 }`}
               >
@@ -71,7 +71,7 @@ export function StateDrawer({ signature }: StateDrawerProps) {
             <Drawer.Title className="sr-only">{signature.name}</Drawer.Title>
             <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-3 mb-2 flex-shrink-0" />
             <div className="flex justify-between items-center px-4 pb-3 border-b border-gray-100 flex-shrink-0">
-              <span className="font-display text-base font-semibold text-gray-900">
+              <span className="font-display text-base font-semibold text-charcoal">
                 {signature.name}
               </span>
             </div>
@@ -84,7 +84,7 @@ export function StateDrawer({ signature }: StateDrawerProps) {
                     onClick={() => toggleState(state.id, signature.id)}
                     className={`w-full text-left p-3 rounded border transition-all duration-150 ${
                       isSelected
-                        ? "border-gray-900 bg-gray-50 font-semibold text-gray-900"
+                        ? "border-charcoal bg-paper font-semibold text-charcoal"
                         : "border-gray-200 text-gray-500"
                     }`}
                   >

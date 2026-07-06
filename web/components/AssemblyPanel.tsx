@@ -36,7 +36,7 @@ function AssemblyList() {
           <ul className="space-y-0 divide-y divide-gray-100">
             {selected.map((state) => (
               <li key={state.id} className="py-2 first:pt-0">
-                <span className="text-sm text-gray-900 leading-snug">
+                <span className="text-sm text-charcoal leading-snug">
                   {state.name}
                 </span>
               </li>
@@ -62,7 +62,7 @@ export default function AssemblyPanel() {
   return (
     <>
       {/* Desktop — persistent sidebar */}
-      <aside className="hidden md:flex md:flex-col w-72 shrink-0 border-l border-gray-200 bg-white sticky top-0 h-screen overflow-y-auto">
+      <aside className="hidden md:flex md:flex-col w-72 shrink-0 border-l border-gray-200 bg-paper sticky top-0 h-screen overflow-y-auto">
         <div className="p-6">
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-4">
             What you&apos;re carrying
@@ -80,7 +80,7 @@ export default function AssemblyPanel() {
           <Drawer.Trigger asChild>
             <button
               onClick={() => setActiveSheet("assembly")}
-              className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-5 py-4 flex items-center justify-between text-sm font-medium text-gray-900"
+              className="fixed bottom-0 left-0 right-0 z-40 bg-paper border-t border-gray-200 px-5 py-4 flex items-center justify-between text-sm font-medium text-charcoal"
             >
               <span>
                 {count > 0
@@ -92,7 +92,7 @@ export default function AssemblyPanel() {
           </Drawer.Trigger>
           <Drawer.Portal>
             <Drawer.Overlay className="fixed inset-0 z-40 bg-black/30" />
-            <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl border-t border-gray-200 flex flex-col max-h-[80vh]">
+            <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-paper rounded-t-2xl border-t border-gray-200 flex flex-col max-h-[80vh]">
               <Drawer.Title className="sr-only">What you&apos;re carrying</Drawer.Title>
               <div className="flex justify-center pt-3 pb-1 shrink-0">
                 <div className="w-10 h-1 rounded-full bg-gray-300" />
