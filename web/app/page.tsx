@@ -25,7 +25,7 @@ export default function Home() {
         <section className="mb-16 space-y-10">
 
           {/* Path 1 — primary */}
-          <div className="space-y-2">
+          <div className="space-y-2" data-emphasis="primary">
             <h2 className="font-display text-xl font-bold text-charcoal">
               Start with the diagnostic.
             </h2>
@@ -44,7 +44,7 @@ export default function Home() {
           </div>
 
           {/* Path 2 — secondary */}
-          <div className="space-y-2">
+          <div className="space-y-2" data-emphasis="secondary">
             <h3 className="font-ui text-lg font-semibold text-charcoal">
               Start by recognizing what&apos;s familiar.
             </h3>
@@ -63,7 +63,7 @@ export default function Home() {
           </div>
 
           {/* Path 3 — secondary */}
-          <div className="space-y-2">
+          <div className="space-y-2" data-emphasis="secondary">
             <h3 className="font-ui text-lg font-semibold text-charcoal">
               Come with a specific situation.
             </h3>

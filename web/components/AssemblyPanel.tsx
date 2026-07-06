@@ -35,15 +35,15 @@ function AssemblyList() {
           </p>
           <ul className="space-y-0 divide-y divide-gray-100">
             {selected.map((state) => (
-              <li key={state.id} className="py-2 first:pt-0">
+              <li key={state.id} className="py-2 first:pt-0" data-emphasis="primary">
                 <span className="text-sm text-charcoal leading-snug">
                   {state.name}
                 </span>
               </li>
             ))}
             {unselected.map((state) => (
-              <li key={state.id} className="py-2 first:pt-0">
-                <span className="font-ui text-xs text-gray-300 leading-snug">
+              <li key={state.id} className="py-2 first:pt-0" data-emphasis="receded">
+                <span className="font-ui text-xs text-charcoal leading-snug">
                   {state.name}
                 </span>
               </li>
