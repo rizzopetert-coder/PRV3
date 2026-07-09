@@ -70,6 +70,8 @@ Update:
 - Any new locked decisions or retired decisions
 - Session log entry (date + one-line summary)
 - Version number: increment when locked decisions are added, rules change, or workstream status changes materially. Leave unchanged for session log entries only.
+- If book-manifest.ts, book-citations.ts, or web/content/book/ changed this session: update the corresponding Section 15 doc registry entry counts before logging the session and bumping the version.
+- If a new architectural decision was locked this session: confirm it is reflected in both the relevant spec section (Section 8 or equivalent) and Section 14 before logging.
 
 Use `pathlib.Path('tools/_mob.txt').write_text(content, encoding='utf-8')` to overwrite the file.
 
@@ -134,7 +136,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.32 |
+| MOB version | v4.33 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 47 (locked) |
