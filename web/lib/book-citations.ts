@@ -204,4 +204,28 @@ export const bookCitations: Record<string, BookCitation> = {
     urlStatus: "verified",
     severity: 1,
   },
+  "HC-SIXTH-BABB-2019": {
+    id: "HC-SIXTH-BABB-2019",
+    text: "A CRNA was terminated for cited clinical errors, but an email sent hours after her termination attributed the decision to her worsening eyesight. The Sixth Circuit reversed summary judgment for the employer, holding this was 'smoking gun' evidence that the employer regarded her as disabled under the ADA — reaffirming that an employer cannot fire someone because it perceives them as disabled, even if that perception is mistaken.",
+    source: "Babb v. Maryville Anesthesiologists, P.C., 942 F.3d 308 (6th Cir. 2019)",
+    url: "https://law.justia.com/cases/federal/appellate-courts/ca6/19-5148/19-5148-2019-11-06.html",
+    urlStatus: "verified",
+    severity: 1,
+  },
+  "HC-THIRD-TICE-2001": {
+    id: "HC-THIRD-TICE-2001",
+    text: "A bus driver alleged his employer improperly commingled his medical certifications with his general personnel file, violating the ADA's separate confidential medical file requirement. The Third Circuit affirmed summary judgment for the employer, holding that a private plaintiff must show actual damage or tangible injury — such as an unauthorized party viewing the records — to prevail on a confidentiality claim; a technical commingling violation alone is not independently actionable by a private party, though it remains directly enforceable by the EEOC without any injury requirement.",
+    source: "Tice v. Centre Area Transportation Authority, 247 F.3d 506 (3d Cir. 2001)",
+    url: "https://caselaw.findlaw.com/court/us-3rd-circuit/1054873.html",
+    urlStatus: "verified",
+    severity: 1,
+  },
+  "HC-SCOTUS-MURRAYUBS-2024": {
+    id: "HC-SCOTUS-MURRAYUBS-2024",
+    text: "The Supreme Court held, unanimously, that a whistleblower bringing a claim under the Sarbanes-Oxley Act's retaliation provision need only show that protected activity was a 'contributing factor' in an adverse action — not that the employer acted with retaliatory intent or animus. Once a contributing factor is shown, the burden shifts entirely to the employer to prove by clear and convincing evidence it would have taken the same action regardless. This is a substantially more lenient causation standard than Title VII's, meaning close timing between a report and an adverse action can carry significant weight without requiring proof of intent.",
+    source: "Murray v. UBS Securities, LLC, 601 U.S. 23 (2024)",
+    url: "https://www.law.cornell.edu/supremecourt/text/22-660",
+    urlStatus: "verified",
+    severity: 1,
+  },
 };

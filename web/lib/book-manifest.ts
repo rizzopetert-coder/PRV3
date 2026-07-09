@@ -1069,4 +1069,17 @@ export const bookManifest: BookPiece[] = [
     author: "Principal Resolution",
     status: "draft",
   },
+  {
+    id: "LIB-052",
+    slug: "what-not-to-document",
+    contentType: "memo",
+    voice: "standard",
+    title: "What NOT to Document",
+    teaser: "Most organizations document defensively and starve the documentation that actually protects people — the performance conversation, the commitment, the disagreement. The paper that creates real risk isn't the paper you're missing. It's the paper you didn't need.",
+    relatedSlug: "paper-shield",
+    citationIds: ["HC-SIXTH-BABB-2019", "HC-THIRD-TICE-2001", "HC-SCOTUS-MURRAYUBS-2024"],
+    author: "Principal Resolution",
+    status: "draft",
+    contentPillar: "Pattern Named",
+  },
 ];
