@@ -188,6 +188,24 @@ predate this pass.
 
 ---
 
+## 9. Batch B — E3 candidates (Filter A/B/C, Gemini + quote-verification pass)
+
+| Candidate | Disposition | Target | Note |
+|---|---|---|---|
+| Development Promise Violation | STATE | — | Distinct trust-based onboarding covenant breach; checked against The Dormant Talent and The Culture That Wasn't, no clean fit. |
+| Information Architecture Failure | STATE | — | Downward communication vacuum, distinct from The Lost Map (findability) and The Suppression Filter (upward distortion). |
+| Sustainability Theater | COLLAPSE | The Wrong Reward | Initial pass checked only against Culture Drift and called STATE; expanded check against The Wrong Reward found direct structural match — wellbeing is a specific instantiation of the same stated-vs-actual reward mismatch. Disposition reversed; this table reflects the final call, not the original. |
+| Trust Deficit | STATE | — | Institutionalized-distrust root cause, distinct from The Suppression Filter (the downstream symptom — upward-filtered bad news) on Filter B grounds. |
+| Compensation Indifference | COLLAPSE | Pay Exposure | "Know and haven't acted" language matches Pay Exposure closely; also checked against The Pay Fog (transparency-driven exposure, different mechanism), ruled out. |
+
+**Known non-load-bearing error, logged for the record:** one response in this batch contained
+a factual error unrelated to any disposition — a stray, out-of-context mention of "The
+Unexamined Algorithm" appeared inside the Compensation Indifference/Pay Fog comparison prose,
+with no bearing on pay-related states. Not adopted, not load-bearing, logged here only so it
+isn't later mistaken for a considered claim.
+
+---
+
 ## Summary
 
 This trace is now complete. **The Squeeze**, all of **E1, E4, and E5** (8/8, 10/10, 8/8 named
