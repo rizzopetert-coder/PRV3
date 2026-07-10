@@ -172,6 +172,22 @@ list below.
 
 ---
 
+## 8. E2/E3/E6/E7 raw candidates — already resolved, cross-referenced only
+
+| Candidate | Source | Disposition | Basis |
+|---|---|---|---|
+| Purpose Deficit | E6 #4 | ELIMINATE | Trace Section 7 — Pete's explicit ruling, confirmed multiple times across sessions. |
+| The Squeeze | E6 #8, also referenced in E7 | COLLAPSE | Trace Section 1 — collapses into both The Overloaded Manager and Structural Overload. E6's own description ("The Overloaded Manager at cultural and systemic scale") matches almost verbatim — third independent confirmation. |
+| Workforce Planning Myopia | E6 #15 | COLLAPSE | Trace Section 7 — Pete's ruling: collapse into Reactive Talent Management (override of Gemini's original "borderline survives" filter-run read). |
+| Performative Equity | E3 #8, also "Triple-Confirmed" in E6 | COLLAPSE | Already established outside this trace as the same state as the_diversity_ceiling under an earlier working name. |
+| Resource Depletion Architecture | E7 #04 | ROOT | Confirmed in tools/qualitative_review.py's MOB_ROOT_CONDITIONS set — existing formal code classification, not a thematic read. |
+
+These five are logged here for completeness of the E2/E3/E6/E7 consolidation effort so this
+work has one canonical record. No new disposition work was performed — all five dispositions
+predate this pass.
+
+---
+
 ## Summary
 
 This trace is now complete. **The Squeeze**, all of **E1, E4, and E5** (8/8, 10/10, 8/8 named
