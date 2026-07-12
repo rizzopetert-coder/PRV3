@@ -190,6 +190,26 @@ predate this pass.
 
 ## 9. Batch consolidation dispositions (Filter A/B/C, Gemini + quote-verification passes)
 
+### Note: "the tool experiment" — unresolved external source
+
+E3 and E5 both reference "the tool experiment" as an established data source alongside the
+conference experiment (E6), litigation experiment (E2), and insurance experiment (E5's own
+self-reference) — e.g., E5: "AI Governance Failure and Algorithmic Accountability Gap have been
+confirmed by the tool experiment, the conference experiment, the litigation experiment, and now
+the insurance experiment. Four independent methodologies..."
+
+No file matching this description exists in research/seven-experiments/ (checked: no 8th HTML
+file, no README entry, no mention in citation-audit.md). Cross-checked against E4's actual
+candidate list (Decision Authority Ambiguity, Implementation Courage Deficit, etc.) — no content
+overlap with what "the tool experiment" is credited with confirming (AI Governance Failure,
+Development Infrastructure Absence, Change Absorption Failure). Source is genuinely unidentified
+— external to this trace's tracked E1-E7 scope, or lost/never actually produced.
+
+Practical impact: Change Absorption Failure's disposition (COLLAPSE → Groundhog Day, Tier 5)
+doesn't depend on resolving this — the disposition rests on E3's own text and the target state's
+real description, independently verified. This is a provenance gap, not a disposition risk.
+Flagged for the record in case "the tool experiment" surfaces elsewhere in the project later.
+
 ### Tier 2 — exact/near-exact taxonomy name matches (verification pass, Gemini + Pete's residue check)
 
 | Candidate | Disposition | Target | Note |
@@ -206,14 +226,14 @@ Note: two additional Tier 2 candidates (Sequential Decision Blindness, Transitio
 
 | Candidate | Disposition | Target | Note |
 |---|---|---|---|
-| Organizational Deafness | COLLAPSE | Leadership Deafness | Absorbed Organizing Trigger Blindness (E2 inline sub-candidate) as a downstream mechanism, not a separate condition. |
-| AI Governance Failure | COLLAPSE | The Unexamined Algorithm | Absorbed Algorithmic Accountability Gap (E2 inline sub-candidate) as the same underlying claim. First-pass response for this candidate contained a fabricated quote (invented "Unexamined Algorithm" text); rejected and redone with real corpus text before this disposition was accepted. |
-| Misconduct Infrastructure Absence | COLLAPSE | The Tolerated Violation | E2 inline-only candidate, no numbered definition; "accumulated tolerance" framing led to an early invalid-target COLLAPSE attempt (Normalization Creep, not a locked state) — corrected on rework. |
+| Organizational Deafness | COLLAPSE | Leadership Deafness | Absorbed Organizing Trigger Blindness (E2 inline sub-candidate) as a downstream mechanism, not a separate condition. Primary 'New Candidate' badge is in E3, Theme 01 ('Management doesn't listen') — the E2 framing above describes an absorbed sub-mechanism (Organizing Trigger Blindness), not the candidate's origin. |
+| AI Governance Failure | COLLAPSE | The Unexamined Algorithm | Absorbed Algorithmic Accountability Gap (E2 inline sub-candidate) as the same underlying claim. First-pass response for this candidate contained a fabricated quote (invented "Unexamined Algorithm" text); rejected and redone with real corpus text before this disposition was accepted. Primary 'New Candidate' badge is in E6 — the E2 framing above describes an absorbed sub-mechanism (Algorithmic Accountability Gap) and E2's own independent litigation-based corroboration, not the candidate's origin. |
+| Misconduct Infrastructure Absence | COLLAPSE | The Tolerated Violation | Originating badge is in E3, Theme 06 ('Toxic culture / toxic manager'), which explicitly names it: 'This is Misconduct Infrastructure Absence at its most specific presentation.' E2 cites it as already-established ('Confirmed across Glassdoor, exit interview, and litigation data'), not as its origin. "Accumulated tolerance" framing led to an early invalid-target COLLAPSE attempt (Normalization Creep, not a locked state) — corrected on rework. |
 | Unmanaged Underperformance | COLLAPSE | The Paper Tiger | Dual-sourced (E2 inline, E3 #07, contradictory "already exists" vs. "new candidate" framing between the two files). Split disposition: behavioral half collapses into The Paper Tiger; the documentation-failure half was separated out as its own candidate (see Invisible Performance Management, below). |
 | Invisible Performance Management | STATE | — | E2 #06. Split out from Unmanaged Underperformance — accurate managerial judgment rendered legally indefensible solely by lack of documentation, distinct from The Paper Tiger's active-concealment mechanism. |
 | Psychological Contract Violation | COLLAPSE | The Culture That Wasn't | E3 #10. Absorbed two E7 sub-candidates as mechanism/endpoint: Unacknowledged Breach (mechanism) and Trust Collapse (accumulated endpoint). |
 | Executive Reality Gap | COLLAPSE | The Suppression Filter | E3 #09. E7's own citation of this candidate mislabeled its source as "the conference experiment" (E6) — corrected; it is exclusively E3-sourced, cited once by E7. |
-| Change Absorption Failure | COLLAPSE | Groundhog Day | E3 #06. Repeated-failed-initiative pattern producing organizational cynicism; same underlying mechanism as Groundhog Day's "keeps treating what's visible and leaving intact what's generating it." Checked against The Burned Credibility (leadership-trust-specific, different scope) and Transition Paralysis (anchored to leadership-change events, not longitudinal program fatigue), both ruled out. This is the first of two candidates to collapse into Groundhog Day this consolidation effort — Learning Architecture Failure (Batch D) is the second, on closely related but independently-argued reasoning. |
+| Change Absorption Failure | COLLAPSE | Groundhog Day | E3 #06. Repeated-failed-initiative pattern producing organizational cynicism; same underlying mechanism as Groundhog Day's "keeps treating what's visible and leaving intact what's generating it." Checked against The Burned Credibility (leadership-trust-specific, different scope) and Transition Paralysis (anchored to leadership-change events, not longitudinal program fatigue), both ruled out. This is the first of two candidates to collapse into Groundhog Day this consolidation effort — Learning Architecture Failure (Batch D) is the second, on closely related but independently-argued reasoning. OPEN PROVENANCE QUESTION: E3's own verdict-text cites this as confirming a candidate 'from the tool experiment' — a source not otherwise named anywhere in this trace or identifiable among E1/E2/E3/E4/E5/E6/E7. True origin unconfirmed; flagged for Pete's read on whether this candidate is fully in-scope for the E2/E3/E6/E7 pool as framed, or represents an earlier/external source this trace doesn't otherwise track. |
 
 ### Batch A — E2 candidates (Filter A/B/C, Gemini + quote-verification pass; first batch run after the verification tool was built)
 
