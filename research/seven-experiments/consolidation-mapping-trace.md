@@ -190,6 +190,18 @@ predate this pass.
 
 ## 9. Batch consolidation dispositions (Filter A/B/C, Gemini + quote-verification passes)
 
+### Tier 2 — exact/near-exact taxonomy name matches (verification pass, Gemini + Pete's residue check)
+
+| Candidate | Disposition | Target | Note |
+|---|---|---|---|
+| HR Capture | COLLAPSE | HR Capture | E3 #05. Genuine content match confirmed against the identically-named taxonomy state — same governance-independence-loss mechanism. |
+| Identity Erosion | COLLAPSE | Identity Erosion | E7 #06. Genuine content match confirmed against the identically-named taxonomy state — same cumulative-departure-of-culture-carriers mechanism. |
+| Role Clarity Deficit | COLLAPSE | The Undefined Role | E7 #01. Genuine content match; residue-checked specifically on a causal clause ("produced by restructuring") the target state's description doesn't share — confirmed as irrelevant color, target state is deliberately cause-agnostic by design. |
+| Information Suppression Cascade | COLLAPSE | The Suppression Filter | E7 #02. Genuine content match — same upward-filtering-of-bad-news mechanism. |
+| Process Justice Failure | COLLAPSE | The Arbitrary Standard | E7 #03. Genuine content match — same inconsistent/opaque-process mechanism. |
+
+Note: two additional Tier 2 candidates (Sequential Decision Blindness, Transition Paralysis) were flagged as FALSE MATCHES in this same pass — coincidental name overlap, not genuine content matches — and were carried forward to full Filter A/B/C treatment; see Batch E for their actual dispositions.
+
 ### Tier 5 — high-signal cross-experiment candidates (Filter A/B/C, two-pass Gemini review with quote verification)
 
 | Candidate | Disposition | Target | Note |
@@ -201,6 +213,7 @@ predate this pass.
 | Invisible Performance Management | STATE | — | E2 #06. Split out from Unmanaged Underperformance — accurate managerial judgment rendered legally indefensible solely by lack of documentation, distinct from The Paper Tiger's active-concealment mechanism. |
 | Psychological Contract Violation | COLLAPSE | The Culture That Wasn't | E3 #10. Absorbed two E7 sub-candidates as mechanism/endpoint: Unacknowledged Breach (mechanism) and Trust Collapse (accumulated endpoint). |
 | Executive Reality Gap | COLLAPSE | The Suppression Filter | E3 #09. E7's own citation of this candidate mislabeled its source as "the conference experiment" (E6) — corrected; it is exclusively E3-sourced, cited once by E7. |
+| Change Absorption Failure | COLLAPSE | Groundhog Day | E3 #06. Repeated-failed-initiative pattern producing organizational cynicism; same underlying mechanism as Groundhog Day's "keeps treating what's visible and leaving intact what's generating it." Checked against The Burned Credibility (leadership-trust-specific, different scope) and Transition Paralysis (anchored to leadership-change events, not longitudinal program fatigue), both ruled out. This is the first of two candidates to collapse into Groundhog Day this consolidation effort — Learning Architecture Failure (Batch D) is the second, on closely related but independently-argued reasoning. |
 
 ### Batch A — E2 candidates (Filter A/B/C, Gemini + quote-verification pass; first batch run after the verification tool was built)
 
@@ -258,8 +271,8 @@ analysis retained for subsequent batches.
 |---|---|---|---|
 | Sequential Decision Blindness | STATE | — | Originally flagged as a false match to Decision Blindness in Tier 2 (name collision, different mechanism). Confirmed distinct: retaliation-liability pattern from uncoordinated sequential decisions, vs. Decision Blindness's single-decision coordination failure. Checked against Decision Blindness and The Tolerated Violation. Confirmed E2-native — E7 cites both under the 'Confirms and Explains' pattern (cond-confirm badge, research-basis explanation, not a competing definition), same structure as Psychological Contract Violation's E7 citation. No separate E7-proposed candidate exists under either name; single disposition fully accounts for both source appearances. |
 | Transition Paralysis (E6) | STATE — NAME PENDING | — | Deliberate namespace-collision test: shares an identical name with the locked taxonomy state but describes a genuinely different mechanism (infrastructure/talent-system migration stall vs. leadership succession stall). Confirmed as a real collision, not a coincidence — collapse into the locked state was explicitly rejected as the correct call. Gemini proposed the replacement name "Talent Transformation Deadlock" — this is an unconfirmed suggestion, not an adopted decision; Pete has not signed off on the specific name. Disposition (distinct STATE) stands; naming is open. |
-| Normalization Creep | ROOT | — | "Accumulated tolerance" as generative cultural substrate producing Tolerated Violation instances and Policy Lag drift downstream, not itself a single presenting complaint. Same Filter B reasoning pattern as Organizational Moral Drift (Batch D). Fifth ROOT mechanism identified, alongside Presenting Complaint Displacement, Anchor/LIB-014, DEI Accountability Collapse, and Organizational Moral Drift. Confirmed E2-native — E7 cites both under the 'Confirms and Explains' pattern (cond-confirm badge, research-basis explanation, not a competing definition), same structure as Psychological Contract Violation's E7 citation. No separate E7-proposed candidate exists under either name; single disposition fully accounts for both source appearances. |
-| Training-Behavior Gap | COLLAPSE | Groundhog Day | Development-investment-without-consequence pattern folds into Groundhog Day's repeated-intervention-same-root-untouched mechanism; checked against The Dormant Talent (individual manager neglect, different scope), ruled out. |
+| Normalization Creep | ROOT | — | "Accumulated tolerance" as generative cultural substrate producing Tolerated Violation instances and Policy Lag drift downstream, not itself a single presenting complaint. Same Filter B reasoning pattern as Organizational Moral Drift (Batch D). Fifth ROOT mechanism identified, alongside Presenting Complaint Displacement, Anchor/LIB-014, DEI Accountability Collapse, and Organizational Moral Drift. Confirmed E2-native — E7 cites both under the 'Confirms and Explains' pattern (cond-confirm badge, research-basis explanation, not a competing definition), same structure as Psychological Contract Violation's E7 citation. No separate E7-proposed candidate exists under either name; single disposition fully accounts for both source appearances. Tier 3 note: this disposition also covers Compliance Normalization (E2 #03), consolidated as the same underlying candidate — both describe gradually-tolerated wrongdoing accumulating into invisible/normalized status over time. |
+| Training-Behavior Gap | COLLAPSE | Groundhog Day | Development-investment-without-consequence pattern folds into Groundhog Day's repeated-intervention-same-root-untouched mechanism; checked against The Dormant Talent (individual manager neglect, different scope), ruled out. Tier 3 note: this disposition also covers Development Without Stakes (E6 #16), consolidated as the specific structural mechanism underlying this candidate — E6's own text states it 'Explains the Training-Behavior Gap at the structural level.' |
 
 ### Batch F — Tier 4 rejects, full Filter A/B/C pass (Gemini + quote-verification, one direct reconciliation)
 
