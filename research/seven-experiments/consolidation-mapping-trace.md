@@ -188,7 +188,9 @@ predate this pass.
 
 ---
 
-## 9. Batch B — E3 candidates (Filter A/B/C, Gemini + quote-verification pass)
+## 9. Batch consolidation dispositions (Filter A/B/C, Gemini + quote-verification passes)
+
+### Batch B — E3 candidates (Filter A/B/C, Gemini + quote-verification pass)
 
 | Candidate | Disposition | Target | Note |
 |---|---|---|---|
@@ -203,6 +205,16 @@ a factual error unrelated to any disposition — a stray, out-of-context mention
 Unexamined Algorithm" appeared inside the Compensation Indifference/Pay Fog comparison prose,
 with no bearing on pay-related states. Not adopted, not load-bearing, logged here only so it
 isn't later mistaken for a considered claim.
+
+### Batch C — E6 candidates (Filter A/B/C, Gemini + quote-verification pass)
+
+| Candidate | Disposition | Target | Note |
+|---|---|---|---|
+| Human Displacement Anxiety | STATE | — | AI-deployment-specific role-security anxiety and departure; checked against Invisible Burnout (capacity exhaustion) and Transition Paralysis (leadership-change stall), distinct mechanism from both. |
+| DEI Accountability Collapse | ROOT | — | Two-pass disposition, same pattern as Anchor/LIB-014. First pass: COLLAPSE into The Diversity Ceiling, but its own Filter B reasoning actually described a root mechanism rather than supporting collapse — inconsistency flagged and re-run. Second pass, targeted ROOT-vs-COLLAPSE re-check: reversed to ROOT — accountability-vacuum governance gap plausibly generates downstream symptoms beyond Diversity Ceiling's specific promotion/retention pattern. CAVEAT: the second pass's two illustrative examples of alternate downstream symptoms ("inconsistent enforcement patterns," "tolerated exceptions") were verified as unsupported by any real source text — not fabricated as false attributions to a specific state, but offered in quotation marks as if evidentiary when they were actually hypothetical. The core structural argument for ROOT does not depend on these two phrases and is not undermined by their absence, but they should not be treated as verified textual support. Third ROOT mechanism identified, alongside Presenting Complaint Displacement and Anchor/LIB-014. |
+| Transparency Exposure | COLLAPSE | The Pay Fog | Near-duplicate mechanism — legacy compensation inconsistency exposed by transparency/disclosure requirements, same as The Pay Fog's existing description. |
+| Compression Crisis | STATE | — | Distinct salary-inversion dynamic (new-hire pay meeting/exceeding tenured pay); checked against Pay Exposure (market-rate lag) and The Pay Fog (unexplained internal discrepancy), neither captures the tenure-inversion mechanism. |
+| Proximity Bias | COLLAPSE | The Inside Track | Specific instantiation of unwritten-advancement-criteria pattern (physical presence as the unstated qualifying trait); checked against The Arbitrary Standard (disciplinary inconsistency, different domain) and ruled out. |
 
 ---
 
