@@ -190,6 +190,27 @@ predate this pass.
 
 ## 9. Batch consolidation dispositions (Filter A/B/C, Gemini + quote-verification passes)
 
+### Tier 5 — high-signal cross-experiment candidates (Filter A/B/C, two-pass Gemini review with quote verification)
+
+| Candidate | Disposition | Target | Note |
+|---|---|---|---|
+| Organizational Deafness | COLLAPSE | Leadership Deafness | Absorbed Organizing Trigger Blindness (E2 inline sub-candidate) as a downstream mechanism, not a separate condition. |
+| AI Governance Failure | COLLAPSE | The Unexamined Algorithm | Absorbed Algorithmic Accountability Gap (E2 inline sub-candidate) as the same underlying claim. First-pass response for this candidate contained a fabricated quote (invented "Unexamined Algorithm" text); rejected and redone with real corpus text before this disposition was accepted. |
+| Misconduct Infrastructure Absence | COLLAPSE | The Tolerated Violation | E2 inline-only candidate, no numbered definition; "accumulated tolerance" framing led to an early invalid-target COLLAPSE attempt (Normalization Creep, not a locked state) — corrected on rework. |
+| Unmanaged Underperformance | COLLAPSE | The Paper Tiger | Dual-sourced (E2 inline, E3 #07, contradictory "already exists" vs. "new candidate" framing between the two files). Split disposition: behavioral half collapses into The Paper Tiger; the documentation-failure half was separated out as its own candidate (see Invisible Performance Management, below). |
+| Invisible Performance Management | STATE | — | E2 #06. Split out from Unmanaged Underperformance — accurate managerial judgment rendered legally indefensible solely by lack of documentation, distinct from The Paper Tiger's active-concealment mechanism. |
+| Psychological Contract Violation | COLLAPSE | The Culture That Wasn't | E3 #10. Absorbed two E7 sub-candidates as mechanism/endpoint: Unacknowledged Breach (mechanism) and Trust Collapse (accumulated endpoint). |
+| Executive Reality Gap | COLLAPSE | The Suppression Filter | E3 #09. E7's own citation of this candidate mislabeled its source as "the conference experiment" (E6) — corrected; it is exclusively E3-sourced, cited once by E7. |
+
+### Batch A — E2 candidates (Filter A/B/C, Gemini + quote-verification pass; first batch run after the verification tool was built)
+
+| Candidate | Disposition | Target | Note |
+|---|---|---|---|
+| Disparate Impact Architecture | STATE | — | E2 #02. Distinct from The Unexamined Algorithm (bounded to AI/automated tooling specifically) and The Arbitrary Standard (selective enforcement vs. systemic disparate-impact-through-operation). |
+| Manager Legal Overreach | COLLAPSE | Decision Blindness | E2 #05. Managers acting independently without regulatory coordination checks — same coordination-failure mechanism Decision Blindness already names. |
+| Internal Reporting Failure | COLLAPSE | Heard & Ignored | E2 #07, marked "Highest Priority" in source. First check attempt lacked real Heard & Ignored text and correctly declined to force a fit rather than fabricate; re-run with real text confirmed the collapse. |
+| Cultural Overtime | STATE | — | E2 #08. Distinct wage-and-hour compliance mechanism (unrecorded off-the-clock liability from cultural pressure) from Invisible Burnout (individual psychological exhaustion) and The Tolerated Violation (protected-individual violation, not diffuse cultural norm). |
+
 ### Batch B — E3 candidates (Filter A/B/C, Gemini + quote-verification pass)
 
 | Candidate | Disposition | Target | Note |
