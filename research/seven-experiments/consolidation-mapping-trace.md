@@ -216,6 +216,30 @@ isn't later mistaken for a considered claim.
 | Compression Crisis | STATE | — | Distinct salary-inversion dynamic (new-hire pay meeting/exceeding tenured pay); checked against Pay Exposure (market-rate lag) and The Pay Fog (unexplained internal discrepancy), neither captures the tenure-inversion mechanism. |
 | Proximity Bias | COLLAPSE | The Inside Track | Specific instantiation of unwritten-advancement-criteria pattern (physical presence as the unstated qualifying trait); checked against The Arbitrary Standard (disciplinary inconsistency, different domain) and ruled out. |
 
+### Batch D — E7 psych-construct candidates (Filter A/B/C, Gemini + CC independent comparison, both quote-verified)
+
+| Candidate | Disposition | Target | Note |
+|---|---|---|---|
+| Motivational Architecture Failure | STATE | — | Distinct psychological condition (controlled/amotivated workforce via reward-system failure) from The Wrong Reward (strategic optimization for unstated incentives) and Invisible Burnout (capacity exhaustion). Checked independently by both Gemini and CC (run in parallel on identical source text as a process-quality comparison); both landed on STATE with matching reasoning. |
+| Organizational Moral Drift | ROOT | — | Moral-disengagement mechanisms (euphemistic language, diffused responsibility, advantageous comparison) as generative cultural substrate — plausibly produces Tolerated Violation (if harm concentrates around one protected practice) or Narrative Lock (if euphemism calcifies into defended official story), not a single presenting complaint. Independently confirmed by both Gemini and CC on identical source text — first cross-model corroborated ROOT disposition in this consolidation effort. Fourth ROOT mechanism identified, alongside Presenting Complaint Displacement, Anchor/LIB-014, and DEI Accountability Collapse. |
+| Learning Architecture Failure | COLLAPSE | Groundhog Day | Single-loop/double-loop learning failure as the structural mechanism explaining Groundhog Day's cyclical presenting pattern ("keeps treating what's visible and leaving intact what's generating it"). Independently confirmed by both Gemini and CC. Note: this is the second distinct experiment candidate to collapse into Groundhog Day (after Change Absorption Failure, Tier 5) — worth flagging as a sign Groundhog Day's description is absorbing a wide range of "repeated failed intervention" mechanisms, not a disposition concern on its own. |
+
+Process note: Batch D was run as a deliberate comparison exercise — Gemini and Claude Code independently
+analyzed identical locked source text to evaluate whether a second AI party adds verification value
+beyond quote-checking alone. Both parties reached identical dispositions on all three candidates,
+including the harder ROOT judgment call, with zero genuine fabrication from either side (CC's
+quote-hygiene issues were self-labeling/formatting lapses, not invented content). Result: dual-party
+analysis retained for subsequent batches.
+
+### Batch E — carried-forward candidates (Filter A/B/C, Gemini + quote-verification pass)
+
+| Candidate | Disposition | Target | Note |
+|---|---|---|---|
+| Sequential Decision Blindness | STATE | — | Originally flagged as a false match to Decision Blindness in Tier 2 (name collision, different mechanism). Confirmed distinct: retaliation-liability pattern from uncoordinated sequential decisions, vs. Decision Blindness's single-decision coordination failure. Checked against Decision Blindness and The Tolerated Violation. |
+| Transition Paralysis (E6) | STATE — NAME PENDING | — | Deliberate namespace-collision test: shares an identical name with the locked taxonomy state but describes a genuinely different mechanism (infrastructure/talent-system migration stall vs. leadership succession stall). Confirmed as a real collision, not a coincidence — collapse into the locked state was explicitly rejected as the correct call. Gemini proposed the replacement name "Talent Transformation Deadlock" — this is an unconfirmed suggestion, not an adopted decision; Pete has not signed off on the specific name. Disposition (distinct STATE) stands; naming is open. |
+| Normalization Creep | ROOT | — | "Accumulated tolerance" as generative cultural substrate producing Tolerated Violation instances and Policy Lag drift downstream, not itself a single presenting complaint. Same Filter B reasoning pattern as Organizational Moral Drift (Batch D). Fifth ROOT mechanism identified, alongside Presenting Complaint Displacement, Anchor/LIB-014, DEI Accountability Collapse, and Organizational Moral Drift. |
+| Training-Behavior Gap | COLLAPSE | Groundhog Day | Development-investment-without-consequence pattern folds into Groundhog Day's repeated-intervention-same-root-untouched mechanism; checked against The Dormant Talent (individual manager neglect, different scope), ruled out. |
+
 ---
 
 ## Summary
