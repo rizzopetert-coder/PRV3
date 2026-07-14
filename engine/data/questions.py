@@ -208,7 +208,8 @@ _QDATA = [
             ("E", "None of the above.", False, None),
         ],
         ["heard_and_ignored", "the_unsolved_problem", "decision_blindness",
-         "the_tolerated_violation", "the_policy_lag", "the_paper_tiger"],
+         "the_tolerated_violation", "the_policy_lag", "the_paper_tiger",
+         "disparate_impact_architecture"],
         False,
     ),
     (
