@@ -103,7 +103,7 @@ _QDATA = [
             ("D", "It's slow and effortful. Getting to a decision takes more than it should.", False, None),
             ("E", "It's unclear who has authority for what. Decisions happen but the accountability is hard to pin down.", False, None),
         ],
-        ["decision_paralysis", "the_lost_map", "the_founders_grip"],
+        ["decision_paralysis", "the_lost_map", "the_founders_grip", "sequential_decision_blindness"],
         False,
     ),
     (
@@ -579,7 +579,7 @@ _QDATA = [
             ("C", "We resolved the situation but I'm not confident we addressed what caused it.", True, "SEVER-11"),
             ("D", "The condition that produced the matter is still present — we closed the claim, not the problem.", True, "SEVER-11"),
         ],
-        ["the_unsolved_problem", "decision_blindness"],
+        ["the_unsolved_problem", "decision_blindness", "sequential_decision_blindness"],
         True,
     ),
     (
