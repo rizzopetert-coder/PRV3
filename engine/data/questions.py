@@ -278,7 +278,8 @@ _QDATA = [
             ("E", "Our values are stated but they don't really govern anything.", False, None),
         ],
         ["culture_drift", "the_wrong_reward", "the_inside_track",
-         "the_arbitrary_standard", "the_basement_standard", "the_broken_compass"],
+         "the_arbitrary_standard", "the_basement_standard", "the_broken_compass",
+         "cultural_overtime"],
         False,
     ),
     (
