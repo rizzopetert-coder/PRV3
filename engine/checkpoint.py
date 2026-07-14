@@ -27,9 +27,10 @@ from engine.accumulation import StateRanking
 
 # ── III.1  Shannon Entropy ─────────────────────────────────────────────────────
 
-# Maximum entropy: uniform distribution across all 47 states
-# Spec references 45 states (documentation artifact); confirmed count is 47.
-MAX_ENTROPY: float = log2(len(STATE_PROFILES))  # ≈ 5.554 bits
+# Maximum entropy: uniform distribution across all 57 states
+# Spec references 45 states (documentation artifact); confirmed count is 57
+# (47 locked Session 5, +10 taxonomy expansion Session 65/67).
+MAX_ENTROPY: float = log2(len(STATE_PROFILES))  # ≈ 5.833 bits
 
 # Checkpoint entropy thresholds — CALIBRATION TARGET
 # Starting hypotheses from spec III.1. Adjust based on Phase 1 false-positive

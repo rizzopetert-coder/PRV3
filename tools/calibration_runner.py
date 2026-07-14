@@ -52,6 +52,7 @@ from engine.test_profiles_alliance import ALLIANCE_PROFILES
 from engine.test_profiles_attitude_b1 import ATTITUDE_B1_PROFILES
 from engine.test_profiles_attitude_b2 import ATTITUDE_B2_PROFILES
 from engine.test_profiles_attitude_b3 import ATTITUDE_B3_PROFILES
+from engine.test_profiles_expansion import EXPANSION_PROFILES
 
 
 ALL_PROFILES = (
@@ -63,6 +64,7 @@ ALL_PROFILES = (
     + ATTITUDE_B1_PROFILES
     + ATTITUDE_B2_PROFILES
     + ATTITUDE_B3_PROFILES
+    + EXPANSION_PROFILES
 )
 
 # Noise baseline computed once and shared across the full run

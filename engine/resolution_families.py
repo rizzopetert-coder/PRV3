@@ -125,11 +125,23 @@ STATE_RESOLUTION_FAMILY: dict[str, str] = {
     "narrative_lock":                   "directional",
     "the_wrong_reward":                 "directional",
     "leadership_deafness":              "directional",
+
+    # ── Taxonomy expansion (Session 67) — DRAFT, pending Gemini review ──────────
+    "invisible_performance_management":  "structural",
+    "compression_crisis":                "investigative",
+    "sequential_decision_blindness":     "investigative",
+    "disparate_impact_architecture":     "investigative",
+    "planning_authority_gap":            "structural",
+    "distributed_culture_fragmentation": "directional",
+    "wellbeing_theater":                 "directional",
+    "human_displacement_anxiety":        "directional",
+    "motivational_architecture_failure": "directional",
+    "cultural_overtime":                 "investigative",
 }
 
-# Verify count at import — must be 47
-assert len(STATE_RESOLUTION_FAMILY) == 47, (
-    f"STATE_RESOLUTION_FAMILY has {len(STATE_RESOLUTION_FAMILY)} entries, expected 47"
+# Verify count at import — must be 57
+assert len(STATE_RESOLUTION_FAMILY) == 57, (
+    f"STATE_RESOLUTION_FAMILY has {len(STATE_RESOLUTION_FAMILY)} entries, expected 57"
 )
 
 

@@ -113,7 +113,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 
 ### Engine Rules
 - All engine writes use Python patch scripts with dry-run verification
-- `engine/data/states.py` is the authoritative state registry — 47 states
+- `engine/data/states.py` is the authoritative state registry — 57 states
 - `engine/data/questions.py` registry is intentionally empty — question population is a separate deliverable
 - Do not adjust calibration target values speculatively — data-first calibration principle applies
 
@@ -136,13 +136,13 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.37 |
+| MOB version | v4.38 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
-| Engine state count | 47 (locked) |
-| Test suite minimum (Phase 1) | 141 profiles across 47 states |
+| Engine state count | 57 (locked) |
+| Test suite minimum (Phase 1) | 171 profiles across 57 states |
 | Checkpoints | Q11 · Q19 · Q27 |
-| Shannon Entropy max (47 states) | 5.55 bits |
+| Shannon Entropy max (57 states) | 5.83 bits |
 | Gemini handoff template | `prompts/gemini-handoff.md` |
 
 ---

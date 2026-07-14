@@ -3,8 +3,8 @@ PRV3 Checkpoint Engine — Section III Integration Test
 
 Verifies:
   1. scores_to_probabilities: normalizes correctly, handles zero sum
-  2. compute_entropy: uniform dist = log2(47), single-state = 0, known values
-  3. MAX_ENTROPY: correct for 47-state taxonomy
+  2. compute_entropy: uniform dist = log2(n), single-state = 0, known values
+  3. MAX_ENTROPY: correct for the current state-taxonomy count
   4. top_cluster_by_score: returns dominant cluster by aggregate score
   5. evaluate_checkpoint Q11: fires when entropy > threshold, correct cluster
   6. evaluate_checkpoint Q19: fires when entropy > threshold
@@ -123,8 +123,8 @@ print(f"  Uniform entropy: {h_uniform:.6f} bits")
 # ── 3. MAX_ENTROPY ─────────────────────────────────────────────────────────────
 print("\n3. MAX_ENTROPY")
 
-check("MAX_ENTROPY = log2(47)",
-      isclose(MAX_ENTROPY, log2(47), rel_tol=1e-9),
+check("MAX_ENTROPY = log2(n)",
+      isclose(MAX_ENTROPY, log2(n), rel_tol=1e-9),
       f"got {MAX_ENTROPY}")
 check("MAX_ENTROPY matches uniform entropy",
       isclose(MAX_ENTROPY, h_uniform, rel_tol=1e-9),

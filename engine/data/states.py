@@ -12,7 +12,13 @@ Source documents:
   - Severity range, resolution family, axis descriptions: PRV3_State_Taxonomy_Profiles.docx (April 2026)
   - Canonical dimension/cluster assignments: PRV3_MOB_v1.2.md (May 2026)
 
-NOTE — COUNT: Aptitude (6), Authority (18), Alliance (6), Attitude (17) = 47.
+NOTE — COUNT: Aptitude (7), Authority (22), Alliance (7), Attitude (21) = 57.
+Taxonomy expansion (Session 65 decision, Session 67 implementation): 10 states added.
+Per-state classification fields (signal_weight, cluster_id, axes, severity_range,
+resolution_family, dimensional_vector) for the 10 new states are DRAFT — authored
+this session from consolidation-mapping-trace.md disposition rationale and analogy
+to the closest existing state, NOT independently Gemini-reviewed. See
+prompts/gemini-handoff-taxonomy-expansion-57.md.
 Rename applied: invisible_performance_management → the_paper_tiger (moved to Aptitude).
 Second removal pending Pete confirmation per state_removal_final.md step 4.
 
@@ -359,8 +365,49 @@ STATE_PROFILES["the_paper_tiger"].dimensional_vector = DimensionalVector(
 )
 
 
+# ============================================================
+# DRAFT — TAXONOMY EXPANSION (47→57), PENDING GEMINI REVIEW
+# State names + dimension assignments: LOCKED (Session 65).
+# signal_weight, severity range, resolution family, liability/
+# asset axes, dimensional vectors, salience, signature clustering:
+# UNREVIEWED DRAFT — see prompts/gemini-handoff-taxonomy-expansion-57.md
+# Do not treat any value below as calibrated or final until that
+# review closes.
+# ============================================================
+_reg(_profile(
+    state_id="invisible_performance_management",
+    state_name="Invisible Performance Management",
+    primary_dimension="Aptitude",
+    signal_weight="medium",
+    cluster_id=None,
+    liability_axes=["Legal & Compliance", "Governance & Authority", "Talent & Retention"],
+    asset_axes=["Governance Discipline", "Accountability Architecture"],
+    sev_min="Emerging", sev_max="Entrenched",
+    # DRAFT — pending Gemini review. E2 #06 (consolidation-mapping-trace.md Batch A).
+    # NAMING HISTORY: this exact state_id/name was previously used pre-rename for what
+    # is now the_paper_tiger (see NOTE — NAME MAPPING above, profiles doc #33, and
+    # the_paper_tiger's own "Renamed from clinical name" comment below). That entry was
+    # fully removed from this registry years ago (state_removal_final.md, 45-vs-47 count
+    # question, resolved at 47) -- no live id collision. This is a mechanistically
+    # distinct NEW state per Session 65's disposition: accurate managerial judgment
+    # rendered legally indefensible solely by lack of documentation, distinct from
+    # The Paper Tiger's active-concealment mechanism.
+    resolution_family="Development + Roadmap",
+))
+STATE_PROFILES["invisible_performance_management"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.45,
+    aptitude_asset=0.15,
+    authority_liability=0.25,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.10,
+    attitude_asset=0.15,
+)
+
+
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  AUTHORITY  (18 states)                                                     ║
+# ║  AUTHORITY  (22 states)                                                     ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 _reg(_profile(
@@ -771,8 +818,107 @@ STATE_PROFILES["the_pay_fog"].dimensional_vector = DimensionalVector(
 )
 
 
+_reg(_profile(
+    state_id="compression_crisis",
+    state_name="Compression Crisis",
+    primary_dimension="Authority",
+    signal_weight="medium",
+    cluster_id=None,
+    liability_axes=["Talent & Retention", "Financial & Economic", "Legal & Compliance"],
+    asset_axes=["Governance Discipline", "Strategic Execution Capacity"],
+    sev_min="Emerging", sev_max="Entrenched",
+    # DRAFT — pending Gemini review. E6 (consolidation-mapping-trace.md Batch C).
+    resolution_family="Roadmap",
+))
+STATE_PROFILES["compression_crisis"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
+
+_reg(_profile(
+    state_id="sequential_decision_blindness",
+    state_name="Sequential Decision Blindness",
+    primary_dimension="Authority",
+    signal_weight="high",
+    cluster_id=None,
+    liability_axes=["Legal & Compliance", "Governance & Authority", "Financial & Economic"],
+    asset_axes=["Governance Discipline", "Accountability Architecture"],
+    sev_min="Emerging", sev_max="Entrenched",
+    # DRAFT — pending Gemini review. E2 (consolidation-mapping-trace.md Batch E).
+    # NAMING COLLISION (Session 65 required mitigation): "Sequential Decision Blindness"
+    # is also the profiles-doc inferred-mapping source name for the LOCKED Alliance-
+    # dimension state decision_blindness (see NOTE — NAME MAPPING above). Confirmed
+    # distinct per trace: retaliation-liability pattern from uncoordinated sequential
+    # decisions (this state, Authority), vs. decision_blindness's single-decision
+    # coordination failure (Alliance). Different dimension, different mechanism.
+    resolution_family="Intervention + Executive Counsel",
+))
+STATE_PROFILES["sequential_decision_blindness"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
+    authority_liability=0.60,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
+)
+
+_reg(_profile(
+    state_id="disparate_impact_architecture",
+    state_name="Disparate Impact Architecture",
+    primary_dimension="Authority",
+    signal_weight="high",
+    cluster_id=None,
+    liability_axes=["Legal & Compliance", "Financial & Economic", "Reputational & Brand"],
+    asset_axes=["Governance Discipline", "Accountability Architecture"],
+    sev_min="Entrenched", sev_max="Endemic",
+    # DRAFT — pending Gemini review. E2 #02 (consolidation-mapping-trace.md Batch C).
+    resolution_family="Intervention + Executive Counsel",
+))
+STATE_PROFILES["disparate_impact_architecture"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
+    authority_liability=0.60,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.10,
+    attitude_asset=0.10,
+)
+
+_reg(_profile(
+    state_id="planning_authority_gap",
+    state_name="Planning Authority Gap",
+    primary_dimension="Authority",
+    signal_weight="low",
+    cluster_id=None,
+    liability_axes=["Operational & Structural", "Strategic", "Talent & Retention"],
+    asset_axes=["Strategic Execution Capacity", "Governance Discipline"],
+    sev_min="Emerging", sev_max="Entrenched",
+    # DRAFT — pending Gemini review. E6 (consolidation-mapping-trace.md Batch F).
+    resolution_family="Roadmap + Executive Counsel",
+))
+STATE_PROFILES["planning_authority_gap"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.35,
+    authority_asset=0.15,
+    alliance_liability=0.25,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
+)
+
+
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  ALLIANCE  (6 states)                                                       ║
+# ║  ALLIANCE  (7 states)                                                       ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 _reg(_profile(
@@ -911,8 +1057,32 @@ STATE_PROFILES["decision_blindness"].dimensional_vector = DimensionalVector(
 )
 
 
+_reg(_profile(
+    state_id="distributed_culture_fragmentation",
+    state_name="Distributed Culture Fragmentation",
+    primary_dimension="Alliance",
+    signal_weight="medium",
+    cluster_id=None,
+    liability_axes=["Cultural & Behavioral", "Talent & Retention", "Operational & Structural"],
+    asset_axes=["Cultural Stewardship", "Relational Trust"],
+    sev_min="Emerging", sev_max="Entrenched",
+    # DRAFT — pending Gemini review. E6 (consolidation-mapping-trace.md Batch F).
+    resolution_family="Development + Intervention",
+))
+STATE_PROFILES["distributed_culture_fragmentation"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.45,
+    alliance_asset=0.15,
+    attitude_liability=0.25,
+    attitude_asset=0.15,
+)
+
+
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  ATTITUDE  (17 states)                                                      ║
+# ║  ATTITUDE  (21 states)                                                      ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 _reg(_profile(
@@ -1316,3 +1486,108 @@ CLUSTERS: dict[str, list[str]] = {
         "the_culture_that_wasnt",
     ],
 }
+
+_reg(_profile(
+    state_id="wellbeing_theater",
+    state_name="Wellbeing Theater",
+    primary_dimension="Attitude",
+    signal_weight="cluster",
+    cluster_id="C-Culture",
+    liability_axes=["Cultural & Behavioral", "Talent & Retention", "Financial & Economic"],
+    asset_axes=["Cultural Stewardship", "People Development Capability"],
+    sev_min="Emerging", sev_max="Entrenched",
+    # DRAFT — pending Gemini review. E6 (consolidation-mapping-trace.md Batch F).
+    # Source text self-describes as "a specific variant of Culture Drift" -- cluster_id
+    # drafted to match on that basis; Gemini review should confirm or reject C-Culture
+    # membership specifically (this is a judgment call, not a mechanical mapping).
+    # CLUSTERS["C-Culture"] updated below to include this state for functional
+    # consistency with checkpoint.py's cluster stress-test routing.
+    resolution_family="Intervention",
+))
+STATE_PROFILES["wellbeing_theater"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.25,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.35,
+    attitude_asset=0.15,
+)
+CLUSTERS["C-Culture"].append("wellbeing_theater")
+
+_reg(_profile(
+    state_id="human_displacement_anxiety",
+    state_name="Human Displacement Anxiety",
+    primary_dimension="Attitude",
+    signal_weight="medium",
+    cluster_id=None,
+    liability_axes=["Talent & Retention", "Cultural & Behavioral", "Strategic"],
+    asset_axes=["Adaptive Capacity", "People Development Capability"],
+    sev_min="Emerging", sev_max="Entrenched",
+    # DRAFT — pending Gemini review. E6 (consolidation-mapping-trace.md Batch D).
+    resolution_family="Development + Intervention",
+))
+STATE_PROFILES["human_displacement_anxiety"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)
+
+_reg(_profile(
+    state_id="motivational_architecture_failure",
+    state_name="Motivational Architecture Failure",
+    primary_dimension="Attitude",
+    signal_weight="medium",
+    cluster_id=None,
+    liability_axes=["Cultural & Behavioral", "Talent & Retention", "Operational & Structural"],
+    asset_axes=["Governance Discipline", "Accountability Architecture"],
+    sev_min="Entrenched", sev_max="Endemic",
+    # DRAFT — pending Gemini review. E7 (consolidation-mapping-trace.md Batch D).
+    # NAMING COLLISION (found during implementation, not in Session 65's mitigation
+    # list): "Motivational Architecture Failure" is also the profiles-doc inferred-
+    # mapping source name for the LOCKED state the_wrong_reward (see NOTE — NAME
+    # MAPPING above, and the_wrong_reward's own "Inferred from profiles doc" comment
+    # below). Confirmed distinct per trace: clinical controlled/amotivated workforce
+    # condition via reward-system failure (this state), vs. The Wrong Reward's rational
+    # strategic optimization for the real, unstated incentive system.
+    resolution_family="Intervention + Roadmap",
+))
+STATE_PROFILES["motivational_architecture_failure"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)
+
+_reg(_profile(
+    state_id="cultural_overtime",
+    state_name="Cultural Overtime",
+    primary_dimension="Attitude",
+    signal_weight="medium",
+    cluster_id=None,
+    liability_axes=["Legal & Compliance", "Financial & Economic", "Cultural & Behavioral"],
+    asset_axes=["Governance Discipline", "Accountability Architecture"],
+    sev_min="Emerging", sev_max="Entrenched",
+    # DRAFT — pending Gemini review. E2 #08 (consolidation-mapping-trace.md Batch C).
+    resolution_family="Intervention + Roadmap",
+))
+STATE_PROFILES["cultural_overtime"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.45,
+    attitude_asset=0.15,
+)

@@ -2,7 +2,7 @@
 PRV3 Output Layer — Resolution Families Unit Tests
 
 Verifies:
-  1. STATE_RESOLUTION_FAMILY has exactly 47 entries
+  1. STATE_RESOLUTION_FAMILY has exactly 57 entries
   2. All state IDs match the engine state registry
   3. All family values are valid (structural/developmental/investigative/directional)
   4. All four families have at least one state assigned
@@ -53,11 +53,11 @@ VALID_FAMILIES = {"structural", "developmental", "investigative", "directional"}
 SERVICE_NAMES = {"formation", "practicum", "counsel", "navigation"}
 
 
-# ── 1. 47 entries ─────────────────────────────────────────────────────────────
+# ── 1. 57 entries ─────────────────────────────────────────────────────────────
 
 check(
-    "STATE_RESOLUTION_FAMILY has 47 entries",
-    len(STATE_RESOLUTION_FAMILY) == 47,
+    "STATE_RESOLUTION_FAMILY has 57 entries",
+    len(STATE_RESOLUTION_FAMILY) == 57,
     f"got {len(STATE_RESOLUTION_FAMILY)}",
 )
 

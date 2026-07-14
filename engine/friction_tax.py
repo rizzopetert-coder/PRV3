@@ -123,6 +123,18 @@ STATE_MULTIPLIERS: dict[str, Optional[float]] = {
     "the_unreported_hazard":            None,  # CALIBRATION TARGET
     "the_unlocked_door":                None,  # CALIBRATION TARGET
     "the_broken_compass":               None,  # CALIBRATION TARGET
+
+    # ── Taxonomy expansion (Session 67) ──────────────────────────────────────
+    "invisible_performance_management":  None,  # CALIBRATION TARGET
+    "compression_crisis":                None,  # CALIBRATION TARGET
+    "sequential_decision_blindness":     None,  # CALIBRATION TARGET
+    "disparate_impact_architecture":     None,  # CALIBRATION TARGET
+    "planning_authority_gap":            None,  # CALIBRATION TARGET
+    "distributed_culture_fragmentation": None,  # CALIBRATION TARGET
+    "wellbeing_theater":                 None,  # CALIBRATION TARGET
+    "human_displacement_anxiety":        None,  # CALIBRATION TARGET
+    "motivational_architecture_failure": None,  # CALIBRATION TARGET
+    "cultural_overtime":                 None,  # CALIBRATION TARGET
 }
 
 _DEFAULT_MULTIPLIER: float = 0.0

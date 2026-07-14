@@ -6,8 +6,9 @@ Defines the test case schema, pass criteria, and validation scaffolding for
 the Phase 1 test suite. Test profiles are a separate deliverable — this module
 defines the schema they must conform to and the evaluation functions.
 
-Phase 1 minimum: 3 profiles per state × 47 states = 141 test profiles.
-(Spec references 45 states × 3 = 135; confirmed count is 47.)
+Phase 1 minimum: 3 profiles per state × 57 states = 171 test profiles.
+(Spec references 45 states × 3 = 135; confirmed count is 57 as of Session 67
+taxonomy expansion, up from 47 locked Session 5.)
 
 Profile types per state:
   high_confidence:        clear single-state signal → output_type = single_state

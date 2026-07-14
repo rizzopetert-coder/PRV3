@@ -326,4 +326,69 @@ SALIENCE_PROFILES = {
         "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 2.5, "attitude_asset": 2.5,
     },
+
+    # ── TAXONOMY EXPANSION (Session 67) — DRAFT, pending Gemini review ──────────
+    # Seeded per the three-tier rule above from each state's draft signal_weight in
+    # engine/data/states.py; secondary bumps mirror that state's dimensional_vector
+    # secondary-field elevation.
+    "invisible_performance_management": {  # medium tier, primary only
+        "aptitude_liability": 2.5, "aptitude_asset": 2.5,
+        "authority_liability": 0.4, "authority_asset": 0.4,
+        "alliance_liability": 0.4, "alliance_asset": 0.4,
+        "attitude_liability": 0.4, "attitude_asset": 0.4,
+    },
+    "compression_crisis": {  # medium tier, primary only
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 2.5, "authority_asset": 2.5,
+        "alliance_liability": 0.4, "alliance_asset": 0.4,
+        "attitude_liability": 0.4, "attitude_asset": 0.4,
+    },
+    "sequential_decision_blindness": {  # high tier, primary only
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 2.5, "authority_asset": 2.5,
+        "alliance_liability": 0.4, "alliance_asset": 0.4,
+        "attitude_liability": 0.4, "attitude_asset": 0.4,
+    },
+    "disparate_impact_architecture": {  # high tier, primary only
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 2.5, "authority_asset": 2.5,
+        "alliance_liability": 0.4, "alliance_asset": 0.4,
+        "attitude_liability": 0.4, "attitude_asset": 0.4,
+    },
+    "planning_authority_gap": {  # low tier, alliance secondary 2.5->1.0
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 2.5, "authority_asset": 2.5,
+        "alliance_liability": 1.0, "alliance_asset": 1.0,
+        "attitude_liability": 0.4, "attitude_asset": 0.4,
+    },
+    "distributed_culture_fragmentation": {  # medium tier, attitude secondary 2.5->1.0
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 0.4, "authority_asset": 0.4,
+        "alliance_liability": 2.5, "alliance_asset": 2.5,
+        "attitude_liability": 1.0, "attitude_asset": 1.0,
+    },
+    "wellbeing_theater": {  # cluster tier (C-Culture), authority secondary 2.5->1.0
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 1.0, "authority_asset": 1.0,
+        "alliance_liability": 0.4, "alliance_asset": 0.4,
+        "attitude_liability": 2.5, "attitude_asset": 2.5,
+    },
+    "human_displacement_anxiety": {  # medium tier, primary only
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 0.4, "authority_asset": 0.4,
+        "alliance_liability": 0.4, "alliance_asset": 0.4,
+        "attitude_liability": 2.5, "attitude_asset": 2.5,
+    },
+    "motivational_architecture_failure": {  # medium tier, primary only
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 0.4, "authority_asset": 0.4,
+        "alliance_liability": 0.4, "alliance_asset": 0.4,
+        "attitude_liability": 2.5, "attitude_asset": 2.5,
+    },
+    "cultural_overtime": {  # medium tier, primary only
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 0.4, "authority_asset": 0.4,
+        "alliance_liability": 0.4, "alliance_asset": 0.4,
+        "attitude_liability": 2.5, "attitude_asset": 2.5,
+    },
 }

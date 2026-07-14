@@ -44,7 +44,8 @@ export interface UICopy {
 }
 
 // ---------------------------------------------------------------------------
-// States — 47 total
+// States — 57 total (47 locked Session 5 + 10 added Session 67, taxonomy expansion,
+// DRAFT pending Gemini architecture review of signatureId assignment)
 // ---------------------------------------------------------------------------
 // Register: individual lived experience first, organizational cost at close.
 // signatureId = primary signature.
@@ -95,7 +96,24 @@ export const states: State[] = [
       "Everyone knows this person shouldn't still be here. The conversations have happened — in one-on-ones, in hallways, in performance reviews that somehow came out fine. The file tells a different story than the one the manager has been telling. When the moment comes to act, the organization discovers it has been managing one employee on paper and a completely different one in practice.",
   },
 
-  // AUTHORITY — 18 states
+  // ============================================================
+  // DRAFT — TAXONOMY EXPANSION (47→57), PENDING GEMINI REVIEW
+  // State names + dimension assignments: LOCKED (Session 65).
+  // signal_weight, severity range, resolution family, liability/
+  // asset axes, dimensional vectors, salience, signature clustering:
+  // UNREVIEWED DRAFT — see prompts/gemini-handoff-taxonomy-expansion-57.md
+  // Do not treat any value below as calibrated or final until that
+  // review closes.
+  // ============================================================
+  {
+    id: "invisible_performance_management",
+    name: "Invisible Performance Management",
+    signatureId: "compounding_risks",
+    description:
+      "Performance managed through relationship and conversation rather than documentation. The manager's judgment is accurate. The file doesn't support it. The termination is legally indefensible not because it's wrong but because it's undocumented.",
+  },
+
+  // AUTHORITY — 22 states
   {
     id: "the_founders_grip",
     name: "The Founder's Grip",
@@ -224,7 +242,36 @@ export const states: State[] = [
       "You've compared notes. The numbers don't make sense. Similar roles, different pay, no framework anyone can explain or defend. It wasn't a problem when the numbers were private. Pay transparency requirements are making the incoherence visible in ways the organization isn't prepared for.",
   },
 
-  // ALLIANCE — 6 states
+  {
+    id: "compression_crisis",
+    name: "Compression Crisis",
+    signatureId: "compounding_risks",
+    description:
+      "New hires offered at or above salaries of longer-tenured employees in the same role. Simultaneously losing existing employees who discover the compression and constrained on offers by transparency requirements. A dynamic condition created by intersecting pressures.",
+  },
+  {
+    id: "sequential_decision_blindness",
+    name: "Sequential Decision Blindness",
+    signatureId: "compounding_risks",
+    description:
+      "Individual decisions made in isolation that constitute retaliation in sequence. No individual acts with retaliatory intent. The absence of coordinated oversight makes the sequence structurally inevitable. The organization pays for intent it didn't have. Distinct from Decision Blindness (Alliance) — that is a single-decision coordination failure; this is a retaliation-liability pattern produced by a sequence of uncoordinated decisions, none of them individually retaliatory.",
+  },
+  {
+    id: "disparate_impact_architecture",
+    name: "Disparate Impact Architecture",
+    signatureId: "compounding_risks",
+    description:
+      "Organizational systems designed without disparate impact analysis that produce discriminatory outcomes through their operation. The strongest financial consequence narrative in the taxonomy — class action exposure with no statutory cap.",
+  },
+  {
+    id: "planning_authority_gap",
+    name: "Planning Authority Gap",
+    signatureId: "leadership_bottleneck",
+    description:
+      "HR has the capability to do strategic workforce planning and lacks the organizational authority and credibility to have its output treated as strategic input. Distinct from HR Capture (compromised) — this is specifically about the gap between analytical capability and organizational standing to act on the analysis.",
+  },
+
+  // ALLIANCE — 7 states
   {
     id: "the_fracture",
     name: "The Fracture",
@@ -268,7 +315,15 @@ export const states: State[] = [
       "A consequential decision was made without the people who should have been in the room. Legal found out after. HR heard it secondhand. The coordination failure was invisible until something went wrong — and now everyone is looking at who knew what and when, and the answer is uncomfortable.",
   },
 
-  // ATTITUDE — 17 states
+  {
+    id: "distributed_culture_fragmentation",
+    name: "Distributed Culture Fragmentation",
+    signatureId: "culture_erosion",
+    description:
+      "The organization's culture has fractured along location lines. In-office and remote cultures have diverged to the point of producing different experiences, different leadership relationships, and different career trajectories. Culture Drift applied to a geographic dimension.",
+  },
+
+  // ATTITUDE — 21 states
   {
     id: "the_untouchable",
     name: "The Untouchable",
@@ -389,6 +444,34 @@ export const states: State[] = [
     description:
       "You've been in the meeting where it was diagnosed. You've read the report. You've heard the leadership team agree that something needs to change. That was eighteen months ago. The people with the most options — the ones the organization can least afford to lose — have stopped waiting for the next conversation to be different.",
   },
+  {
+    id: "wellbeing_theater",
+    name: "Wellbeing Theater",
+    signatureId: "culture_erosion",
+    description:
+      "Structural mismatch between wellbeing investment and wellbeing conditions. A specific variant of Culture Drift — the stated value and the structural reality have diverged at the wellbeing dimension specifically.",
+  },
+  {
+    id: "human_displacement_anxiety",
+    name: "Human Displacement Anxiety",
+    signatureId: "stunted_growth",
+    description:
+      "AI deployed without managing the human response. Employees uncertain about role security and value in an AI-augmented environment. Produces disengagement and departure of the people who would have been most effective AI collaborators.",
+  },
+  {
+    id: "motivational_architecture_failure",
+    name: "Motivational Architecture Failure",
+    signatureId: "culture_erosion",
+    description:
+      "Reward, recognition, and performance management systems have produced a predominantly controlled or amotivated workforce. Not low engagement — a specific psychological condition where the majority of employees either perform to avoid punishment or have stopped believing their effort affects outcomes. Self-reinforcing: organizations with controlled motivation produce more controlling management. Distinct from The Wrong Reward — that is rational strategic optimization for the real, unstated incentive system; this is a clinical amotivation condition regardless of what the real incentives are.",
+  },
+  {
+    id: "cultural_overtime",
+    name: "Cultural Overtime",
+    signatureId: "culture_erosion",
+    description:
+      "Compensable work produced outside paid hours through cultural pressure rather than explicit instruction. The policy is compliant. The culture creates the liability. Distinct from Structural Overload — this is about expected availability, not volume.",
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -411,6 +494,7 @@ export const signatures: Signature[] = [
       "invisible_influence_architecture",
       "hr_capture",
       "the_fracture",
+      "planning_authority_gap",
     ],
     description:
       "You know what needs to happen. Getting there requires navigating a set of approvals, relationships, and informal power structures that aren't on any org chart. Decisions that should take days take weeks. The people with the authority to move things forward are either unreachable, uncommitted, or operating without the independence their role requires. You've learned to work around the bottleneck because working through it stopped being viable. The senior people who couldn't live with that have already left. The organization isn't frozen — it's moving, just not in the direction anyone chose.",
@@ -429,6 +513,10 @@ export const signatures: Signature[] = [
       "the_basement_standard",
       "the_inside_track",
       "narrative_lock",
+      "wellbeing_theater",
+      "motivational_architecture_failure",
+      "cultural_overtime",
+      "distributed_culture_fragmentation",
     ],
     description:
       "You remember when this place felt different. The people who've been here long enough know what changed — not the moment it changed, but the accumulation of small decisions that added up to something large. The values are still on the wall. The all-hands still describes an organization that doesn't quite match the one people experience every day. New hires figure out the gap in their first ninety days. Tenured employees stopped expecting it to close. The ones who cared most about what this place stood for are the ones leaving first.",
@@ -447,6 +535,7 @@ export const signatures: Signature[] = [
       "leadership_continuity_risk",
       "invisible_burnout",
       "the_second_close",
+      "human_displacement_anxiety",
     ],
     description:
       "You're not being developed here. You're not sure your manager could tell you what your next step looks like, or whether they've thought about it. The people above you are either too stretched to invest in anyone else's growth, too disengaged to bother, or operating inside roles that were never designed to be survivable. You're doing good work in a structure that isn't built to recognize or advance it. The people who figured that out before you did have already moved on.",
@@ -473,6 +562,10 @@ export const signatures: Signature[] = [
       "decision_blindness",
       "the_arbitrary_standard",
       "paper_shield",
+      "compression_crisis",
+      "sequential_decision_blindness",
+      "disparate_impact_architecture",
+      "invisible_performance_management",
     ],
     description:
       "You've raised concerns before. Some of them went somewhere. Others landed in a process that looked responsive and produced nothing. The organization has policies, documentation, training records, acknowledgment forms — the infrastructure of compliance. What it doesn't always have is the practice that infrastructure is supposed to reflect. Meanwhile the gaps are accumulating: the report that wasn't acted on, the practice everyone knows is wrong, the policy that hasn't been updated, the algorithm nobody has audited. Each one is manageable in isolation. Together they represent an exposure the organization hasn't fully mapped.",

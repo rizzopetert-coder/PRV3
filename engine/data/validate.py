@@ -43,7 +43,7 @@ print("\nSTATE PROFILES")
 
 n = len(STATE_PROFILES)
 print(f"  Total states: {n}")
-check("State count is 47", n == 47, f"got {n}")
+check("State count is 57", n == 57, f"got {n}")
 
 # Dimensional vectors all at baseline
 bad_vectors = [
@@ -114,10 +114,10 @@ for p in STATE_PROFILES.values():
     d = p.primary_dimension
     dim_counts[d] = dim_counts.get(d, 0) + 1
 print(f"\n  States per dimension: {dim_counts}")
-check("Aptitude count = 6",  dim_counts.get("Aptitude",  0) == 6,  f"got {dim_counts.get('Aptitude',0)}")
-check("Authority count = 18", dim_counts.get("Authority", 0) == 18, f"got {dim_counts.get('Authority',0)}")
-check("Alliance count = 6",  dim_counts.get("Alliance",  0) == 6,  f"got {dim_counts.get('Alliance',0)}")
-check("Attitude count = 17", dim_counts.get("Attitude",  0) == 17, f"got {dim_counts.get('Attitude',0)}")
+check("Aptitude count = 7",  dim_counts.get("Aptitude",  0) == 7,  f"got {dim_counts.get('Aptitude',0)}")
+check("Authority count = 22", dim_counts.get("Authority", 0) == 22, f"got {dim_counts.get('Authority',0)}")
+check("Alliance count = 7",  dim_counts.get("Alliance",  0) == 7,  f"got {dim_counts.get('Alliance',0)}")
+check("Attitude count = 21", dim_counts.get("Attitude",  0) == 21, f"got {dim_counts.get('Attitude',0)}")
 
 
 # ── Question library ───────────────────────────────────────────────────────────
