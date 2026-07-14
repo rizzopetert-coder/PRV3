@@ -137,3 +137,67 @@ calibration is appropriately a follow-up workstream once this review lands.
    signature assignment.
 5. Anything else structurally unsound that a fresh read catches — this was authored by one
    party (Claude Code) without the second-look Gemini gave the original 47.
+
+## Resolution (Session 68) — review complete, all 10 states have verdicts
+
+Gemini's review returned full verdicts on all 10 states. Nine were confirmed as drafted
+with no changes. One (Wellbeing Theater) had two confirmed changes. Two states had a
+single field revised (Human Displacement Anxiety). Implementation of every change below is
+complete as of this entry.
+
+- **Motivational Architecture Failure naming collision (item 2 above)** — Gemini's review
+  floated a rename (to `systemic_amotivation` or a similar variant) as one option for
+  resolving the collision with `the_wrong_reward`. **Pete's decision: reject the rename.**
+  Keep the existing `state_id` (`motivational_architecture_failure`) and existing external
+  label exactly as drafted. Resolve the collision via inline documentation cross-reference
+  only — the same pattern already used for Sequential Decision Blindness vs. Decision
+  Blindness. No code change was needed for the name/id itself (it was never changed);
+  `engine/data/states.py`'s comment on this entry was extended to record the rejected
+  rename and the reasoning, so a future reader doesn't re-propose it.
+- **Invisible Performance Management (item covered in the Naming collisions section
+  above)** — Gemini's condition for accepting the identifier reuse was verification that no
+  legacy analysis/migration script string-matches the retired identifier against old log
+  files. Checked Session 68: the only repo hits on `invisible_performance_management` are
+  this new state's own files (taxonomy.ts, states.py, salience.py, friction_tax.py,
+  resolution_families.py, test_profiles_expansion.py, this handoff doc, and the Session 67
+  patch scripts and MOB entry) plus three inert historical prompt files
+  (`state_count_resolved.md`, `state_removal_v3.md`, `state_removal_final.md`) that are
+  narrative prose, not executable scripts, and already describe this exact history as
+  resolved. The only actual `.log` file anywhere in the repo is an auto-generated Next.js
+  dev-server log with no state-name references. No executable script string-matches the
+  retired identifier. Condition satisfied — collision treated as closed.
+- **Wellbeing Theater (item 3 above)** — confirmed distinct from a simple `signatureId`
+  question; two separate changes were required and both are now implemented:
+  (1) removed from `CLUSTERS["C-Culture"]` in `engine/data/states.py` (the
+  `CLUSTERS["C-Culture"].append("wellbeing_theater")` line was deleted) — `cluster_id` and
+  `signal_weight` on the state's own profile were left as originally drafted
+  (`"C-Culture"` / `"cluster"`), since only removal from the active `CLUSTERS` routing dict
+  was directed, not a change to those fields; (2) `resolution_family` in
+  `engine/resolution_families.py` changed from `"directional"` to `"structural"`.
+- **Human Displacement Anxiety (item 4 above)** — revised from the draft on both fields
+  named in that item: `resolution_family` in `engine/resolution_families.py` changed from
+  `"directional"` to `"structural"`; `signatureId` in `web/data/taxonomy.ts` changed from
+  `"stunted_growth"` to `"culture_erosion"` (and the `stateIds` membership arrays for both
+  signatures updated accordingly).
+- **Cultural Overtime** — confirmed as drafted (`investigative` / `culture_erosion`), no
+  change.
+- **All other states** (Distributed Culture Fragmentation, Compression Crisis, Sequential
+  Decision Blindness, Disparate Impact Architecture, Planning Authority Gap, Invisible
+  Performance Management's non-naming fields) — confirmed as drafted, no changes beyond
+  the items above.
+
+**Note on the instruction that triggered this resolution section:** the message
+summarizing Gemini's review referred at one point to "Systemic Amotivation's other
+fields" in the general confirmed-as-drafted list. That name is the rejected rename
+proposal for Motivational Architecture Failure (see above) — there is no state by that
+name. Treating it as a stale carryover from an earlier round of the review checklist and
+reading it as "Motivational Architecture Failure's other fields," which is consistent with
+everything else in the instruction (item 1 explicitly rejects that exact rename). Flagging
+here rather than silently resolving it, in case it means something else that hasn't
+surfaced yet.
+
+**Verification:** `engine/data/validate.py` clean at 57 states (7/22/7/21), same 2
+pre-existing stale-check failures as before. `tsc --noEmit`: 0 errors.
+`calibration_runner.py`: 152/172, unchanged from the Session 67 draft run — none of these
+changes touch a field the calibration scoring path reads, so no regression was expected
+and none occurred.

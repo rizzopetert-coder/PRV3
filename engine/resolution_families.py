@@ -126,15 +126,15 @@ STATE_RESOLUTION_FAMILY: dict[str, str] = {
     "the_wrong_reward":                 "directional",
     "leadership_deafness":              "directional",
 
-    # ── Taxonomy expansion (Session 67) — DRAFT, pending Gemini review ──────────
+    # ── Taxonomy expansion (Session 67 draft, Session 68 Gemini review) ─────────
     "invisible_performance_management":  "structural",
     "compression_crisis":                "investigative",
     "sequential_decision_blindness":     "investigative",
     "disparate_impact_architecture":     "investigative",
     "planning_authority_gap":            "structural",
     "distributed_culture_fragmentation": "directional",
-    "wellbeing_theater":                 "directional",
-    "human_displacement_anxiety":        "directional",
+    "wellbeing_theater":                 "structural",  # revised S68: was "directional" in S67 draft
+    "human_displacement_anxiety":        "structural",  # revised S68: was "directional" in S67 draft
     "motivational_architecture_failure": "directional",
     "cultural_overtime":                 "investigative",
 }

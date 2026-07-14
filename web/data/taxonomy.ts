@@ -97,13 +97,12 @@ export const states: State[] = [
   },
 
   // ============================================================
-  // DRAFT — TAXONOMY EXPANSION (47→57), PENDING GEMINI REVIEW
+  // TAXONOMY EXPANSION (47→57) — Session 67 draft, Gemini review complete Session 68.
   // State names + dimension assignments: LOCKED (Session 65).
-  // signal_weight, severity range, resolution family, liability/
-  // asset axes, dimensional vectors, salience, signature clustering:
-  // UNREVIEWED DRAFT — see prompts/gemini-handoff-taxonomy-expansion-57.md
-  // Do not treat any value below as calibrated or final until that
-  // review closes.
+  // signatureId and description text: CONFIRMED per-state below (see each entry's
+  // description for cross-reference notes; human_displacement_anxiety's signatureId
+  // was revised from stunted_growth to culture_erosion). Full detail in
+  // prompts/gemini-handoff-taxonomy-expansion-57.md.
   // ============================================================
   {
     id: "invisible_performance_management",
@@ -454,7 +453,7 @@ export const states: State[] = [
   {
     id: "human_displacement_anxiety",
     name: "Human Displacement Anxiety",
-    signatureId: "stunted_growth",
+    signatureId: "culture_erosion",
     description:
       "AI deployed without managing the human response. Employees uncertain about role security and value in an AI-augmented environment. Produces disengagement and departure of the people who would have been most effective AI collaborators.",
   },
@@ -517,6 +516,7 @@ export const signatures: Signature[] = [
       "motivational_architecture_failure",
       "cultural_overtime",
       "distributed_culture_fragmentation",
+      "human_displacement_anxiety",
     ],
     description:
       "You remember when this place felt different. The people who've been here long enough know what changed — not the moment it changed, but the accumulation of small decisions that added up to something large. The values are still on the wall. The all-hands still describes an organization that doesn't quite match the one people experience every day. New hires figure out the gap in their first ninety days. Tenured employees stopped expecting it to close. The ones who cared most about what this place stood for are the ones leaving first.",
@@ -535,7 +535,6 @@ export const signatures: Signature[] = [
       "leadership_continuity_risk",
       "invisible_burnout",
       "the_second_close",
-      "human_displacement_anxiety",
     ],
     description:
       "You're not being developed here. You're not sure your manager could tell you what your next step looks like, or whether they've thought about it. The people above you are either too stretched to invest in anyone else's growth, too disengaged to bother, or operating inside roles that were never designed to be survivable. You're doing good work in a structure that isn't built to recognize or advance it. The people who figured that out before you did have already moved on.",

@@ -366,13 +366,16 @@ STATE_PROFILES["the_paper_tiger"].dimensional_vector = DimensionalVector(
 
 
 # ============================================================
-# DRAFT — TAXONOMY EXPANSION (47→57), PENDING GEMINI REVIEW
+# TAXONOMY EXPANSION (47→57) — Session 67 draft, Gemini review complete Session 68.
 # State names + dimension assignments: LOCKED (Session 65).
-# signal_weight, severity range, resolution family, liability/
-# asset axes, dimensional vectors, salience, signature clustering:
-# UNREVIEWED DRAFT — see prompts/gemini-handoff-taxonomy-expansion-57.md
-# Do not treat any value below as calibrated or final until that
-# review closes.
+# signal_weight, severity range, resolution family, liability/asset axes,
+# dimensional vectors, salience, signature clustering: CONFIRMED per-state below
+# (see each entry's own comment — most confirmed as-drafted; wellbeing_theater and
+# human_displacement_anxiety were revised). Full detail in
+# prompts/gemini-handoff-taxonomy-expansion-57.md. Calibration (test-profile pass
+# rate) is separately still in progress — see engine/test_profiles_expansion.py and
+# tools/calibration_runner.py; a CONFIRMED classification does not imply a
+# calibrated dimensional_vector yet.
 # ============================================================
 _reg(_profile(
     state_id="invisible_performance_management",
@@ -383,7 +386,8 @@ _reg(_profile(
     liability_axes=["Legal & Compliance", "Governance & Authority", "Talent & Retention"],
     asset_axes=["Governance Discipline", "Accountability Architecture"],
     sev_min="Emerging", sev_max="Entrenched",
-    # DRAFT — pending Gemini review. E2 #06 (consolidation-mapping-trace.md Batch A).
+    # CONFIRMED — Gemini review complete (round two, Session 68). E2 #06
+    # (consolidation-mapping-trace.md Batch A). No changes from the Session 67 draft.
     # NAMING HISTORY: this exact state_id/name was previously used pre-rename for what
     # is now the_paper_tiger (see NOTE — NAME MAPPING above, profiles doc #33, and
     # the_paper_tiger's own "Renamed from clinical name" comment below). That entry was
@@ -391,7 +395,12 @@ _reg(_profile(
     # question, resolved at 47) -- no live id collision. This is a mechanistically
     # distinct NEW state per Session 65's disposition: accurate managerial judgment
     # rendered legally indefensible solely by lack of documentation, distinct from
-    # The Paper Tiger's active-concealment mechanism.
+    # The Paper Tiger's active-concealment mechanism. Gemini's condition for accepting
+    # the reuse -- confirm no legacy analysis/migration script string-matches the
+    # retired identifier against old log files -- was checked Session 68: the only
+    # repo hits are this new state's own files and inert historical prose
+    # (state_removal_final.md, state_removal_v3.md, state_count_resolved.md); no
+    # executable script references it. Condition satisfied.
     resolution_family="Development + Roadmap",
 ))
 STATE_PROFILES["invisible_performance_management"].dimensional_vector = DimensionalVector(
@@ -827,7 +836,8 @@ _reg(_profile(
     liability_axes=["Talent & Retention", "Financial & Economic", "Legal & Compliance"],
     asset_axes=["Governance Discipline", "Strategic Execution Capacity"],
     sev_min="Emerging", sev_max="Entrenched",
-    # DRAFT — pending Gemini review. E6 (consolidation-mapping-trace.md Batch C).
+    # CONFIRMED — Gemini review complete (round two, Session 68). E6
+    # (consolidation-mapping-trace.md Batch C). No changes from the Session 67 draft.
     resolution_family="Roadmap",
 ))
 STATE_PROFILES["compression_crisis"].dimensional_vector = DimensionalVector(
@@ -850,7 +860,8 @@ _reg(_profile(
     liability_axes=["Legal & Compliance", "Governance & Authority", "Financial & Economic"],
     asset_axes=["Governance Discipline", "Accountability Architecture"],
     sev_min="Emerging", sev_max="Entrenched",
-    # DRAFT — pending Gemini review. E2 (consolidation-mapping-trace.md Batch E).
+    # CONFIRMED — Gemini review complete (round two, Session 68). E2
+    # (consolidation-mapping-trace.md Batch E). No changes from the Session 67 draft.
     # NAMING COLLISION (Session 65 required mitigation): "Sequential Decision Blindness"
     # is also the profiles-doc inferred-mapping source name for the LOCKED Alliance-
     # dimension state decision_blindness (see NOTE — NAME MAPPING above). Confirmed
@@ -879,7 +890,8 @@ _reg(_profile(
     liability_axes=["Legal & Compliance", "Financial & Economic", "Reputational & Brand"],
     asset_axes=["Governance Discipline", "Accountability Architecture"],
     sev_min="Entrenched", sev_max="Endemic",
-    # DRAFT — pending Gemini review. E2 #02 (consolidation-mapping-trace.md Batch C).
+    # CONFIRMED — Gemini review complete (round two, Session 68). E2 #02
+    # (consolidation-mapping-trace.md Batch C). No changes from the Session 67 draft.
     resolution_family="Intervention + Executive Counsel",
 ))
 STATE_PROFILES["disparate_impact_architecture"].dimensional_vector = DimensionalVector(
@@ -902,7 +914,8 @@ _reg(_profile(
     liability_axes=["Operational & Structural", "Strategic", "Talent & Retention"],
     asset_axes=["Strategic Execution Capacity", "Governance Discipline"],
     sev_min="Emerging", sev_max="Entrenched",
-    # DRAFT — pending Gemini review. E6 (consolidation-mapping-trace.md Batch F).
+    # CONFIRMED — Gemini review complete (round two, Session 68). E6
+    # (consolidation-mapping-trace.md Batch F). No changes from the Session 67 draft.
     resolution_family="Roadmap + Executive Counsel",
 ))
 STATE_PROFILES["planning_authority_gap"].dimensional_vector = DimensionalVector(
@@ -1066,7 +1079,8 @@ _reg(_profile(
     liability_axes=["Cultural & Behavioral", "Talent & Retention", "Operational & Structural"],
     asset_axes=["Cultural Stewardship", "Relational Trust"],
     sev_min="Emerging", sev_max="Entrenched",
-    # DRAFT — pending Gemini review. E6 (consolidation-mapping-trace.md Batch F).
+    # CONFIRMED — Gemini review complete (round two, Session 68). E6
+    # (consolidation-mapping-trace.md Batch F). No changes from the Session 67 draft.
     resolution_family="Development + Intervention",
 ))
 STATE_PROFILES["distributed_culture_fragmentation"].dimensional_vector = DimensionalVector(
@@ -1496,12 +1510,13 @@ _reg(_profile(
     liability_axes=["Cultural & Behavioral", "Talent & Retention", "Financial & Economic"],
     asset_axes=["Cultural Stewardship", "People Development Capability"],
     sev_min="Emerging", sev_max="Entrenched",
-    # DRAFT — pending Gemini review. E6 (consolidation-mapping-trace.md Batch F).
-    # Source text self-describes as "a specific variant of Culture Drift" -- cluster_id
-    # drafted to match on that basis; Gemini review should confirm or reject C-Culture
-    # membership specifically (this is a judgment call, not a mechanical mapping).
-    # CLUSTERS["C-Culture"] updated below to include this state for functional
-    # consistency with checkpoint.py's cluster stress-test routing.
+    # CONFIRMED — Gemini review complete (round two, Session 68). E6
+    # (consolidation-mapping-trace.md Batch F). Source text self-describes as "a
+    # specific variant of Culture Drift"; Gemini's review rejected C-Culture cluster
+    # membership specifically (kept cluster_id/signal_weight as drafted, but this
+    # state does NOT belong in CLUSTERS["C-Culture"] -- removed below). Also
+    # confirmed: resolution_family (4-bucket, engine/resolution_families.py) is
+    # "structural", not the "directional" drafted in Session 67.
     resolution_family="Intervention",
 ))
 STATE_PROFILES["wellbeing_theater"].dimensional_vector = DimensionalVector(
@@ -1514,7 +1529,6 @@ STATE_PROFILES["wellbeing_theater"].dimensional_vector = DimensionalVector(
     attitude_liability=0.35,
     attitude_asset=0.15,
 )
-CLUSTERS["C-Culture"].append("wellbeing_theater")
 
 _reg(_profile(
     state_id="human_displacement_anxiety",
@@ -1525,7 +1539,11 @@ _reg(_profile(
     liability_axes=["Talent & Retention", "Cultural & Behavioral", "Strategic"],
     asset_axes=["Adaptive Capacity", "People Development Capability"],
     sev_min="Emerging", sev_max="Entrenched",
-    # DRAFT — pending Gemini review. E6 (consolidation-mapping-trace.md Batch D).
+    # CONFIRMED — Gemini review complete (round two, Session 68). E6
+    # (consolidation-mapping-trace.md Batch D). Revised from the Session 67 draft:
+    # resolution_family (4-bucket, engine/resolution_families.py) is "structural",
+    # not "directional"; taxonomy.ts signatureId is "culture_erosion", not
+    # "stunted_growth".
     resolution_family="Development + Intervention",
 ))
 STATE_PROFILES["human_displacement_anxiety"].dimensional_vector = DimensionalVector(
@@ -1548,14 +1566,20 @@ _reg(_profile(
     liability_axes=["Cultural & Behavioral", "Talent & Retention", "Operational & Structural"],
     asset_axes=["Governance Discipline", "Accountability Architecture"],
     sev_min="Entrenched", sev_max="Endemic",
-    # DRAFT — pending Gemini review. E7 (consolidation-mapping-trace.md Batch D).
+    # CONFIRMED — Gemini review complete (round two, Session 68). E7
+    # (consolidation-mapping-trace.md Batch D). No changes from the Session 67 draft
+    # to signal_weight/severity/axes/resolution_family/dimensional_vector.
     # NAMING COLLISION (found during implementation, not in Session 65's mitigation
     # list): "Motivational Architecture Failure" is also the profiles-doc inferred-
     # mapping source name for the LOCKED state the_wrong_reward (see NOTE — NAME
     # MAPPING above, and the_wrong_reward's own "Inferred from profiles doc" comment
     # below). Confirmed distinct per trace: clinical controlled/amotivated workforce
     # condition via reward-system failure (this state), vs. The Wrong Reward's rational
-    # strategic optimization for the real, unstated incentive system.
+    # strategic optimization for the real, unstated incentive system. RESOLUTION
+    # (Pete's call, Session 68): keep this state_id and external label as-is -- do
+    # NOT rename to "systemic_amotivation" or any variant Gemini's review floated.
+    # Collision resolved via inline documentation cross-reference only, same pattern
+    # as Sequential Decision Blindness vs. Decision Blindness above.
     resolution_family="Intervention + Roadmap",
 ))
 STATE_PROFILES["motivational_architecture_failure"].dimensional_vector = DimensionalVector(
@@ -1578,7 +1602,8 @@ _reg(_profile(
     liability_axes=["Legal & Compliance", "Financial & Economic", "Cultural & Behavioral"],
     asset_axes=["Governance Discipline", "Accountability Architecture"],
     sev_min="Emerging", sev_max="Entrenched",
-    # DRAFT — pending Gemini review. E2 #08 (consolidation-mapping-trace.md Batch C).
+    # CONFIRMED — Gemini review complete (round two, Session 68). E2 #08
+    # (consolidation-mapping-trace.md Batch C). No changes from the Session 67 draft.
     resolution_family="Intervention + Roadmap",
 ))
 STATE_PROFILES["cultural_overtime"].dimensional_vector = DimensionalVector(
