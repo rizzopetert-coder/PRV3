@@ -1,0 +1,17 @@
+{
+  "batch_name": "Batch B Example",
+  "candidates": [
+    {
+      "name": "Development Promise Violation",
+      "source_file": "E3",
+      "candidate_number": "#03",
+      "check_against": ["The Dormant Talent", "The Culture That Wasn't"]
+    },
+    {
+      "name": "Information Architecture Failure",
+      "source_file": "E3",
+      "candidate_number": "#04",
+      "check_against": ["The Lost Map", "The Suppression Filter"]
+    }
+  ]
+}
