@@ -323,7 +323,7 @@ _QDATA = [
             ("D", "We have concerns about both — consistency and competitiveness are issues.", False, None),
             ("E", "Honestly, we haven't looked closely enough to know.", False, None),
         ],
-        ["pay_exposure", "the_pay_fog"],
+        ["pay_exposure", "the_pay_fog", "compression_crisis"],
         False,
     ),
     (
