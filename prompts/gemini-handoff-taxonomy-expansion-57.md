@@ -115,15 +115,17 @@ significant enough to warrant one.
 ## Current status (informational — test suite runs, not fully calibrated)
 
 30 new test profiles were authored (3 per state) and wired into `calibration_runner.py`.
-Current run: 152/172 passed. 3 of the 10 new states pass all 3 profiles outright
-(Distributed Culture Fragmentation, Invisible Performance Management, Wellbeing Theater);
-1 passes 2/3 (Compression Crisis); the remaining 6 fail on `cluster` (high_confidence) or
-`prominence` (moderate/weak) criteria — the same category of gap the original 47 states
-took roughly 13 sessions (S16-S29) of Monte Carlo calibration to close. No attempt was made
-to force a pass by hand-tuning against un-reviewed classification choices — that would
-waste effort if this review changes the underlying signal_weight/severity/axis
-assignments first. Full calibration is appropriately a follow-up workstream once this
-review lands.
+Current run: 152/172 passed (15 of the 30 new profiles). Per-state breakdown: 4 of the 10
+new states pass all 3 profiles outright (Distributed Culture Fragmentation, Invisible
+Performance Management, Planning Authority Gap, Wellbeing Theater); Compression Crisis
+passes 2/3; Cultural Overtime passes 1/3; the remaining 4 states (Disparate Impact
+Architecture, Human Displacement Anxiety, Motivational Architecture Failure, Sequential
+Decision Blindness) fail all 3, on `cluster` (high_confidence) or `prominence`
+(moderate/weak) criteria — the same category of gap the original 47 states took roughly
+13 sessions (S16-S29) of Monte Carlo calibration to close. No attempt was made to force a
+pass by hand-tuning against un-reviewed classification choices — that would waste effort
+if this review changes the underlying signal_weight/severity/axis assignments first. Full
+calibration is appropriately a follow-up workstream once this review lands.
 
 ## What's being asked of this review
 
