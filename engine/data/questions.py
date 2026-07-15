@@ -808,7 +808,7 @@ _QDATA = [
             ("C", "We talk about whether this is the right role for this person.", False, None),
             ("D", "We don't usually have that conversation until something forces it.", False, None),
         ],
-        ["built_to_fail", "the_undefined_role", "the_overloaded_manager"],
+        ["built_to_fail", "the_undefined_role", "the_overloaded_manager", "invisible_performance_management"],
         False,
     ),
     (
