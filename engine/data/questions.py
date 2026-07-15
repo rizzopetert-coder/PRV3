@@ -280,7 +280,7 @@ _QDATA = [
         ],
         ["culture_drift", "the_wrong_reward", "the_inside_track",
          "the_arbitrary_standard", "the_basement_standard", "the_broken_compass",
-         "cultural_overtime"],
+         "cultural_overtime", "motivational_architecture_failure"],
         False,
     ),
     (
