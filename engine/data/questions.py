@@ -117,7 +117,7 @@ _QDATA = [
             ("D", "Absent — we don't have a dedicated HR function right now.", False, None),
             ("E", "We have HR but I sometimes wonder whether it's truly independent.", False, None),
         ],
-        ["the_exposed", "hr_capture"],
+        ["the_exposed", "hr_capture", "planning_authority_gap"],
         False,
     ),
     (
