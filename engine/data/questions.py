@@ -495,7 +495,7 @@ _QDATA = [
             ("C", "It's a consistent problem — cross-functional initiatives stall predictably at the same points.", True, "SEVER-08"),
             ("D", "Functions operate independently — collaboration is the exception rather than the rule.", True, "SEVER-08"),
         ],
-        ["silosolation", "the_fracture"],
+        ["silosolation", "the_fracture", "distributed_culture_fragmentation"],
         True,
     ),
     (
