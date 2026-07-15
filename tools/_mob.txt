@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.40
+\\\#\\\# MOB v4.41
 
   
 
@@ -1834,6 +1834,7 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
 
   
 
+| **July 2026 — Session 70** | Weak-branch damped primary-dimension routing LOCKED (threshold 0.25, max-contribution tiebreak) — resolves the state-agnostic weak-profile finding flagged for Gemini review at Session 69 close. Grounded solely in this session's own 4-state dry-run, not any external precedent: two Gemini-cited design justifications ("Authority Domination Root Cause Analysis"/Session 16 provenance; "initial uniform baseline vector" threshold justification) did not survive direct filesystem/git-history verification and were excluded. Full 172-profile suite 162 -> 169, weak tier 50/57 -> 57/57 (100%), 0 regressions; expansion suite 25/30 -> 30/30. Commits 87a50a1 + 6ade3e2, pushed clean (12 commits, dd5e42d..6ade3e2). Full detail in Section 14. MOB v4.41. |
 | **July 2026 — Session 69** | Calibration pilot: diagnosed why all 10 new states were failing every profile type (no question_library state_targets wiring at all, not a dimensional_vector problem) and wired 6 of 10 into existing core questions, one content-only commit per state (Q14, Q11 x2, Q06, Q01+Q31, Q24). Full expansion suite 15/30 -> 25/30. Confirmed weak-profile outcomes are state-agnostic across all 57 states (structural, flagged for future Gemini review) and that only built_to_fail reliably hits rank-1 anywhere in the taxonomy (suite's real pass bar is top_3/cluster/prominence, confirmed intentional per S7 precedent). Full detail in Section 14. MOB v4.40. |
 | \\\*\\\*July 2026 — Session 68\\\*\\\* | Gemini review of the Session 67 draft classification returned verdicts on all 10 new states — 7 confirmed as drafted, Wellbeing Theater and Human Displacement Anxiety revised on specific fields, both naming collisions resolved (one via Pete rejecting a proposed rename, one via a verified-clean legacy-script check). Full detail in Section 14. MOB v4.39. |
 | \\\*\\\*July 2026 — Session 67\\\*\\\* | Taxonomy expansion 47->57 implemented end-to-end (taxonomy.ts, states.py, validate.py, resolution_families.py, salience.py, checkpoint.py, friction_tax.py, test_suite.py + 30 new test profiles, CLAUDE.md, book copy) — status DRAFT, per-state classification fields not in Session 65's Gemini-reviewed scope, routed for review before lock. Two new naming collisions found and inline-documented (Motivational Architecture Failure, Invisible Performance Management). Full detail in Section 14. MOB v4.38. |
