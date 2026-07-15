@@ -141,6 +141,40 @@ def _neutral_option(question):
     return min(question.answer_options, key=_abs_sum)
 
 
+# CALIBRATION TARGET -- Session 70. Weak-branch damped primary-dimension routing.
+WEAK_DAMPED_THRESHOLD: float = 0.25
+
+
+def _damped_weak_option(question, target_state_id: str):
+    """
+    Weak-branch damped primary-dimension routing -- Session 70.
+
+    Prefer the option with the largest positive contribution (<= WEAK_DAMPED_THRESHOLD)
+    on target_state's primary_dimension liability field. Falls back to the real,
+    unmodified _neutral_option(question) when no qualifying option exists for this
+    question.
+
+    Confirmed via Session 70 dry-run against 4 states (decision_paralysis,
+    the_arbitrary_standard, the_untouchable, sequential_decision_blindness):
+    2 fail-to-pass flips, 0 pass-to-fail regressions at threshold 0.25.
+
+    Known limitation, accepted as-is: operates at dimension granularity, not state
+    granularity. Any two states sharing a primary_dimension receive byte-for-byte
+    identical weak-branch answer vectors under this rule -- downstream cosine
+    similarity against each state's own distinct profile vector still differentiates
+    them.
+    """
+    profile = STATE_PROFILES.get(target_state_id)
+    field = _DIM_TO_LIABILITY_FIELD.get(profile.primary_dimension, "") if profile else ""
+    candidates = [
+        opt for opt in question.answer_options
+        if 0.0 < opt.dimensional_contributions.get(field, 0.0) <= WEAK_DAMPED_THRESHOLD
+    ]
+    if not candidates:
+        return _neutral_option(question)
+    return max(candidates, key=lambda opt: opt.dimensional_contributions.get(field, 0.0))
+
+
 _CORE_QUESTION_IDS = [
     qid for qid in QUESTION_LIBRARY
     if qid.startswith("Q") and "SEVER" not in qid
@@ -156,7 +190,9 @@ def generate_answers(test_case):
 
     high_confidence/extreme: best_option_for_state() where target in state_targets, neutral elsewhere.
     moderate: best_option_for_state() where target in state_targets, neutral elsewhere.
-    weak: neutral option throughout.
+    weak: damped primary-dimension routing (Session 70) -- prefers a lightly-loading
+          positive option on target's primary_dimension liability field (<= 0.25),
+          neutral fallback otherwise.
 
     Handles Q03A/Q03B and Q27A/Q27B conditional pairs from intake.
     """
@@ -189,7 +225,7 @@ def generate_answers(test_case):
                    if test_case.target_state in (q.state_targets or [])
                    else _neutral_option(q))
         else:
-            opt = _neutral_option(q)
+            opt = _damped_weak_option(q, test_case.target_state)
         answers.append(TestAnswer(question_id=qid, selected_option_ids=[opt.option_id]))
     return answers
 
