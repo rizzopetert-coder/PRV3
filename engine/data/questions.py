@@ -468,7 +468,7 @@ _QDATA = [
             ("C", "We've lost high performers recently in ways that surprised us — people who seemed fine until they weren't.", True, "SEVER-06"),
             ("D", "I know there are people who are running on empty and I'm not sure how to address it.", True, "SEVER-06"),
         ],
-        ["invisible_burnout"],
+        ["invisible_burnout", "human_displacement_anxiety"],
         True,
     ),
     (
