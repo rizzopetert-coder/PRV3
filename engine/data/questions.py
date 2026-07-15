@@ -522,7 +522,7 @@ _QDATA = [
             ("D", "Unclear — I'm not sure what our culture actually is right now.", True, "SEVER-10"),
             ("E", "The culture people experience doesn't match what we describe in recruiting.", False, None),
         ],
-        ["culture_drift", "identity_erosion", "the_culture_that_wasnt"],
+        ["culture_drift", "identity_erosion", "the_culture_that_wasnt", "wellbeing_theater"],
         True,
     ),
     (
