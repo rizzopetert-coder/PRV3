@@ -3,6 +3,44 @@ import type { AccumulatedVector } from "@/lib/session-store";
 
 const ENGINE_SECRET = process.env.ENGINE_SECRET ?? "";
 
+// Deployment Protection (Vercel's SSO gate on Preview/branch deployments)
+// applies to every serverless function in a protected deployment, including
+// function-to-function calls over the public URL -- the Next.js function
+// and api/engine.py's Python function are genuinely separate services, not
+// an in-process call, so a call from one to the other is subject to the
+// same gate an external request would hit. VERCEL_AUTOMATION_BYPASS_SECRET
+// is Vercel's own mechanism for this exact case (Project Settings ->
+// Deployment Protection -> "Protection Bypass for Automation", added as a
+// System Environment Variable so it's available to server-side code).
+// Server-side only -- never NEXT_PUBLIC_-prefixed, never reaches the
+// browser bundle. Absent in Production today (no Deployment Protection
+// there), so this is a harmless no-op there and only activates the header
+// when the env var is actually set. Discovered and fixed Session 71 while
+// testing Path 1 against a protected Preview deployment; applies equally
+// to Path B's invokeEngine() below, which had the identical unprotected
+// gap -- would have failed the same way if Deployment Protection were ever
+// enabled on Production.
+const VERCEL_PROTECTION_BYPASS = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+
+function engineHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "x-engine-secret": ENGINE_SECRET,
+  };
+  if (VERCEL_PROTECTION_BYPASS) {
+    headers["x-vercel-protection-bypass"] = VERCEL_PROTECTION_BYPASS;
+  }
+  return headers;
+}
+
+async function engineFetch(url: string, body: unknown): Promise<Response> {
+  return fetch(url, {
+    method: "POST",
+    headers: engineHeaders(),
+    body: JSON.stringify(body),
+  });
+}
+
 function resolveEngineUrl(): string {
   if (process.env.ENGINE_URL) {
     return process.env.ENGINE_URL;
@@ -102,15 +140,7 @@ export interface EngineResult {
 
 export async function invokeEngine(payload: EnginePayload): Promise<EngineResult> {
   const url = resolveEngineUrl();
-
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-engine-secret": ENGINE_SECRET,
-    },
-    body: JSON.stringify(payload),
-  });
+  const response = await engineFetch(url, payload);
 
   if (!response.ok) {
     throw new Error(`Engine invocation failed: ${response.status}`);
@@ -133,14 +163,7 @@ export interface AccumulatePayload {
 export async function invokeAccumulate(
   payload: AccumulatePayload,
 ): Promise<AccumulatedVector> {
-  const response = await fetch(resolveEnginePath("/api/accumulate"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-engine-secret": ENGINE_SECRET,
-    },
-    body: JSON.stringify(payload),
-  });
+  const response = await engineFetch(resolveEnginePath("/api/accumulate"), payload);
 
   if (!response.ok) {
     throw new Error(`Accumulate invocation failed: ${response.status}`);
@@ -158,14 +181,7 @@ export interface CompletePayload {
 export async function invokeComplete(
   payload: CompletePayload,
 ): Promise<EngineResult> {
-  const response = await fetch(resolveEnginePath("/api/complete"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-engine-secret": ENGINE_SECRET,
-    },
-    body: JSON.stringify(payload),
-  });
+  const response = await engineFetch(resolveEnginePath("/api/complete"), payload);
 
   if (!response.ok) {
     throw new Error(`Complete invocation failed: ${response.status}`);
@@ -183,13 +199,8 @@ export interface QuestionCopy {
 export async function invokeQuestionCopy(
   questionId: string,
 ): Promise<QuestionCopy> {
-  const response = await fetch(resolveEnginePath("/api/question-copy"), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-engine-secret": ENGINE_SECRET,
-    },
-    body: JSON.stringify({ question_id: questionId }),
+  const response = await engineFetch(resolveEnginePath("/api/question-copy"), {
+    question_id: questionId,
   });
 
   if (!response.ok) {
