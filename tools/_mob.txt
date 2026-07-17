@@ -1295,6 +1295,7 @@ Three additional governance ideas were considered and explicitly declined by Pet
 | Attorney review (LinkedIn + coaching template gate) | 3 | Parked | No active timeline set with counsel | Long-standing, parked indefinitely | Pete's call — no forced check-in, Pete has explicitly chosen to leave this open-ended |
 | LinkedIn campaign go-live | 4 (irreversible) | Blocked | Gated entirely on attorney review above | Long-standing | Tied to attorney-review item, not separately tracked |
 | Public methodology series expansion (Option B: /book pieces, Option C: standalone Research section) | 3 | Open, no urgency | Nothing — genuinely fine parked indefinitely | This session | No forced check-in — explicitly low-stakes to leave open |
+| .claude/settings.local.json tracked in git (should be gitignored) | N/A — repo hygiene, not a Tier 1-4 workflow item | Open, no urgency | Committed since Session 37 (b3d58a6), no .gitignore entry excludes it — the file Claude Code's own convention treats as a personal, gitignored override is actually checked into this repo. Current tracked content confirmed safe (permissions allowlist only, no secrets ever committed there) — surfaced while confirming where VERCEL_TOKEN should NOT go (S71 Path 1 credential-access work). No urgency beyond not forgetting it exists — but a file positioned to silently absorb someone's next local override belongs on the record | Session 71 (Claude Code) | Session 72 — untrack (`git rm --cached`) and add to `.gitignore` |
 
 \\---
 
