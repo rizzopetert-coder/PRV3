@@ -193,11 +193,25 @@ reused as-is. Real Path-1-aware sharing is explicitly out of scope this phase.
 
 ## Known open verification gap
 
-**No live HTTP round trip has been exercised anywhere in this build.** Upstash Redis
-credentials are not provisioned in the sandbox this build was done in — a pre-existing
-environment limitation already on record in the MOB for the Vercel deployment itself
-(env vars never provisioned there either), not something this build introduced or could
-have avoided.
+**No live HTTP round trip has been exercised anywhere in this build.**
+
+**Correction, same session, before this doc's first commit:** the original framing above
+attributed this to credentials not being provisioned in Vercel at all, mirroring a MOB
+note that turned out to be stale — Pete confirmed all 5 vars (`ENGINE_URL`,
+`ENGINE_SECRET`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`,
+`ANTHROPIC_API_KEY`) were provisioned in Vercel Production/Preview on 2026-06-14,
+Sensitive-flagged. That MOB note (Section 13, Workstream 2 narrative) had been carried
+forward inaccurately for roughly a month of session history and is now corrected there.
+
+The real gap is narrower: those credentials exist in Vercel but are not present in the
+Claude Code coding sandbox this build was done in. `vercel env pull web/.env.local`
+would resolve this directly, but requires an authenticated Vercel CLI session — this
+sandbox has network access to Vercel's API (confirmed: `vercel whoami` returned a real
+401 "token not valid" response, not a connection failure) but no valid token, and
+completing `vercel login` requires an interactive step (browser or email verification)
+this non-interactive environment can't perform. Resolving this is Pete's call: pull
+`.env.local` locally and transfer it into the coding environment some other way, or
+authenticate the CLI in-session some other way.
 
 What WAS verified, rigorously:
 - Direct Python function calls — `accumulate_one_answer()` and `run_accumulated_engine()`
@@ -225,7 +239,9 @@ they don't catch anything that only surfaces under real network/serialization co
 underlying gap (no live exercise has happened anywhere in this build), tracked once in
 the Decision Register (`tools/_mob.txt` Section 13a) rather than duplicated. **Before
 Path 1 Phase 1 is treated as genuinely done — not just committed — this round trip needs
-to happen once Upstash credentials exist somewhere they can actually be exercised.**
+to happen once the credential-access path into the coding sandbox is resolved** (the
+credentials themselves already exist in Vercel; access from wherever this round trip
+gets run is the actual remaining blocker).
 
 ## Commits, this build
 
