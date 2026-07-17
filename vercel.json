@@ -15,6 +15,14 @@
       "dest": "/api/engine.py"
     },
     {
+      "src": "/api/accumulate",
+      "dest": "/api/engine.py"
+    },
+    {
+      "src": "/api/complete",
+      "dest": "/api/engine.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "/web/$1"
     }
