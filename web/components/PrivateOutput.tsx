@@ -24,12 +24,20 @@ interface PrivateOutputProps {
   payload: PrivateOutputPayload;
   selectedStateIds: string[];
   intake: EnginePayload["intake"];
+  // Path 1 (Session 71, Phase 1): ShareButton re-invokes /api/share/create
+  // with Path B's declared-diagnosis logic (equal weight, selectedStateIds
+  // as the diagnosis), which would silently recompute — and corrupt — Path
+  // 1's real cosine-similarity-derived weights. ShareableOutput generation
+  // for Path 1 is explicitly out of scope this phase. Default true —
+  // existing self-select callers are unaffected.
+  enableSharing?: boolean;
 }
 
 export default function PrivateOutput({
   payload,
   selectedStateIds,
   intake,
+  enableSharing = true,
 }: PrivateOutputProps) {
   const liabilityText = payload.synthesis.liability_condition_text;
   const anchorText = payload.synthesis.asset_resolution_anchor_text;
@@ -97,9 +105,11 @@ export default function PrivateOutput({
       </div>
 
       {/* Block 5 — ShareButton */}
-      <div className="mt-2 w-full">
-        <ShareButton selectedStateIds={selectedStateIds} intake={intake} />
-      </div>
+      {enableSharing && (
+        <div className="mt-2 w-full">
+          <ShareButton selectedStateIds={selectedStateIds} intake={intake} />
+        </div>
+      )}
 
       {/* Block 6 — friction_tax_estimate: null in Path B — render nothing */}
     </div>

@@ -15,7 +15,7 @@ import AssemblyPanel from "@/components/AssemblyPanel";
 import PrivateOutput from "@/components/PrivateOutput";
 import { StateDrawer } from "@/components/StateDrawer";
 import { SelfSelectionProvider, useSelfSelection } from "@/context/SelfSelectionContext";
-import { FullInstrumentPlaceholder } from "@/components/FullInstrumentPlaceholder";
+import DiagnosticFlow from "@/components/DiagnosticFlow";
 
 type DiagnosticPath = "diagnostic" | "self-select" | null;
 
@@ -312,7 +312,11 @@ export default function DiagnosticPage() {
   }
 
   if (diagnosticState.path === "diagnostic") {
-    return <FullInstrumentPlaceholder />;
+    return (
+      <div className="min-h-screen bg-paper">
+        <DiagnosticFlow />
+      </div>
+    );
   }
 
   return (
