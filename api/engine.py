@@ -6,7 +6,12 @@ from fastapi.responses import JSONResponse
 # Add repo root to path so engine package resolves
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from engine.main import run_engine, accumulate_one_answer, run_accumulated_engine
+from engine.main import (
+    run_engine,
+    accumulate_one_answer,
+    run_accumulated_engine,
+    get_question_copy,
+)
 
 app = FastAPI()
 
@@ -96,5 +101,25 @@ async def complete(request: Request):
         raise HTTPException(status_code=400, detail=f"Unknown state ID: {e}")
     except (TypeError, ValueError) as e:
         raise HTTPException(status_code=400, detail=f"Invalid payload: {e}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Engine error")
+
+
+@app.post("/api/question-copy")
+async def question_copy(request: Request):
+    _check_secret(request)
+
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+    try:
+        question_id = payload.get("question_id", "") if isinstance(payload, dict) else ""
+        copy = get_question_copy(question_id)
+        return JSONResponse(content=copy)
+    except KeyError as e:
+        # Unknown question_id — client fault
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception:
         raise HTTPException(status_code=500, detail="Engine error")

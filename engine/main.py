@@ -166,6 +166,39 @@ def _locked_intake_to_engine_intake(intake: dict) -> IntakeData:
     )
 
 
+def get_question_copy(question_id: str) -> dict:
+    """
+    Public-safe question copy for Path 1's frontend. Returns ONLY
+    question_text and option_id/option_text pairs -- explicitly excludes
+    dimensional_contributions, axis_targets, severity_trigger, and
+    severity_follow_on_id. This is the runtime enforcement of the P-03
+    boundary (scoring weight is invisible) for content actually rendered in
+    the browser, not just an absence-by-construction of a duplicated
+    dataset -- QUESTION_LIBRARY remains the single source of truth, nothing
+    about question copy is ever hand-duplicated in TypeScript.
+
+    Added beyond the Session 71 handoff's explicit task list -- necessary
+    to implement Task 3's "session/start returns Q1's copy" and "session/
+    answer returns next question" without duplicating question content in
+    TypeScript (drift risk). Flagged in the Stage 3 dry-run.
+
+    Raises KeyError on an unknown question_id -- the caller (api/engine.py)
+    maps this to a 400.
+    """
+    question = QUESTION_LIBRARY.get(question_id)
+    if question is None:
+        raise KeyError(f"Unknown question_id: {question_id!r}")
+
+    return {
+        "question_id": question.question_id,
+        "question_text": question.question_text,
+        "options": [
+            {"option_id": opt.option_id, "option_text": opt.option_text}
+            for opt in question.answer_options
+        ],
+    }
+
+
 def accumulate_one_answer(
     accumulated_vector: dict,
     question_id: str,

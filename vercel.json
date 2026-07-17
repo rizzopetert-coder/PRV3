@@ -23,6 +23,10 @@
       "dest": "/api/engine.py"
     },
     {
+      "src": "/api/question-copy",
+      "dest": "/api/engine.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "/web/$1"
     }
