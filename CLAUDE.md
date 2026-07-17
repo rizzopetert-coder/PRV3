@@ -88,6 +88,45 @@ Wait for confirmation, then:
 
 ---
 
+## Workflow Governance — Four-Tier Model
+
+Four tiers govern how work in this project gets confirmed and gated. The tier determines the mechanism, not the reverse.
+
+### Tier 1 — Engine Integrity
+Calibration, wiring, taxonomy accuracy, citation verification. Mechanism: dry-run → Pete confirms → commit. Unchanged from existing practice — this tier's verification discipline is already correctly calibrated and should not be modified.
+
+### Tier 2 — Draft Content
+/book pieces, signature copy, anything not yet published. Mechanism: unchanged, low ceremony. Nothing here is public, so thoroughness carries no external cost.
+
+### Tier 3 — Structural/Scope Decisions
+Instrument scope, publish decisions, review timelines, go/no-go calls. Mechanism: logged in the Decision Register (`tools/_mob.txt`, Section 13a). Each entry carries a status, an explicit named blocker, and a "next check-in" — not a deadline, a forced re-look. Claude.ai flags any item that has reached its check-in point at the start of every session that reads the MOB, as part of the standing engage-protocol status report.
+
+### Tier 4 — Public/Irreversible Actions
+Publishing, launching the instrument, sending campaigns live. Split explicitly:
+- **Reversible** (e.g., a single test-publish that can be pulled back) — may proceed with lighter-weight confirmation once genuinely ready.
+- **Irreversible** (e.g., public name exposure, a campaign going live) — requires: (a) explicit standalone confirmation from Pete, (b) a check against the named risk categories below, and (c) a pre-mortem — "if this goes wrong, what specifically caused it, and is that condition present now" — logged before proceeding.
+
+### Named Risk Categories
+Checked against for every Tier 4 action:
+- Reputational exposure from an error reaching a client's eyes
+- The OneDigital non-solicitation/shadow-model boundary
+- Legal/citation exposure from an unverified claim
+- Premature signaling before the instrument is actually built to back up the claim being made
+
+### Pilot Mechanism
+A rung between Tier 2 and Tier 4 — sharing a single piece with 2-3 trusted people before any site publication. Low-ceremony, near-zero-exposure way to get real signal before a public commitment.
+
+### Soft Governor
+If three consecutive sessions are pure Tier 1 work, the next session opens with a Tier 3 touchpoint (a Decision Register item gets actively engaged, even briefly) before other work proceeds. This is a tripwire, not a cap — Tier 1 work continues at whatever pace it needs; this only prevents structural decisions from being avoided indefinitely via comfortable, checkable engine work.
+
+### Quarterly Step-Back
+A full project assessment (workstream status, goal progress, process feedback) should be run roughly every 15 sessions, not only when Pete happens to request one.
+
+### Outside Human Gap (documented, not yet actioned)
+The entire verification/decision loop currently runs inside Pete + the AI stack. This is strong for factual rigor, structurally weak for judgment about public reception. Before the first truly public, hard-to-reverse Tier 4 action, a second human read — a trusted colleague — is recommended over another internal review pass.
+
+---
+
 ## During-Session Rules
 
 ### File Change Protocol
@@ -136,7 +175,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.45 |
+| MOB version | v4.46 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 57 (locked) |
