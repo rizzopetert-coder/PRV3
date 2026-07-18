@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from engine.main import (
     run_engine,
     accumulate_one_answer,
+    run_checkpoint,
     run_accumulated_engine,
     get_question_copy,
 )
@@ -82,6 +83,32 @@ async def accumulate(request: Request):
         raise HTTPException(status_code=500, detail="Engine error")
 
 
+@app.post("/api/checkpoint")
+async def checkpoint(request: Request):
+    _check_secret(request)
+
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+    try:
+        checkpoint_position = payload.get("checkpoint_position", "") if isinstance(payload, dict) else ""
+        accumulated_vector = payload.get("accumulated_vector", {}) if isinstance(payload, dict) else {}
+        answered_question_count = payload.get("answered_question_count", 0) if isinstance(payload, dict) else 0
+        already_asked = payload.get("already_asked", []) if isinstance(payload, dict) else []
+        result = run_checkpoint(
+            checkpoint_position, accumulated_vector, answered_question_count, already_asked
+        )
+        return JSONResponse(content=result)
+    except (TypeError, ValueError) as e:
+        # Invalid checkpoint_position (engine.checkpoint.evaluate_checkpoint) —
+        # client fault
+        raise HTTPException(status_code=400, detail=f"Invalid payload: {e}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Engine error")
+
+
 @app.post("/api/complete")
 async def complete(request: Request):
     _check_secret(request)
@@ -95,7 +122,10 @@ async def complete(request: Request):
         accumulated_vector = payload.get("accumulated_vector", {}) if isinstance(payload, dict) else {}
         intake = payload.get("intake", {}) if isinstance(payload, dict) else {}
         answered_question_count = payload.get("answered_question_count", 0) if isinstance(payload, dict) else 0
-        result = run_accumulated_engine(accumulated_vector, intake, answered_question_count)
+        checkpoint_results = payload.get("checkpoint_results", {}) if isinstance(payload, dict) else {}
+        result = run_accumulated_engine(
+            accumulated_vector, intake, answered_question_count, checkpoint_results
+        )
         return JSONResponse(content=result)
     except KeyError as e:
         raise HTTPException(status_code=400, detail=f"Unknown state ID: {e}")

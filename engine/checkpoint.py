@@ -170,6 +170,45 @@ class CheckpointResult:
     trigger_path:      str = "none"   # "entropy" | "cluster_override" | "none"
 
 
+def checkpoint_result_from_wire(
+    checkpoint_position: str,
+    wire: Optional[dict],
+) -> Optional["CheckpointResult"]:
+    """
+    Reconstruct a CheckpointResult from the trimmed wire shape a completed
+    Path 1 session sends back at Q34 (web/lib/engine-client.ts's
+    CheckpointResultPayload -- entropy/threshold/fires/distinguishers/
+    top_cluster only, no checkpoint/narrative_trigger/trigger_path). Used
+    by run_accumulated_engine() (engine/main.py) to populate
+    SessionData.checkpoint_q11/19/27 from what the session already computed
+    live during Q11/Q19/Q27, instead of recomputing at completion.
+
+    narrative_trigger and trigger_path are Section III.3 concerns, out of
+    Phase 2 checkpoint-wiring scope -- defaulted to False and "none".
+    Neither is read by contract.py's _checkpoint_entry(), which only reads
+    entropy/threshold/fires/len(distinguishers), so this is a lossless
+    reconstruction for everything actually consumed downstream.
+    distinguishers arrives as question_id strings rather than
+    QuestionDefinition objects for the same reason -- _checkpoint_entry()
+    only calls len() on it.
+
+    Returns None if wire is None -- the checkpoint was never reached this
+    session (e.g. completion before Q27) or the slot was never populated.
+    """
+    if wire is None:
+        return None
+    return CheckpointResult(
+        checkpoint=checkpoint_position,
+        entropy=wire["entropy"],
+        threshold=wire["threshold"],
+        fires=wire["fires"],
+        top_cluster=wire.get("top_cluster"),
+        distinguishers=wire.get("distinguishers", []),
+        narrative_trigger=False,
+        trigger_path="none",
+    )
+
+
 def evaluate_checkpoint(
     checkpoint_position: str,
     rankings: list,

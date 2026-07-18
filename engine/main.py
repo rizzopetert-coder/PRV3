@@ -12,6 +12,8 @@ constraints and clears all alignment thresholds unconditionally.
 Exceptions propagate. Error handling is the caller's responsibility (api/engine.py).
 """
 
+from typing import Optional
+
 from engine.accumulation import (
     IntakeData,
     StateRanking,
@@ -22,6 +24,7 @@ from engine.accumulation import (
 from engine.severity import SeverityEngine
 from engine.output import OutputEngine
 from engine.contract import SessionData, assemble_output
+from engine.checkpoint import evaluate_checkpoint, checkpoint_result_from_wire
 from engine.data.states import STATE_PROFILES
 from engine.data.questions import QUESTION_LIBRARY
 from engine.data.salience import SALIENCE_PROFILES
@@ -233,10 +236,57 @@ def accumulate_one_answer(
     return session.accumulated_vector
 
 
+def run_checkpoint(
+    checkpoint_position: str,
+    accumulated_vector: dict,
+    answered_question_count: int,
+    already_asked: list,
+) -> dict:
+    """
+    Path 1 checkpoint evaluation (Phase 2). Ranks the session's current
+    accumulated vector via rank_states() -- the same call
+    run_accumulated_engine() makes at completion, same
+    answered_question_count-scaled centroid displacement -- then evaluates
+    the named checkpoint via engine.checkpoint.evaluate_checkpoint(). No
+    orchestration logic duplicated here; this is a thin wire-shape adapter
+    over both, consistent with accumulate_one_answer() and
+    get_question_copy() above.
+
+    answered_question_count MUST be the session's true live answer count
+    at the moment this checkpoint fires (session.answers_log.length on the
+    caller side), not derived from checkpoint_position -- a session that
+    has already had an earlier checkpoint splice distinguisher questions in
+    will have answered more than 11/19/27 questions by the time a later
+    checkpoint position is reached, and rank_states()'s centroid
+    displacement scales directly off this count.
+
+    Returns only the fields CheckpointResultPayload (web/lib/engine-client.ts)
+    needs: entropy, threshold, fires, distinguishers (question_id strings,
+    not QuestionDefinition objects -- P-03 boundary, same treatment as
+    get_question_copy()), top_cluster. narrative_trigger and trigger_path
+    are Section III.3 / Phase 3 concerns, out of Phase 2 scope, not
+    returned here.
+
+    Raises ValueError on an invalid checkpoint_position -- the caller
+    (api/engine.py) maps this to a 400.
+    """
+    rankings = rank_states(accumulated_vector, answered_question_count, SALIENCE_PROFILES)
+    result = evaluate_checkpoint(checkpoint_position, rankings, already_asked)
+
+    return {
+        "entropy": result.entropy,
+        "threshold": result.threshold,
+        "fires": result.fires,
+        "distinguishers": [q.question_id for q in result.distinguishers],
+        "top_cluster": result.top_cluster,
+    }
+
+
 def run_accumulated_engine(
     accumulated_vector: dict,
     intake: dict,
     answered_question_count: int,
+    checkpoint_results: Optional[dict] = None,
 ) -> dict:
     """
     Path 1 completion orchestrator ("Path A" -- real accumulation-based
@@ -252,6 +302,15 @@ def run_accumulated_engine(
     with no accumulated severity inputs, exactly matching Path B's pattern
     for the same reason (no severity-triggering questions answered in
     Phase 1 scope).
+
+    checkpoint_results (Phase 2): optional dict keyed "q11"/"q19"/"q27",
+    each value either None (that checkpoint was never reached this
+    session -- completion before Q27 is possible, e.g.) or a wire-shaped
+    dict matching run_checkpoint()'s return shape. Threaded into
+    SessionData.checkpoint_q11/19/27 via checkpoint_result_from_wire() so
+    checkpoint_log in the assembled output reflects what actually happened
+    live during the session, instead of the None defaults every session
+    fell through to before this parameter existed.
     """
     intake_data = _locked_intake_to_engine_intake(intake)
 
@@ -287,6 +346,7 @@ def run_accumulated_engine(
             signal_map_context="",
         )
 
+    checkpoint_results = checkpoint_results or {}
     session_data = SessionData(
         session_id=SessionData.new_session_id(),
         intake=intake_data,
@@ -294,6 +354,9 @@ def run_accumulated_engine(
         accumulated_vector=accumulated_vector,
         output_package=output_package,
         severity_result=severity_result,
+        checkpoint_q11=checkpoint_result_from_wire("Q11", checkpoint_results.get("q11")),
+        checkpoint_q19=checkpoint_result_from_wire("Q19", checkpoint_results.get("q19")),
+        checkpoint_q27=checkpoint_result_from_wire("Q27", checkpoint_results.get("q27")),
     )
 
     return assemble_output(session_data, synthesis_result=synthesis_result)

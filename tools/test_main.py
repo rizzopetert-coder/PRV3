@@ -8,7 +8,7 @@ import unittest.mock as mock
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
-from engine.main import run_engine
+from engine.main import run_engine, run_checkpoint, run_accumulated_engine
 
 PASS = []
 FAIL = []
@@ -142,6 +142,156 @@ check(
     "synthesis: None when selectedStateIds is empty",
     result_empty.get("synthesis") is None,
     f"got {result_empty.get('synthesis')}",
+)
+
+# ── 16+  run_checkpoint (Phase 2, Stage 4) ─────────────────────────────────────
+print("\n" + "=" * 64)
+print("run_checkpoint — contract and answered_question_count wiring")
+print("=" * 64)
+
+# Nonzero vector so rank_states() produces a real, non-degenerate ranking
+# (an all-zero vector at low answered_question_count can trip the
+# magnitude guard and return uniform zero scores for every state).
+_CP_VECTOR = {"authority_liability": 5.0}
+
+result_cp = run_checkpoint("Q11", _CP_VECTOR, 11, [])
+
+# 16. run_checkpoint returns exactly the CheckpointResultPayload contract
+check(
+    "run_checkpoint: returns exactly the wire-contract keys",
+    set(result_cp.keys()) == {"entropy", "threshold", "fires", "distinguishers", "top_cluster"},
+    f"got keys: {sorted(result_cp.keys())}",
+)
+check(
+    "run_checkpoint: entropy is float",
+    isinstance(result_cp["entropy"], float),
+    f"got {type(result_cp['entropy'])}",
+)
+check(
+    "run_checkpoint: distinguishers is a list of strings, not QuestionDefinition objects",
+    isinstance(result_cp["distinguishers"], list)
+    and all(isinstance(d, str) for d in result_cp["distinguishers"]),
+    f"got {result_cp['distinguishers']!r}",
+)
+
+# 17. answered_question_count is actually wired into rank_states()'s centroid
+# displacement, not silently ignored — the bug Stage 4 exists to avoid.
+# Same accumulated_vector, two different counts, must NOT produce identical
+# entropy (the whole point of threading the real live count through).
+result_cp_low = run_checkpoint("Q11", _CP_VECTOR, 11, [])
+result_cp_high = run_checkpoint("Q11", _CP_VECTOR, 21, [])
+check(
+    "run_checkpoint: answered_question_count changes entropy for the same vector "
+    "(confirms it reaches rank_states(), not silently dropped)",
+    result_cp_low["entropy"] != result_cp_high["entropy"],
+    f"count=11 entropy={result_cp_low['entropy']!r}, count=21 entropy={result_cp_high['entropy']!r}",
+)
+
+# 18. Invalid checkpoint_position propagates as ValueError (api/engine.py
+# maps this to 400 — same contract as evaluate_checkpoint() itself).
+try:
+    run_checkpoint("Q99", _CP_VECTOR, 11, [])
+    check("run_checkpoint: invalid checkpoint_position raises ValueError", False, "no exception raised")
+except ValueError:
+    check("run_checkpoint: invalid checkpoint_position raises ValueError", True)
+
+
+# ── 19+  run_accumulated_engine — checkpoint_results threading (Stage 4) ──────
+print("\n" + "=" * 64)
+print("run_accumulated_engine — checkpoint_results -> SessionData -> checkpoint_log")
+print("=" * 64)
+
+_LOCKED_INTAKE = {
+    "organization_size": "51-200",
+    "industry": "Technology",
+    "role_level": "CEO",
+    "jurisdiction": "US-CA",
+}
+
+_WIRE_Q11 = {
+    "entropy": 2.5,
+    "threshold": 0.6,
+    "fires": True,
+    "distinguishers": ["DIST-CM-01", "DIST-CM-02"],
+    "top_cluster": "C-Manager",
+}
+_WIRE_Q19 = {
+    "entropy": 1.1,
+    "threshold": 0.4,
+    "fires": False,
+    "distinguishers": [],
+    "top_cluster": None,
+}
+# q27 deliberately omitted from the bundle below — a session can complete
+# before reaching a later checkpoint; the None-fallthrough path must still
+# work cleanly.
+
+with mock.patch.dict("sys.modules", {"anthropic": None}):
+    result_with_checkpoints = run_accumulated_engine(
+        _CP_VECTOR,
+        _LOCKED_INTAKE,
+        27,
+        {"q11": _WIRE_Q11, "q19": _WIRE_Q19},
+    )
+
+cl = result_with_checkpoints.get("checkpoint_log", {})
+
+# 19. checkpoint_log.q11 genuinely populated — THE original bug this whole
+# stage sequence exists to fix (previously unconditionally null).
+check(
+    "checkpoint_log.q11: entropy/threshold/threshold_exceeded/distinguisher_fired "
+    "genuinely populated, not null",
+    cl.get("q11") == {
+        "entropy": 2.5,
+        "threshold": 0.6,
+        "threshold_exceeded": True,
+        "distinguisher_fired": True,
+    },
+    f"got {cl.get('q11')!r}",
+)
+check(
+    "checkpoint_log.q19: populated, fires=False -> distinguisher_fired=False",
+    cl.get("q19") == {
+        "entropy": 1.1,
+        "threshold": 0.4,
+        "threshold_exceeded": False,
+        "distinguisher_fired": False,
+    },
+    f"got {cl.get('q19')!r}",
+)
+# 20. q27 was never in the bundle — must fall through to the all-null shape,
+# not raise or silently default to something else.
+check(
+    "checkpoint_log.q27: never reached this session -> all-null, no crash",
+    cl.get("q27") == {
+        "entropy": None,
+        "threshold": None,
+        "threshold_exceeded": None,
+        "distinguisher_fired": None,
+    },
+    f"got {cl.get('q27')!r}",
+)
+
+# 21. checkpoint_results omitted entirely (e.g. an older caller, or Path B's
+# equivalent) must still produce a clean all-null checkpoint_log — the
+# pre-Stage-4 default behavior, now via an explicit default rather than an
+# accident of SessionData's dataclass defaults.
+with mock.patch.dict("sys.modules", {"anthropic": None}):
+    result_no_checkpoints = run_accumulated_engine(_CP_VECTOR, _LOCKED_INTAKE, 27)
+
+cl_none = result_no_checkpoints.get("checkpoint_log", {})
+check(
+    "checkpoint_log: all three null when checkpoint_results omitted entirely",
+    all(
+        cl_none.get(k) == {
+            "entropy": None,
+            "threshold": None,
+            "threshold_exceeded": None,
+            "distinguisher_fired": None,
+        }
+        for k in ("q11", "q19", "q27")
+    ),
+    f"got {cl_none!r}",
 )
 
 # ── Results ───────────────────────────────────────────────────────────────────
