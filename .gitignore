@@ -3,3 +3,7 @@ __pycache__/
 *.pyo
 .env
 *.log
+
+.vercel
+
+tools/notebooklm_staging/
