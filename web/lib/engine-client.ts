@@ -172,10 +172,56 @@ export async function invokeAccumulate(
   return response.json() as Promise<AccumulatedVector>;
 }
 
+export interface CheckpointPayload {
+  checkpoint_position: "Q11" | "Q19" | "Q27";
+  accumulated_vector: AccumulatedVector;
+  // Session's true live answer count at the moment this checkpoint fires
+  // (session.answers_log.length on the caller side) -- NOT derived from
+  // checkpoint_position. rank_states()'s centroid displacement scales
+  // directly off this count, and a session with an earlier checkpoint
+  // splice already in its sequence will have answered more than 11/19/27
+  // questions by the time a later checkpoint position is reached.
+  answered_question_count: number;
+  already_asked: string[];
+}
+
+export interface CheckpointResultPayload {
+  entropy: number;
+  threshold: number;
+  fires: boolean;
+  distinguishers: string[];
+  top_cluster: string | null;
+}
+
+export async function invokeCheckpoint(
+  payload: CheckpointPayload,
+): Promise<CheckpointResultPayload> {
+  const response = await engineFetch(resolveEnginePath("/api/checkpoint"), payload);
+
+  if (!response.ok) {
+    throw new Error(`Checkpoint invocation failed: ${response.status}`);
+  }
+
+  return response.json() as Promise<CheckpointResultPayload>;
+}
+
+// The three accumulated CheckpointResultPayload objects a session computed
+// live during Q11/Q19/Q27, or null per slot if that checkpoint was never
+// reached (a session can complete before reaching Q27, and in principle
+// before Q19 or Q11 too). Lets the Python-side completion handler populate
+// SessionData.checkpoint_q11/19/27 from what was already computed, rather
+// than recomputing at Q34 (Stage 2/Stage 4).
+export interface CheckpointResultsBundle {
+  q11: CheckpointResultPayload | null;
+  q19: CheckpointResultPayload | null;
+  q27: CheckpointResultPayload | null;
+}
+
 export interface CompletePayload {
   accumulated_vector: AccumulatedVector;
   intake: IntakeEcho;
   answered_question_count: number;
+  checkpoint_results: CheckpointResultsBundle;
 }
 
 export async function invokeComplete(
