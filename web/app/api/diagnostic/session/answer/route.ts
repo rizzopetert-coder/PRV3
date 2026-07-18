@@ -3,16 +3,58 @@ import {
   getSession,
   saveSession,
   completeSession,
-  PHASE_1_QUESTION_SEQUENCE,
+  spliceDistinguishers,
+  isLastQuestionInSequence,
+  validateIndexInvariant,
   type AnswerLogEntry,
+  type CheckpointResult,
+  type DiagnosticSession,
 } from "@/lib/session-store";
-import { invokeAccumulate, invokeComplete, invokeQuestionCopy } from "@/lib/engine-client";
+import {
+  invokeAccumulate,
+  invokeCheckpoint,
+  invokeComplete,
+  invokeQuestionCopy,
+} from "@/lib/engine-client";
 import type {
   PrivateOutputPayload,
   StateRef,
   ResolutionFamily,
   SynthesisFields,
 } from "@/lib/types";
+
+// Checkpoint ID mapping (Phase 2) — Q27 has two branch IDs (Q27A/Q27B)
+// depending on intake.significant_events; Phase 1's locked intake adapter
+// always takes the Q27B branch (session-store.ts header), but both map to
+// the same canonical checkpoint position so this route doesn't hardcode
+// that assumption. Only question_ids present here trigger a checkpoint
+// evaluation call below.
+const checkpointIdMap: Record<string, "Q11" | "Q19" | "Q27"> = {
+  Q11: "Q11",
+  Q19: "Q19",
+  Q27A: "Q27",
+  Q27B: "Q27",
+};
+
+// Three independent DiagnosticSession slots (Stage 1) — not a nested dict.
+function checkpointSlot(
+  session: DiagnosticSession,
+  position: "Q11" | "Q19" | "Q27",
+): CheckpointResult | null {
+  if (position === "Q11") return session.checkpoint_q11;
+  if (position === "Q19") return session.checkpoint_q19;
+  return session.checkpoint_q27;
+}
+
+function setCheckpointSlot(
+  session: DiagnosticSession,
+  position: "Q11" | "Q19" | "Q27",
+  result: CheckpointResult,
+): void {
+  if (position === "Q11") session.checkpoint_q11 = result;
+  else if (position === "Q19") session.checkpoint_q19 = result;
+  else session.checkpoint_q27 = result;
+}
 
 // ---------------------------------------------------------------------------
 // Path 1 (Session 71, Phase 1) — session/answer
@@ -133,7 +175,7 @@ export async function POST(request: NextRequest) {
 
   // Index invariant — the actual security boundary given NanoID-only
   // session ownership.
-  if (question_id !== session.next_question_id) {
+  if (!validateIndexInvariant(question_id, session.next_question_id)) {
     return NextResponse.json(
       { error: "question_id does not match session's current question" },
       { status: 400 },
@@ -151,11 +193,56 @@ export async function POST(request: NextRequest) {
   session.accumulated_vector = updatedVector;
   session.answers_log = [...session.answers_log, answerEntry];
 
-  const currentIndex = PHASE_1_QUESTION_SEQUENCE.indexOf(question_id);
-  const isLastQuestion = currentIndex === PHASE_1_QUESTION_SEQUENCE.length - 1;
+  // currentIndex is stable across the splice below — splicing inserts
+  // strictly after this position, so the just-answered question's own
+  // index never shifts as a result of its own checkpoint firing.
+  const currentIndex = session.question_sequence.indexOf(question_id);
+
+  // Checkpoint evaluation — at most once per canonical position per
+  // session, guarded by the slot-null check (the index invariant above
+  // should already prevent replaying a question_id, but this doesn't rely
+  // on that alone, per explicit instruction).
+  const checkpointPosition = checkpointIdMap[question_id];
+  if (checkpointPosition && checkpointSlot(session, checkpointPosition) === null) {
+    const alreadyAsked = session.answers_log
+      .filter((entry) => entry.question_id.startsWith("DIST-"))
+      .map((entry) => entry.question_id);
+
+    // Propagates on failure — explicit error over silent-ignore, matching
+    // this route's existing philosophy for the index invariant above. A
+    // checkpoint call that fails must not be treated as "evaluated, did
+    // not fire."
+    const checkpointResult = await invokeCheckpoint({
+      checkpoint_position: checkpointPosition,
+      accumulated_vector: session.accumulated_vector,
+      // True live count at this exact moment, not derived from
+      // checkpointPosition -- session.answers_log was already updated
+      // above for the just-answered question, so this is the same value
+      // the Q34 completion call below uses (session.answers_log.length),
+      // computed the same way for the same reason.
+      answered_question_count: session.answers_log.length,
+      already_asked: alreadyAsked,
+    });
+
+    setCheckpointSlot(session, checkpointPosition, checkpointResult);
+
+    if (checkpointResult.fires) {
+      session.question_sequence = spliceDistinguishers(
+        session.question_sequence,
+        currentIndex,
+        checkpointResult.distinguishers,
+      );
+    }
+  }
+
+  // Computed AFTER the possible splice above, so length reflects any
+  // distinguishers just inserted for THIS question. "Last question" means
+  // end of this session's own (possibly-extended) sequence, not a
+  // hardcoded position 34.
+  const isLastQuestion = isLastQuestionInSequence(session.question_sequence, currentIndex);
 
   if (!isLastQuestion) {
-    const nextQuestionId = PHASE_1_QUESTION_SEQUENCE[currentIndex + 1];
+    const nextQuestionId = session.question_sequence[currentIndex + 1];
     session.next_question_id = nextQuestionId;
     await saveSession(session);
 
@@ -169,6 +256,11 @@ export async function POST(request: NextRequest) {
     accumulated_vector: session.accumulated_vector,
     intake: session.intake,
     answered_question_count: session.answers_log.length,
+    checkpoint_results: {
+      q11: session.checkpoint_q11,
+      q19: session.checkpoint_q19,
+      q27: session.checkpoint_q27,
+    },
   });
 
   const allEngineStates = engineResult.identified_states;
