@@ -6,11 +6,13 @@
 // dimensional vector must never round-trip to the client — only this
 // server-side layer and the Python engine ever see it.
 //
-// Phase 1 scope: linear Q01-Q34 core sequence only. No checkpoints, no
-// narrative modulation, no Aptitude addenda (Q35-Q39), no severity
-// follow-ons. next_question_id is a string (question ID), not a
-// positional integer — Phase 2's checkpoint-based dynamic assignment
-// will not require a schema change.
+// Phase 1 scope: linear Q01-Q34 core sequence only. No narrative
+// modulation, no Aptitude addenda (Q35-Q39), no severity follow-ons.
+// next_question_id is a string (question ID), not a positional integer —
+// Phase 2's checkpoint-based dynamic assignment does not require a schema
+// change. Phase 2 checkpoint fields (checkpoint_q11/19/27,
+// question_sequence) are present on DiagnosticSession as of this schema
+// change but not yet wired into session/answer's routing logic.
 //
 // Session 71 (Claude.ai) Path 1 Phase 1 handoff. Full rationale:
 // prompts/path1-phase1-handoff.md.
@@ -94,6 +96,17 @@ export interface AnswerLogEntry {
   option_id: string;
 }
 
+// Mirrors engine.checkpoint.CheckpointResult. Three independent optional
+// slots on DiagnosticSession below — not a nested dict — matching Python's
+// SessionData pattern (confirmed against engine/contract.py lines 47-62).
+export interface CheckpointResult {
+  entropy: number;
+  threshold: number;
+  fires: boolean;
+  distinguishers: string[]; // DIST-[cluster]-## IDs
+  top_cluster: string | null;
+}
+
 export interface DiagnosticSession {
   session_id: string;
   intake: IntakeEcho;
@@ -104,6 +117,16 @@ export interface DiagnosticSession {
   // later would be a mid-flight schema migration on live session data.
   answers_log: AnswerLogEntry[];
   status: "in_progress" | "complete";
+  checkpoint_q11: CheckpointResult | null;
+  checkpoint_q19: CheckpointResult | null;
+  checkpoint_q27: CheckpointResult | null;
+  // Live per-session routing source of truth (Phase 2). Initialized from
+  // PHASE_1_QUESTION_SEQUENCE in createSession(); the static export stays
+  // the canonical template and is never mutated. A checkpoint firing
+  // splices distinguisher questions into this array — session/answer's
+  // route logic reads from this, not from the static template, once Phase
+  // 2 wiring lands.
+  question_sequence: string[];
 }
 
 // Anonymized calibration-relevant record — the only thing that survives
@@ -118,6 +141,50 @@ export interface AnonymizedCompletion {
 }
 
 // ---------------------------------------------------------------------------
+// Pure session-sequence helpers (Phase 2)
+//
+// No I/O, no Redis, no mutation of inputs — extracted from
+// session/answer/route.ts so they're testable in isolation. The route
+// calls these directly; this is not a parallel reimplementation the route
+// could drift from.
+// ---------------------------------------------------------------------------
+
+// Returns a NEW array with distinguishers inserted immediately after
+// currentIndex. Does not mutate sequence — the route is responsible for
+// assigning the result back onto session.question_sequence.
+export function spliceDistinguishers(
+  sequence: string[],
+  currentIndex: number,
+  distinguishers: string[],
+): string[] {
+  return [
+    ...sequence.slice(0, currentIndex + 1),
+    ...distinguishers,
+    ...sequence.slice(currentIndex + 1),
+  ];
+}
+
+// True when currentIndex is the last position in sequence. "Last question"
+// means end of THIS sequence as it currently stands — call after any
+// same-question splice has already been applied, not before.
+export function isLastQuestionInSequence(
+  sequence: string[],
+  currentIndex: number,
+): boolean {
+  return currentIndex === sequence.length - 1;
+}
+
+// The index invariant (Gemini-specified security boundary, given
+// NanoID-only session ownership): the answered question_id must match the
+// session's current next_question_id.
+export function validateIndexInvariant(
+  questionId: string,
+  nextQuestionId: string,
+): boolean {
+  return questionId === nextQuestionId;
+}
+
+// ---------------------------------------------------------------------------
 // Session CRUD
 // ---------------------------------------------------------------------------
 
@@ -129,6 +196,10 @@ export async function createSession(intake: IntakeEcho): Promise<DiagnosticSessi
     accumulated_vector: { ...ZERO_VECTOR },
     answers_log: [],
     status: "in_progress",
+    checkpoint_q11: null,
+    checkpoint_q19: null,
+    checkpoint_q27: null,
+    question_sequence: [...PHASE_1_QUESTION_SEQUENCE],
   };
 
   await redis.set(sessionKey(session.session_id), JSON.stringify(session), {
