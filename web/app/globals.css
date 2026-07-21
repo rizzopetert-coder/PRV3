@@ -5,6 +5,69 @@
   --foreground: #26241F;
 }
 
+/* ---------------------------------------------------------------------
+ * Visual identity v2 tokens (OD-07 closure — hybrid Constellation-Topology
+ * model, Gemini-cleared). ADDITIVE ONLY: these coexist with the Session 58
+ * palette above (--background/--foreground, and --color-paper/-charcoal/
+ * -slate/-rust below) rather than replacing it. Every existing route still
+ * runs on the Session 58 tokens unchanged — this new layer is wired into
+ * markup starting with the Stage 4 homepage proof point, not before.
+ *
+ * --oxide/--oxide-text is the general accent. --urgency/--urgency-text is
+ * reserved exclusively for genuine Endemic-severity signaling — never
+ * decorative, never used elsewhere. In Warm and Dark these currently share
+ * values; in Neutral they diverge (slate blue general accent vs. orange
+ * reserved) — intentional, do not collapse it.
+ *
+ * --slate here is intentionally NOT mirrored into the Tailwind @theme
+ * block below as --color-slate — that name is already taken by the
+ * Session 58 palette's --color-slate (#4A6B85), live today via
+ * `border-slate` in SignatureCard.tsx. Consume the new --slate via
+ * arbitrary-value syntax (e.g. text-[color:var(--slate)]) or inline
+ * style, not a bare `slate` utility class.
+ * --------------------------------------------------------------------- */
+:root {
+  --ink: #14171A;
+  --field: #E9E7E2;
+  --field-raise: #DFDCD5;
+  --oxide: #8C4A2F;
+  --oxide-text: #8C4A2F;
+  --slate: #5C6B66;
+  --line: rgba(20, 23, 26, 0.14);
+  --line-strong: rgba(20, 23, 26, 0.20);
+  --cta-text: #E9E7E2;
+  --urgency: #8C4A2F;
+  --urgency-text: #8C4A2F;
+}
+
+[data-theme="dark"] {
+  --ink: #EDEAE3;
+  --field: #171512;
+  --field-raise: #201E1A;
+  --oxide: #B8663D;
+  --oxide-text: #C9825C;
+  --slate: #8FA39C;
+  --line: rgba(237, 234, 227, 0.09);
+  --line-strong: rgba(237, 234, 227, 0.16);
+  --cta-text: #171512;
+  --urgency: #B8663D;
+  --urgency-text: #C9825C;
+}
+
+[data-theme="neutral"] {
+  --ink: #34383C;
+  --field: #FFFFFF;
+  --field-raise: #EFE6D0;
+  --oxide: #4A6B85;
+  --oxide-text: #3D5A72;
+  --slate: #7A7E82;
+  --line: rgba(52, 56, 60, 0.10);
+  --line-strong: rgba(52, 56, 60, 0.18);
+  --cta-text: #FFFFFF;
+  --urgency: #C9622A;
+  --urgency-text: #B5551F;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -12,10 +75,34 @@
   --color-charcoal: #26241F;
   --color-slate: #4A6B85;
   --color-rust: #C2492E;
+  /* Visual identity v2 (OD-07) — new names only, no collisions with the
+     Session 58 mappings above. --slate (v2) is deliberately excluded —
+     see the comment on the :root token block. */
+  --color-ink: var(--ink);
+  --color-field: var(--field);
+  --color-field-raise: var(--field-raise);
+  --color-oxide: var(--oxide);
+  --color-oxide-text: var(--oxide-text);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-cta-text: var(--cta-text);
+  --color-urgency: var(--urgency);
+  --color-urgency-text: var(--urgency-text);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-jetbrains-mono);
+  /* font-mono repointed to IBM Plex Mono (visual identity v2, Stage 1) —
+     confirmed unused as a live `font-mono` utility class anywhere in the
+     current site before this change, so this is inert today, not a
+     visual change to any existing page. Ready for Stage 2/3's
+     data/taxonomic labels. */
+  --font-mono: var(--font-ibm-plex-mono);
   --font-display: var(--font-lora);
   --font-ui: var(--font-inter);
+  /* font-serif: visual identity v2's display font (Source Serif 4).
+     Tailwind's default font-serif utility was unmapped/unused in this
+     project before this change — new capability, not a change to
+     --font-display (Lora), which every existing page's font-display
+     usage still resolves to unchanged. */
+  --font-serif: var(--font-source-serif-4);
 }
 
 @keyframes card-pulse {
