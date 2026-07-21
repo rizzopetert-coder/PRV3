@@ -3,9 +3,14 @@ import {
   AXES,
   KEYFRAMES,
   RESTING_FRAME,
+  LIVE_CENTER,
+  LIVE_MAX_R,
   computeFrame,
+  dominantAxis,
   pointFor,
   pointsAttr,
+  polarPoint,
+  severityAccentTokens,
 } from "./ConstellationField";
 
 // Locks in the resting-frame geometry hand-verified during Stage 2 against
@@ -61,5 +66,55 @@ describe("computeFrame", () => {
 describe("pointsAttr", () => {
   it("renders the resting frame as the exact hand-verified SVG points string", () => {
     expect(pointsAttr(RESTING_FRAME)).toBe("450,250 510,320 450,370 390,320");
+  });
+});
+
+// --- Stage 3: live mode ------------------------------------------------
+
+describe("severityAccentTokens", () => {
+  it("uses --urgency tokens only for genuine Endemic severity", () => {
+    expect(severityAccentTokens("Endemic")).toEqual({
+      stroke: "var(--urgency)",
+      text: "var(--urgency-text)",
+    });
+  });
+
+  it("uses --oxide tokens for Entrenched", () => {
+    expect(severityAccentTokens("Entrenched")).toEqual({
+      stroke: "var(--oxide)",
+      text: "var(--oxide-text)",
+    });
+  });
+
+  it("uses --oxide tokens for Emerging", () => {
+    expect(severityAccentTokens("Emerging")).toEqual({
+      stroke: "var(--oxide)",
+      text: "var(--oxide-text)",
+    });
+  });
+});
+
+describe("dominantAxis (live mode's static weights, not ambient's interpolated frame)", () => {
+  it("picks the reference mockup's own dominant axis from its labeled weights", () => {
+    // The results mockup's example: Authority 55%, Attitude 20%,
+    // Aptitude 15%, Alliance 10% -> dominant is Authority.
+    expect(dominantAxis({ apt: 0.15, auth: 0.55, all: 0.1, att: 0.2 })).toBe("auth");
+  });
+
+  it("breaks ties in auth -> apt -> all -> att order", () => {
+    expect(dominantAxis({ apt: 0.5, auth: 0.5, all: 0.5, att: 0.5 })).toBe("auth");
+    expect(dominantAxis({ apt: 0.5, auth: 0.1, all: 0.5, att: 0.5 })).toBe("apt");
+    expect(dominantAxis({ apt: 0.1, auth: 0.1, all: 0.5, att: 0.5 })).toBe("all");
+  });
+});
+
+describe("live-mode vertex geometry", () => {
+  it("reproduces the results mockup's own example exactly (hand-verified against its rendered SVG)", () => {
+    // mockup: apt .15, auth .55, all .10, att .20 -> polygon
+    // "300,267 421,300 300,322 256,300"
+    expect(polarPoint(0.15, AXES.apt, LIVE_CENTER, LIVE_MAX_R)).toEqual({ x: 300, y: 267 });
+    expect(polarPoint(0.55, AXES.auth, LIVE_CENTER, LIVE_MAX_R)).toEqual({ x: 421, y: 300 });
+    expect(polarPoint(0.1, AXES.all, LIVE_CENTER, LIVE_MAX_R)).toEqual({ x: 300, y: 322 });
+    expect(polarPoint(0.2, AXES.att, LIVE_CENTER, LIVE_MAX_R)).toEqual({ x: 256, y: 300 });
   });
 });
