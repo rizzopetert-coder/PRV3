@@ -102,6 +102,33 @@ def _compute_asset_score(
     }
 
 
+def _compute_dimension_summary(accumulated_vector: dict) -> dict:
+    """
+    Per-axis asset ratio: asset_d / (asset_d + liability_d), computed
+    independently for each of the four dimensions (aptitude/authority/
+    alliance/attitude). Range 0.0-1.0 per axis. A zero-signal axis
+    (asset_d + liability_d == 0.0) returns 0.0 -- same convention as
+    _compute_asset_score().
+
+    Mirrors _compute_asset_score()'s existing aggregation pattern (a
+    derived ratio, not the raw vector) rather than a fresh min-max
+    normalization -- consistent with how the engine already aggregates
+    dimensional signal without exposing the raw liability/asset split to
+    the client (P-03). Gemini architecture review cleared this shape
+    (single normalized [0,1] scalar per axis) before implementation.
+
+    Spec reference: Section VII.1 — dimension_summary field
+    """
+    axes = ("aptitude", "authority", "alliance", "attitude")
+    summary: dict = {}
+    for axis in axes:
+        liability = accumulated_vector.get(f"{axis}_liability", 0.0)
+        asset = accumulated_vector.get(f"{axis}_asset", 0.0)
+        total = liability + asset
+        summary[axis] = round(asset / total, 4) if total > 0.0 else 0.0
+    return summary
+
+
 # ── Jurisdiction flags assembly ────────────────────────────────────────────────
 
 def _assemble_jurisdiction_flags(intake: IntakeData) -> dict:
@@ -314,6 +341,9 @@ def assemble_output(session: SessionData, synthesis_result=None) -> dict:
     )
     asset_obj = _compute_asset_score(session.accumulated_vector, lead_id)
 
+    # ── dimension_summary ──
+    dimension_obj = _compute_dimension_summary(session.accumulated_vector)
+
     # ── narrative_modulation ──
     narr = session.narrative_result
     pre_rankings = session.pre_narrative_rankings or session.final_rankings
@@ -395,6 +425,7 @@ def assemble_output(session: SessionData, synthesis_result=None) -> dict:
         "identified_states":    identified_states,
         "severity":             severity_obj,
         "asset_score":          asset_obj,
+        "dimension_summary":    dimension_obj,
         "narrative_modulation": narrative_obj,
         "checkpoint_log":       checkpoint_log,
         "jurisdiction_flags":   jurisdiction_flags,
@@ -417,6 +448,7 @@ _TOP_LEVEL_SCHEMA: dict[str, type] = {
     "identified_states":   list,
     "severity":            dict,
     "asset_score":         dict,
+    "dimension_summary":   dict,
     "narrative_modulation": dict,
     "checkpoint_log":      dict,
     "jurisdiction_flags":  dict,
@@ -442,6 +474,7 @@ _IDENTIFIED_STATE_FIELDS = {
 
 _SEVERITY_FIELDS = {"tier", "score", "anchor_text", "inputs"}
 _ASSET_SCORE_FIELDS = {"score", "primary_asset_domain", "resolution_anchor_text"}
+_DIMENSION_SUMMARY_FIELDS = {"aptitude", "authority", "alliance", "attitude"}
 _NARRATIVE_FIELDS = {
     "fired", "trigger_point", "overall_confidence",
     "signals_extracted", "state_delta", "severity_delta",
@@ -485,12 +518,13 @@ def validate_schema(output: dict) -> list:
     Returns a list of violation strings. Empty list = fully contract-compliant.
 
     Checks:
-      - All 14 top-level fields present with correct types
+      - All 15 top-level fields present with correct types
       - output_type value in allowed enum
       - state_distribution entries have required fields and types
       - identified_states entries have required fields
       - severity tier value in allowed enum; required sub-fields present
-      - asset_score, narrative_modulation, checkpoint_log sub-fields present
+      - asset_score, dimension_summary, narrative_modulation,
+        checkpoint_log sub-fields present
       - jurisdiction_flags, private_output, shareable_output sub-fields present
       - intake echo has all six fields
 
@@ -564,6 +598,11 @@ def validate_schema(output: dict) -> list:
     for f in _ASSET_SCORE_FIELDS:
         if f not in output["asset_score"]:
             violations.append(f"asset_score MISSING field {f!r}")
+
+    # dimension_summary sub-fields
+    for f in _DIMENSION_SUMMARY_FIELDS:
+        if f not in output["dimension_summary"]:
+            violations.append(f"dimension_summary MISSING field {f!r}")
 
     # narrative_modulation sub-fields
     for f in _NARRATIVE_FIELDS:

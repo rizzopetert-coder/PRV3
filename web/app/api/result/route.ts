@@ -219,6 +219,8 @@ export async function POST(request: NextRequest) {
     friction_tax_estimate: null,
 
     intake: mapIntake(engineResult.intake as Record<string, unknown>),
+
+    dimension_summary: engineResult.dimension_summary,
   };
 
   // ShareableOutput is NEVER serialized into this response.

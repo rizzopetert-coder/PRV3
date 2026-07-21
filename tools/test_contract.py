@@ -152,18 +152,19 @@ session = SessionData(
 output = assemble_output(session)
 
 
-# ── 1. assemble_output: 13 top-level fields ───────────────────────────────────
-print("\n1. assemble_output — 13 top-level fields present")
+# ── 1. assemble_output: 16 top-level fields ───────────────────────────────────
+print("\n1. assemble_output — 16 top-level fields present")
 
 expected_fields = [
     "session_id", "intake", "state_distribution", "output_type",
-    "identified_states", "severity", "asset_score", "narrative_modulation",
-    "checkpoint_log", "jurisdiction_flags", "private_output",
-    "shareable_output", "engine_version", "monitoring_metadata",
+    "identified_states", "severity", "asset_score", "dimension_summary",
+    "narrative_modulation", "checkpoint_log", "jurisdiction_flags",
+    "private_output", "shareable_output", "synthesis", "engine_version",
+    "monitoring_metadata",
 ]
 for f in expected_fields:
     check(f"Field {f!r} present", f in output, f"missing from output")
-check("Exactly 14 top-level fields", len(output) == 14, f"got {len(output)}")
+check("Exactly 16 top-level fields", len(output) == 16, f"got {len(output)}")
 
 
 # ── 2. validate_schema: clean output passes ───────────────────────────────────
@@ -339,6 +340,24 @@ check("asset_score.primary_asset_domain is string",
       isinstance(asset["primary_asset_domain"], str))
 check("asset_score.resolution_anchor_text is string",
       isinstance(asset["resolution_anchor_text"], str))
+
+
+# ── 8b. dimension_summary ─────────────────────────────────────────────────────
+print("\n8b. dimension_summary")
+
+dim_summary = output["dimension_summary"]
+for axis in ("aptitude", "authority", "alliance", "attitude"):
+    check(f"dimension_summary.{axis} present",
+          axis in dim_summary,
+          f"missing from dimension_summary")
+    check(f"dimension_summary.{axis} is float",
+          isinstance(dim_summary.get(axis), float))
+    check(f"dimension_summary.{axis} in [0, 1]",
+          0.0 <= dim_summary.get(axis, -1.0) <= 1.0,
+          f"got {dim_summary.get(axis)}")
+check("dimension_summary has exactly 4 axes, no raw liability/asset fields",
+      set(dim_summary.keys()) == {"aptitude", "authority", "alliance", "attitude"},
+      f"got keys {list(dim_summary.keys())}")
 
 
 # ── 9. narrative_modulation ───────────────────────────────────────────────────

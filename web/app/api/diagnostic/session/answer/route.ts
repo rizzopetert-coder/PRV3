@@ -315,6 +315,8 @@ export async function POST(request: NextRequest) {
     friction_tax_estimate: null,
 
     intake: session.intake,
+
+    dimension_summary: engineResult.dimension_summary,
   };
 
   // Transition Rule — strips identifiable data the moment status becomes

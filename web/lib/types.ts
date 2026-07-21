@@ -70,6 +70,25 @@ export interface FrictionTaxEstimate {
   currency: string;
 }
 
+/**
+ * Per-axis normalized asset ratio (aptitude/authority/alliance/attitude),
+ * each 0.0-1.0. From engine/contract.py's dimension_summary field
+ * (assemble_output() — Gemini-cleared, single normalized scalar per axis,
+ * not the raw liability/asset split, per P-03). Always present — computed
+ * unconditionally alongside asset_score, never optional.
+ *
+ * Not yet consumed by any component — the live-mode ConstellationField
+ * (web/components/ConstellationField.tsx) that will read this is built
+ * and tested against representative mock data but not wired to this real
+ * field yet, pending a separate review of that wiring step.
+ */
+export interface DimensionSummary {
+  aptitude: number;
+  authority: number;
+  alliance: number;
+  attitude: number;
+}
+
 // ---------------------------------------------------------------------------
 // Synthesis types — S42 5-field contract migration
 // ---------------------------------------------------------------------------
@@ -122,6 +141,9 @@ export interface PrivateOutputPayload {
 
   // Intake echo — all six fields for recognition framing
   intake: IntakeEcho;
+
+  // Per-axis asset ratio for the live-mode ConstellationField visualization.
+  dimension_summary: DimensionSummary;
 }
 
 // ---------------------------------------------------------------------------

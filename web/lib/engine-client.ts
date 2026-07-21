@@ -107,6 +107,12 @@ export interface EngineResult {
     primary_asset_domain: string;
     resolution_anchor_text: string;
   };
+  dimension_summary: {
+    aptitude: number;
+    authority: number;
+    alliance: number;
+    attitude: number;
+  };
   narrative_modulation: {
     fired: boolean;
     trigger_point: string | null;
