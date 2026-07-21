@@ -2,10 +2,21 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
+// NavBar is shared across every route (mounted once in the root layout) —
+// NOT homepage-specific. The Stage 4 brief scopes the theme switcher to
+// "the homepage nav" while also requiring every other route stay
+// untouched. Since there is no separate homepage-only nav, the switcher
+// is mounted here but gated on pathname === "/" — every other route
+// renders this component exactly as before (confirmed via the Stage 4
+// production-build diff), only the homepage additionally shows it.
 export function NavBar() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const aboutRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const isHomepage = pathname === "/";
 
   useEffect(() => {
     if (!aboutOpen) return;
@@ -75,6 +86,11 @@ export function NavBar() {
             </div>
           )}
         </div>
+        {isHomepage && (
+          <div className="w-55">
+            <ThemeSwitcher />
+          </div>
+        )}
       </div>
     </nav>
   );
