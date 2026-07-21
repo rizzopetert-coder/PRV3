@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Principal Resolution — Ambient Constellation Motif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171A; --field:#E9E7E2; --field-raise:#DFDCD5;
+    --oxide:#8C4A2F; --oxide-text:#8C4A2F; --slate:#5C6B66;
+    --line:rgba(20,23,26,0.14); --line-strong:rgba(20,23,26,0.20);
+    --cta-text:#E9E7E2; --urgency:#8C4A2F; --urgency-text:#8C4A2F;
+  }
+  html[data-theme="dark"]{
+    --ink:#EDEAE3; --field:#171512; --field-raise:#201E1A;
+    --oxide:#B8663D; --oxide-text:#C9825C; --slate:#8FA39C;
+    --line:rgba(237,234,227,0.09); --line-strong:rgba(237,234,227,0.16);
+    --cta-text:#171512; --urgency:#B8663D; --urgency-text:#C9825C;
+  }
+  html[data-theme="neutral"]{
+    --ink:#34383C; --field:#FFFFFF; --field-raise:#EFE6D0;
+    --oxide:#4A6B85; --oxide-text:#3D5A72; --slate:#7A7E82;
+    --line:rgba(52,56,60,0.10); --line-strong:rgba(52,56,60,0.18);
+    --cta-text:#FFFFFF; --urgency:#C9622A; --urgency-text:#B5551F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--field); color:var(--ink);
+    font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;
+    transition:background 0.3s ease,color 0.3s ease;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;}
+
+  nav{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:24px 48px; border-bottom:1px solid var(--line); position:relative; z-index:2;
+  }
+  .wordmark{font-family:'Source Serif 4',serif;font-weight:600;font-size:17px;}
+  .theme-switch{display:flex;border:1px solid var(--line-strong);border-radius:2px;overflow:hidden;}
+  .theme-switch button{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.06em;
+    text-transform:uppercase;background:transparent;border:none;
+    border-bottom:2px solid transparent;color:var(--ink);opacity:0.55;
+    flex:1;text-align:center;padding:8px 14px;cursor:pointer;
+    border-right:1px solid var(--line-strong);
+  }
+  .theme-switch button:last-child{border-right:none;}
+  .theme-switch button.active{opacity:1;border-bottom-color:var(--oxide-text);}
+
+  .hero{
+    position:relative; min-height:640px;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .hero-content{
+    position:relative; z-index:2; text-align:center; max-width:560px;
+    padding:0 32px;
+  }
+  .eyebrow{ font-size:12px; color:var(--oxide-text); margin-bottom:20px; }
+  h1{
+    font-family:'Source Serif 4',serif; font-weight:500;
+    font-size:38px; line-height:1.2; letter-spacing:-0.01em;
+    margin-bottom:18px;
+  }
+  .lede{ font-size:16px; line-height:1.6; opacity:0.7; }
+
+  .ambient-svg{
+    position:absolute; inset:0; width:100%; height:100%;
+    z-index:1; opacity:0.55;
+  }
+
+  footer{
+    padding:20px 48px; font-size:11px; color:var(--slate);
+    border-top:1px solid var(--line); display:flex; justify-content:space-between;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wordmark">Principal Resolution</div>
+  <div class="theme-switch" id="themeSwitch">
+    <button data-theme-value="light" class="active" type="button">Warm</button>
+    <button data-theme-value="dark" type="button">Dark</button>
+    <button data-theme-value="neutral" type="button">Neutral</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <svg class="ambient-svg" id="ambientSvg" viewBox="0 0 900 640" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <filter id="wavy-ambient" x="-60%" y="-60%" width="220%" height="220%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="5" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+    <g stroke="var(--line)" stroke-width="1" fill="none">
+      <line id="axV" x1="450" y1="130" x2="450" y2="510"/>
+      <line id="axH" x1="260" y1="320" x2="640" y2="320"/>
+    </g>
+    <polygon id="shape" points="450,220 550,320 450,420 350,320"
+             fill="color-mix(in srgb, var(--oxide) 10%, transparent)"
+             stroke="var(--oxide)" stroke-width="1.4" opacity="0.8"/>
+    <g id="ringGroup" filter="url(#wavy-ambient)" fill="none" stroke="var(--oxide)" stroke-width="1">
+      <circle id="r0" cx="0" cy="0" r="14"/>
+      <circle id="r1" cx="0" cy="0" r="26"/>
+      <circle id="r2" cx="0" cy="0" r="38"/>
+      <circle id="r3" cx="0" cy="0" r="50"/>
+      <circle id="r4" cx="0" cy="0" r="62"/>
+      <circle id="r5" cx="0" cy="0" r="74"/>
+    </g>
+  </svg>
+
+  <div class="hero-content">
+    <div class="eyebrow mono">Organizational Diagnostics</div>
+    <h1>What organizations say is wrong usually isn't where the real problem is.</h1>
+    <p class="lede">Four dimensions. Fifty-seven conditions. One instrument that tells you which one you're actually looking at.</p>
+  </div>
+</section>
+
+<footer>
+  <span>Principal Resolution</span>
+  <span class="mono">Ambient motif — non-diagnostic reference</span>
+</footer>
+
+<script>
+  // Theme switcher
+  const switcher = document.getElementById('themeSwitch');
+  const root = document.documentElement;
+  switcher.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    root.setAttribute('data-theme', btn.dataset.themeValue);
+    switcher.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+  });
+
+  // ---- Ambient constellation animation ----
+  // Deliberately caps ringLevel below the Endemic threshold — this motif
+  // never uses the reserved urgency color. Only a real results page earns it.
+
+  const CENTER = { x: 450, y: 320 };
+  const MAX_R = 200;
+  const AXES = {
+    apt:  { angle: -90 },  // top
+    auth: { angle: 0   },  // right
+    all:  { angle: 90  },  // bottom
+    att:  { angle: 180 },  // left
+  };
+
+  const keyframes = [
+    { w: { apt: .35, auth: .30, all: .25, att: .30 }, ring: 0.0, dominant: 'auth' },
+    { w: { apt: .15, auth: .58, all: .12, att: .22 }, ring: 1.1, dominant: 'auth' },
+    { w: { apt: .15, auth: .58, all: .12, att: .22 }, ring: 1.6, dominant: 'auth' },
+    { w: { apt: .55, auth: .22, all: .15, att: .30 }, ring: 0.9, dominant: 'apt'  },
+    { w: { apt: .55, auth: .22, all: .15, att: .30 }, ring: 1.4, dominant: 'apt'  },
+    { w: { apt: .22, auth: .18, all: .28, att: .56 }, ring: 1.0, dominant: 'att'  },
+    { w: { apt: .22, auth: .18, all: .28, att: .56 }, ring: 1.5, dominant: 'att'  },
+    { w: { apt: .28, auth: .15, all: .52, att: .20 }, ring: 0.9, dominant: 'all'  },
+    { w: { apt: .28, auth: .15, all: .52, att: .20 }, ring: 1.4, dominant: 'all'  },
+  ];
+
+  // Linear, not ease-in-out — ease-in-out decelerates to zero velocity at
+  // every waypoint, which reads as a stutter even with zero hold time.
+  // Constant motion needs constant (or at least continuous) velocity
+  // straight through each handoff.
+  const TRANSITION_MS = 3200;
+
+  function pointFor(weight, angleDeg) {
+    const rad = (angleDeg * Math.PI) / 180;
+    const r = MAX_R * weight;
+    return { x: CENTER.x + r * Math.cos(rad), y: CENTER.y + r * Math.sin(rad) };
+  }
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function computeFrame(kfA, kfB, t) {
+    const w = {};
+    ['apt','auth','all','att'].forEach(k => { w[k] = lerp(kfA.w[k], kfB.w[k], t); });
+    const ring = lerp(kfA.ring, kfB.ring, t);
+    // dominant point position — blend toward whichever axis currently carries
+    // more weight, letting the "hot spot" glide across the shape naturally
+    const domKey = w.auth >= w.apt && w.auth >= w.all && w.auth >= w.att ? 'auth'
+                 : w.apt  >= w.all && w.apt  >= w.att ? 'apt'
+                 : w.all  >= w.att ? 'all' : 'att';
+    return { w, ring, domKey };
+  }
+
+  const shapeEl = document.getElementById('shape');
+  const ringGroup = document.getElementById('ringGroup');
+  const ringEls = [0,1,2,3,4,5].map(i => document.getElementById('r'+i));
+  const ringBaseOpacity = [0.85, 0.68, 0.52, 0.38, 0.26, 0.16];
+
+  function render(frame) {
+    const p = {};
+    Object.keys(AXES).forEach(k => { p[k] = pointFor(frame.w[k], AXES[k].angle); });
+    shapeEl.setAttribute('points',
+      `${p.apt.x},${p.apt.y} ${p.auth.x},${p.auth.y} ${p.all.x},${p.all.y} ${p.att.x},${p.att.y}`
+    );
+
+    const domPoint = p[frame.domKey];
+    ringGroup.setAttribute('transform', `translate(${domPoint.x - CENTER.x}, ${domPoint.y - CENTER.y})`);
+    ringGroup.setAttribute('stroke', 'var(--oxide)'); // capped — never var(--urgency) here
+
+    ringEls.forEach((el, i) => {
+      const visible = Math.max(0, Math.min(1, frame.ring - i * 0.32));
+      el.setAttribute('opacity', (visible * ringBaseOpacity[i]).toFixed(3));
+    });
+  }
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let kfIndex = 0;
+  let segmentStart = performance.now();
+
+  function tick(now) {
+    const kfA = keyframes[kfIndex];
+    const kfB = keyframes[(kfIndex + 1) % keyframes.length];
+
+    let elapsed = now - segmentStart;
+    // Carry overflow into the next segment instead of resetting to `now` —
+    // resetting would eat a few ms every loop and, over many segments,
+    // introduce exactly the kind of micro-pause this whole change is
+    // trying to remove.
+    while (elapsed >= TRANSITION_MS) {
+      elapsed -= TRANSITION_MS;
+      segmentStart += TRANSITION_MS;
+      kfIndex = (kfIndex + 1) % keyframes.length;
+    }
+
+    const t = elapsed / TRANSITION_MS;
+    render(computeFrame(keyframes[kfIndex], keyframes[(kfIndex + 1) % keyframes.length], t));
+
+    if (!prefersReducedMotion) requestAnimationFrame(tick);
+  }
+
+  render(computeFrame(keyframes[0], keyframes[0], 0));
+  if (!prefersReducedMotion) requestAnimationFrame(tick);
+</script>
+</body>
+</html>

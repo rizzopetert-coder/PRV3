@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Principal Resolution — Results Page: Constellation Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171A; --field:#E9E7E2; --field-raise:#DFDCD5;
+    --oxide:#8C4A2F; --oxide-text:#8C4A2F; --slate:#5C6B66;
+    --line:rgba(20,23,26,0.14); --line-strong:rgba(20,23,26,0.20);
+    --cta-text:#E9E7E2; --urgency:#8C4A2F; --urgency-text:#8C4A2F;
+  }
+  html[data-theme="dark"]{
+    --ink:#EDEAE3; --field:#171512; --field-raise:#201E1A;
+    --oxide:#B8663D; --oxide-text:#C9825C; --slate:#8FA39C;
+    --line:rgba(237,234,227,0.09); --line-strong:rgba(237,234,227,0.16);
+    --cta-text:#171512; --urgency:#B8663D; --urgency-text:#C9825C;
+  }
+  html[data-theme="neutral"]{
+    --ink:#34383C; --field:#FFFFFF; --field-raise:#EFE6D0;
+    --oxide:#4A6B85; --oxide-text:#3D5A72; --slate:#7A7E82;
+    --line:rgba(52,56,60,0.10); --line-strong:rgba(52,56,60,0.18);
+    --cta-text:#FFFFFF; --urgency:#C9622A; --urgency-text:#B5551F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--field); color:var(--ink);
+    font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased;
+    transition:background 0.3s ease,color 0.3s ease;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;text-transform:uppercase;}
+  .serif{font-family:'Source Serif 4',serif;}
+
+  nav{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:24px 48px; border-bottom:1px solid var(--line);
+  }
+  .wordmark{font-family:'Source Serif 4',serif;font-weight:600;font-size:17px;}
+  .theme-switch{display:flex;border:1px solid var(--line-strong);border-radius:2px;overflow:hidden;}
+  .theme-switch button{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.06em;
+    text-transform:uppercase;background:transparent;border:none;
+    border-bottom:2px solid transparent;color:var(--ink);opacity:0.55;
+    flex:1;text-align:center;padding:8px 14px;cursor:pointer;
+    border-right:1px solid var(--line-strong);
+  }
+  .theme-switch button:last-child{border-right:none;}
+  .theme-switch button.active{opacity:1;border-bottom-color:var(--oxide-text);}
+
+  main{
+    max-width:920px; margin:0 auto; padding:64px 32px 100px;
+  }
+  .eyebrow{
+    font-size:12px; color:var(--slate); margin-bottom:18px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .severity-badge{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--urgency-text); border:1px solid var(--urgency);
+    padding:5px 12px; border-radius:2px; margin-bottom:22px;
+  }
+  .severity-badge::before{
+    content:""; width:7px; height:7px; border-radius:50%;
+    background:var(--urgency);
+  }
+  h1{
+    font-size:38px; line-height:1.2; font-weight:500;
+    letter-spacing:-0.01em; margin-bottom:16px; max-width:640px;
+  }
+  .lede{
+    font-size:16px; line-height:1.65; color:var(--ink); opacity:0.75;
+    max-width:560px; margin-bottom:56px;
+  }
+
+  .viz-wrap{
+    display:grid; grid-template-columns:1fr 300px; gap:48px;
+    align-items:center; margin-bottom:64px;
+  }
+  .viz-svg{ width:100%; height:auto; }
+  .viz-labels{
+    display:flex; flex-direction:column; gap:22px;
+  }
+  .viz-label{
+    display:flex; align-items:baseline; gap:10px;
+  }
+  .viz-label .code{
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    color:var(--slate); min-width:44px;
+  }
+  .viz-label.dominant .code{ color:var(--urgency-text); font-weight:500; }
+  .viz-label .name{ font-family:'Source Serif 4',serif; font-size:15px; }
+  .viz-label .pct{
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    color:var(--slate); margin-left:auto;
+  }
+  .viz-label.dominant .pct{ color:var(--urgency-text); }
+
+  .synthesis{
+    border-top:1px solid var(--line); padding-top:40px;
+    display:grid; grid-template-columns:1fr 1fr; gap:40px;
+  }
+  .synthesis h3{
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--slate); margin-bottom:14px;
+  }
+  .synthesis p{ font-size:15px; line-height:1.7; opacity:0.85; }
+  .resolution-tag{
+    display:inline-block; margin-top:32px; font-family:'IBM Plex Mono',monospace;
+    font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--oxide-text); border-left:2px solid var(--oxide);
+    padding-left:10px;
+  }
+
+  @media (max-width:720px){
+    nav,main{padding-left:24px;padding-right:24px;}
+    h1{font-size:28px;}
+    .viz-wrap{grid-template-columns:1fr;}
+    .synthesis{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wordmark">Principal Resolution</div>
+  <div class="theme-switch" id="themeSwitch">
+    <button data-theme-value="light" class="active" type="button">Warm</button>
+    <button data-theme-value="dark" type="button">Dark</button>
+    <button data-theme-value="neutral" type="button">Neutral</button>
+  </div>
+</nav>
+
+<main>
+  <div class="eyebrow mono">Your Diagnostic Result</div>
+  <div class="severity-badge">Endemic</div>
+  <h1 class="serif">The Founder's Grip</h1>
+  <p class="lede">Decisions still flow through one person by habit, not by design. The organization has stopped noticing it's waiting for permission.</p>
+
+  <div class="viz-wrap">
+    <svg class="viz-svg" viewBox="0 0 600 600">
+      <defs>
+        <filter id="wavy-severity" x="-40%" y="-40%" width="180%" height="180%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="19" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+
+      <!-- reference grid: straight, quiet, not the severity language -->
+      <g stroke="var(--line)" stroke-width="1" fill="none">
+        <line x1="300" y1="80"  x2="300" y2="520"/>
+        <line x1="80"  y1="300" x2="520" y2="300"/>
+        <polygon points="300,135 465,300 300,465 135,300"/>
+        <polygon points="300,190 410,300 300,410 190,300"/>
+        <polygon points="300,245 355,300 300,355 245,300"/>
+      </g>
+
+      <!-- axis labels -->
+      <text x="300" y="65"  text-anchor="middle" class="axis-label" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1">APT</text>
+      <text x="540" y="305" text-anchor="middle" fill="var(--urgency-text)" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1">AUTH</text>
+      <text x="300" y="545" text-anchor="middle" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1">ALL</text>
+      <text x="60"  y="305" text-anchor="middle" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1">ATT</text>
+
+      <!-- the actual weighted shape -->
+      <polygon points="300,267 421,300 300,322 256,300"
+               fill="color-mix(in srgb, var(--oxide) 14%, transparent)"
+               stroke="var(--oxide)" stroke-width="1.5"/>
+      <circle cx="300" cy="267" r="4" fill="var(--slate)"/>
+      <circle cx="300" cy="322" r="4" fill="var(--slate)"/>
+      <circle cx="256" cy="300" r="4" fill="var(--slate)"/>
+
+      <!-- severity rings, radiating from the dominant point only -->
+      <g filter="url(#wavy-severity)" fill="none" stroke="var(--urgency)" stroke-width="1">
+        <circle cx="421" cy="300" r="14" opacity="0.9"/>
+        <circle cx="421" cy="300" r="28" opacity="0.7"/>
+        <circle cx="421" cy="300" r="42" opacity="0.5"/>
+        <circle cx="421" cy="300" r="56" opacity="0.35"/>
+        <circle cx="421" cy="300" r="70" opacity="0.22"/>
+      </g>
+      <circle cx="421" cy="300" r="5" fill="var(--urgency)"/>
+    </svg>
+
+    <div class="viz-labels">
+      <div class="viz-label dominant">
+        <span class="code">AUTH</span>
+        <span class="name serif">Authority</span>
+        <span class="pct">55%</span>
+      </div>
+      <div class="viz-label">
+        <span class="code">ATT</span>
+        <span class="name serif">Attitude</span>
+        <span class="pct">20%</span>
+      </div>
+      <div class="viz-label">
+        <span class="code">APT</span>
+        <span class="name serif">Aptitude</span>
+        <span class="pct">15%</span>
+      </div>
+      <div class="viz-label">
+        <span class="code">ALL</span>
+        <span class="name serif">Alliance</span>
+        <span class="pct">10%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="synthesis">
+    <div>
+      <h3>What's actually happening</h3>
+      <p>Every meaningful call still routes back to one desk, even when the org chart says otherwise. It isn't malice or control — it's habit nobody has interrupted long enough to break.</p>
+    </div>
+    <div>
+      <h3>What's already working</h3>
+      <p>The team trusts this person's judgment enough that they haven't built workarounds — which means the fix is structural, not a trust problem to repair first.</p>
+    </div>
+  </div>
+  <div class="resolution-tag mono">Resolution family — Executive Advisory</div>
+</main>
+
+<script>
+  const switcher = document.getElementById('themeSwitch');
+  const root = document.documentElement;
+  switcher.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    root.setAttribute('data-theme', btn.dataset.themeValue);
+    switcher.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+  });
+</script>
+</body>
+</html>
