@@ -28,8 +28,10 @@ from engine.output import (
     SIGNAL_FLOOR_MULTIPLIER_AUTHORITY, SIGNAL_FLOOR_MULTIPLIER_DEFAULT,
     NOISE_SIMULATION_COUNT, SEPARATION_THRESHOLD,
     _SEPARATION_THRESHOLD_DEFAULT,
+    CAUSATION_DISPERSION_THRESHOLD,
     compute_noise_baseline, compute_signal_floors, apply_signal_floor,
     route_output, build_private_block, build_shareable_block,
+    compute_causation_pattern,
     OutputEngine, OutputPackage, OutputRouting, QualifiedState,
     PrivateOutputBlock, ShareableOutputBlock,
 )
@@ -442,6 +444,72 @@ check("SEPARATION_THRESHOLD = None (CALIBRATION TARGET)",
       SEPARATION_THRESHOLD is None)
 check("_SEPARATION_THRESHOLD_DEFAULT > 0",
       _SEPARATION_THRESHOLD_DEFAULT > 0.0)
+
+
+# ── 16. compute_causation_pattern (Category B) ────────────────────────────────
+print("\n16. compute_causation_pattern — SPOF vs. Diffuse Causation")
+
+_v_concentrated = {"aptitude_liability": 5.0}
+_v_even = {
+    "aptitude_liability": 2.5, "authority_liability": 2.5,
+    "alliance_liability": 2.5, "attitude_liability": 2.5,
+}
+_v_two_axes = {"aptitude_liability": 3.0, "authority_liability": 3.0}  # dispersion = 0.5 (boundary)
+_v_negative = {"aptitude_liability": -5.0, "authority_liability": 3.0}
+
+check("0 qualified states (insufficient_signal routing): pattern = insufficient_signal",
+      compute_causation_pattern(_v_concentrated, routing_insuff)["pattern"] == "insufficient_signal",
+      f"got {compute_causation_pattern(_v_concentrated, routing_insuff)}")
+check("insufficient_signal: qualified_state_count = 0",
+      compute_causation_pattern({}, routing_insuff)["qualified_state_count"] == 0)
+
+check("1 qualified state, concentrated liability: pattern = single_point",
+      compute_causation_pattern(_v_concentrated, routing_one)["pattern"] == "single_point",
+      f"got {compute_causation_pattern(_v_concentrated, routing_one)}")
+check("1 qualified state, evenly spread liability: pattern = diffuse (dispersion 1.0)",
+      compute_causation_pattern(_v_even, routing_one)["pattern"] == "diffuse",
+      f"got {compute_causation_pattern(_v_even, routing_one)}")
+check("1 qualified state, dispersion exactly at threshold (0.5): pattern = diffuse (>= threshold)",
+      compute_causation_pattern(_v_two_axes, routing_one)["pattern"] == "diffuse"
+      and isclose(compute_causation_pattern(_v_two_axes, routing_one)["dispersion"],
+                  CAUSATION_DISPERSION_THRESHOLD, rel_tol=1e-6),
+      f"got {compute_causation_pattern(_v_two_axes, routing_one)}")
+check("1 qualified state, negative field clamped: pattern = single_point, no crash",
+      compute_causation_pattern(_v_negative, routing_one)["pattern"] == "single_point",
+      f"got {compute_causation_pattern(_v_negative, routing_one)}")
+
+check("2+ qualified states: pattern = diffuse regardless of dispersion (concentrated vector)",
+      compute_causation_pattern(_v_concentrated, routing_multi)["pattern"] == "diffuse",
+      f"got {compute_causation_pattern(_v_concentrated, routing_multi)}")
+check("2+ qualified states: qualified_state_count matches routing.qualified_states length",
+      compute_causation_pattern({}, routing_multi)["qualified_state_count"]
+      == len(routing_multi.qualified_states),
+      f"got {compute_causation_pattern({}, routing_multi)['qualified_state_count']} vs "
+      f"{len(routing_multi.qualified_states)}")
+
+# Path B representative case: accumulated_vector={} (main.py run_engine() passes {}
+# literally). Pattern must be driven entirely by qualified_state_count since
+# dispersion is structurally 0.0 -- confirmed here, not assumed.
+check("Path B style (empty vector), 1 qualified state: pattern = single_point, dispersion = 0.0",
+      compute_causation_pattern({}, routing_one) == {
+          "pattern": "single_point", "dispersion": 0.0,
+          "qualified_state_count": 1,
+      },
+      f"got {compute_causation_pattern({}, routing_one)}")
+check("Path B style (empty vector), 2+ qualified states: pattern = diffuse, dispersion = 0.0",
+      compute_causation_pattern({}, routing_multi)["pattern"] == "diffuse"
+      and compute_causation_pattern({}, routing_multi)["dispersion"] == 0.0,
+      f"got {compute_causation_pattern({}, routing_multi)}")
+
+check("dispersion always in [0.0, 1.0]",
+      all(0.0 <= compute_causation_pattern(v, r)["dispersion"] <= 1.0
+          for v in (_v_concentrated, _v_even, _v_two_axes, _v_negative, {})
+          for r in (routing_insuff, routing_one, routing_multi)))
+check("pattern always one of the three allowed values",
+      all(compute_causation_pattern(v, r)["pattern"]
+          in ("insufficient_signal", "single_point", "diffuse")
+          for v in (_v_concentrated, _v_even, _v_two_axes, _v_negative, {})
+          for r in (routing_insuff, routing_one, routing_multi)))
 
 
 # ── Summary ────────────────────────────────────────────────────────────────────

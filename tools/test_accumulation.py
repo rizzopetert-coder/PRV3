@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).parents[1]))
 from engine.accumulation import (
     IntakeData, AccumulationEngine, AccumulationSession,
     initialize_priors, rank_states, accumulate_answer, _apply_signal_reliability,
-    StateRanking, compute_cascade_risk, MC_CENTROID_39,
+    StateRanking, compute_cascade_risk, compute_liability_dispersion, MC_CENTROID_39,
 )
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS, BASELINE_VALUE
 from engine.data.questions import AnswerOption, QUESTION_LIBRARY
@@ -368,6 +368,58 @@ check("CR always in [0.0, 1.0]",
       all(0.0 <= compute_cascade_risk(v) <= 1.0 for v in
           (_v_concentrated, _v_even, _v_even_low, _v_two_axes, _v_huge, _v_negative, {})),
       "found a CR value outside [0, 1]")
+
+
+# ── 12. compute_liability_dispersion (extracted for Category B reuse) ─────────
+print("\n12. compute_liability_dispersion")
+
+check("empty vector: dispersion = 0.0 (no signal to disperse)",
+      compute_liability_dispersion({}) == 0.0,
+      f"got {compute_liability_dispersion({})}")
+
+check("fully concentrated in one axis: dispersion = 0.0, regardless of magnitude",
+      compute_liability_dispersion(_v_concentrated) == 0.0,
+      f"got {compute_liability_dispersion(_v_concentrated)}")
+
+check("evenly spread across all 4 axes: dispersion = 1.0, regardless of magnitude",
+      isclose(compute_liability_dispersion(_v_even), 1.0, rel_tol=1e-6),
+      f"got {compute_liability_dispersion(_v_even)}")
+
+check("evenly spread, low magnitude: dispersion still 1.0 (dispersion is magnitude-independent)",
+      isclose(compute_liability_dispersion(_v_even_low), 1.0, rel_tol=1e-6),
+      f"got {compute_liability_dispersion(_v_even_low)}")
+
+check("spread across 2 of 4 axes: dispersion = 0.5 (log2(2)/log2(4))",
+      isclose(compute_liability_dispersion(_v_two_axes), 0.5, rel_tol=1e-6),
+      f"got {compute_liability_dispersion(_v_two_axes)}")
+
+check("negative field clamped to 0 signal, no crash",
+      compute_liability_dispersion(_v_negative) == 0.0,
+      f"got {compute_liability_dispersion(_v_negative)}")
+
+check("dispersion never negative (no -0.0 sign artifact)",
+      all(compute_liability_dispersion(v) >= 0.0 for v in
+          (_v_concentrated, _v_negative, {}, _v_even, _v_two_axes)),
+      "found a negative dispersion value")
+
+check("compute_cascade_risk(v) == round(compute_liability_dispersion(v) * intensity(v), 4) "
+      "for all tested vectors -- refactor is behavior-preserving",
+      all(
+          isclose(
+              compute_cascade_risk(v),
+              max(0.0, round(
+                  compute_liability_dispersion(v) *
+                  min(
+                      math.sqrt(sum(v.get(f, 0.0) ** 2 for f in DIMENSIONAL_FIELDS)) / _ref_mag,
+                      1.0,
+                  ),
+                  4,
+              )),
+              abs_tol=1e-9,
+          )
+          for v in (_v_concentrated, _v_even, _v_even_low, _v_two_axes, _v_huge, _v_negative, {})
+      ),
+      "cascade_risk no longer matches dispersion * intensity for some tested vector")
 
 
 # ── Summary ────────────────────────────────────────────────────────────────────

@@ -333,53 +333,31 @@ def compute_session_magnitude(accumulated: dict, fields: list) -> float:
     return math.sqrt(sum(accumulated.get(f, 0.0) ** 2 for f in fields))
 
 
-def compute_cascade_risk(accumulated_vector: dict) -> float:
+def compute_liability_dispersion(accumulated_vector: dict) -> float:
     """
-    Cross-Dimensional Cascade Risk (CR) -- Category A, Gemini-reviewed.
-    Derived output only: zero new signal collection, zero modification to
-    the 8-field accumulation model or rank_states(). A framing input for
-    output_synthesis, not a new scored dimension and not threaded into
-    accumulated_vector or the ranking pipeline.
+    Normalized Shannon entropy of the four liability fields' relative
+    shares -- how evenly liability signal is spread across axes
+    (aptitude/authority/alliance/attitude) rather than concentrated in
+    one. The same entropy technique engine/checkpoint.py already uses
+    for checkpoint routing, reused rather than reinvented. 0.0 =
+    liability fully concentrated in one axis (contained); 1.0 =
+    perfectly even across all four (maximally dispersed). Negative
+    per-field values (individual answer contributions can be signed,
+    e.g. authority_liability: -0.15 in engine/data/questions.py) are
+    clamped to 0.0 before forming the probability distribution --
+    entropy is undefined over negative "probabilities", and a
+    net-negative accumulated field means that axis contributed no
+    liability signal to disperse, not negative dispersion.
 
-    CR = dispersion * intensity, both terms in [0.0, 1.0]:
+    Returns 0.0 if all four liability fields are non-positive (no
+    signal to disperse).
 
-    dispersion -- how evenly liability signal is spread across the four
-    axes (aptitude/authority/alliance/attitude) rather than concentrated
-    in one. High off-axis liability accumulation across MULTIPLE axes
-    indicates the condition has already spilled over structurally, not
-    remained contained to a single dimension. Computed as normalized
-    Shannon entropy of the four liability fields' relative shares -- the
-    same entropy technique engine/checkpoint.py already uses for
-    checkpoint routing, reused rather than reinvented. 0.0 = liability
-    fully concentrated in one axis (contained); 1.0 = perfectly even
-    across all four (maximally dispersed). Negative per-field values
-    (individual answer contributions can be signed, e.g. authority_liability:
-    -0.15 in engine/data/questions.py) are clamped to 0.0 before forming
-    the probability distribution -- entropy is undefined over negative
-    "probabilities", and a net-negative accumulated field means that axis
-    contributed no liability signal to disperse, not negative dispersion.
+    Extracted from compute_cascade_risk() (Category A) so Category B's
+    SPOF vs. Diffuse Causation candidate (engine/output.py) can reuse
+    the identical dispersion term without duplicating the entropy math.
 
-    intensity -- session magnitude (compute_session_magnitude(), the same
-    L2 norm used elsewhere), normalized against the L2 norm of
-    MC_CENTROID_39 -- an already-locked empirical reference (N=1000
-    simulations), not an invented threshold -- and saturated at 1.0
-    rather than left unbounded.
-
-    A session with wide off-axis spread but low overall signal, or high
-    signal concentrated in one axis, both score low; only high signal AND
-    high spread scores high.
-
-    Returns 0.0 if all four liability fields are non-positive (no signal
-    to disperse).
-
-    CALIBRATION TARGET: the multiplicative combination and the centroid-
-    based intensity normalization are starting hypotheses, not locked
-    values -- consistent with this engine's existing convention for
-    not-yet-data-validated constants (see MODERATE_PROMINENCE_DELTA,
-    SEVERITY_SCORE_NORMALIZATION, etc. elsewhere in this codebase).
-
-    Spec reference: Category A architecture review (Gemini-cleared,
-    this session) -- Cross-Dimensional Cascade Risk.
+    Spec reference: Category A architecture review (Gemini-cleared) --
+    Cross-Dimensional Cascade Risk.
     """
     liability_fields = [f for f in DIMENSIONAL_FIELDS if f.endswith("_liability")]
     liability_values = [max(accumulated_vector.get(f, 0.0), 0.0) for f in liability_fields]
@@ -393,15 +371,59 @@ def compute_cascade_risk(accumulated_vector: dict) -> float:
     max_entropy = math.log2(len(liability_fields))  # log2(4) = 2.0
     dispersion = entropy / max_entropy if max_entropy > 0.0 else 0.0
 
+    # max(0.0, ...) is a floor, not just a sign-cleanup: entropy's
+    # -sum(p * log2(p)) produces a signed -0.0 when exactly one axis holds
+    # all the signal (log2(1.0) == 0.0), which would otherwise surface as
+    # -0.0 in the returned/serialized value.
+    return max(0.0, dispersion)
+
+
+def compute_cascade_risk(accumulated_vector: dict) -> float:
+    """
+    Cross-Dimensional Cascade Risk (CR) -- Category A, Gemini-reviewed.
+    Derived output only: zero new signal collection, zero modification to
+    the 8-field accumulation model or rank_states(). A framing input for
+    output_synthesis, not a new scored dimension and not threaded into
+    accumulated_vector or the ranking pipeline.
+
+    CR = dispersion * intensity, both terms in [0.0, 1.0]:
+
+    dispersion -- compute_liability_dispersion() above. High off-axis
+    liability accumulation across MULTIPLE axes indicates the condition
+    has already spilled over structurally, not remained contained to a
+    single dimension.
+
+    intensity -- session magnitude (compute_session_magnitude(), the same
+    L2 norm used elsewhere), normalized against the L2 norm of
+    MC_CENTROID_39 -- an already-locked empirical reference (N=1000
+    simulations), not an invented threshold -- and saturated at 1.0
+    rather than left unbounded.
+
+    A session with wide off-axis spread but low overall signal, or high
+    signal concentrated in one axis, both score low; only high signal AND
+    high spread scores high.
+
+    Returns 0.0 if all four liability fields are non-positive (no signal
+    to disperse) -- dispersion is 0.0 in that case, which forces the
+    product to 0.0 regardless of intensity.
+
+    CALIBRATION TARGET: the multiplicative combination and the centroid-
+    based intensity normalization are starting hypotheses, not locked
+    values -- consistent with this engine's existing convention for
+    not-yet-data-validated constants (see MODERATE_PROMINENCE_DELTA,
+    SEVERITY_SCORE_NORMALIZATION, etc. elsewhere in this codebase).
+
+    Spec reference: Category A architecture review (Gemini-cleared,
+    this session) -- Cross-Dimensional Cascade Risk.
+    """
+    dispersion = compute_liability_dispersion(accumulated_vector)
+
     magnitude = compute_session_magnitude(accumulated_vector, list(DIMENSIONAL_FIELDS))
     reference_magnitude = math.sqrt(sum(v ** 2 for v in MC_CENTROID_39.values()))
     intensity = min(magnitude / reference_magnitude, 1.0) if reference_magnitude > 0.0 else 0.0
 
-    # max(0.0, ...) is a floor, not just a sign-cleanup: dispersion and
-    # intensity are both non-negative by construction, but entropy's
-    # -sum(p * log2(p)) produces a signed -0.0 when exactly one axis holds
-    # all the signal (log2(1.0) == 0.0), which would otherwise surface as
-    # -0.0 in the returned/serialized value.
+    # max(0.0, ...) is a floor against the same -0.0 propagation described
+    # in compute_liability_dispersion() above.
     return max(0.0, round(dispersion * intensity, 4))
 
 

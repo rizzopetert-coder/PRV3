@@ -23,7 +23,7 @@ from typing import Optional
 
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS, BASELINE_VALUE
 from engine.data.questions import QUESTION_LIBRARY
-from engine.accumulation import StateRanking, rank_states
+from engine.accumulation import StateRanking, rank_states, compute_liability_dispersion
 from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
 
 
@@ -445,6 +445,88 @@ def route_output(evaluated_states: list) -> OutputRouting:
         separation_threshold=threshold,
         single_state_threshold_met=threshold_met,
     )
+
+
+# ── Category B: SPOF vs. Diffuse Causation ────────────────────────────────────
+
+# Dispersion threshold for the single-qualified-state tiebreak below.
+# CALIBRATION TARGET -- starting hypothesis (midpoint of dispersion's
+# [0, 1] range), same convention as compute_cascade_risk's combination
+# logic in engine/accumulation.py.
+CAUSATION_DISPERSION_THRESHOLD: float = 0.5  # CALIBRATION TARGET
+
+
+def compute_causation_pattern(
+    accumulated_vector: dict,
+    routing: OutputRouting,
+) -> dict:
+    """
+    SPOF vs. Diffuse Causation -- Category B, Gemini-reviewed. Derived
+    output only: zero new signal collection, zero modification to
+    route_output() or the 8-field accumulation model. A framing input,
+    not a new scored dimension and not currently threaded into the
+    engine output contract -- mirrors Category A's compute_cascade_risk
+    (a pure helper, not wired into assemble_output()).
+
+    Reads two already-real, already-populated signals. No new math:
+
+    qualified_state_count -- len(routing.qualified_states), the number
+    of states that cleared the signal floor this session (this module's
+    existing route_output() decision, Section VI.1-VI.3). 0 states = no
+    attribution possible; 2+ states = causation is diffuse across
+    multiple distinct conditions -- a direct real signal on both Path A
+    and Path B, since every session runs OutputEngine.build().
+
+    dispersion -- compute_liability_dispersion() from engine.accumulation,
+    the identical Shannon-entropy term Cascade Risk already uses, reused
+    rather than reinvented. Used only as a tiebreak when exactly one
+    state qualifies: distinguishes a clean single-point-of-failure
+    signature (liability concentrated in one axis) from a state that
+    surfaced alone but whose underlying liability is already spread
+    across multiple axes (diffuse at the axis level even though only
+    one state cleared the floor).
+
+    Classification:
+      0 states                          -> "insufficient_signal"
+      1 state,  dispersion <  threshold -> "single_point"
+      1 state,  dispersion >= threshold -> "diffuse"
+      2+ states                         -> "diffuse"
+
+    accumulated_vector={} on Path B (self-select, declared diagnosis)
+    makes dispersion structurally 0.0 for every Path B session -- the
+    same known limitation Cascade Risk already carries there.
+    accumulated_vector is never computed for Path B's declared-diagnosis
+    shortcut by design (engine/main.py run_engine() passes {} because
+    there is no real Q&A sequence to derive it from), not an oversight.
+    Path B's pattern value is therefore driven entirely by
+    qualified_state_count -- i.e. by how many states the principal
+    self-selected, not by a computed axis-level signal. Path A (the live
+    sequential diagnostic) populates a real, session-varying vector, so
+    dispersion is a genuine computed signal there.
+
+    CALIBRATION TARGET: CAUSATION_DISPERSION_THRESHOLD (0.5) is a
+    starting hypothesis, not a locked value.
+
+    Spec reference: Category B architecture review (Gemini-cleared) --
+    SPOF vs. Diffuse Causation.
+    """
+    qualified_count = len(routing.qualified_states)
+    dispersion = compute_liability_dispersion(accumulated_vector)
+
+    if qualified_count == 0:
+        pattern = "insufficient_signal"
+    elif qualified_count >= 2:
+        pattern = "diffuse"
+    elif dispersion >= CAUSATION_DISPERSION_THRESHOLD:
+        pattern = "diffuse"
+    else:
+        pattern = "single_point"
+
+    return {
+        "pattern": pattern,
+        "dispersion": round(dispersion, 4),
+        "qualified_state_count": qualified_count,
+    }
 
 
 # ── VI.4  Private Output Assembly ─────────────────────────────────────────────
