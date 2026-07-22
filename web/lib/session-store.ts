@@ -20,6 +20,7 @@
 import { Redis } from "@upstash/redis";
 import { nanoid } from "nanoid";
 import type { IntakeEcho } from "@/lib/types";
+import type { SeverityInputPayload } from "@/lib/engine-client";
 
 const redis = Redis.fromEnv();
 
@@ -127,6 +128,14 @@ export interface DiagnosticSession {
   // route logic reads from this, not from the static template, once Phase
   // 2 wiring lands.
   question_sequence: string[];
+  // Severity follow-on wiring (Path 1). Append-only, one entry per
+  // answered SEVER-01..13 follow-on this session -- mirrors answers_log's
+  // append-only shape. Threaded into invokeComplete()'s severity_inputs
+  // at Q34 so run_accumulated_engine() can call SeverityEngine.add_input()
+  // for each, the first path by which severity.tier can vary from the
+  // "Emerging" constant. [] (no follow-ons fired) preserves that constant
+  // exactly, same as before this wiring existed.
+  severity_inputs: SeverityInputPayload[];
 }
 
 // Anonymized calibration-relevant record — the only thing that survives
@@ -184,6 +193,22 @@ export function validateIndexInvariant(
   return questionId === nextQuestionId;
 }
 
+// True when a SEVER-## follow-on has already been asked this session (its
+// question_id already appears in answers_log) -- prevents re-splicing the
+// same follow-on twice when two different core questions share one (e.g.
+// Q28 and Q31 both map to SEVER-11, per engine/data/questions.py's own
+// header comment: "Q28a and Q31a share SEVER-11"). Safe against the
+// sequence's own linear ordering: Q28 always precedes Q31 in
+// PHASE_1_QUESTION_SEQUENCE, so SEVER-11's first splice (from Q28) is
+// always answered, and therefore present in answers_log, before Q31 is
+// ever reached.
+export function severityFollowOnAlreadyAsked(
+  answersLog: AnswerLogEntry[],
+  followOnId: string,
+): boolean {
+  return answersLog.some((entry) => entry.question_id === followOnId);
+}
+
 // ---------------------------------------------------------------------------
 // Session CRUD
 // ---------------------------------------------------------------------------
@@ -200,6 +225,7 @@ export async function createSession(intake: IntakeEcho): Promise<DiagnosticSessi
     checkpoint_q19: null,
     checkpoint_q27: null,
     question_sequence: [...PHASE_1_QUESTION_SEQUENCE],
+    severity_inputs: [],
   };
 
   await redis.set(sessionKey(session.session_id), JSON.stringify(session), {

@@ -166,16 +166,48 @@ export interface AccumulatePayload {
   intake: IntakeEcho;
 }
 
+// Mirrors engine.severity.SeverityInput's constructor kwargs exactly.
+// trigger_question_id/severity_follow_on_id are always present;
+// duration_band/population_band/prior_failed_resolution/
+// financial_indicators/named_condition are mutually optional -- each
+// SEVER-01..13 option maps to exactly one of the five per
+// engine/data/questions.py's _severity_input_tags, never more than one.
+export interface SeverityInputPayload {
+  trigger_question_id: string;
+  severity_follow_on_id: string;
+  duration_band?: "0_6mo" | "6_18mo" | "18mo_plus";
+  population_band?: "under_10pct" | "10_30pct" | "30pct_plus";
+  prior_failed_resolution?: boolean;
+  financial_indicators?: boolean;
+  named_condition?: boolean;
+}
+
+// Mirrors accumulate_one_answer()'s return shape exactly (engine/main.py).
+export interface AccumulateResult {
+  accumulated_vector: AccumulatedVector;
+  // Populated only when question_id itself is a SEVER-01..13 follow-on
+  // whose answer maps to a real SeverityInput field -- null for every
+  // other question, including the core question that triggered the
+  // follow-on.
+  severity_input: SeverityInputPayload | null;
+  // Populated only when the just-answered option carries
+  // severity_trigger=true (a core question option) -- the SEVER-##
+  // question_id to splice into the sequence next. Null otherwise,
+  // including on SEVER-01..13 answers themselves (those never trigger a
+  // further follow-on).
+  severity_follow_on_id: string | null;
+}
+
 export async function invokeAccumulate(
   payload: AccumulatePayload,
-): Promise<AccumulatedVector> {
+): Promise<AccumulateResult> {
   const response = await engineFetch(resolveEnginePath("/api/accumulate"), payload);
 
   if (!response.ok) {
     throw new Error(`Accumulate invocation failed: ${response.status}`);
   }
 
-  return response.json() as Promise<AccumulatedVector>;
+  return response.json() as Promise<AccumulateResult>;
 }
 
 export interface CheckpointPayload {
@@ -228,6 +260,12 @@ export interface CompletePayload {
   intake: IntakeEcho;
   answered_question_count: number;
   checkpoint_results: CheckpointResultsBundle;
+  // Every SeverityInputPayload collected across the session (one per
+  // answered SEVER-01..13 follow-on) -- threaded into
+  // run_accumulated_engine()'s severity_inputs parameter so
+  // SeverityEngine.add_input() is called for each before scoring. []
+  // (never fired) preserves the original constant-"Emerging" behavior.
+  severity_inputs: SeverityInputPayload[];
 }
 
 export async function invokeComplete(

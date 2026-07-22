@@ -74,8 +74,14 @@ async def accumulate(request: Request):
         question_id = payload.get("question_id", "") if isinstance(payload, dict) else ""
         option_id = payload.get("option_id", "") if isinstance(payload, dict) else ""
         intake = payload.get("intake", {}) if isinstance(payload, dict) else {}
-        updated_vector = accumulate_one_answer(accumulated_vector, question_id, option_id, intake)
-        return JSONResponse(content=updated_vector)
+        # accumulate_one_answer() returns {"accumulated_vector", "severity_input",
+        # "severity_follow_on_id"} -- passed straight through as the response
+        # body. The Next.js caller unpacks accumulated_vector for the session's
+        # own vector, persists severity_input (when present) into
+        # session.severity_inputs, and splices severity_follow_on_id (when
+        # present) into question_sequence, mirroring checkpoint distinguishers.
+        result = accumulate_one_answer(accumulated_vector, question_id, option_id, intake)
+        return JSONResponse(content=result)
     except KeyError as e:
         # Unknown question_id or option_id — client fault
         raise HTTPException(status_code=400, detail=str(e))
@@ -123,8 +129,10 @@ async def complete(request: Request):
         intake = payload.get("intake", {}) if isinstance(payload, dict) else {}
         answered_question_count = payload.get("answered_question_count", 0) if isinstance(payload, dict) else 0
         checkpoint_results = payload.get("checkpoint_results", {}) if isinstance(payload, dict) else {}
+        severity_inputs = payload.get("severity_inputs", []) if isinstance(payload, dict) else []
         result = run_accumulated_engine(
-            accumulated_vector, intake, answered_question_count, checkpoint_results
+            accumulated_vector, intake, answered_question_count, checkpoint_results,
+            severity_inputs,
         )
         return JSONResponse(content=result)
     except KeyError as e:

@@ -236,15 +236,23 @@ def accumulate_one_answer(
     through. Ignored entirely when this question has no
     severity_input_mapping.
 
-    KNOWN CALLER IMPACT, not yet applied beyond this file: this function's
-    return shape has changed from a bare accumulated_vector dict to
-    {"accumulated_vector": dict, "severity_input": dict | None}.
-    api/engine.py's /api/accumulate route
-    (`updated_vector = accumulate_one_answer(...)`) still expects the old
-    bare-vector shape and will break on this change until it -- and the
-    Next.js caller reading its response -- are updated to unpack the new
-    shape and persist severity_input into session state. Deliberately not
-    touched in this pass; scope was engine/main.py only.
+    severity_follow_on_id (return value): the OPPOSITE direction from
+    severity_input above -- when the just-answered option itself carries
+    severity_trigger=True (a core question option, e.g. Q22-D), this
+    surfaces its severity_follow_on_id (e.g. "SEVER-04") so the caller
+    knows to splice that follow-on question into the live sequence next,
+    mirroring how checkpoint distinguisher IDs are already surfaced as
+    bare strings (P-03 safe -- a routing ID, not a scoring weight). None
+    whenever the answered option doesn't trigger a follow-on, including
+    every SEVER-01..13 option itself (those never carry their own
+    severity_trigger -- confirmed in engine/data/questions.py's _QDATA).
+
+    KNOWN CALLER IMPACT, applied this pass: this function's return shape
+    changed from a bare accumulated_vector dict to {"accumulated_vector":
+    dict, "severity_input": dict | None, "severity_follow_on_id": str |
+    None}. api/engine.py's /api/accumulate route and the Next.js caller
+    have been updated to match (see api/engine.py, web/lib/engine-client.ts,
+    web/lib/session-store.ts, web/app/api/diagnostic/session/answer/route.ts).
 
     Raises KeyError on an unknown question_id or option_id -- the caller
     (api/engine.py) maps this to a 400.
@@ -272,9 +280,12 @@ def accumulate_one_answer(
             **option.severity_input_mapping,
         }
 
+    severity_follow_on_id = option.severity_follow_on_id if option.severity_trigger else None
+
     return {
         "accumulated_vector": session.accumulated_vector,
         "severity_input": severity_input,
+        "severity_follow_on_id": severity_follow_on_id,
     }
 
 

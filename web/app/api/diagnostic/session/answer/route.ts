@@ -6,6 +6,7 @@ import {
   spliceDistinguishers,
   isLastQuestionInSequence,
   validateIndexInvariant,
+  severityFollowOnAlreadyAsked,
   type AnswerLogEntry,
   type CheckpointResult,
   type DiagnosticSession,
@@ -182,7 +183,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const updatedVector = await invokeAccumulate({
+  const accumulateResult = await invokeAccumulate({
     accumulated_vector: session.accumulated_vector,
     question_id,
     option_id,
@@ -190,13 +191,40 @@ export async function POST(request: NextRequest) {
   });
 
   const answerEntry: AnswerLogEntry = { question_id, option_id };
-  session.accumulated_vector = updatedVector;
+  session.accumulated_vector = accumulateResult.accumulated_vector;
   session.answers_log = [...session.answers_log, answerEntry];
 
-  // currentIndex is stable across the splice below — splicing inserts
-  // strictly after this position, so the just-answered question's own
-  // index never shifts as a result of its own checkpoint firing.
+  // Severity follow-on wiring (Path 1): question_id itself was a SEVER-##
+  // follow-on that maps to a real SeverityInput field -- collect it for
+  // threading into invokeComplete() at Q34.
+  if (accumulateResult.severity_input) {
+    session.severity_inputs = [...session.severity_inputs, accumulateResult.severity_input];
+  }
+
+  // currentIndex is stable across the splices below — both insert strictly
+  // after this position, so the just-answered question's own index never
+  // shifts as a result of its own follow-on or checkpoint firing.
   const currentIndex = session.question_sequence.indexOf(question_id);
+
+  // Severity follow-on splice — simple per-answer boolean check on the
+  // just-answered option's own severity_trigger flag (already present on
+  // AnswerOption, previously unread), NOT an entropy calculation like
+  // checkpoints use. Mirrors spliceDistinguishers()'s existing pattern
+  // exactly, reusing the same function (a single-element distinguishers
+  // list is exactly what it already handles) rather than a parallel
+  // reimplementation. Guarded against re-firing an already-asked follow-on
+  // (SEVER-11 can be reached from either Q28 or Q31).
+  const severityFollowOnId = accumulateResult.severity_follow_on_id;
+  if (
+    severityFollowOnId &&
+    !severityFollowOnAlreadyAsked(session.answers_log, severityFollowOnId)
+  ) {
+    session.question_sequence = spliceDistinguishers(
+      session.question_sequence,
+      currentIndex,
+      [severityFollowOnId],
+    );
+  }
 
   // Checkpoint evaluation — at most once per canonical position per
   // session, guarded by the slot-null check (the index invariant above
@@ -261,6 +289,7 @@ export async function POST(request: NextRequest) {
       q19: session.checkpoint_q19,
       q27: session.checkpoint_q27,
     },
+    severity_inputs: session.severity_inputs,
   });
 
   const allEngineStates = engineResult.identified_states;

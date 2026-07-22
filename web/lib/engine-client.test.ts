@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { CompletePayload, CheckpointResultsBundle } from "./engine-client";
+import type { CompletePayload, CheckpointResultsBundle, SeverityInputPayload } from "./engine-client";
 import { ZERO_VECTOR } from "./session-store";
 
 // Type-level check only — no network call, no fetch, no mocking.
@@ -39,6 +39,7 @@ describe("CompletePayload shape (Stage 4 — checkpoint_results addition)", () =
       intake: BASE_INTAKE,
       answered_question_count: 34,
       checkpoint_results: bundle,
+      severity_inputs: [],
     };
 
     expect(payload.checkpoint_results.q11?.fires).toBe(true);
@@ -52,10 +53,50 @@ describe("CompletePayload shape (Stage 4 — checkpoint_results addition)", () =
       intake: BASE_INTAKE,
       answered_question_count: 5,
       checkpoint_results: { q11: null, q19: null, q27: null },
+      severity_inputs: [],
     };
 
     expect(payload.checkpoint_results.q11).toBeNull();
     expect(payload.checkpoint_results.q19).toBeNull();
     expect(payload.checkpoint_results.q27).toBeNull();
+  });
+});
+
+describe("CompletePayload shape (severity follow-on wiring — Path 1)", () => {
+  it("accepts a payload with real severity_inputs collected across the session", () => {
+    const inputs: SeverityInputPayload[] = [
+      {
+        trigger_question_id: "Q22",
+        severity_follow_on_id: "SEVER-04",
+        duration_band: "18mo_plus",
+      },
+      {
+        trigger_question_id: "Q24",
+        severity_follow_on_id: "SEVER-06",
+        duration_band: "18mo_plus",
+      },
+    ];
+    const payload: CompletePayload = {
+      accumulated_vector: ZERO_VECTOR,
+      intake: BASE_INTAKE,
+      answered_question_count: 9,
+      checkpoint_results: { q11: null, q19: null, q27: null },
+      severity_inputs: inputs,
+    };
+
+    expect(payload.severity_inputs).toHaveLength(2);
+    expect(payload.severity_inputs[0].duration_band).toBe("18mo_plus");
+  });
+
+  it("accepts a payload where no severity follow-on ever fired ([])", () => {
+    const payload: CompletePayload = {
+      accumulated_vector: ZERO_VECTOR,
+      intake: BASE_INTAKE,
+      answered_question_count: 34,
+      checkpoint_results: { q11: null, q19: null, q27: null },
+      severity_inputs: [],
+    };
+
+    expect(payload.severity_inputs).toEqual([]);
   });
 });

@@ -4,6 +4,8 @@ import {
   spliceDistinguishers,
   isLastQuestionInSequence,
   validateIndexInvariant,
+  severityFollowOnAlreadyAsked,
+  type AnswerLogEntry,
 } from "./session-store";
 
 // All tests exercise the same PHASE_1_QUESTION_SEQUENCE template that
@@ -95,6 +97,71 @@ describe("validateIndexInvariant", () => {
   it("accepts a matching question_id on an unmutated sequence", () => {
     expect(validateIndexInvariant("Q01", "Q01")).toBe(true);
     expect(validateIndexInvariant("Q01", "Q02")).toBe(false);
+  });
+});
+
+describe("severity follow-on splice — reuses spliceDistinguishers() directly", () => {
+  it("inserts a single SEVER-## question immediately after the triggering core question", () => {
+    const template = [...PHASE_1_QUESTION_SEQUENCE];
+    const q22Index = template.indexOf("Q22");
+
+    const result = spliceDistinguishers(template, q22Index, ["SEVER-04"]);
+
+    expect(result).toHaveLength(35);
+    expect(result[q22Index]).toBe("Q22");
+    expect(result[q22Index + 1]).toBe("SEVER-04");
+    expect(result[q22Index + 2]).toBe("Q23");
+  });
+
+  it("compounds correctly alongside a later checkpoint splice on a different question", () => {
+    let sequence = [...PHASE_1_QUESTION_SEQUENCE];
+
+    // Q22 triggers a severity follow-on.
+    const q22Index = sequence.indexOf("Q22");
+    sequence = spliceDistinguishers(sequence, q22Index, ["SEVER-04"]);
+    expect(sequence).toHaveLength(35);
+
+    // Q19 (checkpoint position, earlier in the sequence) — real order
+    // wouldn't have Q19 fire after Q22 in a live session, but this proves
+    // the two splice call sites don't corrupt each other's indices when
+    // applied to the same evolving array.
+    const q19Index = sequence.indexOf("Q19");
+    sequence = spliceDistinguishers(sequence, q19Index, ["DIST-CC-01"]);
+    expect(sequence).toHaveLength(36);
+
+    expect(sequence[q19Index + 1]).toBe("DIST-CC-01");
+    // Q22's own splice, further down the array, is unaffected in content
+    // (still immediately follows Q22) even though its absolute index
+    // shifted by the earlier insertion.
+    const shiftedQ22Index = sequence.indexOf("Q22");
+    expect(sequence[shiftedQ22Index + 1]).toBe("SEVER-04");
+  });
+});
+
+describe("severityFollowOnAlreadyAsked", () => {
+  it("returns false when the follow-on has never been asked", () => {
+    const log: AnswerLogEntry[] = [{ question_id: "Q22", option_id: "D" }];
+    expect(severityFollowOnAlreadyAsked(log, "SEVER-04")).toBe(false);
+  });
+
+  it("returns true once the follow-on itself has been answered", () => {
+    const log: AnswerLogEntry[] = [
+      { question_id: "Q22", option_id: "D" },
+      { question_id: "SEVER-04", option_id: "D" },
+    ];
+    expect(severityFollowOnAlreadyAsked(log, "SEVER-04")).toBe(true);
+  });
+
+  it("SEVER-11 shared trigger (Q28 and Q31): second trigger is correctly suppressed", () => {
+    // Regression case named in engine/data/questions.py's own header
+    // comment: "Q28a and Q31a share SEVER-11". Q28 always precedes Q31 in
+    // PHASE_1_QUESTION_SEQUENCE, so by the time Q31 fires, SEVER-11 (asked
+    // right after Q28) is already in answers_log.
+    const log: AnswerLogEntry[] = [
+      { question_id: "Q28", option_id: "C" },
+      { question_id: "SEVER-11", option_id: "B" },
+    ];
+    expect(severityFollowOnAlreadyAsked(log, "SEVER-11")).toBe(true);
   });
 });
 
