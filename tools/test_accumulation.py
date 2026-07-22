@@ -12,6 +12,7 @@ Verifies:
 """
 
 import sys
+import math
 from math import isclose
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
@@ -19,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).parents[1]))
 from engine.accumulation import (
     IntakeData, AccumulationEngine, AccumulationSession,
     initialize_priors, rank_states, accumulate_answer, _apply_signal_reliability,
-    StateRanking,
+    StateRanking, compute_cascade_risk, MC_CENTROID_39,
 )
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS, BASELINE_VALUE
 from engine.data.questions import AnswerOption, QUESTION_LIBRARY
@@ -310,6 +311,63 @@ check("Q18-E high-hazard: all other fields 0.00",
       all(engine_q18_high.accumulated_vector[f] == 0.0
           for f in DIMENSIONAL_FIELDS if f != "attitude_liability"),
       f"non-zero: {[(f, engine_q18_high.accumulated_vector[f]) for f in DIMENSIONAL_FIELDS if f != 'attitude_liability' and engine_q18_high.accumulated_vector[f] != 0.0]}")
+
+
+# ── 11. compute_cascade_risk (Category A) ─────────────────────────────────────
+print("\n11. compute_cascade_risk")
+
+_ref_mag = math.sqrt(sum(v ** 2 for v in MC_CENTROID_39.values()))
+
+check("all-zero vector: CR = 0.0 (no signal to disperse)",
+      compute_cascade_risk({}) == 0.0,
+      f"got {compute_cascade_risk({})}")
+
+_v_concentrated = {"aptitude_liability": _ref_mag}
+check("fully concentrated in one axis at reference magnitude: CR = 0.0",
+      compute_cascade_risk(_v_concentrated) == 0.0,
+      f"got {compute_cascade_risk(_v_concentrated)}")
+
+_per_axis = _ref_mag / math.sqrt(4)
+_v_even = {
+    "aptitude_liability": _per_axis, "authority_liability": _per_axis,
+    "alliance_liability": _per_axis, "attitude_liability": _per_axis,
+}
+check("evenly spread across all 4 axes at reference magnitude: CR = 1.0",
+      isclose(compute_cascade_risk(_v_even), 1.0, rel_tol=1e-6),
+      f"got {compute_cascade_risk(_v_even)}")
+
+_v_even_low = {k: v / 10 for k, v in _v_even.items()}
+check("evenly spread but low magnitude: CR = 0.1 (max dispersion, low intensity)",
+      isclose(compute_cascade_risk(_v_even_low), 0.1, rel_tol=1e-6),
+      f"got {compute_cascade_risk(_v_even_low)}")
+
+_v_two_axes = {
+    "aptitude_liability": _ref_mag / math.sqrt(2),
+    "authority_liability": _ref_mag / math.sqrt(2),
+}
+check("spread across 2 of 4 axes at reference magnitude: CR = 0.5 (log2(2)/log2(4))",
+      isclose(compute_cascade_risk(_v_two_axes), 0.5, rel_tol=1e-6),
+      f"got {compute_cascade_risk(_v_two_axes)}")
+
+_v_huge = {k: v * 10 for k, v in _v_even.items()}
+check("intensity saturates at 1.0, never exceeds, even at 10x reference magnitude",
+      compute_cascade_risk(_v_huge) == 1.0,
+      f"got {compute_cascade_risk(_v_huge)}")
+
+_v_negative = {"aptitude_liability": -5.0, "authority_liability": 3.0}
+check("negative field clamped to 0 signal (not negative dispersion), no crash",
+      compute_cascade_risk(_v_negative) == 0.0,
+      f"got {compute_cascade_risk(_v_negative)}")
+
+check("return value is never negative (no -0.0 sign artifact)",
+      all(compute_cascade_risk(v) >= 0.0 for v in
+          (_v_concentrated, _v_negative, {}, _v_even, _v_two_axes)),
+      "found a negative CR value")
+
+check("CR always in [0.0, 1.0]",
+      all(0.0 <= compute_cascade_risk(v) <= 1.0 for v in
+          (_v_concentrated, _v_even, _v_even_low, _v_two_axes, _v_huge, _v_negative, {})),
+      "found a CR value outside [0, 1]")
 
 
 # ── Summary ────────────────────────────────────────────────────────────────────
