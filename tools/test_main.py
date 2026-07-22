@@ -8,7 +8,10 @@ import unittest.mock as mock
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
-from engine.main import run_engine, run_checkpoint, run_accumulated_engine
+from engine.main import (
+    run_engine, run_checkpoint, run_accumulated_engine, accumulate_one_answer,
+)
+from engine.data.states import DIMENSIONAL_FIELDS
 
 PASS = []
 FAIL = []
@@ -293,6 +296,133 @@ check(
     ),
     f"got {cl_none!r}",
 )
+
+# ── 22+  accumulate_one_answer / run_accumulated_engine — severity follow-on
+#         wiring (Path 1 only). First time severity.tier can vary from the
+#         "Emerging" constant in this project's history. ────────────────────
+print("\n" + "=" * 64)
+print("Severity follow-on wiring — accumulate_one_answer + run_accumulated_engine")
+print("=" * 64)
+
+_SEV_INTAKE = {
+    "organization_size": "100-249",
+    "industry": "Technology",
+    "role_level": "CEO",
+    "jurisdiction": "US-CA",
+}
+
+
+def _zero_vector():
+    return {f: 0.0 for f in DIMENSIONAL_FIELDS}
+
+
+# 22. Core question answer: return shape has both keys, severity_input is
+# None (core questions never carry severity_input_mapping themselves).
+r_core = accumulate_one_answer(_zero_vector(), "Q01", "A", _SEV_INTAKE)
+check(
+    "accumulate_one_answer: core question returns accumulated_vector + severity_input=None",
+    set(r_core.keys()) == {"accumulated_vector", "severity_input"}
+    and r_core["severity_input"] is None,
+    f"got keys={set(r_core.keys())!r}, severity_input={r_core.get('severity_input')!r}",
+)
+
+# 23. SEVER-04 option D (18mo_plus): severity_input populated with the
+# real duration_band tag, trigger_question_id threaded from the caller.
+r_sever = accumulate_one_answer(
+    r_core["accumulated_vector"], "SEVER-04", "D", _SEV_INTAKE,
+    trigger_question_id="Q22",
+)
+check(
+    "accumulate_one_answer: SEVER-04 option D produces real SeverityInput dict",
+    r_sever["severity_input"] == {
+        "trigger_question_id": "Q22",
+        "severity_follow_on_id": "SEVER-04",
+        "duration_band": "18mo_plus",
+    },
+    f"got {r_sever['severity_input']!r}",
+)
+
+# 24. trigger_question_id defaults to the follow-on's own question_id when
+# not supplied by the caller (documented simplification).
+r_sever_default = accumulate_one_answer(
+    r_core["accumulated_vector"], "SEVER-04", "D", _SEV_INTAKE,
+)
+check(
+    "accumulate_one_answer: trigger_question_id defaults to question_id when omitted",
+    r_sever_default["severity_input"]["trigger_question_id"] == "SEVER-04",
+    f"got {r_sever_default['severity_input']!r}",
+)
+
+with mock.patch.dict("sys.modules", {"anthropic": None}):
+    # 25. Zero severity_inputs (default None/[]) preserves the original
+    # constant-Emerging behavior exactly — backward compatible, and this is
+    # Path B's permanent behavior by design (Path B never calls this at all).
+    out_zero = run_accumulated_engine(_CP_VECTOR, _LOCKED_INTAKE, 27)
+    check(
+        "run_accumulated_engine: severity_inputs omitted -> tier stays Emerging (unchanged)",
+        out_zero["severity"]["tier"] == "Emerging",
+        f"got {out_zero['severity']['tier']!r}",
+    )
+
+    # 26. One 18mo_plus duration_band input -> raw=2.0 -> score=33.33 ->
+    # Entrenched. First non-"Emerging" tier ever produced in this project.
+    out_entrenched = run_accumulated_engine(
+        _CP_VECTOR, _LOCKED_INTAKE, 27,
+        severity_inputs=[{
+            "trigger_question_id": "Q22",
+            "severity_follow_on_id": "SEVER-04",
+            "duration_band": "18mo_plus",
+        }],
+    )
+    check(
+        "run_accumulated_engine: 1x 18mo_plus duration_band -> tier=Entrenched, score=33.33",
+        out_entrenched["severity"]["tier"] == "Entrenched"
+        and abs(out_entrenched["severity"]["score"] - 33.33) < 0.01,
+        f"got tier={out_entrenched['severity']['tier']!r}, score={out_entrenched['severity']['score']!r}",
+    )
+
+    # 27. Two 18mo_plus duration_band inputs -> raw=4.0 -> score=66.67 ->
+    # Endemic.
+    out_endemic = run_accumulated_engine(
+        _CP_VECTOR, _LOCKED_INTAKE, 27,
+        severity_inputs=[
+            {"trigger_question_id": "Q22", "severity_follow_on_id": "SEVER-04",
+             "duration_band": "18mo_plus"},
+            {"trigger_question_id": "Q24", "severity_follow_on_id": "SEVER-06",
+             "duration_band": "18mo_plus"},
+        ],
+    )
+    check(
+        "run_accumulated_engine: 2x 18mo_plus duration_band -> tier=Endemic, score=66.67",
+        out_endemic["severity"]["tier"] == "Endemic"
+        and abs(out_endemic["severity"]["score"] - 66.67) < 0.01,
+        f"got tier={out_endemic['severity']['tier']!r}, score={out_endemic['severity']['score']!r}",
+    )
+
+    # 28. CALIBRATION TARGET exposure, confirmed not assumed: named_condition/
+    # financial_indicators/population_band alone (no duration_band) produce
+    # the SAME score regardless of value, since POPULATION_WEIGHTS and the
+    # three additive weights are still None (CALIBRATION TARGET) in
+    # engine/severity.py -- pre-existing, out of this task's scope to
+    # populate. Documents the gap rather than silently passing over it.
+    out_named_true = run_accumulated_engine(
+        _CP_VECTOR, _LOCKED_INTAKE, 27,
+        severity_inputs=[{"trigger_question_id": "Q30", "severity_follow_on_id": "SEVER-01",
+                           "named_condition": True}],
+    )
+    out_named_false = run_accumulated_engine(
+        _CP_VECTOR, _LOCKED_INTAKE, 27,
+        severity_inputs=[{"trigger_question_id": "Q30", "severity_follow_on_id": "SEVER-01",
+                           "named_condition": False}],
+    )
+    check(
+        "CALIBRATION TARGET exposure: named_condition True vs False produce identical "
+        "score today (NAMED_CONDITION_WEIGHT still None) -- confirmed, not assumed",
+        out_named_true["severity"]["score"] == out_named_false["severity"]["score"],
+        f"got True->{out_named_true['severity']['score']!r}, "
+        f"False->{out_named_false['severity']['score']!r}",
+    )
+
 
 # ── Results ───────────────────────────────────────────────────────────────────
 

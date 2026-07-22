@@ -51,6 +51,15 @@ class AnswerOption:
     severity_trigger:      bool          = False
     severity_follow_on_id: Optional[str] = None
 
+    # Populated only on SEVER-01..13 follow-on options (never on core Q01-Q34
+    # options, whose own severity_trigger only signals that a follow-on
+    # should be presented next -- the SeverityInput values themselves come
+    # from the follow-on's own answer). Single-key dict mapping one of the
+    # 5 real SeverityInput fields (duration_band, population_band,
+    # prior_failed_resolution, financial_indicators, named_condition) to
+    # this option's value for that field. See _severity_input_tags below.
+    severity_input_mapping: Optional[dict] = None
+
 
 # -- Question definition -------------------------------------------------------
 
@@ -1647,6 +1656,102 @@ def _build_library():
         "Q18": {"E": ["Safety & Wellbeing_DE"]},
     }
 
+    # Severity follow-on input tags wired to AnswerOption.severity_input_mapping
+    # at build time. Maps each SEVER-01..13 answer option to one of the 5 real
+    # SeverityInput fields -- content-authoring pass, Gemini-approved handoff.
+    # Confidence noted per question (fit strength against the question's
+    # actual authored content, flagged rather than smoothed over):
+    #
+    #   STRONG   -- direct fit: SEVER-01, 02, 03, 04, 06, 07, 11
+    #   MODERATE -- fits under a reasonable reinterpretation of the field's
+    #               literal definition: SEVER-05, 09, 10
+    #   WEAK     -- stretch fit, noted inline: SEVER-08, SEVER-12
+    #   SEVER-13 -- all 4 options map to the same value; the question only
+    #               fires on already-unactioned feedback, so the fact that
+    #               it fired (not which option is chosen) carries the
+    #               prior_failed_resolution=True signal. No per-option
+    #               discrimination is possible from this question's content.
+    _severity_input_tags = {
+        "SEVER-01": {  # STRONG -- awareness/naming (the_diversity_ceiling)
+            "A": {"named_condition": True},
+            "B": {"named_condition": True},
+            "C": {"named_condition": False},
+            "D": {"named_condition": False},
+        },
+        "SEVER-02": {  # STRONG -- breadth (built_to_fail / the_undefined_role / decision_paralysis)
+            "A": {"population_band": "under_10pct"},
+            "B": {"population_band": "under_10pct"},
+            "C": {"population_band": "10_30pct"},
+            "D": {"population_band": "30pct_plus"},
+        },
+        "SEVER-03": {  # STRONG -- breadth (decision_paralysis)
+            "A": {"population_band": "under_10pct"},
+            "B": {"population_band": "10_30pct"},
+            "C": {"population_band": "30pct_plus"},
+            "D": {"population_band": "30pct_plus"},
+        },
+        "SEVER-04": {  # STRONG -- policy review recency as inverse-duration proxy (the_policy_lag)
+            "A": {"duration_band": "0_6mo"},
+            "B": {"duration_band": "6_18mo"},
+            "C": {"duration_band": "18mo_plus"},
+            "D": {"duration_band": "18mo_plus"},
+        },
+        "SEVER-05": {  # MODERATE -- verification confidence, reinterpreted as named_condition
+            "A": {"named_condition": True},          # tested and confirmed
+            "B": {"named_condition": True},           # documented and reviewed
+            "C": {"named_condition": False},          # unconfirmed
+            "D": {"named_condition": False},          # assumed, unverified
+        },
+        "SEVER-06": {  # STRONG -- duration (invisible_burnout)
+            "A": {"duration_band": "0_6mo"},
+            "B": {"duration_band": "6_18mo"},
+            "C": {"duration_band": "18mo_plus"},
+            "D": {"duration_band": "18mo_plus"},
+        },
+        "SEVER-07": {  # STRONG -- realized turnover as financial indicator (the_dormant_talent / leadership_continuity_risk)
+            "A": {"financial_indicators": False},
+            "B": {"financial_indicators": False},
+            "C": {"financial_indicators": True},      # real departures already occurred
+            "D": {"financial_indicators": True},
+        },
+        "SEVER-08": {  # WEAK -- root-cause diagnosis, reinterpreted as named_condition (silosolation / the_fracture)
+            "A": {"named_condition": True},
+            "B": {"named_condition": True},
+            "C": {"named_condition": True},
+            "D": {"named_condition": False},          # "I'm not sure" -- no diagnosis given
+        },
+        "SEVER-09": {  # MODERATE -- upfront preparation adequacy, reinterpreted as prior_failed_resolution (the_second_close)
+            "A": {"prior_failed_resolution": False},
+            "B": {"prior_failed_resolution": False},
+            "C": {"prior_failed_resolution": True},
+            "D": {"prior_failed_resolution": True},
+        },
+        "SEVER-10": {  # MODERATE -- awareness breadth, reinterpreted as population_band (culture_drift / identity_erosion / the_culture_that_wasnt)
+            "A": {"population_band": "under_10pct"},
+            "B": {"population_band": "under_10pct"},
+            "C": {"population_band": "10_30pct"},
+            "D": {"population_band": "30pct_plus"},
+        },
+        "SEVER-11": {  # STRONG -- root-cause resolution outcome (the_unsolved_problem)
+            "A": {"prior_failed_resolution": False},  # identified and addressed
+            "B": {"prior_failed_resolution": True},
+            "C": {"prior_failed_resolution": True},
+            "D": {"prior_failed_resolution": True},
+        },
+        "SEVER-12": {  # WEAK -- only 1 of 4 options discriminates (the_diversity_ceiling)
+            "A": {"financial_indicators": False},
+            "B": {"financial_indicators": False},
+            "C": {"financial_indicators": True},      # realized attrition
+            "D": {"financial_indicators": False},
+        },
+        "SEVER-13": {  # non-discriminating -- see note above (narrative_lock / the_broken_compass)
+            "A": {"prior_failed_resolution": True},
+            "B": {"prior_failed_resolution": True},
+            "C": {"prior_failed_resolution": True},
+            "D": {"prior_failed_resolution": True},
+        },
+    }
+
     for (qid, text, fmt, pos, seg, opts, targets, sev) in _QDATA:
         base = dict(_uniform)
         base.update(_seed.get(qid, {}))
@@ -1673,6 +1778,7 @@ def _build_library():
                     severity_trigger=o[2],
                     severity_follow_on_id=o[3],
                     axis_targets=_axis_tags.get(qid, {}).get(o[0], []),
+                    severity_input_mapping=_severity_input_tags.get(qid, {}).get(o[0]),
                 )
                 for o in opts
             ],

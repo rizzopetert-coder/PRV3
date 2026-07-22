@@ -21,7 +21,7 @@ from engine.accumulation import (
     accumulate_answer,
     rank_states,
 )
-from engine.severity import SeverityEngine
+from engine.severity import SeverityEngine, SeverityInput
 from engine.output import OutputEngine
 from engine.contract import SessionData, assemble_output
 from engine.checkpoint import evaluate_checkpoint, checkpoint_result_from_wire
@@ -207,14 +207,44 @@ def accumulate_one_answer(
     question_id: str,
     option_id: str,
     intake: dict,
+    trigger_question_id: str = "",
 ) -> dict:
     """
     Stateless per-answer accumulation step. Pure vector math -- no ranking,
-    no severity, no checkpoint, no narrative modulation. The caller (Next.js
-    route handler) supplies only question_id/option_id, never
+    no checkpoint, no narrative modulation. The caller (Next.js route
+    handler) supplies only question_id/option_id, never
     dimensional_contributions -- this function looks up the real
     AnswerOption server-side from QUESTION_LIBRARY. P-03 boundary: scoring
     weight is invisible, the browser never sees or sends it.
+
+    Severity follow-on wiring (Path 1 only): when the answered option
+    carries AnswerOption.severity_input_mapping (populated only on
+    SEVER-01..13 follow-on options -- see engine/data/questions.py's
+    _severity_input_tags), constructs a SeverityInput-shaped dict for the
+    caller to accumulate across the session and pass into
+    run_accumulated_engine()'s severity_inputs parameter at completion.
+    None for every other question, including core Q01-Q34 questions
+    themselves -- their own severity_trigger only signals that a follow-on
+    should be presented next; the actual SeverityInput values come from the
+    follow-on's own answer, not the triggering question's answer.
+
+    trigger_question_id: the core question whose answer caused this
+    follow-on to be presented (known only by the caller, which decided to
+    splice the follow-on in). Defaults to question_id itself (the
+    follow-on's own ID) when not supplied -- a documented simplification,
+    not true provenance, when the real trigger context isn't threaded
+    through. Ignored entirely when this question has no
+    severity_input_mapping.
+
+    KNOWN CALLER IMPACT, not yet applied beyond this file: this function's
+    return shape has changed from a bare accumulated_vector dict to
+    {"accumulated_vector": dict, "severity_input": dict | None}.
+    api/engine.py's /api/accumulate route
+    (`updated_vector = accumulate_one_answer(...)`) still expects the old
+    bare-vector shape and will break on this change until it -- and the
+    Next.js caller reading its response -- are updated to unpack the new
+    shape and persist severity_input into session state. Deliberately not
+    touched in this pass; scope was engine/main.py only.
 
     Raises KeyError on an unknown question_id or option_id -- the caller
     (api/engine.py) maps this to a 400.
@@ -233,7 +263,19 @@ def accumulate_one_answer(
     intake_data = _locked_intake_to_engine_intake(intake)
     session = AccumulationSession(accumulated_vector=dict(accumulated_vector))
     accumulate_answer(session, option, intake_data, question_id)
-    return session.accumulated_vector
+
+    severity_input = None
+    if option.severity_input_mapping:
+        severity_input = {
+            "trigger_question_id": trigger_question_id or question_id,
+            "severity_follow_on_id": question_id,
+            **option.severity_input_mapping,
+        }
+
+    return {
+        "accumulated_vector": session.accumulated_vector,
+        "severity_input": severity_input,
+    }
 
 
 def run_checkpoint(
@@ -287,6 +329,7 @@ def run_accumulated_engine(
     intake: dict,
     answered_question_count: int,
     checkpoint_results: Optional[dict] = None,
+    severity_inputs: Optional[list] = None,
 ) -> dict:
     """
     Path 1 completion orchestrator ("Path A" -- real accumulation-based
@@ -297,11 +340,20 @@ def run_accumulated_engine(
     instead of Path B's synthetic score=1.0 declared rankings. Same
     reference pattern as tools/calibration_runner.py's run_profile().
 
-    Phase 1 has no narrative modulation and no severity follow-ons --
-    narrative_response is always "" and SeverityEngine.score() is called
-    with no accumulated severity inputs, exactly matching Path B's pattern
-    for the same reason (no severity-triggering questions answered in
-    Phase 1 scope).
+    Phase 1 has no narrative modulation -- narrative_response is always "".
+
+    Severity follow-on wiring (Path 1 only): severity_inputs is an optional
+    list of dicts, each shaped like accumulate_one_answer()'s
+    severity_input return value (trigger_question_id,
+    severity_follow_on_id, plus whichever of duration_band/population_band/
+    prior_failed_resolution/financial_indicators/named_condition that
+    follow-on's answer set). Each is constructed into a real SeverityInput
+    and passed to SeverityEngine.add_input() before scoring -- the first
+    time severity.tier can vary from the "Emerging" constant in this
+    project's history. None or [] (the default) preserves the original
+    zero-input behavior exactly, so this remains backward compatible with
+    any caller not yet collecting real severity inputs -- including Path B,
+    which is untouched and stays permanently "Emerging" by design.
 
     checkpoint_results (Phase 2): optional dict keyed "q11"/"q19"/"q27",
     each value either None (that checkpoint was never reached this
@@ -317,6 +369,8 @@ def run_accumulated_engine(
     final_rankings = rank_states(accumulated_vector, answered_question_count, SALIENCE_PROFILES)
 
     severity_engine = SeverityEngine()
+    for severity_input in (severity_inputs or []):
+        severity_engine.add_input(SeverityInput(**severity_input))
     severity_result = severity_engine.score()
 
     output_engine = OutputEngine()
