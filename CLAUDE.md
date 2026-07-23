@@ -175,7 +175,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.57 |
+| MOB version | v4.58 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 57 (locked) |
