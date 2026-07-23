@@ -256,7 +256,12 @@ def synthesize(
         )
 
     if client is None:
-        client = _anthropic.Anthropic()
+        # max_retries=1: the 5s timeout (LOCKED, Session 42) is a per-attempt
+        # budget in the SDK's request loop, not a total budget -- left at the
+        # SDK default (2 retries) it silently becomes a ~15s+ giveaway. One
+        # retry is kept deliberately (not 0) for resilience against a single
+        # transient blip; worst case is now ~10.5s, not ~17s.
+        client = _anthropic.Anthropic(max_retries=1)
 
     prompt = _build_synthesis_prompt(
         state_name=state_name,
