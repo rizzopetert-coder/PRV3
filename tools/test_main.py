@@ -316,18 +316,37 @@ def _zero_vector():
     return {f: 0.0 for f in DIMENSIONAL_FIELDS}
 
 
-# 22. Core question answer: return shape has both keys, severity_input is
-# None (core questions never carry severity_input_mapping themselves).
+# 22. Core question answer, non-triggering option: return shape has all
+# three keys, severity_input and severity_follow_on_id both None.
 r_core = accumulate_one_answer(_zero_vector(), "Q01", "A", _SEV_INTAKE)
 check(
-    "accumulate_one_answer: core question returns accumulated_vector + severity_input=None",
-    set(r_core.keys()) == {"accumulated_vector", "severity_input"}
-    and r_core["severity_input"] is None,
-    f"got keys={set(r_core.keys())!r}, severity_input={r_core.get('severity_input')!r}",
+    "accumulate_one_answer: core question (non-triggering) returns all three keys, "
+    "severity_input=None, severity_follow_on_id=None",
+    set(r_core.keys()) == {"accumulated_vector", "severity_input", "severity_follow_on_id"}
+    and r_core["severity_input"] is None
+    and r_core["severity_follow_on_id"] is None,
+    f"got keys={set(r_core.keys())!r}, severity_input={r_core.get('severity_input')!r}, "
+    f"severity_follow_on_id={r_core.get('severity_follow_on_id')!r}",
+)
+
+# 22b. Core question Q22 option D: severity_trigger=True in the question
+# data -- severity_follow_on_id surfaces "SEVER-04" so the caller knows to
+# splice it in next. severity_input stays None (Q22's own option carries
+# no severity_input_mapping -- only SEVER-04's own options do).
+r_trigger = accumulate_one_answer(_zero_vector(), "Q22", "D", _SEV_INTAKE)
+check(
+    "accumulate_one_answer: Q22 option D surfaces severity_follow_on_id=SEVER-04, "
+    "severity_input stays None",
+    r_trigger["severity_follow_on_id"] == "SEVER-04"
+    and r_trigger["severity_input"] is None,
+    f"got severity_follow_on_id={r_trigger['severity_follow_on_id']!r}, "
+    f"severity_input={r_trigger['severity_input']!r}",
 )
 
 # 23. SEVER-04 option D (18mo_plus): severity_input populated with the
 # real duration_band tag, trigger_question_id threaded from the caller.
+# severity_follow_on_id is None here -- SEVER-## answers never trigger a
+# further follow-on themselves.
 r_sever = accumulate_one_answer(
     r_core["accumulated_vector"], "SEVER-04", "D", _SEV_INTAKE,
     trigger_question_id="Q22",
@@ -340,6 +359,12 @@ check(
         "duration_band": "18mo_plus",
     },
     f"got {r_sever['severity_input']!r}",
+)
+check(
+    "accumulate_one_answer: SEVER-04 answer itself has severity_follow_on_id=None "
+    "(follow-ons never chain into a further follow-on)",
+    r_sever["severity_follow_on_id"] is None,
+    f"got {r_sever['severity_follow_on_id']!r}",
 )
 
 # 24. trigger_question_id defaults to the follow-on's own question_id when
