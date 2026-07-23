@@ -36,9 +36,9 @@ function DiagnosticGate({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <button
           onClick={() => onChoose("diagnostic")}
-          className="text-left p-6 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-all duration-300 animate-fade-up"
+          className="text-left p-6 rounded-xl border border-gray-200 bg-white hover:border-ink transition-all duration-300 animate-fade-up"
         >
-          <h2 className="font-display text-lg font-semibold text-charcoal mb-2">
+          <h2 className="font-serif text-lg font-semibold text-ink mb-2">
             Take the diagnostic.
           </h2>
           <p className="font-ui text-sm text-gray-600">
@@ -48,9 +48,9 @@ function DiagnosticGate({
         </button>
         <button
           onClick={() => onChoose("self-select")}
-          className="text-left p-6 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-all duration-300 animate-fade-up"
+          className="text-left p-6 rounded-xl border border-gray-200 bg-white hover:border-ink transition-all duration-300 animate-fade-up"
         >
-          <h2 className="font-display text-lg font-semibold text-charcoal mb-2">
+          <h2 className="font-serif text-lg font-semibold text-ink mb-2">
             Start by recognizing.
           </h2>
           <p className="font-ui text-sm text-gray-600">
@@ -165,7 +165,7 @@ function SelfSelectionInterface({
   }
 
   return (
-    <div className="flex min-h-screen bg-paper">
+    <div className="flex min-h-screen bg-field">
       <main className="flex-1 min-w-0 px-6 py-10 md:px-10 md:py-14 pb-36 md:pb-14">
         <div className={`max-w-5xl ${currentPhase === 1 ? "mx-auto" : ""}`}>
 
@@ -206,7 +206,7 @@ function SelfSelectionInterface({
               {isLoadingInterpretation ? (
                 <p className="text-sm text-gray-400">Loading&hellip;</p>
               ) : (
-                <p className="text-charcoal text-base leading-relaxed">
+                <p className="text-ink text-base leading-relaxed">
                   {interpretation}
                 </p>
               )}
@@ -214,7 +214,7 @@ function SelfSelectionInterface({
                 <div className="mt-6">
                   <button
                     onClick={() => onPhaseAdvance(4)}
-                    className="bg-charcoal text-white font-ui text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="bg-ink text-white font-ui text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
                   >
                     {uiCopy.phase3CTALabel}
                   </button>
@@ -226,18 +226,18 @@ function SelfSelectionInterface({
           {/* Phase 4 — Transition */}
           {currentPhase === 4 && (
             <div className="mt-10 pt-10 border-t border-gray-200 max-w-2xl">
-              <p className="text-charcoal text-base leading-relaxed mb-6">
+              <p className="text-ink text-base leading-relaxed mb-6">
                 {uiCopy.phase4Copy}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleTakeDiagnostic}
                   disabled={isLoadingResult}
-                  className="flex-1 bg-charcoal text-white font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex-1 bg-ink text-white font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isLoadingResult ? "Synthesizing…" : uiCopy.diagnosticCTA}
                 </button>
-                <button className="flex-1 border border-charcoal text-charcoal font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                <button className="flex-1 border border-ink text-ink font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-100 transition-colors">
                   {uiCopy.conversationCTA}
                 </button>
               </div>
@@ -259,7 +259,7 @@ function SelfSelectionInterface({
           </span>
           <button
             onClick={() => onPhaseAdvance(2)}
-            className="bg-charcoal text-white font-ui text-sm font-medium px-6 py-2 hover:bg-gray-700 transition-colors rounded"
+            className="bg-ink text-white font-ui text-sm font-medium px-6 py-2 hover:bg-gray-700 transition-colors rounded"
           >
             Let&apos;s take a closer look.
           </button>
@@ -281,7 +281,7 @@ function SelfSelectionInterface({
           <button
             onClick={handleSeeWhatThisMeans}
             disabled={selectedStateIds.size < 2}
-            className="bg-charcoal text-white font-ui text-sm font-medium px-6 py-2 hover:bg-gray-700 transition-colors rounded disabled:opacity-40 disabled:cursor-not-allowed"
+            className="bg-ink text-white font-ui text-sm font-medium px-6 py-2 hover:bg-gray-700 transition-colors rounded disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {uiCopy.seeWhatThisMeans}
           </button>
@@ -301,7 +301,7 @@ export default function DiagnosticPage() {
 
   if (diagnosticState.path === null) {
     return (
-      <div className="min-h-screen bg-paper transition-opacity duration-300">
+      <div className="min-h-screen bg-field transition-opacity duration-300">
         <DiagnosticGate
           onChoose={(path) =>
             setDiagnosticState({ path, currentPhase: 1 })
@@ -313,7 +313,7 @@ export default function DiagnosticPage() {
 
   if (diagnosticState.path === "diagnostic") {
     return (
-      <div className="min-h-screen bg-paper">
+      <div className="min-h-screen bg-field">
         <DiagnosticFlow />
       </div>
     );
