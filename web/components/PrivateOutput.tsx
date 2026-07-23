@@ -3,6 +3,7 @@
 import type { PrivateOutputPayload, SeverityTier } from "@/lib/types";
 import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
+import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
 
 // Tier-based LOCKED copy — mirrors engine/severity.py SEVERITY_TIER_DESCRIPTIONS.
 const SEVERITY_ANCHOR: Record<SeverityTier, string> = {
@@ -47,6 +48,12 @@ export default function PrivateOutput({
   // Block 4 must not repeat it if it was already used in block 2.
   const usedRoutingInBlock2 = !liabilityText && Boolean(payload.resolution_routing);
 
+  // Severity-conditional accent — reuses the same tested function live-mode
+  // ConstellationField uses for its own rings, rather than a parallel
+  // implementation. --urgency/--urgency-text only at genuine Endemic;
+  // --oxide/--oxide-text at Emerging/Entrenched.
+  const accent = severityAccentTokens(payload.severity);
+
   return (
     <div className="max-w-2xl">
 
@@ -59,7 +66,10 @@ export default function PrivateOutput({
           <span className="text-[13px] font-medium text-gray-500">
             {payload.primary_state.name}
           </span>
-          <span className="text-[11px] bg-gray-100 border border-gray-200 text-gray-500 rounded-md px-2 py-0.5">
+          <span
+            className="text-[11px] rounded-md px-2 py-0.5 border"
+            style={{ borderColor: accent.stroke, color: accent.text }}
+          >
             {payload.severity}
           </span>
         </div>
@@ -67,11 +77,29 @@ export default function PrivateOutput({
           {SEVERITY_ANCHOR[payload.severity]}
         </p>
       </div>
+
+      {/* Block 1b — Weighted dimensional shape (live mode). Placeholder
+          mock weights from Stage 3's scaffolding replaced with the real
+          dimension_summary field (shipped commit 9c52e7d) — confirmed
+          present in this payload at runtime for both Path A and Path B,
+          not just in the type. */}
+      <div className="max-w-70 mx-auto pb-4">
+        <ConstellationField
+          mode="live"
+          weights={{
+            apt: payload.dimension_summary.aptitude,
+            auth: payload.dimension_summary.authority,
+            all: payload.dimension_summary.alliance,
+            att: payload.dimension_summary.attitude,
+          }}
+          severityTier={payload.severity}
+        />
+      </div>
       <Rule />
 
       {/* Block 2 — Liability condition */}
       <div className="py-4">
-        <p className="text-sm leading-[1.65] text-charcoal">
+        <p className="text-sm leading-[1.65] text-ink">
           {liabilityText || payload.resolution_routing}
         </p>
       </div>
@@ -92,7 +120,7 @@ export default function PrivateOutput({
         <p className="text-[11px] uppercase tracking-wide text-gray-400">
           Resolution pathway
         </p>
-        <p className="text-[13px] font-medium text-charcoal">
+        <p className="text-[13px] font-medium text-ink">
           {payload.resolution_family}
         </p>
         {resolutionFramingText ? (
