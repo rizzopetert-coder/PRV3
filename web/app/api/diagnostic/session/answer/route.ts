@@ -7,6 +7,8 @@ import {
   isLastQuestionInSequence,
   validateIndexInvariant,
   severityFollowOnAlreadyAsked,
+  spliceLabel,
+  resolveQuestionLabel,
   type AnswerLogEntry,
   type CheckpointResult,
   type DiagnosticSession,
@@ -213,7 +215,9 @@ export async function POST(request: NextRequest) {
   // exactly, reusing the same function (a single-element distinguishers
   // list is exactly what it already handles) rather than a parallel
   // reimplementation. Guarded against re-firing an already-asked follow-on
-  // (SEVER-11 can be reached from either Q28 or Q31).
+  // (SEVER-11's parked Q31 alternate parent means this only matters for
+  // Q28 today, but the guard is real, general infrastructure -- see
+  // session-store.ts).
   const severityFollowOnId = accumulateResult.severity_follow_on_id;
   if (
     severityFollowOnId &&
@@ -224,6 +228,23 @@ export async function POST(request: NextRequest) {
       currentIndex,
       [severityFollowOnId],
     );
+    session.question_labels[severityFollowOnId] = spliceLabel(question_id, 0);
+  }
+
+  // Q28 conditional splice — the only one of the two live-session-surfaced
+  // "adaptive" annotations actually built as a real conditional trigger
+  // (Q31 is parked, see PHASE_1_QUESTION_SEQUENCE's comment). Q06 itself
+  // carries no severity_trigger of its own (its options don't set one),
+  // so this is a direct, explicit check rather than reusing the severity
+  // mechanism above -- a single hardcoded case, not a generalized
+  // framework, since nothing else currently needs this shape.
+  if (question_id === "Q06" && (option_id === "A" || option_id === "B")) {
+    session.question_sequence = spliceDistinguishers(
+      session.question_sequence,
+      currentIndex,
+      ["Q28"],
+    );
+    session.question_labels["Q28"] = spliceLabel("Q06", 0);
   }
 
   // Checkpoint evaluation — at most once per canonical position per
@@ -260,6 +281,9 @@ export async function POST(request: NextRequest) {
         currentIndex,
         checkpointResult.distinguishers,
       );
+      checkpointResult.distinguishers.forEach((distinguisherId, letterIndex) => {
+        session.question_labels[distinguisherId] = spliceLabel(question_id, letterIndex);
+      });
     }
   }
 
@@ -275,7 +299,8 @@ export async function POST(request: NextRequest) {
     await saveSession(session);
 
     const nextQuestion = await invokeQuestionCopy(nextQuestionId);
-    return NextResponse.json({ status: "in_progress", question: nextQuestion });
+    const label = resolveQuestionLabel(nextQuestionId, session.question_labels);
+    return NextResponse.json({ status: "in_progress", question: nextQuestion, label });
   }
 
   // Q34 just answered — completion. Route into the real accumulation-based

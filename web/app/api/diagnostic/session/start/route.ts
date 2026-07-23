@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSession } from "@/lib/session-store";
+import { createSession, resolveQuestionLabel } from "@/lib/session-store";
 import { invokeQuestionCopy } from "@/lib/engine-client";
 import type { IntakeEcho } from "@/lib/types";
 
@@ -39,9 +39,11 @@ export async function POST(request: NextRequest) {
 
   const session = await createSession(body);
   const firstQuestion = await invokeQuestionCopy(session.next_question_id);
+  const label = resolveQuestionLabel(session.next_question_id, session.question_labels);
 
   return NextResponse.json({
     session_id: session.session_id,
     question: firstQuestion,
+    label,
   });
 }

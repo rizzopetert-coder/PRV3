@@ -7,12 +7,19 @@ import PrivateOutput from "@/components/PrivateOutput";
 // ---------------------------------------------------------------------------
 // Path 1 (Session 71, Phase 1) — live sequential-question diagnostic.
 //
-// Deliberately linear and plain: one question at a time, no checkpoint-
-// triggered branching UI, no narrative textbox, no addenda, no severity
-// follow-on prompts. Those are Phase 2-4, out of scope here.
+// One question at a time. Checkpoint distinguishers, severity follow-ons,
+// and Q28's Q06-conditional splice are all live -- the question label
+// (below) reflects whichever of those the session/answer route resolves,
+// not a hardcoded position. No narrative textbox, no Aptitude addenda.
 // ---------------------------------------------------------------------------
 
-const TOTAL_QUESTIONS = 34;
+// Mirrors web/lib/session-store.ts's QuestionLabel exactly -- redeclared
+// here rather than imported since that module pulls in server-only Redis
+// code ("use client" can't import it), same reason QuestionCopy below is
+// its own local type rather than imported from engine-client.ts.
+type QuestionLabel =
+  | { kind: "core"; position: number; total: number }
+  | { kind: "spliced"; label: string };
 
 // Value vocabularies mirror engine/data/intake.py's INTAKE_FIELDS wherever
 // an engine equivalent exists (organization_size <- headcount, industry,
@@ -72,7 +79,7 @@ interface QuestionCopy {
 type FlowState =
   | { phase: "intake" }
   | { phase: "loading" }
-  | { phase: "question"; sessionId: string; question: QuestionCopy; questionNumber: number }
+  | { phase: "question"; sessionId: string; question: QuestionCopy; label: QuestionLabel }
   | { phase: "complete"; result: PrivateOutputPayload }
   | { phase: "error"; message: string };
 
@@ -98,13 +105,13 @@ function IntakeForm({
   ) {
     return (
       <div className="mb-5">
-        <label className="block font-ui text-sm font-medium text-charcoal mb-1.5">
+        <label className="block font-ui text-sm font-medium text-ink mb-1.5">
           {label}
         </label>
         <select
           value={intake[key]}
           onChange={(e) => onChange({ ...intake, [key]: e.target.value })}
-          className="w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-charcoal focus:outline-none focus:border-charcoal"
+          className="w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-ink focus:outline-none focus:border-ink"
         >
           <option value="">Select…</option>
           {options.map((opt) => (
@@ -122,7 +129,7 @@ function IntakeForm({
       <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">
         Before you start
       </p>
-      <h2 className="font-display text-2xl text-charcoal mb-8">
+      <h2 className="font-serif text-2xl text-ink mb-8">
         A few things about your organization.
       </h2>
 
@@ -136,7 +143,7 @@ function IntakeForm({
       <button
         onClick={onSubmit}
         disabled={!isComplete}
-        className="w-full bg-charcoal text-white font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-3"
+        className="w-full bg-ink text-white font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-3"
       >
         Begin the diagnostic
       </button>
@@ -148,19 +155,21 @@ function IntakeForm({
 
 function QuestionView({
   question,
-  questionNumber,
+  label,
   onAnswer,
 }: {
   question: QuestionCopy;
-  questionNumber: number;
+  label: QuestionLabel;
   onAnswer: (optionId: string) => void;
 }) {
   return (
     <div className="max-w-xl mx-auto px-6 py-16">
       <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-6">
-        Question {questionNumber} of {TOTAL_QUESTIONS}
+        {label.kind === "core"
+          ? `Question ${label.position} of ${label.total}`
+          : `Follow-up ${label.label}`}
       </p>
-      <h2 className="font-display text-xl md:text-2xl text-charcoal mb-8 leading-snug">
+      <h2 className="font-serif text-xl md:text-2xl text-ink mb-8 leading-snug">
         {question.question_text}
       </h2>
       <div className="space-y-3">
@@ -168,7 +177,7 @@ function QuestionView({
           <button
             key={opt.option_id}
             onClick={() => onAnswer(opt.option_id)}
-            className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-colors font-ui text-sm text-charcoal"
+            className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white hover:border-ink transition-colors font-ui text-sm text-ink"
           >
             {opt.option_text}
           </button>
@@ -201,7 +210,7 @@ export default function DiagnosticFlow() {
         phase: "question",
         sessionId: data.session_id,
         question: data.question,
-        questionNumber: 1,
+        label: data.label,
       });
     } catch {
       setState({ phase: "error", message: ERROR_COPY });
@@ -210,7 +219,7 @@ export default function DiagnosticFlow() {
 
   async function handleAnswer(optionId: string) {
     if (state.phase !== "question") return;
-    const { sessionId, question, questionNumber } = state;
+    const { sessionId, question } = state;
 
     setState({ phase: "loading" });
     try {
@@ -235,7 +244,7 @@ export default function DiagnosticFlow() {
           phase: "question",
           sessionId,
           question: data.question,
-          questionNumber: questionNumber + 1,
+          label: data.label,
         });
       }
     } catch {
@@ -270,10 +279,10 @@ export default function DiagnosticFlow() {
   if (state.phase === "error") {
     return (
       <div className="max-w-2xl mx-auto px-6 py-16 text-center">
-        <p className="font-display text-2xl text-charcoal mb-4">{state.message}</p>
+        <p className="font-serif text-2xl text-ink mb-4">{state.message}</p>
         <button
           onClick={() => setState({ phase: "intake" })}
-          className="bg-charcoal text-white font-ui text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
+          className="bg-ink text-white font-ui text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
         >
           Start over
         </button>
@@ -293,7 +302,7 @@ export default function DiagnosticFlow() {
     return (
       <QuestionView
         question={state.question}
-        questionNumber={state.questionNumber}
+        label={state.label}
         onAnswer={handleAnswer}
       />
     );

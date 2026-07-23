@@ -1,10 +1,14 @@
 import { describe, it, expect } from "vitest";
 import {
   PHASE_1_QUESTION_SEQUENCE,
+  TOTAL_CORE_QUESTIONS,
   spliceDistinguishers,
   isLastQuestionInSequence,
   validateIndexInvariant,
   severityFollowOnAlreadyAsked,
+  coreQuestionPosition,
+  spliceLabel,
+  resolveQuestionLabel,
   type AnswerLogEntry,
 } from "./session-store";
 
@@ -25,10 +29,10 @@ describe("spliceDistinguishers", () => {
 
     // Input untouched.
     expect(template).toEqual([...PHASE_1_QUESTION_SEQUENCE]);
-    expect(template).toHaveLength(34);
+    expect(template).toHaveLength(32);
 
     // Output matches Stage 3's hand-traced shape exactly.
-    expect(result).toHaveLength(36);
+    expect(result).toHaveLength(34);
     expect(result[currentIndex]).toBe("Q11");
     expect(result[currentIndex + 1]).toBe("DIST-CM-01");
     expect(result[currentIndex + 2]).toBe("DIST-CM-02");
@@ -107,7 +111,7 @@ describe("severity follow-on splice — reuses spliceDistinguishers() directly",
 
     const result = spliceDistinguishers(template, q22Index, ["SEVER-04"]);
 
-    expect(result).toHaveLength(35);
+    expect(result).toHaveLength(33);
     expect(result[q22Index]).toBe("Q22");
     expect(result[q22Index + 1]).toBe("SEVER-04");
     expect(result[q22Index + 2]).toBe("Q23");
@@ -119,7 +123,7 @@ describe("severity follow-on splice — reuses spliceDistinguishers() directly",
     // Q22 triggers a severity follow-on.
     const q22Index = sequence.indexOf("Q22");
     sequence = spliceDistinguishers(sequence, q22Index, ["SEVER-04"]);
-    expect(sequence).toHaveLength(35);
+    expect(sequence).toHaveLength(33);
 
     // Q19 (checkpoint position, earlier in the sequence) — real order
     // wouldn't have Q19 fire after Q22 in a live session, but this proves
@@ -127,7 +131,7 @@ describe("severity follow-on splice — reuses spliceDistinguishers() directly",
     // applied to the same evolving array.
     const q19Index = sequence.indexOf("Q19");
     sequence = spliceDistinguishers(sequence, q19Index, ["DIST-CC-01"]);
-    expect(sequence).toHaveLength(36);
+    expect(sequence).toHaveLength(34);
 
     expect(sequence[q19Index + 1]).toBe("DIST-CC-01");
     // Q22's own splice, further down the array, is unaffected in content
@@ -152,11 +156,13 @@ describe("severityFollowOnAlreadyAsked", () => {
     expect(severityFollowOnAlreadyAsked(log, "SEVER-04")).toBe(true);
   });
 
-  it("SEVER-11 shared trigger (Q28 and Q31): second trigger is correctly suppressed", () => {
-    // Regression case named in engine/data/questions.py's own header
-    // comment: "Q28a and Q31a share SEVER-11". Q28 always precedes Q31 in
-    // PHASE_1_QUESTION_SEQUENCE, so by the time Q31 fires, SEVER-11 (asked
-    // right after Q28) is already in answers_log.
+  it("a shared follow-on already asked from one parent is correctly suppressed for a second", () => {
+    // General multi-parent case -- engine/data/questions.py's header
+    // comment notes SEVER-11 was originally authored with two possible
+    // parents (Q28 and Q31), though Q31 is now parked (excluded from the
+    // live sequence entirely -- see PHASE_1_QUESTION_SEQUENCE's comment),
+    // so SEVER-11 can in practice only fire from Q28 today. This test
+    // exercises the guard generically, not tied to a live Q28/Q31 case.
     const log: AnswerLogEntry[] = [
       { question_id: "Q28", option_id: "C" },
       { question_id: "SEVER-11", option_id: "B" },
@@ -165,8 +171,70 @@ describe("severityFollowOnAlreadyAsked", () => {
   });
 });
 
+describe("Q28/Q31 parked (live-session investigation)", () => {
+  it("Q28 and Q31 are excluded from the static core sequence", () => {
+    expect(PHASE_1_QUESTION_SEQUENCE).not.toContain("Q28");
+    expect(PHASE_1_QUESTION_SEQUENCE).not.toContain("Q31");
+  });
+
+  it("TOTAL_CORE_QUESTIONS reflects the 32-entry sequence, not a stale hardcoded 34", () => {
+    expect(TOTAL_CORE_QUESTIONS).toBe(32);
+    expect(TOTAL_CORE_QUESTIONS).toBe(PHASE_1_QUESTION_SEQUENCE.length);
+  });
+});
+
+describe("coreQuestionPosition", () => {
+  it("returns the 1-indexed static position for a core question", () => {
+    expect(coreQuestionPosition("Q01")).toBe(1);
+    expect(coreQuestionPosition("Q06")).toBe(6);
+    expect(coreQuestionPosition("Q34")).toBe(32);
+  });
+
+  it("returns null for a spliced or parked question_id", () => {
+    expect(coreQuestionPosition("DIST-CM-01")).toBeNull();
+    expect(coreQuestionPosition("SEVER-04")).toBeNull();
+    // Q28 is a live splice now, not a static member -- correctly null here.
+    expect(coreQuestionPosition("Q28")).toBeNull();
+    // Q31 is parked -- also correctly null, same reason.
+    expect(coreQuestionPosition("Q31")).toBeNull();
+  });
+});
+
+describe("spliceLabel", () => {
+  it("builds [parent][letter] from a real core parent's position", () => {
+    expect(spliceLabel("Q11", 0)).toBe("11A");
+    expect(spliceLabel("Q11", 1)).toBe("11B");
+    expect(spliceLabel("Q22", 0)).toBe("22A");
+  });
+
+  it("Q28's conditional splice off Q06 labels as 6A", () => {
+    expect(spliceLabel("Q06", 0)).toBe("6A");
+  });
+});
+
+describe("resolveQuestionLabel", () => {
+  it("resolves a core question to its static position, ignoring question_labels", () => {
+    const label = resolveQuestionLabel("Q12", { Q12: "should never be read" });
+    expect(label).toEqual({ kind: "core", position: 12, total: TOTAL_CORE_QUESTIONS });
+  });
+
+  it("resolves a spliced question to its stored label", () => {
+    const label = resolveQuestionLabel("SEVER-04", { "SEVER-04": "22A" });
+    expect(label).toEqual({ kind: "spliced", label: "22A" });
+  });
+
+  it("falls back to the raw question_id if a spliced question has no stored label", () => {
+    const label = resolveQuestionLabel("SEVER-99", {});
+    expect(label).toEqual({ kind: "spliced", label: "SEVER-99" });
+  });
+});
+
 describe("regression — Stage 3 trace (c): three compounding checkpoint splices", () => {
-  it("Q11+2, Q19+1, Q27B+3 compound correctly, landing Q34 at index 39 of a length-40 sequence", () => {
+  it("Q11+2, Q19+1, Q27B+3 compound correctly, landing Q34 at index 37 of a length-38 sequence", () => {
+    // Base length is 32 (Q28/Q31 parked -- see PHASE_1_QUESTION_SEQUENCE's
+    // comment). Q11/Q19/Q27B all sit before that removal point, so their
+    // own base indices are unchanged from before; only the totals below
+    // (and Q34's final index, which sits after the removal point) differ.
     let sequence: string[] = [...PHASE_1_QUESTION_SEQUENCE];
 
     // Q11 fires with 2 distinguishers.
@@ -176,14 +244,14 @@ describe("regression — Stage 3 trace (c): three compounding checkpoint splices
       "DIST-CM-01",
       "DIST-CM-02",
     ]);
-    expect(sequence).toHaveLength(36);
+    expect(sequence).toHaveLength(34);
 
     // Q19 fires with 1 distinguisher — its index has shifted +2 from the
     // first splice.
     currentIndex = sequence.indexOf("Q19");
     expect(currentIndex).toBe(20);
     sequence = spliceDistinguishers(sequence, currentIndex, ["DIST-CC-01"]);
-    expect(sequence).toHaveLength(37);
+    expect(sequence).toHaveLength(35);
 
     // Q27B fires with 3 distinguishers — its index has shifted +3
     // cumulative from the first two splices.
@@ -194,11 +262,11 @@ describe("regression — Stage 3 trace (c): three compounding checkpoint splices
       "DIST-X-02",
       "DIST-X-03",
     ]);
-    expect(sequence).toHaveLength(40);
+    expect(sequence).toHaveLength(38);
 
     // Q34 lands at the true final index after all three splices compound.
     const q34Index = sequence.indexOf("Q34");
-    expect(q34Index).toBe(39);
+    expect(q34Index).toBe(37);
     expect(isLastQuestionInSequence(sequence, q34Index)).toBe(true);
   });
 });

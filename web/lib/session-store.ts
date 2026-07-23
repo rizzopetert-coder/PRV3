@@ -6,13 +6,12 @@
 // dimensional vector must never round-trip to the client — only this
 // server-side layer and the Python engine ever see it.
 //
-// Phase 1 scope: linear Q01-Q34 core sequence only. No narrative
-// modulation, no Aptitude addenda (Q35-Q39), no severity follow-ons.
+// Phase 1 scope: linear core sequence (see PHASE_1_QUESTION_SEQUENCE) plus
+// live splices -- Phase 2 checkpoint distinguishers, severity follow-ons,
+// and Q28's Q06-conditional splice are all wired and live. No narrative
+// modulation, no Aptitude addenda (Q35-Q39).
 // next_question_id is a string (question ID), not a positional integer —
-// Phase 2's checkpoint-based dynamic assignment does not require a schema
-// change. Phase 2 checkpoint fields (checkpoint_q11/19/27,
-// question_sequence) are present on DiagnosticSession as of this schema
-// change but not yet wired into session/answer's routing logic.
+// dynamic splice-based assignment does not require a schema change.
 //
 // Session 71 (Claude.ai) Path 1 Phase 1 handoff. Full rationale:
 // prompts/path1-phase1-handoff.md.
@@ -50,19 +49,38 @@ function sessionKey(sessionId: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Phase 1 linear question sequence — 34 positions, sequence_position 1-34
-// from engine/data/questions.py, conditional pairs resolved to their "no
-// significant event" branch (Q03B, Q27B) since Phase 1's intake adapter
-// always sets significant_events=["none"] (Session 71 architecture
-// decision — org_type and significant_events have no locked-spec intake
-// equivalent, confirmed with Pete before this build). Verified against the
-// live QUESTION_LIBRARY's sequence_position field, not hand-derived.
+// Phase 1 linear question sequence — 32 positions, conditional pairs
+// resolved to their "no significant event" branch (Q03B, Q27B) since
+// Phase 1's intake adapter always sets significant_events=["none"]
+// (Session 71 architecture decision — org_type and significant_events have
+// no locked-spec intake equivalent, confirmed with Pete before this build).
+// Verified against the live QUESTION_LIBRARY's sequence_position field, not
+// hand-derived.
+//
+// Q28 and Q31 deliberately excluded (live-session investigation, this
+// session): both were authored with a "fires only if Q06 A or B selected"
+// condition baked directly into their own question_text (a leaked dev
+// annotation, stripped separately in engine/data/questions.py) but neither
+// was ever actually gated -- both fired unconditionally to every session
+// regardless of Q06's answer. Q28 is now wired as a real conditional
+// splice off Q06 (see the answer route) rather than a fixed position, so
+// it no longer belongs in this static template. Q31's own guard ("Q06 A/B
+// AND Q28 not yet asked") is mathematically unreachable under that same
+// single-condition gate -- Q28 fires deterministically whenever the shared
+// condition is true, so Q31's "not yet asked" clause can never be
+// satisfied. Building it as live defensive logic would be correct-looking
+// code that can never produce a different outcome -- the same landmine
+// already avoided once this session (Trajectory, Category A). Q31 is
+// PARKED: content intact in questions.py, not deleted, not spliced, not
+// guarded, no firing logic of any kind. Do not build Q31 firing logic
+// until a real distinguishing condition is found or authored -- not the
+// current self-contradicting one.
 // ---------------------------------------------------------------------------
 export const PHASE_1_QUESTION_SEQUENCE: readonly string[] = [
   "Q01", "Q02", "Q03B", "Q04", "Q05", "Q06", "Q07", "Q08", "Q09", "Q10",
   "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17", "Q18", "Q19", "Q20",
-  "Q21", "Q22", "Q23", "Q24", "Q25", "Q26", "Q27B", "Q28", "Q29", "Q30",
-  "Q31", "Q32", "Q33", "Q34",
+  "Q21", "Q22", "Q23", "Q24", "Q25", "Q26", "Q27B", "Q29", "Q30",
+  "Q32", "Q33", "Q34",
 ];
 
 // ---------------------------------------------------------------------------
@@ -136,6 +154,13 @@ export interface DiagnosticSession {
   // "Emerging" constant. [] (no follow-ons fired) preserves that constant
   // exactly, same as before this wiring existed.
   severity_inputs: SeverityInputPayload[];
+  // Display labels for spliced questions only (question_id -> "[parent]
+  // [letter]", e.g. "6A", "11A", "11B"). Core questions never get an
+  // entry here -- their label is always derivable via
+  // coreQuestionPosition(), which is why it isn't stored. Populated at
+  // each splice site (checkpoint distinguishers, severity follow-ons,
+  // Q28's Q06-conditional splice) in the answer route.
+  question_labels: Record<string, string>;
 }
 
 // Anonymized calibration-relevant record — the only thing that survives
@@ -194,19 +219,83 @@ export function validateIndexInvariant(
 }
 
 // True when a SEVER-## follow-on has already been asked this session (its
-// question_id already appears in answers_log) -- prevents re-splicing the
-// same follow-on twice when two different core questions share one (e.g.
-// Q28 and Q31 both map to SEVER-11, per engine/data/questions.py's own
-// header comment: "Q28a and Q31a share SEVER-11"). Safe against the
-// sequence's own linear ordering: Q28 always precedes Q31 in
-// PHASE_1_QUESTION_SEQUENCE, so SEVER-11's first splice (from Q28) is
-// always answered, and therefore present in answers_log, before Q31 is
-// ever reached.
+// question_id already appears in answers_log). General-purpose guard
+// against re-splicing the same follow-on twice from more than one parent.
+// engine/data/questions.py's own header comment notes SEVER-11 was
+// originally authored with two possible parents (Q28 and Q31) -- with Q31
+// now parked (see PHASE_1_QUESTION_SEQUENCE's comment above) and never
+// spliced, SEVER-11 can in practice only ever fire from Q28 today. Kept as
+// real, general infrastructure rather than removed -- any future
+// multi-parent follow-on would need exactly this check, and it costs
+// nothing to leave in place for a case that isn't live today.
 export function severityFollowOnAlreadyAsked(
   answersLog: AnswerLogEntry[],
   followOnId: string,
 ): boolean {
   return answersLog.some((entry) => entry.question_id === followOnId);
+}
+
+// ---------------------------------------------------------------------------
+// Display labeling (splice-numbering fix)
+//
+// Two categories. Core questions (PHASE_1_QUESTION_SEQUENCE members) get a
+// static "N of TOTAL" position, looked up directly by array index rather
+// than tracked via an incrementing counter -- correct regardless of how
+// many splices occurred earlier in the session. Replaces
+// web/components/DiagnosticFlow.tsx's prior questionNumber + fixed
+// TOTAL_QUESTIONS=34 pattern, which drifted past its denominator the
+// moment 2+ splices occurred in one session (confirmed live: Pete's own
+// session showed "Question 36/40 of 34"; the Part 1 live-verification
+// round trip this session independently reproduced the same pattern,
+// reaching 38 total answers against a fixed 34).
+//
+// Spliced questions (checkpoint distinguishers, severity follow-ons, Q28)
+// get a "[parent][letter]" label instead -- parent = the triggering
+// question's own core position (itself looked up the same way, not
+// hardcoded), letter = firing order among any siblings spliced from the
+// same parent in the same splice call.
+// ---------------------------------------------------------------------------
+
+export const TOTAL_CORE_QUESTIONS = PHASE_1_QUESTION_SEQUENCE.length;
+
+// Returns the 1-indexed static position of a core question, or null if
+// questionId isn't a member of PHASE_1_QUESTION_SEQUENCE (i.e. it's a
+// spliced question -- DIST-##, SEVER-##, or Q28).
+export function coreQuestionPosition(questionId: string): number | null {
+  const index = PHASE_1_QUESTION_SEQUENCE.indexOf(questionId);
+  return index === -1 ? null : index + 1;
+}
+
+// letterIndex is 0-based (0 -> "A", 1 -> "B", ...) -- the firing order of
+// this question among any siblings spliced from the same parent in the
+// same call (checkpoints can splice up to 2 at once; severity follow-ons
+// and Q28 only ever splice one, so letterIndex is always 0 for those).
+export function spliceLabel(parentQuestionId: string, letterIndex: number): string {
+  const parentPosition = coreQuestionPosition(parentQuestionId);
+  const letter = String.fromCharCode(65 + letterIndex);
+  // parentPosition should never be null in practice -- every current splice
+  // mechanism fires from a real core question. Falls back to the raw
+  // parent ID rather than throwing, so a label always renders instead of
+  // crashing the session on an unexpected edge case.
+  return `${parentPosition ?? parentQuestionId}${letter}`;
+}
+
+// A question's resolved display label -- exactly one of the two shapes.
+// Core positions are always derivable (never stored); splice labels are
+// looked up from session.question_labels, populated at splice time.
+export type QuestionLabel =
+  | { kind: "core"; position: number; total: number }
+  | { kind: "spliced"; label: string };
+
+export function resolveQuestionLabel(
+  questionId: string,
+  spliceLabels: Record<string, string>,
+): QuestionLabel {
+  const corePosition = coreQuestionPosition(questionId);
+  if (corePosition !== null) {
+    return { kind: "core", position: corePosition, total: TOTAL_CORE_QUESTIONS };
+  }
+  return { kind: "spliced", label: spliceLabels[questionId] ?? questionId };
 }
 
 // ---------------------------------------------------------------------------
@@ -226,6 +315,7 @@ export async function createSession(intake: IntakeEcho): Promise<DiagnosticSessi
     checkpoint_q27: null,
     question_sequence: [...PHASE_1_QUESTION_SEQUENCE],
     severity_inputs: [],
+    question_labels: {},
   };
 
   await redis.set(sessionKey(session.session_id), JSON.stringify(session), {

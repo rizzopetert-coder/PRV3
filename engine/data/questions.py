@@ -6,9 +6,16 @@ Populated Session 9 from PRV3_Question_Library_Draft (Google Drive).
 Source: Session 2 conversation history, confirmed and locked.
 
 Core sequence: Q01-Q34. Q03 and Q27 have conditional A/B versions.
+Q28 is a live conditional splice off Q06 (fires when A or B is selected),
+  not a fixed position -- see web/lib/session-store.ts's
+  PHASE_1_QUESTION_SEQUENCE. Q31 is PARKED (excluded from the live
+  sequence entirely) -- its authored guard is unreachable under Q28's
+  single-condition gate; see Q31's own inline comment below.
 Severity follow-ons: SEVER-01 through SEVER-13.
   Note: spec originally specified 12 follow-ons; Q32a adds a 13th distinct follow-on.
-  Q28a and Q31a share SEVER-11 (same content, different adaptive parent question).
+  Q28a and Q31a share SEVER-11 (same content, different adaptive parent
+  question) -- with Q31 parked, SEVER-11 can in practice only fire from
+  Q28 today.
 
 dimensional_contributions: seeded from Signal Map tier assignments (Session 11).
 HIGH->0.60, MEDIUM->0.40, LOW/Cluster->0.25 baseline. Asset fields at 0.25.
@@ -536,8 +543,8 @@ _QDATA = [
     ),
     (
         "Q28",
-        "You mentioned [earlier legal/compliance/HR matter]. What changed as a result?"
-        " (Adaptive — fires only if Q06 A or B selected.)",
+        "You mentioned an earlier legal, compliance, or HR matter."
+        " What changed as a result?",
         "forced_choice", 28, "late",
         [
             ("A", "A great deal changed — we made real structural or policy changes and I'm confident we addressed the root cause.", False, None),
@@ -577,10 +584,20 @@ _QDATA = [
         ["the_suppression_filter", "the_lost_map"],
         False,
     ),
+    # PARKED (live-session investigation, this session): Q31 was authored
+    # with a "fires only if Q06 A/B selected AND Q28 not yet asked"
+    # condition, but that guard is mathematically unreachable under Q28's
+    # own single-condition gate (Q28 fires deterministically whenever the
+    # same Q06 answer is true, so "Q28 not yet asked" can never hold).
+    # Excluded from web/lib/session-store.ts's PHASE_1_QUESTION_SEQUENCE
+    # entirely -- not deleted, not spliced, not guarded, no firing logic
+    # of any kind. Do not build firing logic for this question until a
+    # real distinguishing condition is found or authored (not the current
+    # self-contradicting one). See tools/_mob.txt Section 14 for the full
+    # investigation.
     (
         "Q31",
-        "Thinking back to the matter you mentioned earlier — what came out of the process?"
-        " (Adaptive — fires only if Q06 A or B selected and Q28 not yet asked.)",
+        "Thinking back to the matter you mentioned earlier — what came out of the process?",
         "forced_choice", 31, "late",
         [
             ("A", "Isolated incidents — each situation was distinct and unrelated to the others.", False, None),
