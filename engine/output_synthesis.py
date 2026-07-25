@@ -247,7 +247,7 @@ def synthesize(
     signal_map_context: str = "",
     model: str = "claude-sonnet-4-6",
     client=None,
-    timeout: float = 5.0,
+    timeout: float = 15.0,
 ) -> SynthesisResult:
     """
     Call the LLM to generate five synthesis fields for a diagnostic result.
@@ -263,7 +263,11 @@ def synthesize(
       signal_map_context: observable signals for the identified state
       model:              LLM model identifier
       client:             anthropic.Anthropic client instance
-      timeout:            max seconds to wait (5s LOCKED, Gemini Q4, S42)
+      timeout:            max seconds to wait (15.0s LOCKED, re-set this
+                           session -- Gemini-reviewed, Pete-approved,
+                           grounded in real Production latency data (6/6
+                           samples, 7.4-13.6s, avg ~9.8s). Supersedes the
+                           original 5s LOCKED value (Gemini Q4, S42).
 
     On timeout or any exception: returns full SynthesisResult from static
     fallback dict. No partial LLM survival. max_tokens=800 (Gemini Q5, S42).
@@ -283,12 +287,15 @@ def synthesize(
         )
 
     if client is None:
-        # max_retries=1: the 5s timeout (LOCKED, Session 42) is a per-attempt
-        # budget in the SDK's request loop, not a total budget -- left at the
-        # SDK default (2 retries) it silently becomes a ~15s+ giveaway. One
-        # retry is kept deliberately (not 0) for resilience against a single
-        # transient blip; worst case is now ~10.5s, not ~17s.
-        client = _anthropic.Anthropic(max_retries=1)
+        # max_retries=0: timeout raised to 15.0s LOCKED (this session,
+        # Gemini-reviewed, Pete-approved) on real Production latency data
+        # (6/6 samples, 7.4-13.6s). Session 72's max_retries=1 traded a
+        # longer worst case for resilience against a transient blip -- at
+        # 15s that trade no longer holds: one retry means a ~30-40s worst
+        # case, unacceptable UX regardless of Vercel's platform ceiling
+        # (confirmed 300s, Hobby + Fluid compute -- no collision risk).
+        # Fail fast at 15s instead.
+        client = _anthropic.Anthropic(max_retries=0)
 
     prompt = _build_synthesis_prompt(
         state_name=state_name,
@@ -346,7 +353,7 @@ class OutputSynthesisEngine:
         narrative_response: str = "",
         intake: dict | None = None,
         signal_map_context: str = "",
-        timeout: float = 5.0,
+        timeout: float = 15.0,
     ) -> SynthesisResult:
         """Run synthesis and store result for downstream access."""
         self.result = synthesize(
