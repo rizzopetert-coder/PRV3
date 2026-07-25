@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import type { PrivateOutputPayload } from "@/lib/types";
 import PrivateOutput from "@/components/PrivateOutput";
 
@@ -192,6 +193,59 @@ function QuestionView({
 export default function DiagnosticFlow() {
   const [state, setState] = useState<FlowState>({ phase: "intake" });
   const [intake, setIntake] = useState<IntakeFormState>(EMPTY_INTAKE);
+
+  // Additive resume capability (not part of the original Session 71 build):
+  // a ?session=<id> query param, if present, skips the intake form entirely
+  // and jumps straight to that session's current question -- used by
+  // tools/diagnostic_fast_forward.py's Mode 2 and any Pete-held mid-flow
+  // link. resumeAttempted guards against re-firing on re-render (searchParams
+  // is not a stable reference across renders); absent the param, this effect
+  // is a no-op and `state` never leaves its initial { phase: "intake" } --
+  // the normal path every real respondent uses is untouched.
+  const searchParams = useSearchParams();
+  const resumeAttempted = useRef(false);
+
+  async function handleResume(sessionId: string) {
+    setState({ phase: "loading" });
+    try {
+      const res = await fetch("/api/diagnostic/session/resume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
+      if (!res.ok) {
+        setState({
+          phase: "error",
+          message:
+            "This session could not be resumed. It may have expired, already completed, or the link may be invalid.",
+        });
+        return;
+      }
+      const data = await res.json();
+      setState({
+        phase: "question",
+        sessionId,
+        question: data.question,
+        label: data.label,
+      });
+    } catch {
+      setState({ phase: "error", message: ERROR_COPY });
+    }
+  }
+
+  useEffect(() => {
+    if (resumeAttempted.current) return;
+    resumeAttempted.current = true;
+    const sessionId = searchParams.get("session");
+    if (!sessionId) return;
+    // One-time mount check for a URL-driven resume, mirroring handleStart's
+    // own async-fetch-then-setState shape (triggered by mount instead of a
+    // click) -- not a synchronous setState cascade despite the rule's
+    // generic pattern match.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    handleResume(sessionId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleStart() {
     setState({ phase: "loading" });

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   signatures,
   states,
@@ -293,11 +294,32 @@ function SelfSelectionInterface({
 
 // ── Main export ───────────────────────────────────────────────────────────────
 
+// DiagnosticPage is a thin Suspense wrapper -- useSearchParams() (below, for
+// the ?session= resume link) requires a Suspense boundary so a production
+// static prerender of this route doesn't fail the build. Has no effect on
+// the no-param path's rendered output.
 export default function DiagnosticPage() {
-  const [diagnosticState, setDiagnosticState] = useState<DiagnosticState>({
-    path: null,
-    currentPhase: 0,
-  });
+  return (
+    <Suspense fallback={null}>
+      <DiagnosticPageInner />
+    </Suspense>
+  );
+}
+
+function DiagnosticPageInner() {
+  // ?session=<id>, if present, skips the DiagnosticGate entirely and goes
+  // straight to DiagnosticFlow (which itself resumes that session -- see
+  // DiagnosticFlow.tsx) -- true "skip straight to the question view," not
+  // just DiagnosticFlow resuming after a manual gate click. Lazy useState
+  // initializer so this is decided once, on first render, from the URL
+  // actually requested; absent the param, this is byte-identical to the
+  // original { path: null, currentPhase: 0 } default.
+  const searchParams = useSearchParams();
+  const [diagnosticState, setDiagnosticState] = useState<DiagnosticState>(() =>
+    searchParams.get("session")
+      ? { path: "diagnostic", currentPhase: 1 }
+      : { path: null, currentPhase: 0 }
+  );
 
   if (diagnosticState.path === null) {
     return (
