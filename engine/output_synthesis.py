@@ -16,6 +16,7 @@ Spec reference: PRV3_Output_Synthesis_Prompts_v1.0.docx — Session 42.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Optional
 
@@ -128,23 +129,49 @@ class SynthesisResult:
 
 # ── Parse ──────────────────────────────────────────────────────────────────────
 
+_MARKDOWN_FENCE_RE = re.compile(r"^```(?:json)?\s*\n?(.*?)\n?```\s*$", re.DOTALL)
+_JSON_OBJECT_RE = re.compile(r"\{.*\}", re.DOTALL)
+
+
+def _strip_markdown_fence(text: str) -> str:
+    """Strip a ```json / ``` code fence wrapping the response, if present.
+
+    Models sometimes wrap their JSON in a markdown code fence despite the
+    system prompt explicitly instructing otherwise (confirmed live on
+    prv-3 Production, Session 72). Returns text unchanged if no fence
+    is found, so the already-working bare-JSON case is untouched.
+    """
+    match = _MARKDOWN_FENCE_RE.match(text.strip())
+    return match.group(1).strip() if match else text
+
+
 def _parse_synthesis_response(
     response_text: str,
     commercial_name: str = "",
     severity_tier: str | None = None,
 ) -> SynthesisResult:
     """Parse LLM JSON response. Full fallback from static dict on any failure."""
+    cleaned = _strip_markdown_fence(response_text)
     try:
-        data = json.loads(response_text)
+        data = json.loads(cleaned)
     except json.JSONDecodeError as e:
-        fb = get_fallback_synthesis(commercial_name, severity_tier)
-        return SynthesisResult(
-            **fb,
-            synthesis_confidence=0.0,
-            raw_response=response_text,
-            parse_error=str(e),
-            is_fallback=True,
-        )
+        # Second layer: the model may have added prose around the JSON
+        # rather than a clean fence -- extract the outermost {...} block
+        # before giving up. Original error preserved in parse_error either way.
+        match = _JSON_OBJECT_RE.search(cleaned)
+        try:
+            if match is None:
+                raise e
+            data = json.loads(match.group(0))
+        except json.JSONDecodeError:
+            fb = get_fallback_synthesis(commercial_name, severity_tier)
+            return SynthesisResult(
+                **fb,
+                synthesis_confidence=0.0,
+                raw_response=response_text,
+                parse_error=str(e),
+                is_fallback=True,
+            )
 
     liability  = str(data.get("liability_condition_text", "")).strip()
     asset      = str(data.get("asset_resolution_anchor_text", "")).strip()

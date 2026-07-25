@@ -27,6 +27,11 @@ Verifies the 5-field contract migration (S42):
   23. _build_synthesis_prompt: includes narrative_response context
   24. OutputSynthesisEngine: result is None before first call
   25. OutputSynthesisEngine: result stored after synthesize() call
+  26. _parse_synthesis_response: ```json-fenced response parses successfully
+  27. _parse_synthesis_response: bare ```-fenced (no "json" label) response parses
+  28. _parse_synthesis_response: bare JSON still works post-fix (regression guard)
+  29. _parse_synthesis_response: JSON embedded in surrounding prose recovered via regex fallback
+  30. _parse_synthesis_response: genuinely broken fenced response still falls back correctly
 """
 
 import sys
@@ -215,6 +220,87 @@ check(
     "observable_indicators not list: is_fallback stays False",
     not_list_result.is_fallback is False,
     f"got {not_list_result.is_fallback}",
+)
+
+
+# ── 26–30. _parse_synthesis_response: markdown-fence handling (Session 72) ────
+
+fenced_json = json.dumps({
+    "liability_condition_text":     "The decision-making pattern is structural.",
+    "asset_resolution_anchor_text": "Governance discipline is intact.",
+    "framing_text":                 "An organizational pattern is affecting decision-making.",
+    "observable_indicators":        ["Decisions escalate to senior leadership."],
+    "resolution_framing_text":      "Groundwork at this stage produces a clear structural account.",
+    "synthesis_confidence":         0.82,
+})
+
+fenced_with_label = f"```json\n{fenced_json}\n```"
+fenced_parsed = _parse_synthesis_response(fenced_with_label, "Groundwork", "Entrenched")
+
+check(
+    "```json-fenced response: is_fallback False",
+    fenced_parsed.is_fallback is False,
+    f"got {fenced_parsed.is_fallback}, parse_error={fenced_parsed.parse_error!r}",
+)
+check(
+    "```json-fenced response: liability_condition_text populated",
+    fenced_parsed.liability_condition_text == "The decision-making pattern is structural.",
+    f"got {fenced_parsed.liability_condition_text!r}",
+)
+
+fenced_bare = f"```\n{fenced_json}\n```"
+fenced_bare_parsed = _parse_synthesis_response(fenced_bare, "Groundwork", "Entrenched")
+
+check(
+    "bare ```-fenced (no json label) response: is_fallback False",
+    fenced_bare_parsed.is_fallback is False,
+    f"got {fenced_bare_parsed.is_fallback}, parse_error={fenced_bare_parsed.parse_error!r}",
+)
+check(
+    "bare ```-fenced response: framing_text populated",
+    fenced_bare_parsed.framing_text == "An organizational pattern is affecting decision-making.",
+    f"got {fenced_bare_parsed.framing_text!r}",
+)
+
+unfenced_parsed = _parse_synthesis_response(fenced_json, "Groundwork", "Entrenched")
+
+check(
+    "unfenced JSON still works post-fix (regression guard): is_fallback False",
+    unfenced_parsed.is_fallback is False,
+    f"got {unfenced_parsed.is_fallback}, parse_error={unfenced_parsed.parse_error!r}",
+)
+check(
+    "unfenced JSON still works post-fix: resolution_framing_text populated",
+    unfenced_parsed.resolution_framing_text == "Groundwork at this stage produces a clear structural account.",
+    f"got {unfenced_parsed.resolution_framing_text!r}",
+)
+
+embedded_in_prose = f"Here is the result:\n\n{fenced_json}\n\nHope this helps!"
+prose_parsed = _parse_synthesis_response(embedded_in_prose, "Groundwork", "Entrenched")
+
+check(
+    "JSON embedded in prose (no fence): recovered via regex fallback, is_fallback False",
+    prose_parsed.is_fallback is False,
+    f"got {prose_parsed.is_fallback}, parse_error={prose_parsed.parse_error!r}",
+)
+check(
+    "JSON embedded in prose: observable_indicators populated",
+    prose_parsed.observable_indicators == ["Decisions escalate to senior leadership."],
+    f"got {prose_parsed.observable_indicators!r}",
+)
+
+broken_fenced = "```json\nnot actually valid json {{{{\n```"
+broken_parsed = _parse_synthesis_response(broken_fenced, "Groundwork", "Entrenched")
+
+check(
+    "genuinely broken fenced response: is_fallback True (not silently swallowed)",
+    broken_parsed.is_fallback is True,
+    f"got {broken_parsed.is_fallback}",
+)
+check(
+    "genuinely broken fenced response: parse_error populated",
+    len(broken_parsed.parse_error) > 0,
+    "parse_error empty",
 )
 
 
