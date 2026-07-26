@@ -40,6 +40,7 @@ describe("CompletePayload shape (Stage 4 — checkpoint_results addition)", () =
       answered_question_count: 34,
       checkpoint_results: bundle,
       severity_inputs: [],
+      answers_log: [],
     };
 
     expect(payload.checkpoint_results.q11?.fires).toBe(true);
@@ -54,6 +55,7 @@ describe("CompletePayload shape (Stage 4 — checkpoint_results addition)", () =
       answered_question_count: 5,
       checkpoint_results: { q11: null, q19: null, q27: null },
       severity_inputs: [],
+      answers_log: [],
     };
 
     expect(payload.checkpoint_results.q11).toBeNull();
@@ -82,6 +84,7 @@ describe("CompletePayload shape (severity follow-on wiring — Path 1)", () => {
       answered_question_count: 9,
       checkpoint_results: { q11: null, q19: null, q27: null },
       severity_inputs: inputs,
+      answers_log: [],
     };
 
     expect(payload.severity_inputs).toHaveLength(2);
@@ -95,6 +98,7 @@ describe("CompletePayload shape (severity follow-on wiring — Path 1)", () => {
       answered_question_count: 34,
       checkpoint_results: { q11: null, q19: null, q27: null },
       severity_inputs: [],
+      answers_log: [],
     };
 
     expect(payload.severity_inputs).toEqual([]);

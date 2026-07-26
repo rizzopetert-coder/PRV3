@@ -23,9 +23,9 @@ from engine.accumulation import (
 )
 from engine.severity import SeverityEngine, SeverityInput
 from engine.output import OutputEngine
-from engine.contract import SessionData, assemble_output
+from engine.contract import SessionData, assemble_output, _compute_asset_score, _compute_liability_score
 from engine.checkpoint import evaluate_checkpoint, checkpoint_result_from_wire
-from engine.data.states import STATE_PROFILES
+from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.data.questions import QUESTION_LIBRARY
 from engine.data.salience import SALIENCE_PROFILES
 from engine.output_synthesis import OutputSynthesisEngine
@@ -335,12 +335,85 @@ def run_checkpoint(
     }
 
 
+def _build_signal_map_context(
+    answers_log: list,
+    intake_data: IntakeData,
+    winning_state_id: Optional[str],
+) -> str:
+    """
+    Rank every answered core-question option by its resolved contribution's
+    salience-weighted dot product against the winning state's profile
+    (SALIENCE_PROFILES[winning_state_id]), then walk down the ranking and
+    join the first 5-7 options that carry authored AnswerOption.
+    observation_text. Skip-and-backfill: an unauthored option is skipped
+    outright, never padded with a fallback (no raw option_text, no
+    axis-level canned phrasing) -- Session decision, see MOB.
+
+    Each option's REAL resolved per-answer contribution is obtained by
+    replaying accumulate_answer() against a scratch, zero-initialized
+    AccumulationSession rather than reading
+    AnswerOption.dimensional_contributions directly. This is required for
+    correctness, not just consistency: options like Q18-E carry an
+    intake-conditioned _conditional contribution
+    (is_high_hazard-gated, resolved via _apply_axis_modifiers() inside
+    accumulate_answer()) with no single static value to read. Reusing
+    accumulate_answer() wholesale means this ranking can never drift from
+    what the same answer actually contributed to the live session's
+    accumulated_vector.
+
+    Returns "" when answers_log is empty, winning_state_id has no salience
+    profile, or zero ranked options carry authored observation_text yet
+    (the expected state until the copywriting pass populates entries --
+    synthesize() treats "" as "omit signal_map_context from the prompt
+    entirely", not an error).
+    """
+    salience = SALIENCE_PROFILES.get(winning_state_id) if winning_state_id else None
+    if not answers_log or not salience:
+        return ""
+
+    scored: list = []
+    for entry in answers_log:
+        question_id = entry.get("question_id") if isinstance(entry, dict) else None
+        option_id = entry.get("option_id") if isinstance(entry, dict) else None
+        question = QUESTION_LIBRARY.get(question_id)
+        if question is None:
+            continue
+        option = next(
+            (o for o in question.answer_options if o.option_id == option_id),
+            None,
+        )
+        if option is None:
+            continue
+
+        scratch = AccumulationSession()
+        accumulate_answer(scratch, option, intake_data, question_id)
+        contribution = scratch.accumulated_vector
+
+        weight = sum(
+            contribution.get(f, 0.0) * salience.get(f, 0.0)
+            for f in DIMENSIONAL_FIELDS
+        )
+        scored.append((weight, option))
+
+    scored.sort(key=lambda pair: pair[0], reverse=True)
+
+    observations: list = []
+    for _, option in scored:
+        if option.observation_text:
+            observations.append(option.observation_text)
+        if len(observations) == 7:
+            break
+
+    return " ".join(observations)
+
+
 def run_accumulated_engine(
     accumulated_vector: dict,
     intake: dict,
     answered_question_count: int,
     checkpoint_results: Optional[dict] = None,
     severity_inputs: Optional[list] = None,
+    answers_log: Optional[list] = None,
 ) -> dict:
     """
     Path 1 completion orchestrator ("Path A" -- real accumulation-based
@@ -374,6 +447,22 @@ def run_accumulated_engine(
     checkpoint_log in the assembled output reflects what actually happened
     live during the session, instead of the None defaults every session
     fell through to before this parameter existed.
+
+    answers_log (Path 1 only): optional list of {"question_id": str,
+    "option_id": str} dicts, mirroring web/lib/session-store.ts's
+    AnswerLogEntry -- the session's full answer history. None or [] (the
+    default) preserves prior behavior exactly (empty signal_map_context).
+    Used only to build signal_map_context via _build_signal_map_context()
+    below; not accumulated again here (accumulated_vector already reflects
+    every answer by the time this function is called).
+
+    asset_score / liability_score: computed here, before synthesize(), via
+    _compute_asset_score()/_compute_liability_score() -- previously
+    hardcoded 0.0 at this call site even though accumulated_vector already
+    held the real signal needed to compute them (assemble_output() below
+    recomputes asset_score independently for the VII.1 contract; this is a
+    second, earlier call for synthesis's benefit, not a dependency between
+    the two).
     """
     intake_data = _locked_intake_to_engine_intake(intake)
 
@@ -400,15 +489,20 @@ def run_accumulated_engine(
             output_package.private.resolution_family
             if output_package.private else ""
         )
+        asset_obj = _compute_asset_score(accumulated_vector, lead_id)
+        liability_obj = _compute_liability_score(accumulated_vector, lead_id)
+        signal_map_context = _build_signal_map_context(
+            answers_log or [], intake_data, lead_id
+        )
         synthesis_result = OutputSynthesisEngine().synthesize(
             state_name=lead_name,
             severity_tier=severity_result.tier,
             resolution_family=commercial_family,
-            asset_score=0.0,
-            liability_score=0.0,
+            asset_score=asset_obj["score"],
+            liability_score=liability_obj["score"],
             narrative_response="",
             intake=intake,
-            signal_map_context="",
+            signal_map_context=signal_map_context,
         )
 
     checkpoint_results = checkpoint_results or {}

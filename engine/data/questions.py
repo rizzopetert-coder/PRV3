@@ -67,6 +67,17 @@ class AnswerOption:
     # this option's value for that field. See _severity_input_tags below.
     severity_input_mapping: Optional[dict] = None
 
+    # Short third-person observational statement describing what choosing
+    # this option indicates about the organization (e.g. "Respondent
+    # described authority and responsibility boundaries as a recurring
+    # source of friction inside the organization."). Feeds
+    # output_synthesis.py's signal_map_context -- never shown to the
+    # respondent, never the option_text verbatim. None until authored;
+    # see _observation_text_tags below. Content-authoring pass is a
+    # separate, later phase -- this field defaults to None for all options
+    # as of this build.
+    observation_text: Optional[str] = None
+
 
 # -- Question definition -------------------------------------------------------
 
@@ -1673,6 +1684,192 @@ def _build_library():
         "Q18": {"E": ["Safety & Wellbeing_DE"]},
     }
 
+    # Sparse per-option observation_text, wired to AnswerOption.observation_text
+    # at build time -- same pattern as _axis_tags above. Any option not
+    # listed here defaults to None via .get(qid, {}).get(o[0]). Q03B
+    # intentionally excluded -- all four options share an identical flat
+    # 0.25 baseline across every field, no salience-differentiating signal
+    # to author against. The single strength/baseline option per other
+    # question (the asset/healthy case) is deliberately left unauthored
+    # throughout, except where a question has no such option (Q07, Q34).
+    _observation_text_tags: dict = {
+        "Q01": {
+            "B": "Bigger decisions get complicated here even when smaller ones don't.",
+            "C": "Decisions get made, then get reopened. People aren't always sure what's actually final.",
+            "D": "Getting to a decision here takes more effort than it should.",
+            "E": "Decisions happen, but nobody's quite sure who was accountable for making them.",
+        },
+        "Q02": {
+            "B": "HR handles what it needs to, but it isn't operating as a strategic function here.",
+            "C": "HR is thin -- a part-time role or something people share on top of other work.",
+            "D": "There's no dedicated HR function in this organization right now.",
+            "E": "There's an HR function, but its independence is genuinely in question.",
+        },
+        "Q04": {
+            "B": "Whether a concern gets addressed here depends more on the person than the process.",
+            "C": "There's real uncertainty about what actually happens once a concern gets raised.",
+            "D": "People have learned that raising a concern here doesn't produce results.",
+        },
+        "Q05": {
+            "B": "Underperformance gets addressed eventually, but it takes longer than it should.",
+            "C": "Whether someone's held accountable here seems to depend on who they are.",
+            "D": "Underperformance tends to get tolerated rather than addressed.",
+        },
+        "Q06": {
+            "A": "There's been an external legal claim, EEOC charge, or regulatory inquiry.",
+            "B": "There's been a monetary settlement tied to an employment matter.",
+            "C": "Legal counsel has already flagged something here as a liability.",
+            "D": "There's a known practice here that isn't fully compliant, and it hasn't been addressed.",
+        },
+        "Q07": {
+            "A": "Turnover here doesn't concentrate anywhere obvious -- it's spread across the organization.",
+            "B": "Turnover concentrates under specific managers or in specific teams.",
+            "C": "The same roles keep turning over here.",
+            "D": "People tend to leave at a specific point in their career with this organization.",
+        },
+        "Q08": {
+            "B": "Leadership sometimes wonders whether they're getting the full picture.",
+            "C": "Problems tend to reach leadership only once they're already crises.",
+            "D": "What people hear informally here doesn't match what comes through formal channels.",
+        },
+        "Q09": {
+            "B": "People here do their jobs, but they don't really operate as a team.",
+            "C": "There's tension at the senior level that's mostly stayed contained there.",
+            "D": "There's a senior-level dynamic that's broken the surface -- the rest of the organization has noticed.",
+            "E": "There's a real unresolved conflict at the senior level.",
+        },
+        "Q10": {
+            "B": "Some processes here are out of date or inconsistently followed.",
+            "C": "There's a real gap between what's written down and how this organization actually operates.",
+            "D": "This organization runs more on managers' judgment than on documented process.",
+        },
+        "Q11": {
+            "B": "There are visible exceptions here to what this organization says it values.",
+            "C": "Relationships and visibility tend to drive outcomes here more than the stated values do.",
+            "D": "What gets rewarded here and what this organization says it values are two different things, and people know it.",
+            "E": "This organization's values are written down, but they don't really govern anything.",
+        },
+        "Q12": {
+            "B": "Manager quality is uneven here, some strong, some struggling.",
+            "C": "The managers here are capable individually, but they're stretched beyond what they can handle.",
+            "D": "There are specific managers here who are a real problem, not the whole layer.",
+            "E": "Leadership doesn't have great visibility into how managers are actually performing.",
+        },
+        "Q13": {
+            "A": "Leadership knows where this organization is going, but it's not clear the rest of the organization does.",
+            "B": "This organization has been here before. People are waiting to see if this time is actually different.",
+            "C": "The direction here isn't as clear as it should be, and people are operating on different assumptions.",
+            "D": "The direction is clear, but there's real skepticism about whether it'll be followed through on.",
+        },
+        "Q14": {
+            "B": "This organization may be externally competitive, but internal consistency is a real question.",
+            "C": "This organization may be internally consistent, but external competitiveness is a real question.",
+            "D": "There are real concerns here about both compensation consistency and competitiveness.",
+            "E": "This organization hasn't looked closely enough at compensation to know where it stands.",
+        },
+        "Q15": {
+            "B": "Advancement happens here, but the criteria aren't always transparent.",
+            "C": "Advancement here tends to favor certain people or certain teams.",
+            "D": "This organization doesn't have much room for advancement to offer.",
+            "E": "People looking to grow tend to leave before this organization can develop them.",
+        },
+        "Q16": {
+            "B": "This organization is diverse at entry levels, but that changes as people move up.",
+            "C": "This organization has invested in diversity, but it's not clear that's translating into advancement.",
+            "D": "This organization is losing diverse talent before it reaches senior levels, and the reason isn't clear.",
+            "E": "This isn't something this organization has looked at closely enough to answer with confidence.",
+        },
+        "Q17": {
+            "B": "Initiatives here tend to start strong and fade before they take hold.",
+            "C": "People here participate in change, but they don't really invest in it.",
+            "D": "This organization keeps addressing the same problems with different approaches and getting the same result.",
+            "E": "This organization knows what needs to change and talks about it, but doesn't actually move.",
+        },
+        "Q18": {
+            "B": "The policies exist here, but there's real doubt about whether people follow them or report when something's wrong.",
+            "C": "This organization has had incidents that, in hindsight, could have been prevented if people had spoken up earlier.",
+            "D": "Security here is a known gap, people work around protocols rather than follow them.",
+            "E": "Safety and security concerns here have gone unaddressed longer than they should have.",
+        },
+        "Q19": {
+            "B": "There are gaps between what this organization says internally and externally, and people are aware of them.",
+            "C": "There's a real gap here, the external narrative is ahead of the internal reality.",
+            "D": "This organization hasn't really looked at whether its internal and external stories align.",
+        },
+        "Q20": {
+            "B": "There are some areas of overlap or ambiguity in who owns what here.",
+            "C": "There are meaningful gaps here, certain functions or roles don't have clear mandates.",
+            "D": "Authority and responsibility questions are a recurring source of friction here.",
+        },
+        "Q21": {
+            "B": "Decisions here require more back-and-forth than they should.",
+            "C": "Decisions that shouldn't need senior involvement tend to escalate there anyway.",
+            "D": "Decisions get made here and then get reopened without much new information.",
+            "E": "Decisions happen here, but it's unclear who actually has the authority to make them.",
+        },
+        "Q22": {
+            "B": "Some policies here haven't been looked at in a while.",
+            "C": "This organization hasn't reviewed its policies recently, and there's real doubt they reflect current law or practice.",
+            "D": "This organization has run into a situation its policies didn't cover, or didn't cover correctly.",
+            "E": "This organization uses AI tools in people decisions without a clear sense of the implications.",
+        },
+        "Q23": {
+            "B": "This organization is more dependent on certain people than it should be, even if it hasn't been tested yet.",
+            "C": "A past departure exposed how thin this organization was in a role, and recovery was harder than expected.",
+            "D": "There are people here right now whose departure would be genuinely destabilizing.",
+        },
+        "Q24": {
+            "B": "Some high performers here are carrying more than is healthy long term.",
+            "C": "This organization has lost high performers recently in ways that came as a real surprise.",
+            "D": "There are people here running on empty, and it's not clear how to address it.",
+        },
+        "Q25": {
+            "B": "Internal development here is inconsistent, promotion from within happens when it can.",
+            "C": "This organization tends to hire externally for senior roles rather than build the pipeline.",
+            "D": "This organization has invested in developing people, but it hasn't produced what was expected.",
+            "E": "Developing people hasn't really been a priority here.",
+        },
+        "Q26": {
+            "B": "Cross-functional work here happens, but there's more friction at the seams than there should be.",
+            "C": "Cross-functional initiatives here stall predictably at the same points.",
+            "D": "Functions here operate independently, collaboration is the exception rather than the rule.",
+        },
+        "Q27B": {
+            "B": "This organization's culture is drifting, things feel different from what it's been.",
+            "C": "Different parts of this organization seem to have genuinely different cultures.",
+            "D": "There's real uncertainty here about what the culture actually is right now.",
+            "E": "The culture people experience here doesn't match what gets described in recruiting.",
+        },
+        "Q29": {
+            "B": "This organization is diverse at entry levels, but that changes as people move up.",
+            "C": "This organization has invested in diversity, but it's not clear that's translating into advancement.",
+            "D": "This organization is losing diverse talent before it reaches senior levels, and the reason isn't clear.",
+            "E": "This isn't something this organization has looked at closely enough to answer with confidence.",
+        },
+        "Q30": {
+            "B": "There are gaps in what reaches people here, some things land and some don't.",
+            "C": "Communication here is inconsistent, it varies a lot by team or manager.",
+            "D": "There's a real information gap here, people often hear about things informally before it's official.",
+        },
+        "Q32": {
+            "B": "This organization reflects on what happens, but doesn't always follow through on the learning.",
+            "C": "This organization has received consistent feedback, through surveys, consultants, or data, that it's struggled to act on.",
+            "D": "This organization tends to move on from difficult experiences without really examining them.",
+        },
+        "Q33": {
+            "B": "Continuity plans exist here, but there's real doubt they're current or would hold up under pressure.",
+            "C": "This organization has some continuity documentation, but it isn't something actively maintained.",
+            "D": "This organization doesn't have continuity infrastructure in place.",
+        },
+        "Q34": {
+            "A": "This reads as a people issue, specific individuals or relationships are at the center of it.",
+            "B": "This reads as a structural issue, the way this organization is set up is producing the problem.",
+            "C": "This reads as a cultural issue, about how people behave and what this organization accepts.",
+            "D": "This reads as a leadership issue, the will or capability to act on what's known isn't there.",
+            "E": "The problem here is real, but it doesn't cleanly categorize into one clear cause.",
+        },
+    }
+
     # Severity follow-on input tags wired to AnswerOption.severity_input_mapping
     # at build time. Maps each SEVER-01..13 answer option to one of the 5 real
     # SeverityInput fields -- content-authoring pass, Gemini-approved handoff.
@@ -1796,6 +1993,7 @@ def _build_library():
                     severity_follow_on_id=o[3],
                     axis_targets=_axis_tags.get(qid, {}).get(o[0], []),
                     severity_input_mapping=_severity_input_tags.get(qid, {}).get(o[0]),
+                    observation_text=_observation_text_tags.get(qid, {}).get(o[0]),
                 )
                 for o in opts
             ],

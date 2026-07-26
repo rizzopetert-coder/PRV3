@@ -130,9 +130,10 @@ async def complete(request: Request):
         answered_question_count = payload.get("answered_question_count", 0) if isinstance(payload, dict) else 0
         checkpoint_results = payload.get("checkpoint_results", {}) if isinstance(payload, dict) else {}
         severity_inputs = payload.get("severity_inputs", []) if isinstance(payload, dict) else []
+        answers_log = payload.get("answers_log", []) if isinstance(payload, dict) else []
         result = run_accumulated_engine(
             accumulated_vector, intake, answered_question_count, checkpoint_results,
-            severity_inputs,
+            severity_inputs, answers_log,
         )
         return JSONResponse(content=result)
     except KeyError as e:

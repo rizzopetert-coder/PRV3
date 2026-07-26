@@ -102,6 +102,44 @@ def _compute_asset_score(
     }
 
 
+# ── Liability score derivation ──────────────────────────────────────────────
+
+def _compute_liability_score(
+    accumulated_vector: dict,
+    lead_state_id: Optional[str],
+) -> dict:
+    """
+    Derive liability score from the accumulated vector and the leading
+    state's profile. Mirrors _compute_asset_score() exactly, substituting
+    the liability-side fields and the leading state's liability_axes.
+
+    Not part of the VII.1 output contract -- no liability_score field
+    exists there (asset_score does). This exists solely to give
+    OutputSynthesisEngine.synthesize() a real liability_score instead of
+    the hardcoded 0.0 both call sites passed before this fix.
+
+    score: ratio of liability-axis signal to total signal in the
+      accumulated vector. Range 0.0-1.0. Same CALIBRATION TARGET
+      methodology caveat as _compute_asset_score().
+    """
+    liability_fields = [f for f in DIMENSIONAL_FIELDS if f.endswith("_liability")]
+    total_all = sum(accumulated_vector.get(f, 0.0) for f in DIMENSIONAL_FIELDS)
+    total_liability = sum(accumulated_vector.get(f, 0.0) for f in liability_fields)
+
+    score = round(min(total_liability / total_all, 1.0), 4) if total_all > 0.0 else 0.0
+
+    primary_domain = ""
+    if lead_state_id and lead_state_id in STATE_PROFILES:
+        axes = STATE_PROFILES[lead_state_id].liability_axes
+        primary_domain = axes[0] if axes else ""
+
+    return {
+        "score": score,
+        "primary_liability_domain": primary_domain,
+        "condition_text": "",  # LLM-generated at application layer
+    }
+
+
 def _compute_dimension_summary(accumulated_vector: dict) -> dict:
     """
     Per-axis asset ratio: asset_d / (asset_d + liability_d), computed

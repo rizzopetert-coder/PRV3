@@ -1,5 +1,5 @@
 import type { IntakeEcho } from "@/lib/types";
-import type { AccumulatedVector } from "@/lib/session-store";
+import type { AccumulatedVector, AnswerLogEntry } from "@/lib/session-store";
 
 const ENGINE_SECRET = process.env.ENGINE_SECRET ?? "";
 
@@ -266,6 +266,12 @@ export interface CompletePayload {
   // SeverityEngine.add_input() is called for each before scoring. []
   // (never fired) preserves the original constant-"Emerging" behavior.
   severity_inputs: SeverityInputPayload[];
+  // Full answer history -- threaded into run_accumulated_engine()'s
+  // answers_log parameter, used server-side to build signal_map_context
+  // (salience-ranked, authored observation_text only -- see
+  // engine/main.py::_build_signal_map_context()). Session data only,
+  // never option_id-to-weight info computed client-side -- P-03.
+  answers_log: AnswerLogEntry[];
 }
 
 export async function invokeComplete(

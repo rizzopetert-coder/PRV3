@@ -315,6 +315,7 @@ export async function POST(request: NextRequest) {
       q27: session.checkpoint_q27,
     },
     severity_inputs: session.severity_inputs,
+    answers_log: session.answers_log,
   });
 
   const allEngineStates = engineResult.identified_states;
