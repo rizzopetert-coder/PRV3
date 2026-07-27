@@ -1,5 +1,6 @@
 export type BookContentType = "memo" | "methodology" | "case_pattern";
 export type BookVoice = "standard" | "from_the_author";
+export type DimensionKey = "aptitude" | "authority" | "alliance" | "attitude";
 
 export interface BookPiece {
   id: string;
@@ -16,6 +17,10 @@ export interface BookPiece {
   scheduledWeek?: number;
   scheduledDay?: "Tue" | "Thu" | "Fri";
   contentPillar?: "Reframe" | "Pattern Named" | "Case Composited" | "Underneath" | "Foundation";
+  // Permanently optional (Gemini-reviewed, Step 2 closeout) -- not every piece has a state-dimension home, and that's a normal, first-class state, not a gap awaiting population.
+  primaryDimension?: DimensionKey;
+  secondaryDimensions?: DimensionKey[];
+  stateIds?: string[];
 }
 
 export const bookManifest: BookPiece[] = [
@@ -32,6 +37,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 1,
     scheduledDay: "Thu",
     contentPillar: "Pattern Named",
+    primaryDimension: "attitude",
   },
   {
     id: "LIB-021",
@@ -151,6 +157,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 2,
     scheduledDay: "Fri",
     contentPillar: "Pattern Named",
+    stateIds: ["the_overloaded_manager", "the_founders_grip"],
+    secondaryDimensions: ["aptitude", "authority"],
   },
   {
     id: "LIB-013",
@@ -165,6 +173,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 4,
     scheduledDay: "Tue",
     contentPillar: "Pattern Named",
+    primaryDimension: "attitude",
   },
   {
     id: "LIB-015",
@@ -178,6 +187,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 6,
     scheduledDay: "Tue",
     contentPillar: "Pattern Named",
+    primaryDimension: "attitude",
   },
   {
     id: "LIB-016",
@@ -192,6 +202,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 7,
     scheduledDay: "Thu",
     contentPillar: "Pattern Named",
+    primaryDimension: "attitude",
   },
   {
     id: "LIB-017",
@@ -205,6 +216,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 8,
     scheduledDay: "Fri",
     contentPillar: "Pattern Named",
+    primaryDimension: "authority",
   },
   {
     id: "LIB-035",
@@ -254,6 +266,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 3,
     scheduledDay: "Fri",
     contentPillar: "Reframe",
+    primaryDimension: "authority",
   },
   {
     id: "FTA-06",
@@ -267,6 +280,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 8,
     scheduledDay: "Thu",
     contentPillar: "Reframe",
+    primaryDimension: "authority",
   },
   {
     id: "FTA-10",
@@ -280,6 +294,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 12,
     scheduledDay: "Tue",
     contentPillar: "Reframe",
+    primaryDimension: "authority",
   },
   {
     id: "FTA-11",
@@ -293,6 +308,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 12,
     scheduledDay: "Fri",
     contentPillar: "Reframe",
+    primaryDimension: "authority",
   },
   {
     id: "FTA-12",
@@ -306,6 +322,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 13,
     scheduledDay: "Thu",
     contentPillar: "Reframe",
+    primaryDimension: "attitude",
   },
   {
     id: "FTA-01",
@@ -320,6 +337,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 1,
     scheduledDay: "Tue",
     contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["the_untouchable"],
   },
   {
     id: "FTA-02",
@@ -334,6 +353,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 2,
     scheduledDay: "Thu",
     contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["leadership_deafness"],
   },
   {
     id: "FTA-04",
@@ -347,6 +368,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 5,
     scheduledDay: "Fri",
     contentPillar: "Reframe",
+    primaryDimension: "aptitude",
   },
   {
     id: "FTA-05",
@@ -362,6 +384,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 7,
     scheduledDay: "Tue",
     contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["identity_erosion"],
   },
   {
     id: "FTA-07",
@@ -376,6 +400,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 9,
     scheduledDay: "Thu",
     contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["the_basement_standard"],
   },
   {
     id: "FTA-08",
@@ -390,6 +416,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 10,
     scheduledDay: "Fri",
     contentPillar: "Reframe",
+    primaryDimension: "alliance",
+    stateIds: ["silosolation"],
   },
   {
     id: "FTA-09",
@@ -404,6 +432,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 11,
     scheduledDay: "Thu",
     contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["the_broken_compass"],
   },
   {
     id: "FTA-13",
@@ -418,6 +448,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 14,
     scheduledDay: "Tue",
     contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["decision_paralysis"],
   },
   {
     id: "FTA-14",
@@ -432,6 +464,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 15,
     scheduledDay: "Thu",
     contentPillar: "Reframe",
+    primaryDimension: "aptitude",
+    stateIds: ["the_undefined_role"],
   },
   {
     id: "FTA-15",
@@ -446,6 +480,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 16,
     scheduledDay: "Tue",
     contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["the_policy_lag"],
   },
   {
     id: "FTA-16",
@@ -460,6 +496,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 16,
     scheduledDay: "Fri",
     contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["the_lost_map"],
   },
   {
     id: "LIB-018",
@@ -473,6 +511,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 10,
     scheduledDay: "Thu",
     contentPillar: "Pattern Named",
+    primaryDimension: "attitude",
   },
   {
     id: "LIB-019",
@@ -486,6 +525,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 11,
     scheduledDay: "Tue",
     contentPillar: "Pattern Named",
+    primaryDimension: "attitude",
   },
   {
     id: "LIB-022",
@@ -499,6 +539,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 1,
     scheduledDay: "Fri",
     contentPillar: "Case Composited",
+    primaryDimension: "authority",
   },
   {
     id: "LIB-023",
@@ -512,6 +553,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 3,
     scheduledDay: "Tue",
     contentPillar: "Case Composited",
+    primaryDimension: "aptitude",
   },
   {
     id: "LIB-024",
@@ -525,6 +567,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 11,
     scheduledDay: "Fri",
     contentPillar: "Pattern Named",
+    primaryDimension: "attitude",
   },
   {
     id: "LIB-029",
@@ -538,6 +581,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 4,
     scheduledDay: "Thu",
     contentPillar: "Case Composited",
+    primaryDimension: "aptitude",
   },
   {
     id: "LIB-031",
@@ -551,6 +595,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 6,
     scheduledDay: "Thu",
     contentPillar: "Case Composited",
+    primaryDimension: "alliance",
   },
   {
     id: "LIB-032",
@@ -564,6 +609,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 7,
     scheduledDay: "Fri",
     contentPillar: "Case Composited",
+    primaryDimension: "authority",
   },
   {
     id: "LIB-033",
@@ -577,6 +623,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 9,
     scheduledDay: "Tue",
     contentPillar: "Case Composited",
+    primaryDimension: "authority",
   },
   {
     id: "LIB-043",
@@ -591,6 +638,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 15,
     scheduledDay: "Fri",
     contentPillar: "Pattern Named",
+    primaryDimension: "attitude",
   },
   {
     id: "LIB-044",
@@ -606,6 +654,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 16,
     scheduledDay: "Thu",
     contentPillar: "Pattern Named",
+    primaryDimension: "alliance",
+    stateIds: ["silosolation"],
   },
   {
     id: "LIB-045",
@@ -621,6 +671,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 17,
     scheduledDay: "Tue",
     contentPillar: "Pattern Named",
+    primaryDimension: "attitude",
+    stateIds: ["the_broken_compass"],
   },
   {
     id: "LIB-046",
@@ -635,6 +687,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 17,
     scheduledDay: "Fri",
     contentPillar: "Pattern Named",
+    primaryDimension: "authority",
   },
   {
     id: "LIB-047",
@@ -650,6 +703,8 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 18,
     scheduledDay: "Tue",
     contentPillar: "Pattern Named",
+    primaryDimension: "authority",
+    stateIds: ["decision_paralysis"],
   },
   {
     id: "LIB-048",
@@ -665,6 +720,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 18,
     scheduledDay: "Thu",
     contentPillar: "Pattern Named",
+    primaryDimension: "attitude",
   },
   {
     id: "LIB-049",
@@ -680,6 +736,7 @@ export const bookManifest: BookPiece[] = [
     scheduledWeek: 18,
     scheduledDay: "Fri",
     contentPillar: "Pattern Named",
+    primaryDimension: "authority",
   },
   {
     id: "LIB-050",
@@ -717,6 +774,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Three years ago she managed six people and ran the best team in the building. The org chart absorbed the growth. Nobody decided this on purpose — and now you're looking at her numbers wondering what changed about her, when nothing did.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "aptitude",
+    stateIds: ["the_overloaded_manager"],
   },
   {
     id: "FTA-19",
@@ -727,6 +787,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "He was the best individual contributor on the team, so you made him the manager of it. The instincts that made him excellent at the job don't transfer to leading it — and the development you already tried wasn't built for what he actually needed.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "aptitude",
+    stateIds: ["the_unformed_leader"],
   },
   {
     id: "FTA-20",
@@ -737,6 +800,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Ask him what each person on his team needs to grow and he'll tell you, specifically. He's also done nothing about it in eighteen months. Knowing isn't the same as doing — and a manager who can name the gap and doesn't close it is a more complete failure than one who simply doesn't know.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "aptitude",
+    stateIds: ["the_dormant_talent"],
   },
   {
     id: "FTA-21",
@@ -747,6 +813,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "A complaint came in four months ago. Since then, four individually defensible decisions happened to the person who raised it. Nobody has examined them together — and the correction window that's still open right now is closing on a schedule the organization doesn't control.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "alliance",
+    stateIds: ["decision_blindness"],
   },
   {
     id: "FTA-22",
@@ -757,6 +826,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The meeting ends and everyone agreed. Twenty minutes later, in the parking lot, your people are having the real conversation — the one that would have changed the plan if it had happened in the room. Smooth meetings aren't evidence of health. They're often evidence the friction moved somewhere you're not.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["what_nobody_says"],
   },
   {
     id: "FTA-23",
@@ -767,6 +839,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "She did it the right way — used the actual channel, exactly as the handbook described. Nothing happened. Everyone who watched what happened to her report has drawn the same conclusion: the channel doesn't actually do anything.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["heard_and_ignored"],
   },
   {
     id: "FTA-24",
@@ -777,6 +852,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "You stopped telling your manager the full picture a while ago — not because you're hiding anything, but because you watched what happens to bad news once it enters this organization. By the time it reaches someone who could act, it doesn't look like the thing you actually reported.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "alliance",
+    stateIds: ["the_suppression_filter"],
   },
   {
     id: "FTA-25",
@@ -787,6 +865,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Nobody decided this. No policy changed. The words on the wall are the same words that were there three years ago — but a recent survey found ninety-one percent still believe the values are officially in force while seventy-four percent believe leadership doesn't actually operate by them.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["culture_drift"],
   },
   {
     id: "FTA-26",
@@ -797,6 +878,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The first broken commitment got an explanation. The second got a more skeptical one. By now, the next announcement about what's going to be different will land in a room that has already decided not to believe it — and credibility doesn't come back through a better pitch.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["the_burned_credibility"],
   },
   {
     id: "FTA-27",
@@ -807,6 +891,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "She knows she's underpaid. Her manager probably does too. The organization has the market data and has deferred the conversation because fixing it is expensive — and when she leaves, the exit interview will say something true and substantively incomplete.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["pay_exposure"],
   },
   {
     id: "FTA-28",
@@ -817,6 +904,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "You took the job because it looked like the right next step. Six months in, you understand exactly why the last person left. The scope was never realistic — and the organization keeps restaffing the role rather than redesigning it, because restaffing feels like progress and redesigning feels like admitting a mistake.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "aptitude",
+    stateIds: ["built_to_fail"],
   },
   {
     id: "FTA-29",
@@ -827,6 +917,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Everyone already knows this person shouldn't still be on the team. The conversations have happened more than once — in one-on-ones, in hallway asides, in performance reviews that somehow, every cycle, come out fine. The personnel file describes one employee. The conversations describe a completely different one.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "aptitude",
+    stateIds: ["the_paper_tiger"],
   },
   {
     id: "FTA-30",
@@ -837,6 +930,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "There was a complaint, a while back. It went through the right process — investigated, addressed, formally closed. The behavior that caused it didn't move on at all. What got resolved was the paperwork. The condition underneath it was never what anyone addressed.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["the_unsolved_problem"],
   },
   {
     id: "FTA-31",
@@ -847,6 +943,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "There's a practice that people know is wrong. Not unclear or debatable — known, ubiquitous. It continues because the person at the center of it is protected or privileged, and because somewhere along the way it was calculated that the risk of letting it continue was smaller than the discomfort of confronting it.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["the_tolerated_violation"],
   },
   {
     id: "FTA-32",
@@ -857,6 +956,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "There's a safety concern in this organization right now — physical, psychological, operational. People know about it. It hasn't been formally reported. The silence is a separate finding from the hazard itself, and it's the one that will produce the next hazard nobody reports either.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["the_unreported_hazard"],
   },
   {
     id: "FTA-33",
@@ -867,6 +969,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "A known vulnerability exists in this organization. Not hidden, not undiscovered — known, named, and sitting there unaddressed. Not because nobody's seen it. Because the mechanism for closing it has never been used.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["the_unlocked_door"],
   },
   {
     id: "FTA-34",
@@ -877,6 +982,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Two different accounts of what happened are circulating in this organization right now, and both have real authority behind them. The organization isn't operating from one shared understanding of a significant event. It's operating from two, simultaneously — and everyone navigating it has to decide privately which reality they're acting on.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["dueling_narratives"],
   },
   {
     id: "FTA-35",
@@ -887,6 +995,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "This organization has an official account of itself, and it defends that account against evidence. People who contradict the official narrative, even with solid information, don't get heard. They get handled — because the people holding the narrative have more power than the people who can see it's wrong.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["narrative_lock"],
   },
   {
     id: "FTA-36",
@@ -897,6 +1008,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The behaviors that get rewarded here and the behaviors leadership says it values are not the same list. Nobody needed to be told the real criteria. People ran the experiment themselves, watched which behaviors moved careers, and the organization is getting exactly the behavior it's paying for.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["the_wrong_reward"],
   },
   {
     id: "FTA-37",
@@ -907,6 +1021,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "This problem has been solved before. There was a task force, an initiative, a few months of real visible energy — and then, without any single dramatic reversal, everything drifted back to almost exactly where it started. The initiatives aren't failing. They're succeeding at the wrong target.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["groundhog_day"],
   },
   {
     id: "FTA-38",
@@ -917,6 +1034,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Nothing moves without one person's approval, and everyone else has learned to plan around it. The people who couldn't live with the wait already left.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["the_founders_grip"],
   },
   {
     id: "FTA-39",
@@ -927,6 +1047,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The org chart says who has authority. It doesn't say who actually decides anything — and by now you've stopped checking it.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["invisible_influence_architecture"],
   },
   {
     id: "FTA-40",
@@ -937,6 +1060,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Two leaders at the top are in open conflict, and everyone below has already picked a side. The work that needs both of them is exactly the work that isn't happening.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "alliance",
+    stateIds: ["the_fracture"],
   },
   {
     id: "FTA-41",
@@ -947,6 +1073,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "HR reports to the person it's supposed to watch. If you have a concern about them, you already know not to bring it there.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["hr_capture"],
   },
   {
     id: "FTA-42",
@@ -957,6 +1086,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "A leadership change is underway and the whole organization has quietly stalled around it, one reasonable deferral at a time.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["transition_paralysis"],
   },
   {
     id: "FTA-43",
@@ -967,6 +1099,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "There is no functioning HR here. There are employees, obligations, and risk — and nobody whose job it is to manage any of it.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["the_exposed"],
   },
   {
     id: "FTA-44",
@@ -977,6 +1112,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Something consequential is coming and this organization has never done it before. Capable and underprepared aren't the same thing.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["the_uninitiated"],
   },
   {
     id: "FTA-45",
@@ -987,6 +1125,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The policies are current, the training is documented, the forms are signed. None of it describes what actually happens here.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["paper_shield"],
   },
   {
     id: "FTA-46",
@@ -997,6 +1138,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The numbers don't make sense and nobody can explain why. Pay transparency is about to make that a much harder question to dodge.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["the_pay_fog"],
   },
   {
     id: "FTA-47",
@@ -1007,6 +1151,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The rules don't apply the same way to everyone, and people have decoded exactly who they bend for.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "alliance",
+    stateIds: ["the_arbitrary_standard"],
   },
   {
     id: "FTA-48",
@@ -1018,6 +1165,9 @@ export const bookManifest: BookPiece[] = [
     citationIds: ["HC-NYCLL144-2023", "HC-MOBLEY-2024"],
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "authority",
+    stateIds: ["the_unexamined_algorithm"],
   },
   {
     id: "FTA-49",
@@ -1028,6 +1178,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The deal closed months ago. The organization didn't. Two companies are still running under one name.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "alliance",
+    stateIds: ["the_second_close"],
   },
   {
     id: "FTA-50",
@@ -1038,6 +1191,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "You're hitting every number. The exhaustion isn't in any metric the organization is tracking.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["invisible_burnout"],
   },
   {
     id: "FTA-51",
@@ -1048,6 +1204,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "The all-hands still describes who this company used to be. Everyone who's been here long enough knows the gap.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["the_culture_that_wasnt"],
   },
   {
     id: "FTA-52",
@@ -1058,6 +1217,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Certain people move faster here than their output explains. What they have is proximity, not performance.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["the_inside_track"],
   },
   {
     id: "FTA-53",
@@ -1068,6 +1230,9 @@ export const bookManifest: BookPiece[] = [
     teaser: "Representation looks strong at entry level and collapses above a line everyone below it can already see.",
     author: "Principal Resolution",
     status: "published",
+    contentPillar: "Reframe",
+    primaryDimension: "attitude",
+    stateIds: ["the_diversity_ceiling"],
   },
   {
     id: "LIB-052",
@@ -1081,5 +1246,7 @@ export const bookManifest: BookPiece[] = [
     author: "Principal Resolution",
     status: "published",
     contentPillar: "Pattern Named",
+    primaryDimension: "authority",
+    stateIds: ["paper_shield"],
   },
 ];
