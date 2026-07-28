@@ -139,6 +139,13 @@ export interface PrivateOutputPayload {
   // Economic (nullable)
   friction_tax_estimate: FrictionTaxEstimate | null;
 
+  // Cross-Dimensional Cascade Risk -- Shannon-entropy liability dispersion
+  // x session intensity, [0.0, 1.0]. Optional: Path 1 populates this
+  // (web/app/api/diagnostic/session/answer/route.ts); Path B
+  // (web/app/api/result/route.ts) does not yet -- deliberate, separate
+  // decision, not an oversight.
+  cascade_risk?: number;
+
   // Intake echo — all six fields for recognition framing
   intake: IntakeEcho;
 

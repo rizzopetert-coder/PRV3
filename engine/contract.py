@@ -20,7 +20,7 @@ from typing import Optional
 
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.data.jurisdiction import resolve_jurisdiction_flags
-from engine.accumulation import IntakeData, StateRanking
+from engine.accumulation import IntakeData, StateRanking, compute_cascade_risk
 from engine.checkpoint import CheckpointResult
 from engine.narrative import NarrativeExtractionResult
 from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
@@ -420,6 +420,7 @@ def assemble_output(session: SessionData, synthesis_result=None) -> dict:
         "opening_text":          priv.state_name if priv else "",
         "resolution_routing":    priv.resolution_family if priv else "",
         "friction_tax_estimate": priv.friction_tax_estimate if priv else None,
+        "cascade_risk":          compute_cascade_risk(session.accumulated_vector),
     }
 
     # ── shareable_output ──
@@ -525,7 +526,7 @@ _JURISDICTION_FLAGS_FIELDS = {
     "transparency", "retaliation", "procedural", "applied_multipliers",
 }
 _PRIVATE_OUTPUT_FIELDS = {
-    "opening_text", "resolution_routing", "friction_tax_estimate",
+    "opening_text", "resolution_routing", "friction_tax_estimate", "cascade_risk",
 }
 _SHAREABLE_OUTPUT_FIELDS = {
     "attribution_text",

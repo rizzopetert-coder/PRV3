@@ -369,6 +369,8 @@ export async function POST(request: NextRequest) {
     // not set, same as Path B.
     friction_tax_estimate: null,
 
+    cascade_risk: engineResult.private_output.cascade_risk,
+
     intake: session.intake,
 
     dimension_summary: engineResult.dimension_summary,

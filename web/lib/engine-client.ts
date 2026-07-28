@@ -127,6 +127,7 @@ export interface EngineResult {
     opening_text: string;
     resolution_routing: string;
     friction_tax_estimate: number | null;
+    cascade_risk: number;
   };
   shareable_output: {
     attribution_text: string;
