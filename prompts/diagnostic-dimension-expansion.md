@@ -56,11 +56,19 @@ second round verified clean against real ground truth.
 1. **Trajectory / directionality — BUILD.**
    Derive from answers_log early/late-session vector delta + duration_band.
    No new questions, no new vector fields, no new intake.
+   -> DONE. Committed 518545a. Open calibration item:
+      TRAJECTORY_STABILITY_THRESHOLD = 0.20 (engine/accumulation.py) is
+      an explicitly-flagged, unvalidated starting hypothesis --
+      live smoke test showed a real decelerating case crossing it
+      decisively but a real escalating case landing below it. Needs
+      real calibration data before being treated as reliable, not
+      adjusted ad hoc.
 
 2. **Cascade risk — BUILD.**
    Wire existing compute_cascade_risk() into assemble_output() /
    contract.py private_output shape / PrivateOutputPayload (types.ts) /
    answer/route.ts plumbing for Path 1.
+   -> DONE. Committed f4ee405.
 
 3. **Reversibility / structural momentum — PARK as internal synthesis
    context only.**
@@ -78,6 +86,8 @@ second round verified clean against real ground truth.
    signal input; adding causation_pattern-based routing is new surface
    area (new parameter or new function) and is a separate later decision,
    not in this build.
+   -> DONE. Committed 1b75a1b. resolution_families.py routing influence
+      remains split off, not started.
 
 5. **Time-to-consequence / urgency window — DEFER.**
    No real existing signal to derive from (friction_tax has no
