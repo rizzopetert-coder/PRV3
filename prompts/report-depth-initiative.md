@@ -18,6 +18,8 @@ Data the engine already computes and already sends to the browser inside `Privat
 
 **Status: ready to build, no Gemini gate needed.** Pure rendering and payload pass-through — no new data flow, no new architecture, no new LLM call shape.
 
+**Status update: DONE. Committed 3710f37.** All three sub-items built in one commit: framing_text/observable_indicators rendered in PrivateOutput.tsx, secondary_states rendered as closing acknowledgment, primary_asset_domain threaded through both Path 1 (answer/route.ts) and Path B (result/route.ts) plus PrivateOutput.tsx render. One correction to this doc's original framing: primary_asset_domain was not "dropped at the route.ts layer" as originally described -- it had no field on PrivateOutputPayload at all yet, one layer earlier than stated. One scope addition beyond original plan: Path B was included (not originally scoped as Path-1-only, but the value is Path-independent so both routes now carry it). Follow-on fix required: DevDiagnosticPreviewPayload (web/lib/dev-diagnostic-preview.ts) needed a matching field addition, caught by tsc, not proactive discovery -- worth remembering that grep-based searches for PrivateOutputPayload references will miss deliberately-separate matching-shape types.
+
 ---
 
 ## Tier 2 — Wire existing, tested, unused engine functions into the output contract
@@ -28,6 +30,8 @@ Real functions that already exist, are Gemini-reviewed, and are unit-tested, but
 - `compute_cascade_risk()` (`engine/accumulation.py`) — cross-dimensional cascade risk (dispersion × intensity). Same status — defined, tested, never called from `contract.py`, `main.py`, or `output_synthesis.py`.
 
 **Status: needs a Gemini structural review before building.** The underlying math already exists and is already cleared, but adding either to the output contract is genuine output-contract/architecture surface area (new top-level payload fields, new client-facing meaning) — **not yet sent to Gemini.**
+
+**Status update: DONE, ahead of this initiative's own sequencing.** Both compute_causation_pattern() and compute_cascade_risk() were wired into the output contract under a separately-tracked effort (Diagnostic Dimension Expansion, see prompts/diagnostic-dimension-expansion.md), committed 1b75a1b and f4ee405 respectively, before this doc's own "needs a Gemini structural review before building" gate was invoked. This happened because the two initiatives were scoped and tracked independently and the overlap wasn't caught until Report Depth Initiative's Tier 1 build began. No harm done -- Gemini did review compute_cascade_risk() during Diagnostic Dimension Expansion's own process (see that doc), so the substance of the gate was satisfied, just not procedurally through this doc's own sequencing. Flagging for the record: when two plan docs reference the same underlying engine functions, check for overlap before either one's build phase starts, not after.
 
 ---
 
