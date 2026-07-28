@@ -24,7 +24,7 @@ from engine.accumulation import IntakeData, StateRanking, compute_cascade_risk
 from engine.checkpoint import CheckpointResult
 from engine.narrative import NarrativeExtractionResult
 from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
-from engine.output import OutputPackage, OutputRouting
+from engine.output import OutputPackage, OutputRouting, compute_causation_pattern
 
 
 # ── Engine version ─────────────────────────────────────────────────────────────
@@ -421,6 +421,7 @@ def assemble_output(session: SessionData, synthesis_result=None) -> dict:
         "resolution_routing":    priv.resolution_family if priv else "",
         "friction_tax_estimate": priv.friction_tax_estimate if priv else None,
         "cascade_risk":          compute_cascade_risk(session.accumulated_vector),
+        "causation_pattern":     compute_causation_pattern(session.accumulated_vector, routing),
     }
 
     # ── shareable_output ──
@@ -527,6 +528,7 @@ _JURISDICTION_FLAGS_FIELDS = {
 }
 _PRIVATE_OUTPUT_FIELDS = {
     "opening_text", "resolution_routing", "friction_tax_estimate", "cascade_risk",
+    "causation_pattern",
 }
 _SHAREABLE_OUTPUT_FIELDS = {
     "attribution_text",

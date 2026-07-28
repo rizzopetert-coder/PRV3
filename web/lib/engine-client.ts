@@ -128,6 +128,11 @@ export interface EngineResult {
     resolution_routing: string;
     friction_tax_estimate: number | null;
     cascade_risk: number;
+    causation_pattern: {
+      pattern: "single_point" | "diffuse" | "insufficient_signal";
+      dispersion: number;
+      qualified_state_count: number;
+    };
   };
   shareable_output: {
     attribution_text: string;

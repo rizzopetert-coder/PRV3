@@ -146,6 +146,14 @@ export interface PrivateOutputPayload {
   // decision, not an oversight.
   cascade_risk?: number;
 
+  // SPOF vs. Diffuse Causation. Same Path 1 / Path B scoping as
+  // cascade_risk above -- optional, Path B not wired this commit.
+  causation_pattern?: {
+    pattern: "single_point" | "diffuse" | "insufficient_signal";
+    dispersion: number;
+    qualified_state_count: number;
+  };
+
   // Intake echo — all six fields for recognition framing
   intake: IntakeEcho;
 

@@ -370,6 +370,7 @@ export async function POST(request: NextRequest) {
     friction_tax_estimate: null,
 
     cascade_risk: engineResult.private_output.cascade_risk,
+    causation_pattern: engineResult.private_output.causation_pattern,
 
     intake: session.intake,
 
