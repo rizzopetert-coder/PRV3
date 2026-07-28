@@ -154,6 +154,18 @@ export interface PrivateOutputPayload {
     qualified_state_count: number;
   };
 
+  // Trajectory / Directionality. Same Path 1 / Path B scoping as the two
+  // fields above -- optional, Path B not wired this commit. `| null`
+  // included because the raw engine field can genuinely be null (Path B
+  // calls assemble_output() without trajectory_result), passed through
+  // directly from engine-client.ts with no undefined-coercion.
+  trajectory?: {
+    delta: number;
+    dispersion_delta: number;
+    direction: "escalating" | "stable" | "decelerating" | "insufficient_data";
+    duration_band: "0_6mo" | "6_18mo" | "18mo_plus" | null;
+  } | null;
+
   // Intake echo — all six fields for recognition framing
   intake: IntakeEcho;
 

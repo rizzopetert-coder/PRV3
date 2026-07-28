@@ -371,6 +371,7 @@ export async function POST(request: NextRequest) {
 
     cascade_risk: engineResult.private_output.cascade_risk,
     causation_pattern: engineResult.private_output.causation_pattern,
+    trajectory: engineResult.private_output.trajectory,
 
     intake: session.intake,
 

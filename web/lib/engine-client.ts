@@ -133,6 +133,12 @@ export interface EngineResult {
       dispersion: number;
       qualified_state_count: number;
     };
+    trajectory: {
+      delta: number;
+      dispersion_delta: number;
+      direction: "escalating" | "stable" | "decelerating" | "insufficient_data";
+      duration_band: "0_6mo" | "6_18mo" | "18mo_plus" | null;
+    } | null;
   };
   shareable_output: {
     attribution_text: string;

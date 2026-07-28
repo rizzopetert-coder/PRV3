@@ -295,7 +295,7 @@ def _assemble_monitoring_metadata(session: SessionData) -> dict:
     }
 
 
-def assemble_output(session: SessionData, synthesis_result=None) -> dict:
+def assemble_output(session: SessionData, synthesis_result=None, trajectory_result=None) -> dict:
     """
     Assemble the complete VII.1 engine output object from session data.
 
@@ -422,6 +422,7 @@ def assemble_output(session: SessionData, synthesis_result=None) -> dict:
         "friction_tax_estimate": priv.friction_tax_estimate if priv else None,
         "cascade_risk":          compute_cascade_risk(session.accumulated_vector),
         "causation_pattern":     compute_causation_pattern(session.accumulated_vector, routing),
+        "trajectory":            trajectory_result,
     }
 
     # ── shareable_output ──
@@ -528,7 +529,7 @@ _JURISDICTION_FLAGS_FIELDS = {
 }
 _PRIVATE_OUTPUT_FIELDS = {
     "opening_text", "resolution_routing", "friction_tax_estimate", "cascade_risk",
-    "causation_pattern",
+    "causation_pattern", "trajectory",
 }
 _SHAREABLE_OUTPUT_FIELDS = {
     "attribution_text",

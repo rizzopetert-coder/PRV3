@@ -20,6 +20,7 @@ from engine.accumulation import (
     AccumulationSession,
     accumulate_answer,
     rank_states,
+    compute_trajectory,
 )
 from engine.severity import SeverityEngine, SeverityInput
 from engine.output import OutputEngine
@@ -407,6 +408,73 @@ def _build_signal_map_context(
     return " ".join(observations)
 
 
+# Need >=2 real answers per half for a split to mean anything --
+# structural correctness guard, not an empirical calibration constant.
+MIN_ANSWERS_FOR_TRAJECTORY: int = 4
+
+
+def _replay_partial_vector(answers_log_slice: list, intake_data: IntakeData) -> dict:
+    """
+    Replay a slice of answers_log through ONE shared scratch
+    AccumulationSession to get the real accumulated vector for just that
+    slice. Reuses the same accumulate_answer()-against-a-scratch-session
+    technique _build_signal_map_context() uses above, applied differently:
+    one shared scratch session per slice (cumulative across the whole
+    slice), not a fresh scratch per individual answer (which is what
+    _build_signal_map_context() needs to isolate each answer's own
+    contribution in isolation). Duplicated rather than extracted into a
+    shared helper -- same precedent as the STATE_RESOLUTION_FAMILY
+    triplication elsewhere in this codebase, per the standing rule
+    against refactoring adjacent code mid-build.
+    """
+    scratch = AccumulationSession()
+    for entry in answers_log_slice:
+        question_id = entry.get("question_id") if isinstance(entry, dict) else None
+        option_id = entry.get("option_id") if isinstance(entry, dict) else None
+        question = QUESTION_LIBRARY.get(question_id)
+        if question is None:
+            continue
+        option = next(
+            (o for o in question.answer_options if o.option_id == option_id),
+            None,
+        )
+        if option is None:
+            continue
+        accumulate_answer(scratch, option, intake_data, question_id)
+    return scratch.accumulated_vector
+
+
+def _compute_trajectory_context(
+    answers_log: list,
+    intake_data: IntakeData,
+    duration_band: Optional[str],
+) -> dict:
+    """
+    Split answers_log by position (first half vs. second half of the
+    answered sequence) and diff the two halves' independently-replayed
+    vectors via compute_trajectory(). Below MIN_ANSWERS_FOR_TRAJECTORY,
+    returns the defined "insufficient_data" default rather than a
+    degenerate/misleading delta -- same convention as
+    compute_causation_pattern()'s "insufficient_signal" and
+    compute_cascade_risk()'s 0.0-on-no-signal. duration_band is still
+    passed through even in this case -- it is independently real data,
+    unrelated to whether the intra-session split was viable.
+    """
+    if len(answers_log) < MIN_ANSWERS_FOR_TRAJECTORY:
+        return {
+            "delta": 0.0,
+            "dispersion_delta": 0.0,
+            "direction": "insufficient_data",
+            "duration_band": duration_band,
+        }
+
+    midpoint = len(answers_log) // 2
+    early_vector = _replay_partial_vector(answers_log[:midpoint], intake_data)
+    late_vector = _replay_partial_vector(answers_log[midpoint:], intake_data)
+
+    return compute_trajectory(early_vector, late_vector, duration_band)
+
+
 def run_accumulated_engine(
     accumulated_vector: dict,
     intake: dict,
@@ -505,6 +573,12 @@ def run_accumulated_engine(
             signal_map_context=signal_map_context,
         )
 
+    duration_band = next(
+        (si.get("duration_band") for si in (severity_inputs or []) if si.get("duration_band")),
+        None,
+    )
+    trajectory_result = _compute_trajectory_context(answers_log or [], intake_data, duration_band)
+
     checkpoint_results = checkpoint_results or {}
     session_data = SessionData(
         session_id=SessionData.new_session_id(),
@@ -518,4 +592,4 @@ def run_accumulated_engine(
         checkpoint_q27=checkpoint_result_from_wire("Q27", checkpoint_results.get("q27")),
     )
 
-    return assemble_output(session_data, synthesis_result=synthesis_result)
+    return assemble_output(session_data, synthesis_result=synthesis_result, trajectory_result=trajectory_result)

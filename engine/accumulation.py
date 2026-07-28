@@ -427,6 +427,89 @@ def compute_cascade_risk(accumulated_vector: dict) -> float:
     return max(0.0, round(dispersion * intensity, 4))
 
 
+# Bucketing threshold for compute_trajectory()'s direction classification.
+# CALIBRATION TARGET -- starting hypothesis, same order of magnitude as
+# WEAK_DAMPED_THRESHOLD / MODERATE_PROMINENCE_DELTA elsewhere in this
+# codebase. Not yet data-validated.
+TRAJECTORY_STABILITY_THRESHOLD: float = 0.20  # CALIBRATION TARGET
+
+
+def compute_trajectory(
+    early_vector: dict,
+    late_vector: dict,
+    duration_band: Optional[str] = None,
+) -> dict:
+    """
+    Trajectory / Directionality -- Diagnostic Dimension Expansion Step 3.
+    Derived output only: zero new signal collection, zero modification to
+    the 8-field accumulation model or rank_states(). A framing input for
+    output_synthesis, not a new scored dimension -- same convention as
+    Cascade Risk and SPOF/Diffuse Causation.
+
+    early_vector / late_vector: independently-accumulated vectors from the
+    first half and second half of a session's answered-question sequence
+    (position-based split -- answers_log carries no timestamp field, so
+    "early/late" means early/late in answer order, not wall-clock time).
+    Each is its own scratch accumulation, not cumulative-through-midpoint
+    vs. final -- this measures whether the session's SECOND HALF alone
+    carried more or less liability signal than its FIRST HALF, not
+    whether a running total grew (which contributions being signed would
+    make a non-monotonic, misleading read anyway).
+
+    delta -- sum(late 4 liability fields) - sum(early 4 liability fields),
+    RAW values, not clamped to 0.0 the way compute_liability_dispersion()
+    clamps (that clamp exists because entropy is undefined over negative
+    "probabilities" -- a requirement specific to entropy math, not a
+    general policy here). Positive: liability signal denser in the
+    session's second half than its first. Negative: denser in the first
+    half. Same DIMENSIONAL_FIELDS liability-only filtering Cascade Risk
+    and compute_liability_dispersion() already use.
+
+    dispersion_delta -- compute_liability_dispersion(late_vector) -
+    compute_liability_dispersion(early_vector), the identical Shannon-
+    entropy term Cascade Risk and SPOF/Diffuse Causation already use,
+    reused rather than reinvented. Positive: liability spread across more
+    axes in the second half than the first (broadening). Negative:
+    concentrated into fewer axes in the second half (narrowing).
+
+    direction -- delta bucketed against TRAJECTORY_STABILITY_THRESHOLD:
+      delta >=  threshold -> "escalating"
+      delta <= -threshold -> "decelerating"
+      otherwise            -> "stable"
+
+    duration_band -- passthrough only, not blended into delta/direction by
+    any formula. Real value ("0_6mo" | "6_18mo" | "18mo_plus") only when a
+    severity follow-on collecting it fired this session; None otherwise.
+    Reported alongside the intra-session read, not fused with it.
+
+    Spec reference: Diagnostic Dimension Expansion decision record
+    (prompts/diagnostic-dimension-expansion.md), Candidate 1.
+    """
+    liability_fields = [f for f in DIMENSIONAL_FIELDS if f.endswith("_liability")]
+    early_sum = sum(early_vector.get(f, 0.0) for f in liability_fields)
+    late_sum = sum(late_vector.get(f, 0.0) for f in liability_fields)
+    delta = round(late_sum - early_sum, 4)
+
+    dispersion_delta = round(
+        compute_liability_dispersion(late_vector) - compute_liability_dispersion(early_vector),
+        4,
+    )
+
+    if delta >= TRAJECTORY_STABILITY_THRESHOLD:
+        direction = "escalating"
+    elif delta <= -TRAJECTORY_STABILITY_THRESHOLD:
+        direction = "decelerating"
+    else:
+        direction = "stable"
+
+    return {
+        "delta": delta,
+        "dispersion_delta": dispersion_delta,
+        "direction": direction,
+        "duration_band": duration_band,
+    }
+
+
 def rank_states(
     accumulated_vector: dict,
     answered_question_count: int,
