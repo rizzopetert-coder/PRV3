@@ -171,6 +171,16 @@ export interface PrivateOutputPayload {
 
   // Per-axis asset ratio for the live-mode ConstellationField visualization.
   dimension_summary: DimensionSummary;
+
+  // Report Depth Initiative Tier 1: engine-computed via
+  // _compute_asset_score(), already present on EngineResult.asset_score --
+  // was never threaded through to this payload (no field existed here at
+  // all, not just unused). Required, not optional: unlike
+  // cascade_risk/causation_pattern/trajectory this is NOT Path-dependent --
+  // both PrivateOutputPayload builders (answer/route.ts, result/route.ts)
+  // populate it unconditionally from the same always-present EngineResult
+  // field, so there is no path left where it could be missing.
+  primary_asset_domain: string;
 }
 
 // ---------------------------------------------------------------------------

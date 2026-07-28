@@ -26,7 +26,8 @@ function validatePayload(body: unknown): body is DevDiagnosticPreviewPayload {
     typeof b.resolution_family === "string" &&
     typeof b.resolution_routing === "string" &&
     typeof b.intake === "object" && b.intake !== null &&
-    typeof b.dimension_summary === "object" && b.dimension_summary !== null
+    typeof b.dimension_summary === "object" && b.dimension_summary !== null &&
+    typeof b.primary_asset_domain === "string"
   );
 }
 

@@ -43,6 +43,9 @@ export default function PrivateOutput({
   const liabilityText = payload.synthesis.liability_condition_text;
   const anchorText = payload.synthesis.asset_resolution_anchor_text;
   const resolutionFramingText = payload.synthesis.resolution_framing_text;
+  const framingText = payload.synthesis.framing_text;
+  const observableIndicators = payload.synthesis.observable_indicators ?? [];
+  const primaryAssetDomain = payload.primary_asset_domain;
 
   // Block 2 uses resolution_routing as fallback when liability_condition_text is empty.
   // Block 4 must not repeat it if it was already used in block 2.
@@ -105,11 +108,48 @@ export default function PrivateOutput({
       </div>
       <Rule />
 
-      {/* Block 3 — Asset resolution anchor (omit entirely if empty) */}
-      {anchorText && (
+      {/* Block 2b — Framing text (omit entirely if empty) */}
+      {framingText && (
         <>
           <div className="py-4">
-            <p className="text-[13px] text-gray-500">{anchorText}</p>
+            <p className="text-sm leading-[1.65] text-ink">{framingText}</p>
+          </div>
+          <Rule />
+        </>
+      )}
+
+      {/* Block 2c — Observable indicators (omit entirely if empty) */}
+      {observableIndicators.length > 0 && (
+        <>
+          <div className="py-4">
+            <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+              Observable indicators
+            </p>
+            <ul className="space-y-1">
+              {observableIndicators.map((indicator, i) => (
+                <li key={i} className="flex gap-2 text-[13px] leading-[1.6] text-gray-500">
+                  <span className="text-gray-300 shrink-0" aria-hidden>—</span>
+                  <span>{indicator}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <Rule />
+        </>
+      )}
+
+      {/* Block 3 — Asset resolution anchor + primary asset domain (omit entirely if both empty) */}
+      {(anchorText || primaryAssetDomain) && (
+        <>
+          <div className="py-4">
+            {primaryAssetDomain && (
+              <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+                Primary asset domain: {primaryAssetDomain}
+              </p>
+            )}
+            {anchorText && (
+              <p className="text-[13px] text-gray-500">{anchorText}</p>
+            )}
           </div>
           <Rule />
         </>
@@ -131,6 +171,20 @@ export default function PrivateOutput({
           )
         )}
       </div>
+
+      {/* Block 4b — Secondary states acknowledgment (omit entirely if none) */}
+      {payload.secondary_states.length > 0 && (
+        <div className="py-4">
+          <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+            Also present
+          </p>
+          <p className="text-[13px] text-gray-500">
+            {payload.secondary_states
+              .map((s) => `${s.name} (${(s.weight * 100).toFixed(0)}%)`)
+              .join(", ")}
+          </p>
+        </div>
+      )}
 
       {/* Block 5 — ShareButton */}
       {enableSharing && (

@@ -42,6 +42,7 @@ export interface DevDiagnosticPreviewPayload {
   friction_tax_estimate: FrictionTaxEstimate | null;
   intake: IntakeEcho;
   dimension_summary: DimensionSummary;
+  primary_asset_domain: string;
 }
 
 const DEV_PREVIEW_TTL_SECONDS = 24 * 60 * 60; // 24h -- disposable test data, not a real result

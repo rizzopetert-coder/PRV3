@@ -376,6 +376,7 @@ export async function POST(request: NextRequest) {
     intake: session.intake,
 
     dimension_summary: engineResult.dimension_summary,
+    primary_asset_domain: engineResult.asset_score.primary_asset_domain,
   };
 
   // Transition Rule — strips identifiable data the moment status becomes

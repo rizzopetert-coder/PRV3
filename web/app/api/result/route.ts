@@ -221,6 +221,7 @@ export async function POST(request: NextRequest) {
     intake: mapIntake(engineResult.intake as Record<string, unknown>),
 
     dimension_summary: engineResult.dimension_summary,
+    primary_asset_domain: engineResult.asset_score.primary_asset_domain,
   };
 
   // ShareableOutput is NEVER serialized into this response.
