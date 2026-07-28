@@ -40,8 +40,9 @@ _DEFAULT_SEVERITY_SCALAR: float = 1.0
 
 
 # ── Org size bands ─────────────────────────────────────────────────────────────
-# Maps headcount intake strings to annual revenue proxy bands used in
-# friction tax computation.
+# Maps headcount intake strings to annual payroll proxy bands used in
+# friction tax computation. Payroll basis, not revenue -- see
+# prompts/friction-tax-unit-decision.md.
 # CALIBRATION TARGET — all band_low values require population from source research.
 
 _ORG_SIZE_BANDS: dict[str, dict] = {
@@ -71,7 +72,8 @@ _FALLBACK_BAND: dict = {"label": "Unknown", "band_low": None}
 
 
 # ── State multiplier table ─────────────────────────────────────────────────────
-# Per-state friction multiplier applied to the org size band_low.
+# Per-state friction multiplier applied to the org size band_low (payroll
+# basis, not revenue -- see prompts/friction-tax-unit-decision.md).
 # All values CALIBRATION TARGET — populated from source research.
 # Keys: state_id strings matching engine/data/states.py registry (47 states).
 
