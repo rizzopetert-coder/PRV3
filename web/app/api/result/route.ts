@@ -190,6 +190,7 @@ export async function POST(request: NextRequest) {
         framing_text:                 engSynthesis.framing_text,
         observable_indicators:        engSynthesis.observable_indicators,
         resolution_framing_text:      engSynthesis.resolution_framing_text,
+        headline:                     engSynthesis.headline,
         synthesis_confidence:         engSynthesis.synthesis_confidence,
         is_fallback:                  engSynthesis.is_fallback,
       }
@@ -199,6 +200,7 @@ export async function POST(request: NextRequest) {
         framing_text:                 "",
         observable_indicators:        [],
         resolution_framing_text:      "",
+        headline:                     "",
         synthesis_confidence:         0.0,
         is_fallback:                  true,
       };

@@ -99,6 +99,7 @@ export interface SynthesisFields {
   framing_text:                 string;
   observable_indicators:        string[];
   resolution_framing_text:      string;
+  headline:                     string;
   synthesis_confidence:         number;
   is_fallback:                  boolean;
 }

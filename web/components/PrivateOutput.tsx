@@ -46,6 +46,7 @@ export default function PrivateOutput({
   const framingText = payload.synthesis.framing_text;
   const observableIndicators = payload.synthesis.observable_indicators ?? [];
   const primaryAssetDomain = payload.primary_asset_domain;
+  const headline = payload.synthesis.headline;
 
   // Block 2 uses resolution_routing as fallback when liability_condition_text is empty.
   // Block 4 must not repeat it if it was already used in block 2.
@@ -80,6 +81,13 @@ export default function PrivateOutput({
           {SEVERITY_ANCHOR[payload.severity]}
         </p>
       </div>
+
+      {/* Block 1a — Headline (omit entirely if empty) */}
+      {headline && (
+        <div className="pb-4">
+          <p className="text-base font-medium leading-relaxed text-ink">{headline}</p>
+        </div>
+      )}
 
       {/* Block 1b — Weighted dimensional shape (live mode). Placeholder
           mock weights from Stage 3's scaffolding replaced with the real

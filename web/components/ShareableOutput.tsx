@@ -65,6 +65,18 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
       </div>
       <Rule />
 
+      {/* Block 2b — Headline (omit entirely if empty) */}
+      {payload.synthesis.headline && (
+        <>
+          <div className="py-4">
+            <p className="text-base font-medium leading-relaxed text-charcoal">
+              {payload.synthesis.headline}
+            </p>
+          </div>
+          <Rule />
+        </>
+      )}
+
       {/* Block 3 — Framing text */}
       <div className="py-4">
         <p className="text-sm leading-[1.65] text-charcoal">
