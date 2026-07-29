@@ -1,11 +1,11 @@
 """
 PRV3 Output Layer — Output Synthesis Unit Tests
 
-Verifies the 5-field contract migration (S42):
+Verifies the 5-field contract migration (S42), now 6 fields (Tier 4 headline):
   1.  SynthesisResult: 5 content fields + confidence + is_fallback + metadata
   2.  SynthesisResult: is_fallback defaults to False
   3.  SynthesisResult: observable_indicators accepts list
-  4.  _parse_synthesis_response: valid 5-field JSON → correct SynthesisResult
+  4.  _parse_synthesis_response: valid 6-field JSON → correct SynthesisResult
   5.  _parse_synthesis_response: synthesis_confidence correct
   6.  _parse_synthesis_response: invalid JSON → full fallback, is_fallback=True
   7.  _parse_synthesis_response: parse error populates parse_error field
@@ -18,7 +18,7 @@ Verifies the 5-field contract migration (S42):
   14. synthesize: coherent fallback has is_fallback=True
   15. synthesize: fallback observable_indicators is a list
   16. OUTPUT_SYNTHESIS_SYSTEM_PROMPT: no old service names
-  17. OUTPUT_SYNTHESIS_SYSTEM_PROMPT: 5-field JSON output format required
+  17. OUTPUT_SYNTHESIS_SYSTEM_PROMPT: 6-field JSON output format required
   18. OUTPUT_SYNTHESIS_SYSTEM_PROMPT: no semicolons constraint present
   19. OUTPUT_SYNTHESIS_SYSTEM_PROMPT: brevity constraint present
   20. _build_synthesis_prompt: includes state_name
@@ -68,7 +68,7 @@ def check(label, condition, detail=""):
 
 
 print("=" * 64)
-print("PRV3 Output Synthesis — Unit Tests (5-field contract, S42)")
+print("PRV3 Output Synthesis — Unit Tests (6-field contract, S42 + Tier 4 headline)")
 print("=" * 64)
 
 
@@ -80,6 +80,7 @@ result = SynthesisResult(
     framing_text="test framing",
     observable_indicators=["one", "two"],
     resolution_framing_text="test resolution",
+    headline="test headline",
     synthesis_confidence=0.75,
 )
 
@@ -108,6 +109,7 @@ valid_json = json.dumps({
     "framing_text":                 "An organizational pattern is affecting decision-making.",
     "observable_indicators":        ["Decisions escalate to senior leadership.", "Projects stall."],
     "resolution_framing_text":      "Groundwork at this stage produces a clear structural account.",
+    "headline":                     "The pattern has become part of how this organization runs.",
     "synthesis_confidence":         0.82,
 })
 parsed = _parse_synthesis_response(valid_json, "Groundwork", "Entrenched")
@@ -207,6 +209,7 @@ not_list_json = json.dumps({
     "framing_text":                 "Some framing text.",
     "observable_indicators":        "should be a list not a string",
     "resolution_framing_text":      "Some resolution text.",
+    "headline":                     "The pattern has become part of how this organization runs.",
     "synthesis_confidence":         0.6,
 })
 not_list_result = _parse_synthesis_response(not_list_json, "Groundwork", "Entrenched")
@@ -231,6 +234,7 @@ fenced_json = json.dumps({
     "framing_text":                 "An organizational pattern is affecting decision-making.",
     "observable_indicators":        ["Decisions escalate to senior leadership."],
     "resolution_framing_text":      "Groundwork at this stage produces a clear structural account.",
+    "headline":                     "The pattern has become part of how this organization runs.",
     "synthesis_confidence":         0.82,
 })
 
@@ -312,12 +316,13 @@ REQUIRED_KEYS = {
     "framing_text",
     "observable_indicators",
     "resolution_framing_text",
+    "headline",
 }
 
 fb_entry = get_fallback_synthesis("Groundwork", "Entrenched")
 
 check(
-    "get_fallback_synthesis: returns dict with 5 correct keys",
+    "get_fallback_synthesis: returns dict with 6 correct keys",
     set(fb_entry.keys()) == REQUIRED_KEYS,
     f"got keys: {set(fb_entry.keys())}",
 )
@@ -391,12 +396,12 @@ for sn in OLD_SERVICE_NAMES:
     )
 
 check(
-    "System prompt: 5-field JSON output format — liability_condition_text",
+    "System prompt: 6-field JSON output format — liability_condition_text",
     "liability_condition_text" in OUTPUT_SYNTHESIS_SYSTEM_PROMPT,
     "field not found in prompt",
 )
 check(
-    "System prompt: 5-field JSON output format — synthesis_confidence",
+    "System prompt: 6-field JSON output format — synthesis_confidence",
     "synthesis_confidence" in OUTPUT_SYNTHESIS_SYSTEM_PROMPT,
     "field not found in prompt",
 )

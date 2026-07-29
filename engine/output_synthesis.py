@@ -2,7 +2,7 @@
 PRV3 Scoring Engine — Output Layer
 Output Synthesis
 
-Generates five synthesis fields from a diagnosed organizational state.
+Generates six synthesis fields from a diagnosed organizational state.
 Single LLM call. Returns SynthesisResult. On timeout or parse failure,
 returns full SynthesisResult from fallback_synthesis.py static dict.
 No partial LLM survival — coherence over completeness (Gemini Q2, S42).
@@ -61,7 +61,7 @@ the principal's specific responses is not good enough.
 
 FIELDS
 
-liability_condition_text (private — principal only):
+liability_condition_text (private, principal only):
 What is happening in this organization. Clinical and direct. 2-4 sentences.
 Draw from narrative_response and intake. Name what they described. Do not
 restate the state name. Describe what it is doing inside their organization right now.
@@ -70,26 +70,51 @@ Severity calibration:
   Entrenched: describe what has become normal and what that normalization is costing.
   Endemic: describe what the organization has organized itself around.
 
-asset_resolution_anchor_text (private — principal only):
+asset_resolution_anchor_text (private, principal only):
 What strength exists to build from. 1-3 sentences. Draw from asset_score and intake.
 Not reassurance. An honest account of what is working. If asset_score is low, say so
 plainly. Do not manufacture strength the diagnostic did not find.
 
-framing_text (shareable — professional audience):
+framing_text (shareable, professional audience):
 Professional framing for a board member or senior leader. 2-3 sentences.
 Non-confrontational. No liability language. Behavioral and operational, not accusatory.
 Creates conditions for a conversation, not a verdict.
 
-observable_indicators (shareable — JSON array of strings):
+observable_indicators (shareable, JSON array of strings):
 3-5 behavioral and operational signals from signal_map_context. Things visible and
 verifiable by someone outside the principal's team. Specific enough to be
 recognizable, general enough for a shared document. No accusatory framing.
 Return as JSON array of strings.
 
-resolution_framing_text (shareable — professional audience):
+resolution_framing_text (shareable, professional audience):
 2-3 sentences describing the resolution pathway in organizational benefit language.
 No liability framing. Reference the resolution_family name naturally. Forward-facing.
 Do not name specific service inclusions or make guarantees.
+
+headline (private and shareable, board-safe):
+One sentence, 8-14 words. Non-confrontational, behavioral, and
+operational. Not a verdict, not accusatory, and no liability language.
+Uses the same "conditions for a conversation, not a verdict" register as
+framing_text. Draw from the identified state's primary dimension and
+current severity tier, without naming the state directly or using
+liability-specific terms. Should read as the sentence a principal or
+board member remembers after closing the report. Not a teaser, not a
+question, and not marketing copy.
+No exclamation points. No loosely-used superlatives, such as "worst,"
+"biggest," or "critical."
+Severity calibration (behavioral framing only, each tier must use
+genuinely different framing language, not shared words):
+  Emerging: frame the pattern as newly surfacing, something people are
+  just starting to notice. Words like "beginning," "surfacing," or
+  "starting to."
+  Entrenched: frame the pattern as settled and absorbed into how people
+  already work around it. Words like "settled," "routine," or "the way
+  things work now."
+  Endemic: frame the pattern as inseparable from daily operations, not
+  something anyone would think to name anymore. Words like "built into,"
+  "part of how things run," or "the normal way of operating."
+Do not reuse the same framing word or phrase across two tiers in the same
+session.
 
 REQUIRED OUTPUT FORMAT
 
@@ -101,6 +126,7 @@ Return only this JSON structure. No preamble. No explanation. No markdown.
   "framing_text": "<2-3 sentences>",
   "observable_indicators": ["<indicator>", "<indicator>", "<indicator>"],
   "resolution_framing_text": "<2-3 sentences>",
+  "headline": "<8-14 words>",
   "synthesis_confidence": <float 0.0-1.0>
 }\
 """
@@ -111,7 +137,7 @@ Return only this JSON structure. No preamble. No explanation. No markdown.
 @dataclass
 class SynthesisResult:
     """
-    Output of one synthesis call. Five content fields plus metadata.
+    Output of one synthesis call. Six content fields plus metadata.
     All string fields are empty string on failure. observable_indicators is
     empty list on failure. is_fallback=True when LLM call failed or response
     was unparseable.
@@ -121,6 +147,7 @@ class SynthesisResult:
     framing_text:                 str
     observable_indicators:        list
     resolution_framing_text:      str
+    headline:                     str
     synthesis_confidence:         float
     raw_response:                 str  = ""
     parse_error:                  str  = ""
@@ -181,9 +208,10 @@ def _parse_synthesis_response(
         indicators = []
     indicators = [str(i) for i in indicators]
     resolution = str(data.get("resolution_framing_text", "")).strip()
+    headline   = str(data.get("headline", "")).strip()
     confidence = float(data.get("synthesis_confidence", 0.0))
 
-    if not liability or not framing or not resolution:
+    if not liability or not framing or not resolution or not headline:
         fb = get_fallback_synthesis(commercial_name, severity_tier)
         return SynthesisResult(
             **fb,
@@ -199,6 +227,7 @@ def _parse_synthesis_response(
         framing_text=framing,
         observable_indicators=indicators,
         resolution_framing_text=resolution,
+        headline=headline,
         synthesis_confidence=confidence,
         raw_response=response_text,
     )
@@ -232,7 +261,7 @@ def _build_synthesis_prompt(
     ]
     if signal_map_context:
         parts.append(f"signal_map_context: {signal_map_context}")
-    parts.append("\nGenerate all five synthesis fields for this diagnostic result.")
+    parts.append("\nGenerate all six synthesis fields for this diagnostic result.")
     return "\n".join(parts)
 
 
@@ -250,7 +279,7 @@ def synthesize(
     timeout: float = 15.0,
 ) -> SynthesisResult:
     """
-    Call the LLM to generate five synthesis fields for a diagnostic result.
+    Call the LLM to generate six synthesis fields for a diagnostic result.
 
     Parameters:
       state_name:         identified state name, e.g. "The Founder's Grip"

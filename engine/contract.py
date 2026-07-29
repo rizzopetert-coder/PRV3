@@ -440,6 +440,7 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
             "framing_text":                 synthesis_result.framing_text,
             "observable_indicators":        synthesis_result.observable_indicators,
             "resolution_framing_text":      synthesis_result.resolution_framing_text,
+            "headline":                     synthesis_result.headline,
             "synthesis_confidence":         synthesis_result.synthesis_confidence,
             "is_fallback":                  synthesis_result.is_fallback,
         }
@@ -537,7 +538,7 @@ _SHAREABLE_OUTPUT_FIELDS = {
 _SYNTHESIS_FIELDS = {
     "liability_condition_text", "asset_resolution_anchor_text",
     "framing_text", "observable_indicators", "resolution_framing_text",
-    "synthesis_confidence", "is_fallback",
+    "headline", "synthesis_confidence", "is_fallback",
 }
 _INTAKE_FIELDS = {
     "headcount", "org_size", "industry", "org_type",

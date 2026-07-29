@@ -18,14 +18,23 @@ from __future__ import annotations
 from engine.resolution_families import RESOLUTION_FALLBACK_COPY, _FALLBACK_GENERIC
 
 
+# Generic, state/severity-agnostic fallback headline. The fallback path
+# has no real session signal to draw the per-state/per-tier calibration
+# from, so this is the single safe default used everywhere, not a
+# per-tier variant set.
+_FALLBACK_HEADLINE: str = "A pattern in how this organization operates is shaping outcomes internally."
+
+
 def _make_entry(copy_text: str) -> dict:
-    """Build a 5-field synthesis entry from a single copy string."""
+    """Build a synthesis entry from a single copy string, plus the fixed
+    generic headline fallback. Headline is not derived from copy_text."""
     return {
         "liability_condition_text":     copy_text,
         "asset_resolution_anchor_text": "",
         "framing_text":                 copy_text,
         "observable_indicators":        [],
         "resolution_framing_text":      copy_text,
+        "headline":                     _FALLBACK_HEADLINE,
     }
 
 
@@ -44,9 +53,9 @@ def get_fallback_synthesis(
     """
     Return fallback synthesis fields for a commercial name and severity tier.
 
-    Returned dict has exactly 5 keys matching SynthesisResult fields:
+    Returned dict has exactly 6 keys matching SynthesisResult fields:
         liability_condition_text, asset_resolution_anchor_text, framing_text,
-        observable_indicators, resolution_framing_text.
+        observable_indicators, resolution_framing_text, headline.
 
     Single-service names: pass severity_tier ("Emerging", "Entrenched", "Endemic").
     Compound names (contain ' + '): severity_tier is ignored, None key is used.
