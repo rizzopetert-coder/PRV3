@@ -165,6 +165,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 - Before touching any file, state what you are changing and why.
 - If a fix does not work, diagnose before acting again.
 - No semicolons in any string or copy.
+- No em-dashes as default connective tissue. An em-dash is permitted only to mark a genuine interruption or pivot for emphasis, something a comma, colon, or rephrase can't do as well, not a habitual way to link two clauses. Default to a comma, colon, or rephrase first. When used, write a real em-dash, never a "--" placeholder. In LLM system-prompt content specs, avoid entirely.
 - No coined terms requiring a glossary in any output string.
 - Pete confirms everything. No recommendation from any AI is a decision until Pete confirms it.
 
@@ -175,7 +176,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.69 |
+| MOB version | v4.70 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 57 (locked) |
