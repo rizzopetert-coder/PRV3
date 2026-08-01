@@ -25,19 +25,19 @@ from __future__ import annotations
 RESOLUTION_FAMILY_DESCRIPTIONS: dict[str, dict] = {
     "structural": {
         "family_id":   "structural",
-        "description": "COPY PENDING",  # COPY PENDING — structural design resolution copy
+        "description": "Something in how decisions get made, who holds authority, or how the organization is built is producing this condition. Not a person carrying it. The structure itself. It will keep producing the same outcome until that structure changes. Fixing it means no longer managing around it.",  # COPY PENDING — structural design resolution copy
     },
     "developmental": {
         "family_id":   "developmental",
-        "description": "COPY PENDING",  # COPY PENDING — capability development resolution copy
+        "description": "Somebody in this organization needs to be able to do something they can't do yet, and no amount of good intention closes that gap on its own. This is capability work. It's specific, it's learnable, and it requires deliberate practice aimed at exactly what the diagnostic found, not a general program hoping to cover it.",  # COPY PENDING — capability development resolution copy
     },
     "investigative": {
         "family_id":   "investigative",
-        "description": "COPY PENDING",  # COPY PENDING — investigative / compliance resolution copy
+        "description": "Something here needs a direct, unbiased look from someone with no stake in what they find. Not coaching. Not a communication fix. A fact-finding problem, and the resolution starts with an honest, unflinching read on what's actually happening before anyone decides what to do about it.",  # COPY PENDING — investigative / compliance resolution copy
     },
     "directional": {
         "family_id":   "directional",
-        "description": "COPY PENDING",  # COPY PENDING — strategic direction / culture resolution copy
+        "description": "The organization is drifting, and drift doesn't correct itself. This is about realigning what the organization says it values with what it actually rewards and tolerates day to day. Resolution here means naming the gap plainly and doing the harder work of closing it, not writing a new mission statement.",  # COPY PENDING — strategic direction / culture resolution copy
     },
 }
 
