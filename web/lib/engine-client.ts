@@ -88,12 +88,14 @@ export interface EngineResult {
     score: number;
     rank: number;
     above_floor: boolean;
+    descriptive_prose: string;
   }>;
   output_type: "single_state" | "multi_state" | "no_signal";
   identified_states: Array<{
     state_id: string;
     state_name: string;
     score: number;
+    descriptive_prose: string;
     distinguishing_language: string | null;
   }>;
   severity: {

@@ -331,6 +331,7 @@ export async function POST(request: NextRequest) {
     id: s.state_id,
     name: s.state_name,
     weight: totalScore > 0 ? s.score / totalScore : 1 / allEngineStates.length,
+    descriptive_prose: s.descriptive_prose,
   }));
 
   const engSynthesis = engineResult.synthesis;

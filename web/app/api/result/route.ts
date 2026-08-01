@@ -86,19 +86,20 @@ function getPrimaryFamily(stateIds: string[]): ResolutionFamily {
 // ---------------------------------------------------------------------------
 
 function computeWeights(
-  states: Array<{ id: string; name: string; score: number }>,
+  states: Array<{ id: string; name: string; score: number; descriptive_prose: string }>,
   path: "A" | "B"
 ): StateRef[] {
   if (states.length === 0) return [];
   if (path === "B") {
     const w = 1 / states.length;
-    return states.map((s) => ({ id: s.id, name: s.name, weight: w }));
+    return states.map((s) => ({ id: s.id, name: s.name, weight: w, descriptive_prose: s.descriptive_prose }));
   }
   const total = states.reduce((sum, s) => sum + s.score, 0);
   return states.map((s) => ({
     id: s.id,
     name: s.name,
     weight: total > 0 ? s.score / total : 1 / states.length,
+    descriptive_prose: s.descriptive_prose,
   }));
 }
 
@@ -178,6 +179,7 @@ export async function POST(request: NextRequest) {
       id: s.state_id,
       name: s.state_name,
       score: s.score,
+      descriptive_prose: s.descriptive_prose,
     })),
     "B"
   );
