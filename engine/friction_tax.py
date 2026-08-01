@@ -34,13 +34,14 @@ Pete-approved -- see prompts/friction-tax-architecture-decision.md):
 Payroll baseline formula (not yet computable): payroll_floor_annual =
 industry_wage x headcount_midpoint. Industry wage figures are populated
 below for 6 of 9 industries (source/citation_id only -- see each
-PAYROLL_BASELINE_GRID entry). Headcount midpoints are a separate,
-unresolved research item -- an earlier midpoint set (12/62/174.5/374.5/
-749.5/1500 for the 6 buckets) cited Census SUSB size-class data that does
-not actually support those figures (SUSB distributions are bottom-skewed
-toward the smallest firms; they do not support a "1500 median enterprise
-size" for the open-ended "1000+" bucket). 1500 remains Pete's working
-placeholder for that bucket specifically, not a cited or final value.
+PAYROLL_BASELINE_GRID entry). Headcount midpoints (HEADCOUNT_MIDPOINTS,
+below) are now finalized -- real, firm-count-weighted mean employees-per-
+firm values computed from Census SUSB 2022 detailed-size data, replacing
+the earlier fabricated SUSB-citation midpoint set (12/62/174.5/374.5/
+749.5/1500, which cited Census SUSB size-class data that did not
+actually support those figures). payroll_floor_annual itself is still
+not computable -- multiplying HEADCOUNT_MIDPOINTS against the sourced
+industry wages is a separate follow-on task.
 
 Source research flagged:
   McKinsey & Company -- leadership dysfunction cost benchmarks
@@ -160,6 +161,110 @@ PAYROLL_BASELINE_GRID: dict[tuple[str, str], PayrollBaselineEntry] = {
     )
     for headcount in HEADCOUNT_BUCKETS
     for industry in INDUSTRIES
+}
+
+
+# -- Headcount midpoints ----------------------------------------------------------
+# Firm-count-weighted mean employees-per-firm for each headcount bucket.
+# Source: Census SUSB 2022 Annual Data,
+# us_state_naics_detailedsizes_2022.xlsx ("US & states detailed sizes"),
+# national All-Industries Total row -- fetched and computed directly from
+# the real file (2026-08-01), replacing the earlier fabricated SUSB
+# citation. Not yet wired into compute_friction_tax() -- payroll_floor_
+# annual still requires this value multiplied by an industry wage figure,
+# a separate follow-on task once both sides exist.
+
+@dataclass(frozen=True)
+class HeadcountMidpointEntry:
+    """Firm-count-weighted mean employees per firm for one headcount bucket."""
+    employees_per_firm: Optional[float]
+    source: Optional[str]
+    citation_id: Optional[str]
+
+
+HEADCOUNT_MIDPOINTS: dict[str, HeadcountMidpointEntry] = {
+    "Under 25": HeadcountMidpointEntry(
+        employees_per_firm=4.28,
+        source=(
+            "Census SUSB 2022 Annual Data, "
+            "us_state_naics_detailedsizes_2022.xlsx ('US & states detailed "
+            "sizes'), national All-Industries Total row, firm-count-weighted "
+            "mean employees per firm. Brackets used: <5, 5-9, 10-14, 15-19, "
+            "20-24 employees (whole brackets, no splitting needed -- real "
+            "bracket boundaries align exactly at the 24/25 cutoff)."
+        ),
+        citation_id="SUSB_2022_detailedsizes_under25",
+    ),
+    "25-99": HeadcountMidpointEntry(
+        employees_per_firm=45.10,
+        source=(
+            "Census SUSB 2022 Annual Data, "
+            "us_state_naics_detailedsizes_2022.xlsx ('US & states detailed "
+            "sizes'), national All-Industries Total row, firm-count-weighted "
+            "mean employees per firm. Brackets used: 25-29, 30-34, 35-39, "
+            "40-49, 50-74, 75-99 employees (whole brackets, no splitting "
+            "needed -- real bracket boundaries align exactly at the 99/100 "
+            "cutoff)."
+        ),
+        citation_id="SUSB_2022_detailedsizes_25to99",
+    ),
+    "100-249": HeadcountMidpointEntry(
+        employees_per_firm=151.53,
+        source=(
+            "Census SUSB 2022 Annual Data, "
+            "us_state_naics_detailedsizes_2022.xlsx ('US & states detailed "
+            "sizes'), national All-Industries Total row, firm-count-weighted "
+            "mean employees per firm. Brackets used: 100-149, 150-199 "
+            "employees (whole), plus the 200-299 bracket split 50/50 by "
+            "uniform-distribution assumption across its two sub-ranges "
+            "(200-249 used here, 250-299 used in the 250-499 bucket below) "
+            "-- the real brackets do not break at 249/250, so this bracket "
+            "required proportional splitting."
+        ),
+        citation_id="SUSB_2022_detailedsizes_100to249",
+    ),
+    "250-499": HeadcountMidpointEntry(
+        employees_per_firm=327.50,
+        source=(
+            "Census SUSB 2022 Annual Data, "
+            "us_state_naics_detailedsizes_2022.xlsx ('US & states detailed "
+            "sizes'), national All-Industries Total row, firm-count-weighted "
+            "mean employees per firm. Brackets used: the 200-299 bracket "
+            "split 50/50 by uniform-distribution assumption (250-299 half "
+            "used here, 200-249 half used in the 100-249 bucket above), "
+            "plus 300-399, 400-499 employees (whole)."
+        ),
+        citation_id="SUSB_2022_detailedsizes_250to499",
+    ),
+    "500-999": HeadcountMidpointEntry(
+        employees_per_firm=692.43,
+        source=(
+            "Census SUSB 2022 Annual Data, "
+            "us_state_naics_detailedsizes_2022.xlsx ('US & states detailed "
+            "sizes'), national All-Industries Total row, firm-count-weighted "
+            "mean employees per firm. Brackets used: 500-749, 750-999 "
+            "employees (whole brackets, no splitting needed -- these two "
+            "real brackets exactly span 500-999)."
+        ),
+        citation_id="SUSB_2022_detailedsizes_500to999",
+    ),
+    "1000+": HeadcountMidpointEntry(
+        employees_per_firm=2027.26,
+        source=(
+            "Census SUSB 2022 Annual Data, "
+            "us_state_naics_detailedsizes_2022.xlsx ('US & states detailed "
+            "sizes'), national All-Industries Total row, firm-count-weighted "
+            "mean employees per firm. Brackets used: 1,000-1,499, "
+            "1,500-1,999, 2,000-2,499, 2,500-4,999 employees. The 5,000+ "
+            "open bracket was deliberately excluded (Pete's Option 2 call) "
+            "-- including it pulled the mean to approximately 6,230, "
+            "dominated by a small number of mega-corporations, "
+            "unrepresentative of this platform's realistic client base. "
+            "This value represents firms in the 1,000-4,999 range only, "
+            "not the full open-ended 1000+ population."
+        ),
+        citation_id="SUSB_2022_detailedsizes_1000to4999",
+    ),
 }
 
 
