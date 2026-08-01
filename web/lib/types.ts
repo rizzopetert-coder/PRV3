@@ -40,6 +40,7 @@ export interface StateRef {
   id: string;
   name: string;
   weight: number;
+  descriptive_prose?: string;
 }
 
 /**

@@ -323,6 +323,8 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
                 qs.state_id == r.state_id and qs.cleared_floor
                 for qs in routing.all_evaluated
             ),
+            "descriptive_prose": STATE_PROFILES[r.state_id].descriptive_prose
+                          if r.state_id in STATE_PROFILES else "",
         }
         for r in sorted(session.final_rankings, key=lambda r: -r.score)
     ]
@@ -342,6 +344,8 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
             "state_id":              routing.lead_state.state_id,
             "state_name":            routing.lead_state.state_name,
             "score":                 round(routing.lead_state.score, 6),
+            "descriptive_prose":     STATE_PROFILES[routing.lead_state.state_id].descriptive_prose
+                                     if routing.lead_state.state_id in STATE_PROFILES else "",
             "distinguishing_language": None,  # null for single-state per spec
         }]
     elif routing.mode == "multi":
@@ -350,6 +354,8 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
                 "state_id":              qs.state_id,
                 "state_name":            qs.state_name,
                 "score":                 round(qs.score, 6),
+                "descriptive_prose":     STATE_PROFILES[qs.state_id].descriptive_prose
+                                         if qs.state_id in STATE_PROFILES else "",
                 "distinguishing_language": "",  # LLM-generated at application layer
             }
             for qs in routing.qualified_states
@@ -506,11 +512,12 @@ _SEVERITY_TIER_VALUES = {"Emerging", "Entrenched", "Endemic"}
 
 _STATE_DISTRIBUTION_ENTRY_FIELDS = {
     "state_id": str, "state_name": str, "score": float,
-    "rank": int, "above_floor": bool,
+    "rank": int, "above_floor": bool, "descriptive_prose": str,
 }
 
 _IDENTIFIED_STATE_FIELDS = {
     "state_id": str, "state_name": str, "score": float,
+    "descriptive_prose": str,
     # distinguishing_language: str or None — validated separately
 }
 

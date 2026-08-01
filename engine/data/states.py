@@ -156,6 +156,7 @@ class StateProfile:
     asset_axes:         list                 # From Leadership Competency Framework
     severity_range:     SeverityRange
     resolution_family:  str                  # One of the five service offerings
+    descriptive_prose:  str = ""             # Static per-state prose, authored separately (Tier 4)
 
 
 # ── Helper ─────────────────────────────────────────────────────────────────────
