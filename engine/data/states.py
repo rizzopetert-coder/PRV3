@@ -250,6 +250,7 @@ STATE_PROFILES["the_unformed_leader"].dimensional_vector = DimensionalVector(
     attitude_liability=0.25,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_unformed_leader"].descriptive_prose = "A manager occupies the role without having been equipped for it. Direction is inconsistent, feedback arrives late or not at all, and the team absorbs the gap by lowering its own expectations. Turnover concentrates among the people who had other options."
 
 _reg(_profile(
     state_id="the_overloaded_manager",
@@ -272,6 +273,7 @@ STATE_PROFILES["the_overloaded_manager"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_overloaded_manager"].descriptive_prose = "A manager who was competent for the original scope of the role is now carrying more than the role was designed to hold. Development conversations have been replaced by status updates, and decisions queue behind everything else competing for the same attention. The organization redesigned the job without redesigning the resources around it."
 
 _reg(_profile(
     state_id="the_dormant_talent",
@@ -295,6 +297,7 @@ STATE_PROFILES["the_dormant_talent"].dimensional_vector = DimensionalVector(
     attitude_liability=0.25,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_dormant_talent"].descriptive_prose = "The manager can name precisely what each person needs to grow and consistently doesn't act on it. Development stalls while the manager's own visibility and standing continue to rise. The people with the clearest read on the gap are also the ones most able to leave."
 
 _reg(_profile(
     state_id="built_to_fail",
@@ -318,6 +321,7 @@ STATE_PROFILES["built_to_fail"].dimensional_vector = DimensionalVector(
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["built_to_fail"].descriptive_prose = "The role's scope exceeds what any reasonable allocation of resources could support, and each person who holds it is told to make it work rather than given what making it work would require. The organization treats each departure as an individual hiring failure rather than a structural one. The next person inherits the same impossible math."
 
 _reg(_profile(
     state_id="the_undefined_role",
@@ -341,6 +345,7 @@ STATE_PROFILES["the_undefined_role"].dimensional_vector = DimensionalVector(  # 
     attitude_liability=0.10,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_undefined_role"].descriptive_prose = "The role's actual boundaries were never defined, so what lands on the desk, what gets escalated, and what falls through are all matters of local negotiation rather than design. Work duplicates in some places and goes unclaimed in others. The organization is paying for a function that isn't reliably producing what anyone assumes it produces."
 
 _reg(_profile(
     state_id="the_paper_tiger",
@@ -364,6 +369,7 @@ STATE_PROFILES["the_paper_tiger"].dimensional_vector = DimensionalVector(
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["the_paper_tiger"].descriptive_prose = "A performance problem has been managed verbally for long enough that the written record no longer matches what everyone privately knows. When the organization finally needs to act on documented cause, it discovers it has been managing one employee on paper and a different one in practice. The gap surfaces in front of the people with the least patience for it."
 
 
 # ============================================================
@@ -414,6 +420,7 @@ STATE_PROFILES["invisible_performance_management"].dimensional_vector = Dimensio
     attitude_liability=0.10,
     attitude_asset=0.15,
 )
+STATE_PROFILES["invisible_performance_management"].descriptive_prose = "A manager's read on an underperforming employee is accurate but was never written down, so it carries no evidentiary weight when a decision needs defending. This isn't concealment. It's an absence of documentation that turns a sound judgment into an exposed one."
 
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -441,6 +448,7 @@ STATE_PROFILES["the_founders_grip"].dimensional_vector = DimensionalVector(
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["the_founders_grip"].descriptive_prose = "One person's approval gates nearly every consequential decision, and that person is stretched too thin to make those calls on current information. Work either waits in queue or routes around the bottleneck entirely. The senior people who could tolerate neither option have already left."
 
 _reg(_profile(
     state_id="the_exposed",
@@ -463,6 +471,7 @@ STATE_PROFILES["the_exposed"].dimensional_vector = DimensionalVector(
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["the_exposed"].descriptive_prose = "There is no function in the organization whose job it actually is to manage employee-related risk. Concerns have nowhere reliable to land, and obligations accumulate without anyone tracking them. The organization isn't between HR leaders. It's accumulating liability on a clock nobody is watching."
 
 _reg(_profile(
     state_id="the_uninitiated",
@@ -485,6 +494,7 @@ STATE_PROFILES["the_uninitiated"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_uninitiated"].descriptive_prose = "A significant organizational event is underway, and the people leading it have never done this before. They are capable in general and unprepared for this specific kind of decision, which means the costliest mistakes are the ones nobody on the team knows to watch for."
 
 _reg(_profile(
     state_id="leadership_continuity_risk",
@@ -507,6 +517,7 @@ STATE_PROFILES["leadership_continuity_risk"].dimensional_vector = DimensionalVec
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["leadership_continuity_risk"].descriptive_prose = "Authority concentrated in a small number of people has no defined path to anyone else if one of them leaves. The organization can name who is critical but not who would replace them or how. That gap becomes a crisis the moment it stops being theoretical."
 
 _reg(_profile(
     state_id="hr_capture",
@@ -529,6 +540,7 @@ STATE_PROFILES["hr_capture"].dimensional_vector = DimensionalVector(
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["hr_capture"].descriptive_prose = "The function responsible for protecting the organization and its people has been repurposed to protect specific leaders instead. Complaints against the powerful get managed differently than complaints against everyone else, and the people making that distinction know exactly what they're doing."
 
 _reg(_profile(
     state_id="decision_paralysis",
@@ -551,6 +563,7 @@ STATE_PROFILES["decision_paralysis"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["decision_paralysis"].descriptive_prose = "Decisions that should move at operational speed are instead stalling in a governance structure that was never built to render verdicts quickly. Nobody is refusing to decide. The structure itself doesn't produce clear ownership of the call."
 
 _reg(_profile(
     state_id="the_policy_lag",
@@ -574,6 +587,7 @@ STATE_PROFILES["the_policy_lag"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_policy_lag"].descriptive_prose = "The organization's written policies describe an operating reality that no longer exists. Practice has moved on without the documentation catching up, so the rules on paper and the rules people actually follow have quietly diverged."
 
 _reg(_profile(
     state_id="the_unexamined_algorithm",
@@ -597,6 +611,7 @@ STATE_PROFILES["the_unexamined_algorithm"].dimensional_vector = DimensionalVecto
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["the_unexamined_algorithm"].descriptive_prose = "An automated or algorithmic system is making or materially influencing consequential decisions with no governance layer reviewing what it's actually doing. Nobody owns auditing its outputs for bias, error, or drift. The organization finds out something was wrong only after it's been wrong for a while."
 
 
 _reg(_profile(
@@ -621,6 +636,7 @@ STATE_PROFILES["heard_and_ignored"].dimensional_vector = DimensionalVector(
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["heard_and_ignored"].descriptive_prose = "Concerns are being raised through the organization's own channels and are reliably not acted on. The reporting mechanism exists and functions as a formality, not a corrective one. People stop using it once they've tested it enough times to know what happens when they do."
 
 _reg(_profile(
     state_id="the_tolerated_violation",
@@ -644,6 +660,7 @@ STATE_PROFILES["the_tolerated_violation"].dimensional_vector = DimensionalVector
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["the_tolerated_violation"].descriptive_prose = "A known violation of policy, law, or basic standard has been allowed to continue long enough that it now reads as normal rather than exceptional. Everyone involved can describe the violation accurately. Nobody with the authority to stop it has been willing to be the one who does."
 
 _reg(_profile(
     state_id="dueling_narratives",
@@ -667,6 +684,7 @@ STATE_PROFILES["dueling_narratives"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["dueling_narratives"].descriptive_prose = "Different parts of the organization are telling meaningfully different versions of the same set of facts, and nobody has reconciled them into one account. Each version is defensible in isolation. Together they create exposure the moment anyone outside the organization compares notes."
 
 _reg(_profile(
     state_id="the_unsolved_problem",
@@ -690,6 +708,7 @@ STATE_PROFILES["the_unsolved_problem"].dimensional_vector = DimensionalVector(
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["the_unsolved_problem"].descriptive_prose = "A specific problem has been addressed before, more than once, and keeps returning in close to the same form. Each fix treats the most recent symptom rather than whatever keeps regenerating it. The organization is paying repeatedly for a resolution that has never actually resolved anything."
 
 _reg(_profile(
     state_id="transition_paralysis",
@@ -712,6 +731,7 @@ STATE_PROFILES["transition_paralysis"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["transition_paralysis"].descriptive_prose = "An organizational transition has started and then stalled somewhere in the middle, with the old structure partly dismantled and the new one not yet functional. People are operating in the gap, uncertain which authority actually governs their work day to day."
 
 _reg(_profile(
     state_id="paper_shield",
@@ -735,6 +755,7 @@ STATE_PROFILES["paper_shield"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["paper_shield"].descriptive_prose = "Contingency and continuity plans exist in writing and have never been tested against anything real. The organization believes it is prepared because the documentation says so. The gap between documented readiness and actual readiness surfaces exactly once, at the worst time to discover it."
 
 _reg(_profile(
     state_id="the_lost_map",
@@ -758,6 +779,7 @@ STATE_PROFILES["the_lost_map"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_lost_map"].descriptive_prose = "Institutional knowledge lives in individual heads rather than in any system the organization actually maintains. When someone leaves, whatever they knew leaves with them, and the organization relearns it the expensive way."
 
 _reg(_profile(
     state_id="invisible_influence_architecture",
@@ -780,6 +802,7 @@ STATE_PROFILES["invisible_influence_architecture"].dimensional_vector = Dimensio
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["invisible_influence_architecture"].descriptive_prose = "Real influence over decisions runs through informal channels that don't match the org chart anyone would draw. The formally accountable people are not always the ones actually deciding outcomes. New arrivals spend real time discovering who actually has to say yes."
 
 _reg(_profile(
     state_id="pay_exposure",
@@ -803,6 +826,7 @@ STATE_PROFILES["pay_exposure"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["pay_exposure"].descriptive_prose = "Compensation has drifted out of alignment with what the market is currently paying for comparable roles, and the organization is discovering this reactively, through departures, rather than proactively. Each departure it triggers is a preventable one."
 
 _reg(_profile(
     state_id="the_pay_fog",
@@ -826,6 +850,7 @@ STATE_PROFILES["the_pay_fog"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_pay_fog"].descriptive_prose = "Pay decisions across the organization don't follow a consistent, defensible logic, even though each individual decision might have made sense in the moment it was made. That inconsistency is hard to see from inside any one decision and impossible to miss once someone lines them all up."
 
 
 _reg(_profile(
@@ -851,6 +876,7 @@ STATE_PROFILES["compression_crisis"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["compression_crisis"].descriptive_prose = "Layers of management have been compressed or eliminated faster than the remaining structure can absorb the load, concentrating decision-making into fewer people than the work actually requires. What looks like efficiency on an org chart is strain everywhere it actually gets executed."
 
 _reg(_profile(
     state_id="sequential_decision_blindness",
@@ -881,6 +907,7 @@ STATE_PROFILES["sequential_decision_blindness"].dimensional_vector = Dimensional
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["sequential_decision_blindness"].descriptive_prose = "A series of individually defensible decisions, made by different people without coordination, adds up to a pattern that looks like retaliation or targeting when viewed together. No single decision-maker intended that outcome. The exposure exists in the aggregate, not in any one decision anyone can point to."
 
 _reg(_profile(
     state_id="disparate_impact_architecture",
@@ -905,6 +932,7 @@ STATE_PROFILES["disparate_impact_architecture"].dimensional_vector = Dimensional
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["disparate_impact_architecture"].descriptive_prose = "A policy or practice applies the same rule to everyone and produces meaningfully different outcomes across different groups, in a pattern that would be recognizable to anyone who looked at the aggregate data. Neutral intent doesn't change what the data shows."
 
 _reg(_profile(
     state_id="planning_authority_gap",
@@ -929,6 +957,7 @@ STATE_PROFILES["planning_authority_gap"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["planning_authority_gap"].descriptive_prose = "The people responsible for planning don't hold the authority to make the decisions their plans depend on, and the people who hold that authority aren't the ones doing the planning. Plans get built and then wait for approval from someone who wasn't part of building them."
 
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -956,6 +985,7 @@ STATE_PROFILES["the_fracture"].dimensional_vector = DimensionalVector(
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["the_fracture"].descriptive_prose = "A working relationship between two people, teams, or functions that the organization depends on has broken down past the point of informal repair. Work still moves, but it moves around the fracture rather than through it."
 
 _reg(_profile(
     state_id="the_second_close",
@@ -978,6 +1008,7 @@ STATE_PROFILES["the_second_close"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_second_close"].descriptive_prose = "A relationship or agreement was renegotiated once already, and the same underlying issue that forced the first renegotiation is resurfacing. Whatever the first fix addressed, it wasn't the actual cause. The people involved are less willing to extend trust a second time."
 
 _reg(_profile(
     state_id="silosolation",
@@ -1000,6 +1031,7 @@ STATE_PROFILES["silosolation"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["silosolation"].descriptive_prose = "Teams that need each other's information to do their jobs well are operating as if they don't, each optimizing for its own metrics without visibility into how that affects anyone else. The isolation isn't hostile. It's structural, and it produces the same friction hostility would."
 
 _reg(_profile(
     state_id="the_suppression_filter",
@@ -1023,6 +1055,7 @@ STATE_PROFILES["the_suppression_filter"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_suppression_filter"].descriptive_prose = "Bad news gets filtered, softened, or dropped entirely as it moves up through the organization's layers, so the people with authority to act on it are consistently the last to hear an accurate version. Each layer believes it's protecting leadership from noise."
 
 _reg(_profile(
     state_id="the_arbitrary_standard",
@@ -1046,6 +1079,7 @@ STATE_PROFILES["the_arbitrary_standard"].dimensional_vector = DimensionalVector(
     attitude_liability=0.15,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_arbitrary_standard"].descriptive_prose = "The rules that govern who gets what treatment aren't applied consistently, and the pattern of who benefits isn't accidental even if nobody designed it on purpose. People notice the inconsistency well before anyone in leadership does."
 
 _reg(_profile(
     state_id="decision_blindness",
@@ -1069,6 +1103,7 @@ STATE_PROFILES["decision_blindness"].dimensional_vector = DimensionalVector(
     attitude_liability=0.10,
     attitude_asset=0.10,
 )
+STATE_PROFILES["decision_blindness"].descriptive_prose = "A single significant decision was made without input from the people who held the information that would have changed it. The decision-maker wasn't negligent. The information simply never reached them, because nobody's job was making sure it did."
 
 
 _reg(_profile(
@@ -1094,6 +1129,7 @@ STATE_PROFILES["distributed_culture_fragmentation"].dimensional_vector = Dimensi
     attitude_liability=0.25,
     attitude_asset=0.15,
 )
+STATE_PROFILES["distributed_culture_fragmentation"].descriptive_prose = "Teams operating in different locations, functions, or time zones have developed genuinely different norms for how work gets done, and nobody has reconciled them into one coherent culture. The friction shows up exactly at the seams where the teams have to work together."
 
 
 # ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -1121,6 +1157,7 @@ STATE_PROFILES["the_untouchable"].dimensional_vector = DimensionalVector(
     attitude_liability=0.60,
     attitude_asset=0.10,
 )
+STATE_PROFILES["the_untouchable"].descriptive_prose = "One person's results or position have made them functionally exempt from the standards everyone else is held to. Everyone around them can name the exemption specifically. The cost isn't just what that person does. It's what everyone watching learns about what the organization actually values."
 
 _reg(_profile(
     state_id="what_nobody_says",
@@ -1144,6 +1181,7 @@ STATE_PROFILES["what_nobody_says"].dimensional_vector = DimensionalVector(
     attitude_liability=0.35,
     attitude_asset=0.15,
 )
+STATE_PROFILES["what_nobody_says"].descriptive_prose = "There is a specific, known problem that people in the organization can describe accurately in private and will not raise anywhere it might reach someone with the authority to fix it. The silence isn't accidental. It's a rational response to what happened, or is believed to happen, to the last person who spoke up."
 
 _reg(_profile(
     state_id="leadership_deafness",
@@ -1167,6 +1205,7 @@ STATE_PROFILES["leadership_deafness"].dimensional_vector = DimensionalVector(  #
     attitude_liability=0.50,
     attitude_asset=0.10,
 )
+STATE_PROFILES["leadership_deafness"].descriptive_prose = "Leadership is operating on a version of organizational reality that the people below them stopped believing months or years ago. The gap isn't intentional deception so much as an accumulated pattern of information getting softened on its way up."
 
 _reg(_profile(
     state_id="the_diversity_ceiling",
@@ -1190,6 +1229,7 @@ STATE_PROFILES["the_diversity_ceiling"].dimensional_vector = DimensionalVector(
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_diversity_ceiling"].descriptive_prose = "The organization's stated commitment to diversity and inclusion is visible in messaging and invisible in outcomes. Representation doesn't advance past a specific point in the hierarchy no matter how the numbers look at entry level. People below that ceiling can see exactly where it sits."
 
 _reg(_profile(
     state_id="culture_drift",
@@ -1212,6 +1252,7 @@ STATE_PROFILES["culture_drift"].dimensional_vector = DimensionalVector(
     attitude_liability=0.35,
     attitude_asset=0.15,
 )
+STATE_PROFILES["culture_drift"].descriptive_prose = "The organization's stated values and its actual day-to-day behavior have drifted apart gradually enough that no single moment marks the change. Nobody decided to abandon the values. They just stopped being what got rewarded."
 
 _reg(_profile(
     state_id="identity_erosion",
@@ -1234,6 +1275,7 @@ STATE_PROFILES["identity_erosion"].dimensional_vector = DimensionalVector(
     attitude_liability=0.35,
     attitude_asset=0.15,
 )
+STATE_PROFILES["identity_erosion"].descriptive_prose = "The organization has lost a clear, shared answer to what it actually is and what makes it different from anywhere else someone could work. That uncertainty shows up first in retention and recruiting, before it shows up anywhere leadership is looking."
 
 _reg(_profile(
     state_id="the_culture_that_wasnt",
@@ -1257,6 +1299,7 @@ STATE_PROFILES["the_culture_that_wasnt"].dimensional_vector = DimensionalVector(
     attitude_liability=0.35,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_culture_that_wasnt"].descriptive_prose = "What was described during hiring and what actually exists inside the organization are two different cultures, and new hires discover the gap almost immediately. The mismatch is sharpest and most damaging in the first few months, before anyone has built enough tenure to rationalize it."
 
 _reg(_profile(
     state_id="the_burned_credibility",
@@ -1280,6 +1323,7 @@ STATE_PROFILES["the_burned_credibility"].dimensional_vector = DimensionalVector(
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_burned_credibility"].descriptive_prose = "Leadership has announced significant changes before and either didn't follow through or followed through badly enough that people stopped believing the announcements. The next initiative, however well designed, inherits the skepticism earned by the last one."
 
 _reg(_profile(
     state_id="invisible_burnout",
@@ -1302,6 +1346,7 @@ STATE_PROFILES["invisible_burnout"].dimensional_vector = DimensionalVector(
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["invisible_burnout"].descriptive_prose = "People are burning out while their output looks fine, which means the organization's usual signals for catching the problem aren't catching it. The cost surfaces later, all at once, as a resignation or a mistake that looks sudden but wasn't."
 
 _reg(_profile(
     state_id="the_basement_standard",
@@ -1325,6 +1370,7 @@ STATE_PROFILES["the_basement_standard"].dimensional_vector = DimensionalVector(
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_basement_standard"].descriptive_prose = "A standard of performance well below what the organization would say it expects has become the accepted baseline, because nobody has been willing to enforce the standard that's actually on paper. The best performers notice the gap first, and leave."
 
 _reg(_profile(
     state_id="the_inside_track",
@@ -1348,6 +1394,7 @@ STATE_PROFILES["the_inside_track"].dimensional_vector = DimensionalVector(
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_inside_track"].descriptive_prose = "Advancement and opportunity flow disproportionately to a specific, identifiable group through channels that aren't the organization's stated process. Everyone outside that group can name it, usually specifically."
 
 _reg(_profile(
     state_id="narrative_lock",
@@ -1370,6 +1417,7 @@ STATE_PROFILES["narrative_lock"].dimensional_vector = DimensionalVector(
     attitude_liability=0.35,
     attitude_asset=0.15,
 )
+STATE_PROFILES["narrative_lock"].descriptive_prose = "The organization keeps telling itself and its people a story about who it is that stopped being accurate some time ago, and it can't update that story even when the facts on the ground contradict it. Anyone who challenges the story is treated as the problem rather than the messenger."
 
 _reg(_profile(
     state_id="groundhog_day",
@@ -1393,6 +1441,7 @@ STATE_PROFILES["groundhog_day"].dimensional_vector = DimensionalVector(
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["groundhog_day"].descriptive_prose = "The same class of mistake recurs across projects, teams, or cycles, and the organization has no mechanism for capturing what it learned the last time so it doesn't happen again. Each recurrence gets treated as a new problem rather than a repeat of an old one."
 
 _reg(_profile(
     state_id="the_wrong_reward",
@@ -1416,6 +1465,7 @@ STATE_PROFILES["the_wrong_reward"].dimensional_vector = DimensionalVector(
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_wrong_reward"].descriptive_prose = "The organization is getting exactly the behavior its incentive structure actually rewards, and that behavior is not the one leadership says it wants. People are responding rationally to the real incentives, not the stated ones."
 
 _reg(_profile(
     state_id="the_unreported_hazard",
@@ -1439,6 +1489,7 @@ STATE_PROFILES["the_unreported_hazard"].dimensional_vector = DimensionalVector(
     attitude_liability=0.35,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_unreported_hazard"].descriptive_prose = "Real safety concerns exist and are not reliably making it into the organization's reporting system, for reasons that have more to do with culture than process. People have learned that reporting doesn't change much and might cost them something personally."
 
 _reg(_profile(
     state_id="the_unlocked_door",
@@ -1462,6 +1513,7 @@ STATE_PROFILES["the_unlocked_door"].dimensional_vector = DimensionalVector(
     attitude_liability=0.35,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_unlocked_door"].descriptive_prose = "Security or safety practices that were adequate for an earlier version of the organization haven't kept pace with how the organization actually operates now. Nobody decided to leave the door open. It's simply never been revisited."
 
 _reg(_profile(
     state_id="the_broken_compass",
@@ -1485,6 +1537,7 @@ STATE_PROFILES["the_broken_compass"].dimensional_vector = DimensionalVector(
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["the_broken_compass"].descriptive_prose = "The organization can articulate the right strategic direction clearly and consistently fails to actually move in it when the moment requires a hard call. The gap isn't a knowledge problem. It's a courage problem, and it shows up at exactly the moments that matter most."
 
 
 # ── Cluster registries ─────────────────────────────────────────────────────────
@@ -1530,6 +1583,7 @@ STATE_PROFILES["wellbeing_theater"].dimensional_vector = DimensionalVector(
     attitude_liability=0.35,
     attitude_asset=0.15,
 )
+STATE_PROFILES["wellbeing_theater"].descriptive_prose = "The organization has visible wellbeing programming that isn't changing the underlying conditions actually driving people's stress and dissatisfaction. The initiatives address the symptom the organization is comfortable addressing rather than the cause it would rather not name."
 
 _reg(_profile(
     state_id="human_displacement_anxiety",
@@ -1557,6 +1611,7 @@ STATE_PROFILES["human_displacement_anxiety"].dimensional_vector = DimensionalVec
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["human_displacement_anxiety"].descriptive_prose = "People across the organization are anxious about being displaced by automation or AI, and that anxiety is affecting engagement and decision-making whether or not the organization has any actual plans in that direction. Silence from leadership doesn't read as reassurance. It reads as confirmation."
 
 _reg(_profile(
     state_id="motivational_architecture_failure",
@@ -1593,6 +1648,7 @@ STATE_PROFILES["motivational_architecture_failure"].dimensional_vector = Dimensi
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["motivational_architecture_failure"].descriptive_prose = "The organization's reward system has stopped functioning as a source of motivation at all, for enough of the workforce that engagement has flattened across the board rather than in any one identifiable group. People haven't misread the incentives. They've stopped believing the incentives connect to anything real."
 
 _reg(_profile(
     state_id="cultural_overtime",
@@ -1617,3 +1673,4 @@ STATE_PROFILES["cultural_overtime"].dimensional_vector = DimensionalVector(
     attitude_liability=0.45,
     attitude_asset=0.15,
 )
+STATE_PROFILES["cultural_overtime"].descriptive_prose = "Extended hours have become an unstated cultural expectation rather than an occasional operational necessity, and the organization is carrying real legal and financial exposure from that norm without having decided, on paper, that it wants to run this way."
