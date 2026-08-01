@@ -3,8 +3,12 @@ PRV3 Scoring Engine -- Output Layer
 Friction Tax Computation
 
 Computes an estimated financial consequence range for the identified
-organizational state cluster. All calibration values are flagged
-CALIBRATION TARGET until Pete populates from source research.
+organizational state cluster. PAYROLL_BASELINE_GRID's payroll_floor_
+annual values and STATE_MULTIPLIERS remain CALIBRATION TARGET until
+further source research resolves them. ORG_TYPE_SCALARS was finalized
+2026-08-01 -- see the source note on each entry (some are a documented
+"no defensible differential found, defaulted to parity" finding, not an
+absence of research).
 
 Output: {"low": float, "high": float, "currency": "USD"}
   high = low * 1.4  (range spread, LOCKED)
@@ -26,6 +30,17 @@ Pete-approved -- see prompts/friction-tax-architecture-decision.md):
   _ORG_SIZE_BANDS structure and its legacy key format ("1_to_25" etc.,
   which never matched IntakeData.headcount's real values). See also
   prompts/friction-tax-unit-decision.md (payroll basis, not revenue).
+
+Payroll baseline formula (not yet computable): payroll_floor_annual =
+industry_wage x headcount_midpoint. Industry wage figures are populated
+below for 6 of 9 industries (source/citation_id only -- see each
+PAYROLL_BASELINE_GRID entry). Headcount midpoints are a separate,
+unresolved research item -- an earlier midpoint set (12/62/174.5/374.5/
+749.5/1500 for the 6 buckets) cited Census SUSB size-class data that does
+not actually support those figures (SUSB distributions are bottom-skewed
+toward the smallest firms; they do not support a "1500 median enterprise
+size" for the open-ended "1000+" bucket). 1500 remains Pete's working
+placeholder for that bucket specifically, not a cited or final value.
 
 Source research flagged:
   McKinsey & Company -- leadership dysfunction cost benchmarks
@@ -57,8 +72,12 @@ _DEFAULT_SEVERITY_SCALAR: float = 1.0
 # Keyed by (headcount, industry), using IntakeData's real string values
 # directly (engine/data/intake.py's INTAKE_FIELDS) -- not a separate
 # internal bucket format. 6 headcount buckets x 9 industries = 54 cells.
-# CALIBRATION TARGET -- all payroll_floor_annual values require population
-# from source research. Payroll basis, not revenue -- see
+# payroll_floor_annual is CALIBRATION TARGET for all 54 cells -- the
+# formula (industry_wage x headcount_midpoint) can't resolve until
+# headcount midpoints are researched (see module docstring). 6 of 9
+# industries below carry a confirmed BLS OEWS May 2023 wage figure in
+# their source/citation_id fields, ready to compute once midpoints
+# resolve. Payroll basis, not revenue -- see
 # prompts/friction-tax-unit-decision.md.
 
 HEADCOUNT_BUCKETS: tuple[str, ...] = (
@@ -81,16 +100,63 @@ INDUSTRIES: tuple[str, ...] = (
 @dataclass(frozen=True)
 class PayrollBaselineEntry:
     """One cell of the payroll baseline grid."""
-    payroll_floor_annual: Optional[float]  # CALIBRATION TARGET
+    payroll_floor_annual: Optional[float]  # CALIBRATION TARGET -- pending headcount midpoints
     source: Optional[str]                  # named benchmark/study, None until populated
     citation_id: Optional[str]             # cross-reference key into a future citations table
 
 
+# Confirmed BLS OEWS May 2023 mean annual wage figures, by industry.
+# (source, citation_id) tuples -- payroll_floor_annual is populated
+# separately once headcount midpoints resolve, not here. Industries not
+# listed here (Manufacturing & Industrial, Retail & Hospitality,
+# Nonprofit & Education) had unverified or mismatched claims and are
+# deliberately left unsourced this pass -- see module docstring.
+_INDUSTRY_WAGE_SOURCES: dict[str, tuple[str, str]] = {
+    "Professional Services": (
+        "BLS OEWS May 2023 mean annual wage: $102,670. naics4_541000. CONFIRMED exact.",
+        "BLS_OEWS_2023_naics4_541000",
+    ),
+    "Healthcare & Life Sciences": (
+        "BLS OEWS May 2023 mean annual wage: $67,320. naics2_62. CONFIRMED exact.",
+        "BLS_OEWS_2023_naics2_62",
+    ),
+    "Financial Services": (
+        "BLS OEWS May 2023 mean annual wage: $94,150. naics2_52. Corrected from an "
+        "initial $86,120 claim, which did not match published BLS data.",
+        "BLS_OEWS_2023_naics2_52",
+    ),
+    "Technology": (
+        "BLS OEWS May 2023 mean annual wage: $108,110. Sector 51 'Information.' "
+        "Corrected from an initial $117,900 claim, which was actually NAICS 513000 "
+        "'Publishing Industries,' not Technology. Note: Sector 51 'Information' is "
+        "broader than ideal for a 'Technology' label (includes telecom, "
+        "broadcasting, publishing) -- a narrower NAICS 541500 'Computer Systems "
+        "Design and Related Services' figure would be more representative but was "
+        "not independently confirmed this pass. Usable now, worth refining later.",
+        "BLS_OEWS_2023_sector51_information",
+    ),
+    "Government & Public Sector": (
+        "BLS OEWS May 2023 mean annual wage: $74,410. Sector 99 (Federal/State/"
+        "Local Government, excl. schools/hospitals/USPS). Corrected from an "
+        "initial $68,140 claim, which used the wrong sector concept "
+        "(Census/NAICS 'Sector 92' Public Administration is not BLS OEWS's "
+        "government designation) and appears to have pulled the wrong data cell "
+        "entirely (matched the 'Legislators' detailed-occupation figure, not a "
+        "sector aggregate).",
+        "BLS_OEWS_2023_sector99_government",
+    ),
+    "Other": (
+        "BLS OEWS May 2023 national estimate, All Occupations (SOC 00-0000): "
+        "$65,470. CONFIRMED exact.",
+        "BLS_OEWS_2023_national_all_occupations",
+    ),
+}
+
 PAYROLL_BASELINE_GRID: dict[tuple[str, str], PayrollBaselineEntry] = {
     (headcount, industry): PayrollBaselineEntry(
         payroll_floor_annual=None,
-        source=None,
-        citation_id=None,
+        source=_INDUSTRY_WAGE_SOURCES.get(industry, (None, None))[0],
+        citation_id=_INDUSTRY_WAGE_SOURCES.get(industry, (None, None))[1],
     )
     for headcount in HEADCOUNT_BUCKETS
     for industry in INDUSTRIES
@@ -100,16 +166,85 @@ PAYROLL_BASELINE_GRID: dict[tuple[str, str], PayrollBaselineEntry] = {
 # -- Org type scalar --------------------------------------------------------------
 # Standalone multiplicative scalar applied to the grid lookup result, not a
 # third grid axis. Keys match IntakeData.org_type / engine/data/intake.py's
-# INTAKE_FIELDS["org_type"]. CALIBRATION TARGET -- all values require
-# population from source research.
+# INTAKE_FIELDS["org_type"]. FINALIZED 2026-08-01 -- all 6 entries carry a
+# real source note. Several are a documented "no defensible public
+# differential found, defaulted to parity" research finding rather than a
+# proven multiplier -- see each entry's source field for the correction
+# history where an initial claim didn't hold up.
 
-ORG_TYPE_SCALARS: dict[str, Optional[float]] = {
-    "Founder-led":                            None,  # CALIBRATION TARGET
-    "PE or VC-backed":                        None,  # CALIBRATION TARGET
-    "Privately held professional leadership": None,  # CALIBRATION TARGET
-    "Nonprofit":                               None,  # CALIBRATION TARGET
-    "Publicly traded":                        None,  # CALIBRATION TARGET
-    "Government":                              None,  # CALIBRATION TARGET
+@dataclass(frozen=True)
+class OrgTypeScalarEntry:
+    """One entry of the org type scalar table."""
+    scalar: Optional[float]
+    source: Optional[str]
+    citation_id: Optional[str]
+
+
+ORG_TYPE_SCALARS: dict[str, OrgTypeScalarEntry] = {
+    "Founder-led": OrgTypeScalarEntry(
+        scalar=1.00,
+        source=(
+            "No defensible public source found (Aon Radford Global Technology & "
+            "Life Sciences Compensation Survey is proprietary/paywalled, cannot "
+            "verify content). Defaulted to parity per no-citable-differential "
+            "convention."
+        ),
+        citation_id=None,
+    ),
+    "PE or VC-backed": OrgTypeScalarEntry(
+        scalar=1.00,
+        source=(
+            "No defensible source found. Cited PitchBook 'Portfolio Company "
+            "Compensation Benchmark Report' does not appear to exist under that "
+            "name -- PitchBook's actual product (Thelander-PitchBook Investment "
+            "Firm Compensation Survey) measures investment-firm staff pay, not "
+            "portfolio-company workforce. Defaulted to parity."
+        ),
+        citation_id=None,
+    ),
+    "Privately held professional leadership": OrgTypeScalarEntry(
+        scalar=1.00,
+        source="Definitional baseline, 1.00 by construction.",
+        citation_id=None,
+    ),
+    "Nonprofit": OrgTypeScalarEntry(
+        scalar=1.00,
+        source=(
+            "Corrected from an initial 0.90 claim (misattributed to 'BLS OEWS "
+            "Non-Profit Wage Ratios', which does not appear to be a real BLS "
+            "product). Actual data (BLS Monthly Labor Review, 2024, 'Nonprofit "
+            "earnings and sectoral employment in the United States since 1994') "
+            "shows nonprofit wages near-parity to for-profit, higher on a raw "
+            "basis in many fields. Corrected to parity."
+        ),
+        citation_id="BLS_MLR_2024_nonprofit_earnings",
+    ),
+    "Publicly traded": OrgTypeScalarEntry(
+        scalar=1.00,
+        source=(
+            "Corrected from an initial 1.10 claim. Cited source (Mueller, "
+            "Ouimet & Simintzi, NBER Working Paper No. 20876 -- note: "
+            "originally miscited as No. 20820 -- published American Economic "
+            "Review 2017) is a real paper but studies within-firm pay "
+            "inequality by firm size, not a public-vs-private wage premium. "
+            "No valid replacement source found this pass. Defaulted to parity "
+            "pending future research."
+        ),
+        citation_id=None,
+    ),
+    "Government": OrgTypeScalarEntry(
+        scalar=1.05,
+        source=(
+            "Corrected from an initial 1.17 claim. Source (CBO, 'Comparing the "
+            "Compensation of Federal and Private-Sector Employees in 2022', "
+            "April 2024) is real; its actual headline finding is federal "
+            "employees average ~5% higher total compensation overall (varies "
+            "significantly by education level -- 36% higher at high-school-only "
+            "level, 15% higher at bachelor's level, lower at advanced-degree "
+            "level). Corrected to the report's actual overall finding, 1.05."
+        ),
+        citation_id="CBO_2024_federal_private_comp",
+    ),
 }
 
 
@@ -214,9 +349,9 @@ def compute_friction_tax(
       }
 
     Sequence: (1) look up (org_size, industry) in PAYROLL_BASELINE_GRID,
-    (2) apply ORG_TYPE_SCALARS[org_type] to the grid result, (3) compute
-    mean_multiplier via the existing, unchanged averaging logic across
-    state_ids, (4) apply severity_scalar (unchanged, LOCKED), (5)
+    (2) apply ORG_TYPE_SCALARS[org_type].scalar to the grid result, (3)
+    compute mean_multiplier via the existing, unchanged averaging logic
+    across state_ids, (4) apply severity_scalar (unchanged, LOCKED), (5)
     low = adjusted_baseline * mean_multiplier * severity_scalar,
     high = low * 1.4 (unchanged, LOCKED).
 
@@ -227,7 +362,8 @@ def compute_friction_tax(
     """
     grid_entry = PAYROLL_BASELINE_GRID.get((org_size, industry))
     payroll_floor = grid_entry.payroll_floor_annual if grid_entry is not None else None
-    org_type_scalar = ORG_TYPE_SCALARS.get(org_type)
+    org_type_entry = ORG_TYPE_SCALARS.get(org_type)
+    org_type_scalar = org_type_entry.scalar if org_type_entry is not None else None
     severity_scalar = SEVERITY_SCALAR.get(severity_tier, _DEFAULT_SEVERITY_SCALAR)
 
     state_multiplier_values = [
