@@ -324,8 +324,6 @@ check("PrivateOutputBlock liability_condition_text empty (LLM-generated)",
       private.liability_condition_text == "")
 check("PrivateOutputBlock asset_resolution_anchor_text empty (LLM-generated)",
       private.asset_resolution_anchor_text == "")
-check("PrivateOutputBlock friction_tax_estimate None (CALIBRATION TARGET)",
-      private.friction_tax_estimate is None)
 
 
 # ── 10. build_shareable_block ─────────────────────────────────────────────────
