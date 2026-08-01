@@ -368,9 +368,7 @@ export async function POST(request: NextRequest) {
     resolution_family: getPrimaryFamily(stateRefs[0]?.id),
     resolution_routing: engineResult.private_output.resolution_routing,
 
-    // friction_tax_estimate: null — CALIBRATION TARGET, STATE_MULTIPLIERS
-    // not set, same as Path B.
-    friction_tax_estimate: null,
+    friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
 
     cascade_risk: engineResult.private_output.cascade_risk,
     causation_pattern: engineResult.private_output.causation_pattern,

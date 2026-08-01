@@ -24,6 +24,7 @@ from engine.accumulation import IntakeData, StateRanking, compute_cascade_risk
 from engine.checkpoint import CheckpointResult
 from engine.narrative import NarrativeExtractionResult
 from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
+from engine.friction_tax import compute_friction_tax
 from engine.output import OutputPackage, OutputRouting, compute_causation_pattern
 
 
@@ -422,10 +423,26 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
 
     # ── private_output ──
     priv = session.output_package.private
+    friction_tax_result = compute_friction_tax(
+        state_ids=[s["state_id"] for s in identified_states],
+        severity_tier=sev.tier,
+        org_size=session.intake.headcount,
+        industry=session.intake.industry,
+        org_type=session.intake.org_type,
+    )
+    friction_tax_estimate = (
+        {
+            "low":      friction_tax_result["low"],
+            "high":     friction_tax_result["high"],
+            "currency": friction_tax_result["currency"],
+        }
+        if friction_tax_result["calibration_complete"]
+        else None
+    )
     private_output = {
         "opening_text":          priv.state_name if priv else "",
         "resolution_routing":    priv.resolution_family if priv else "",
-        "friction_tax_estimate": priv.friction_tax_estimate if priv else None,
+        "friction_tax_estimate": friction_tax_estimate,
         "cascade_risk":          compute_cascade_risk(session.accumulated_vector),
         "causation_pattern":     compute_causation_pattern(session.accumulated_vector, routing),
         "trajectory":            trajectory_result,

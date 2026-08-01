@@ -219,8 +219,7 @@ export async function POST(request: NextRequest) {
     // resolution_routing: legacy service-name string from states.py profile (old naming, pre-S32)
     resolution_routing: engineResult.private_output.resolution_routing,
 
-    // friction_tax_estimate: null in Path B (CALIBRATION TARGET — STATE_MULTIPLIERS not set)
-    friction_tax_estimate: null,
+    friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
 
     intake: mapIntake(engineResult.intake as Record<string, unknown>),
 

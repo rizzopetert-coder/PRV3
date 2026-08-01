@@ -268,7 +268,10 @@ class PrivateOutputBlock:
       3. liability_condition_text — LLM-generated at application layer.
       4. asset_resolution_anchor_text — LLM-generated at application layer.
       5. resolution_family — one of the five service offerings. LOCKED.
-      6. friction_tax_estimate — CALIBRATION TARGET (separate spec task).
+      6. friction_tax_estimate — always None here. The real value is
+         computed directly in engine/contract.py's assemble_output(),
+         which has access to org_size/industry/org_type and the full
+         multi-state state_ids list that this per-state block does not.
 
     LLM-generated fields are empty strings until populated by the application layer.
 
@@ -280,7 +283,7 @@ class PrivateOutputBlock:
     resolution_family:          str
     liability_condition_text:   str  = ""   # LLM-generated at application layer
     asset_resolution_anchor_text: str = ""  # LLM-generated at application layer
-    friction_tax_estimate:      Optional[float] = None  # CALIBRATION TARGET
+    friction_tax_estimate:      Optional[dict] = None  # {low, high, currency} once computed -- always None here, see build_private_block()
 
 
 @dataclass
