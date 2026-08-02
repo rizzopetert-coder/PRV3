@@ -120,7 +120,10 @@ A rung between Tier 2 and Tier 4 — sharing a single piece with 2-3 trusted peo
 If three consecutive sessions are pure Tier 1 work, the next session opens with a Tier 3 touchpoint (a Decision Register item gets actively engaged, even briefly) before other work proceeds. This is a tripwire, not a cap — Tier 1 work continues at whatever pace it needs; this only prevents structural decisions from being avoided indefinitely via comfortable, checkable engine work.
 
 ### Quarterly Step-Back
-A full project assessment (workstream status, goal progress, process feedback) should be run roughly every 15 sessions, not only when Pete happens to request one.
+A full project assessment (workstream status, goal progress, process feedback) should be run on a calendar cadence: every 3 weeks. Originally defined as "roughly every 15 sessions" (locked at Session 71) — changed because the session-number counter this depended on was discontinued after Session 72 (Section 16 switched to date-based headers with no session numbers), making the original trigger uncheckable. This calendar-based cadence replaces the session-count trigger entirely going forward, not just for this one instance — future step-backs are checked against calendar time from the last logged date below, not a session counter.
+
+- Last step-back: August 2, 2026 (this session — triggered deliberately given scope: all 3 Friction Tax calibration sets closed, multi-state compounding design locked, not waiting for a session-count trigger that no longer functions)
+- Next due: on or near August 23, 2026
 
 ### Outside Human Gap (documented, not yet actioned)
 The entire verification/decision loop currently runs inside Pete + the AI stack. This is strong for factual rigor, structurally weak for judgment about public reception. Before the first truly public, hard-to-reverse Tier 4 action, a second human read — a trusted colleague — is recommended over another internal review pass.
@@ -176,7 +179,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.74 |
+| MOB version | v4.75 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 57 (locked) |
