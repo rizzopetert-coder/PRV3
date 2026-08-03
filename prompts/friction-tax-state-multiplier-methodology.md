@@ -1,6 +1,6 @@
 # Friction Tax — STATE_MULTIPLIERS Methodology (Calibration Set 3)
 
-**Status:** Methodology locked. Scoring not yet started. STATE_MULTIPLIERS remains fully unpopulated (57 x None) until scoring is complete and this doc's output is applied.
+**Status:** Scoring complete, all 57 states populated (Calibration Set 3, commit 469b148). Combination function rescaled this session (Option A, below) -- Gemini-reviewed and cleared (structural check + worked dollar-figure plausibility check across mild/typical/severe scenarios, all landing in a defensible 3%-49% of payroll range). Not yet implemented in compute_friction_tax().
 
 ## Purpose
 
@@ -13,16 +13,18 @@ Confirmed via direct read of compute_friction_tax() (engine/friction_tax.py:464-
 
 ## Scoring criteria (applied per state, by Pete)
 
-Each of the 57 states is scored 0-2 on each of four criteria. These are business-recognizable cost channels, chosen so a skeptical outside reader (HR leader, CFO, attorney) can evaluate the framework without needing PRV3 taxonomy vocabulary:
+Each of the 57 states was originally scored 0-2 on each of four criteria (Calibration Set 3, closed). These are business-recognizable cost channels, chosen so a skeptical outside reader (HR leader, CFO, attorney) can evaluate the framework without needing PRV3 taxonomy vocabulary:
 
 1. **Turnover/retention cost** — does this condition drive people out the door?
 2. **Productivity/output loss** — does it degrade the work itself, even if people stay?
 3. **Decision-quality/velocity cost** — does it cause bad or slow decisions?
-4. **Legal/compliance exposure** — does it carry real liability risk (discrimination, retaliation, safety)?
+4. **Legal/compliance exposure** — **REMOVED from this rubric's raw score (this session).** Legal/Compliance is now fully split out to its own mechanism-aware design (prompts/friction-tax-legal-compliance-methodology.md, in progress, not yet Gemini-reviewed, not yet implemented) — its economics don't scale with headcount the way the other three do, and forcing it through the same linear payroll-fraction mapping either understated it or overstated the other three. Each state's original Legal/Compliance sub-score (from the closed Calibration Set 3 pass) still exists in the underlying scoring worksheet but is no longer summed into this rubric's raw_total.
 
 Scale per criterion: 0 = negligible, 1 = moderate, 2 = significant.
-Total raw score range: 0-8 per state.
-A one-line rationale is required per criterion score, per state, for audit-trail defensibility — not just the numeric total.
+
+**Total raw score range: 0-6 per state (3 criteria x 0-2), not the original 0-8.** Whoever implements this must recompute each state's raw_total using only the three remaining criteria (turnover, productivity, decision_quality), dropping the original Legal/Compliance sub-score, before applying the rescaled interpolation formula below — this is a real recomputation against the existing 57-state scoring worksheet, not just a formula swap.
+
+A one-line rationale is required per criterion score, per state, for audit-trail defensibility — not just the numeric total. (Already satisfied for all 57 states from the original Set 3 pass; no new rationale-writing needed, only the resulting raw_total recompute.)
 
 ## Resolving intra-state variance
 
@@ -30,26 +32,31 @@ Some states' cost profile varies by context — e.g., role level, team size, or 
 
 This rule was surfaced during scoring of built_to_fail's Legal/Compliance criterion, where the initial rationale reasoned about role-level variance (leadership vs. mid-level incumbents) rather than committing to a single typical case.
 
-## Combination function
+## Combination function (rescaled this session — Option A)
 
-Multiplier = linear interpolation of each state's raw total score onto a [1.0, 1.4] range, using min-max normalization against the ACTUAL observed low and high raw totals across all 57 scored states (not the theoretical 0-8 range).
+Supersedes the original [1.0, 1.4] bare-multiplier design and its empirical observed-min/max approach. The rescale uses a **fixed theoretical raw-score range**, not an empirically observed one — this keeps the single-state formula compatible with the multi-state compounding design's frozen-range requirement (prompts/friction-tax-multistate-compounding-methodology.md, Step 2), which needs bounds fixed at design time regardless of which states happen to be identified in a given session.
 
-Formula, once all 57 raw totals are known:
+**Target range: [0.05, 0.25]** (payroll fraction), replacing [1.0, 1.4] (a bare multiplier).
+**Raw score range: [0, 6]** (R_min = 0, R_max = 6 — 3 criteria x 0-2 each), replacing the original [0, 8].
 
-  observed_min = min(raw_total across all 57 states)
-  observed_max = max(raw_total across all 57 states)
-  multiplier(state) = 1.0 + ((raw_total(state) - observed_min) / (observed_max - observed_min)) * 0.4
+Formula:
 
-Floor and ceiling are not arbitrary:
-- **Floor = 1.0**: a diagnosed friction state should never multiply below baseline parity — the instrument's premise is that every identified condition costs the org something, never that it saves money relative to baseline.
-- **Ceiling = 1.4**: reuses the constant already locked elsewhere in the same function (SEVERITY_SCALAR's Endemic tier, and the existing high = low * 1.4 relationship) rather than inventing an unrelated ratio for the same conceptual role of "upper-bound amplification."
+  attritional_fraction(R) = 0.05 + (0.25 - 0.05) x ((R - R_min) / (R_max - R_min))
+  where R_min = 0, R_max = 6
 
-Sequencing requirement: do not derive the interpolation formula's observed_min/observed_max until all 57 states are scored. Scoring must happen first; the mapping is derived from real data, not assumed in advance.
+Floor and ceiling sourcing (Pete, this session):
+- **Floor = 0.05 (5% of payroll)**, **ceiling = 0.25 (25% of payroll)** — sourced at roughly 5%-25% across the three criteria's evidence: productivity 14-18% (Gallup Q12 — solid), turnover ~13% typical / ~38% elevated (solid), decision-quality ~5-7% (Track B reconstruction — softer, no direct source). 25% is the negotiated ceiling across all three criteria's evidence, not any single criterion's own maximum.
+
+**Decision-quality's softer evidentiary support does not need special-casing.** Equal 0-2 rubric weighting across all three criteria naturally bounds decision-quality's max marginal contribution to ~6.7% of payroll (one-sixth of the full [0.05, 0.25] range), which matches the reconstruction's own independently-estimated 5-7% range closely enough that no separate down-weighting is needed.
+
+**Gemini review (this session):** structural check plus a worked dollar-figure plausibility check across mild/typical/severe scenarios, all landing in a defensible 3%-49% of payroll range. Cleared.
+
+Sequencing note: scoring is already complete (Set 3 closed) — the original design's "defer interpolation until all 57 states are scored" caveat no longer applies. What remains is recomputing each state's raw_total (3-criteria only, per the Scoring criteria section above) and applying this formula in code.
 
 ## Explicitly out of scope for this table
 
 - Severity — handled entirely by SEVERITY_SCALAR, never folded into a state's score.
-- Multi-state averaging logic — unchanged, already implemented (plain arithmetic mean across state_ids in compute_friction_tax()).
+- Multi-state averaging logic — historically a plain arithmetic mean across state_ids in compute_friction_tax(); a redesign is locked (not yet implemented) — see prompts/friction-tax-multistate-compounding-methodology.md.
 
 ## Known adjacent issue (not blocking, logged for awareness)
 
@@ -57,7 +64,7 @@ STATE_MULTIPLIERS.get(sid, _DEFAULT_MULTIPLIER) falls back to _DEFAULT_MULTIPLIE
 
 ## Next steps (in order)
 
-1. Pete scores all 57 states against the 4 criteria (manual judgment work — not derived from external research or engine internals).
-2. Once scoring is complete, apply the min-max interpolation formula above to derive final multiplier values.
-3. Gemini architecture review of the resulting schema/type approach before any code is written (consistent with the OrgTypeScalarEntry pattern used for Calibration Set 1).
-4. CC populates STATE_MULTIPLIERS, runs tests, commits under dry-run-before-write protocol.
+1. Recompute each of the 57 states' raw_total using only the 3 remaining criteria (turnover, productivity, decision_quality), dropping the original Legal/Compliance sub-score from the closed Set 3 scoring worksheet.
+2. Apply the rescaled interpolation formula above to derive final multiplier values against the new [0.05, 0.25] / [0, 6] mapping.
+3. CC implements: STATE_MULTIPLIERS values updated, compute_friction_tax() updated to treat the result as a payroll fraction rather than a bare multiplier (touches contract.py / web/lib/types.ts per the Legal/Compliance doc's structural-implications note), tests updated, run under dry-run-before-write protocol.
+4. Coordinate with the multi-state compounding implementation (prompts/friction-tax-multistate-compounding-methodology.md) — both touch compute_friction_tax() and must land consistently, including the single-state continuity check against [0, 6] / [0.05, 0.25], not the original [0, 8] / [1.0, 1.4].
