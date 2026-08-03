@@ -44,7 +44,7 @@ Deliberately kept separate from and multiplicative against the severity multipli
 
 Continuity requirement (N=1): when exactly one state is identified, multi_channel_severity_loading MUST equal 1.0 regardless of how many criteria that single state's own scores span. The breadth-based formula above applies only when two or more states are identified (N >= 2). Without this guard, a single identified state whose own criterion scores happen to span multiple channels (e.g. a state scoring above zero on all four criteria) would incorrectly trigger loading, breaking the exact single-state parity that Step 2's own continuity requirement establishes. This must be verified explicitly during implementation, not assumed.
 
-FLAGGED: the 0.05 increment is a placeholder, not a researched or structurally-derived constant (unlike the geometric decay in Step 1, which is structurally motivated). Requires Pete's judgment or further calibration before implementation, not to be treated as locked.
+CLOSED (Pete's final decision): the 0.05 increment is locked, not a placeholder. Rationale: treats the multi-area premium as a tiebreaker, not a primary cost driver -- the strongest alternative considered (0.15) tops out at a 45% max swing at full breadth, proportionate to the depth lever's 40% max swing and well under severity's ~133% max swing. Not to be reopened absent new information.
 
 ### Final formula
 
@@ -59,6 +59,6 @@ low = adjusted_baseline * combined_multiplier * multi_channel_severity_loading *
 ## Next steps (in order)
 
 1. Gemini architecture review of this design (schema/formula implementation questions) — not yet sent.
-2. Resolve the multi_channel_severity_loading constant (0.05) — placeholder pending Pete's input or calibration.
+2. multi_channel_severity_loading (K) = 0.05 CLOSED -- Pete's final decision, not to be reopened absent new information.
 3. CC implementation: replace compute_friction_tax()'s mean_multiplier step with combined_criterion_score aggregation per Step 1, add multi_channel_severity_loading per Step 3, verify single-state continuity explicitly, update tests.
 4. Only after this design is implemented: reopen the Legal/Compliance tail-risk item.
