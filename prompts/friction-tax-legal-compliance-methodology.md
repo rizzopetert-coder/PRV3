@@ -2,15 +2,17 @@
 
 **Status:** Design in progress. Direction has shifted twice already this session as real data
 falsified two earlier approaches. All 30 Legal-scoring states are classified into 5
-mechanism clusters, with one reclassification still pending (`the_untouchable`, currently
-Cluster 2, likely Cluster 1 per Gemini's review -- unresolved), and all 5 clusters have
-sourced dollar curves (Addenda 1 and 2). A cross-state aggregation design is now proposed
-(Addendum 3, below: within-cluster geometric decay, across-cluster simple addition) but is
-NOT yet ready for Gemini review -- blocked on Cluster 3's interpolation disagreement
-(path-uncertainty pair vs. rubric-score mapping, surfaced by Gemini's review, unresolved)
-resolving first. NOT yet implemented. Does not supersede the Option A attritional-criteria
-rescale (turnover/productivity/decision-quality), which proceeds independently -- this doc
-is specifically the deferred Legal/Compliance item that Option A explicitly excluded.
+mechanism clusters -- `the_untouchable` reclassified Cluster 2 -> Cluster 1 (Addendum 4,
+resolving Gemini's review flag). Cluster 3's interpolation is locked: scope-modulated (rubric
+score sets affected-worker-count via Cluster 2's existing per-capita mechanism), not
+path-modulated (administrative/litigation stays a fixed low/high pair regardless of score),
+resolving the Addendum 2 vs. Gemini's-review disagreement. All 5 clusters have sourced dollar
+curves (Addenda 1 and 2). The cross-state aggregation design (Addendum 3: within-cluster
+geometric decay, across-cluster simple addition) is now UNBLOCKED and ready for Gemini
+review, alongside a fresh review of both resolutions above. NOT yet implemented. Does not
+supersede the Option A attritional-criteria rescale (turnover/productivity/decision-quality),
+which proceeds independently -- this doc is specifically the deferred Legal/Compliance item
+that Option A explicitly excluded.
 
 ## Why Legal/Compliance can't share Option A's mapping
 
@@ -423,6 +425,61 @@ until that's resolved.
 3. Once Cluster 3's interpolation resolves, revisit whether its within-cluster aggregation
    needs different treatment than the other four clusters, given its output shape may differ
    fundamentally (a range vs. a point) depending on how that disagreement resolves.
+
+## Addendum 4 — Cluster 3 Synthesis Locked, the_untouchable Reclassified, Addendum 3 Unblocked
+
+**Status:** Resolves both open items from Gemini's review. Cluster 3 and the classification
+are now final. Addendum 3's cross-state aggregation design is unblocked and ready for its own
+Gemini review, alongside a fresh review of the two resolutions below.
+
+### Cluster 3 — locked: scope-modulated, not path-modulated
+
+Resolves the disagreement between Addendum 2 (administrative/litigation presented as a fixed
+low/high pair) and Gemini's review (binary step keyed to rubric score). Neither wins outright
+— the rubric score doesn't belong on the path-uncertainty axis at all, because path
+(administrative vs. litigation) and severity are independent real-world variables: a minor
+violation can still end up in litigation, a severe one can still resolve administratively. The
+taxonomy data doesn't support predicting legal strategy from severity.
+
+**Locked design:** the administrative ($1,465/worker) to litigation ($2,930/worker) multiplier
+range stays fixed, presented together regardless of score — the genuine uncertainty Addendum 2
+originally captured is preserved unchanged. The rubric score instead modulates the affected-
+worker-count / scope, using the same per-capita-on-plausibly-affected-subgroup logic Cluster 2
+already uses. A score=1 state implies a narrower, more contained exposure (fewer roles, one
+team); a score=2 state implies broader exposure across more of the hourly/non-exempt
+workforce.
+
+**Structural consequence:** Cluster 3 no longer needs a bespoke interpolation rule. It inherits
+Cluster 2's existing per-capita mechanism, just with Cluster 3's own dollar rate substituted
+in. One fewer special case in the overall design, not one more.
+
+### the_untouchable — reclassified from Cluster 2 to Cluster 1
+
+Gemini's catch stands: the state's own modal case is explicitly non-legal (cultural
+exemption), and its edge case — harassment, safety, or fraud committed by one exempted
+individual — is shaped like an individual claim (one perpetrator, one or a small number of
+victims at a time), not a certified class action. Cluster 2's per-capita/class mechanism
+doesn't fit; Cluster 1's individual-claim floor ($50K–$450K) does. Moved.
+
+### Addendum 3 status: unblocked
+
+With Cluster 3's interpolation resolved and now reusing Cluster 2's existing per-capita
+mechanism (not a novel step function), Addendum 3's within-cluster geometric-decay design
+applies uniformly across all five clusters without a carved-out exception for Cluster 3. The
+cross-state aggregation proposal is ready for its own Gemini review as originally scoped.
+
+### Updated full classification (supersedes Addendum 1's table for this one state)
+
+**Cluster 1 — Individual/isolated claim (4 states, was 3):**
+`invisible_performance_management`, `the_paper_tiger`, `built_to_fail`, `the_untouchable`
+
+**Cluster 2 — Class/systemic discrimination (11 states, was 12):**
+`disparate_impact_architecture`, `the_arbitrary_standard`, `the_pay_fog`, `pay_exposure`,
+`the_diversity_ceiling`, `the_inside_track`, `the_unexamined_algorithm`,
+`sequential_decision_blindness`, `the_tolerated_violation`, `the_wrong_reward`,
+`distributed_culture_fragmentation`
+
+All other cluster memberships (3, 4, 5) unchanged from Addendum 1.
 
 ## Structural implications (bigger than Option A)
 
