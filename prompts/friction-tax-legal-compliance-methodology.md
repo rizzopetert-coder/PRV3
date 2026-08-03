@@ -2,11 +2,11 @@
 
 **Status:** Design in progress. Direction has shifted twice already this session as real data
 falsified two earlier approaches. All 30 Legal-scoring states are now classified into 5
-mechanism clusters, with 4 of 5 clusters' dollar curves sourced (Addendum, below) -- ready
-for Gemini architecture review. NOT yet implemented. Does not supersede the Option A
-attritional-criteria rescale (turnover/productivity/decision-quality), which proceeds
-independently -- this doc is specifically the deferred Legal/Compliance item that Option A
-explicitly excluded.
+mechanism clusters, and all 5 clusters now have sourced dollar curves (Addenda 1 and 2,
+below) -- ready for Gemini architecture review. NOT yet implemented. Does not supersede the
+Option A attritional-criteria rescale (turnover/productivity/decision-quality), which
+proceeds independently -- this doc is specifically the deferred Legal/Compliance item that
+Option A explicitly excluded.
 
 ## Why Legal/Compliance can't share Option A's mapping
 
@@ -239,6 +239,90 @@ figure is ever challenged.
 - How does a given state's existing 0–2 rubric score position it within its cluster's range
   (linear? log-scale, matching the attritional design's precedent?) — not yet decided per
   cluster.
+
+## Addendum 2 — Cluster 2 Two-Tier Restructure, Cluster 3 Sourced Formula, DOL Multiplier Correction
+
+**Status:** Closes the two remaining gaps flagged in Addendum 1. All five clusters now have
+sourced dollar curves. Also documents a correction needed to already-committed content
+(experiment-2-employment-litigation-taxonomy.html's DOL multiplier). Ready for Gemini review.
+
+### Correction required to already-committed content
+
+The DOL wage-and-hour mechanism-caveat fix committed earlier this session (4 spots in
+experiment-2-employment-litigation-taxonomy.html) states liquidated damages as "2-4x back
+wages" for the litigation path. This was not independently verified when written and is
+incorrect. Confirmed via multiple independent legal sources this session: **the federal FLSA
+liquidated-damages standard is a flat 2x — back wages plus an equal amount ("double
+damages")**. There is no federal 3x or 4x tier. A small number of states (Massachusetts
+confirmed) separately permit treble (3x) damages under state wage law — a distinct legal
+avenue, not an extension of the federal multiplier. All 4 spots need "2-4x" corrected to "2x
+(federal); some states separately permit treble damages under state law."
+
+### Cluster 2 — restructured as two tiers, not one range
+
+A third verified data point (Jock v. Sterling Jewelers: $175M total, $125M to the class,
+~68,000 class members, well-corroborated across plaintiff counsel's own release, Signet's SEC
+filings, and independent trade press) changed the shape of the evidence, not just its
+precision. Per-claimant: $125M / 68,000 ≈ $1,838. That lands close to Beck v. Boeing's
+~$2,500/claimant — and far from Velez v. Novartis's ~$28,000-31,000/claimant. Two convergent
+points plus one outlier is evidence of two distinct populations, not one wide range:
+
+- **Tier 2a — Compensatory-only:** ~$1,800-2,500/claimant (Beck v. Boeing, Jock v. Sterling
+  Jewelers — both real, verified, no punitive component)
+- **Tier 2b — Punitive-inclusive:** ~$25,000-31,000/claimant (Velez v. Novartis — real,
+  verified, includes a punitive damages component)
+
+**Tier selection:** proposed to follow the state's existing 0-2 Legal rubric score — score=1
+states in cluster 2 default to Tier 2a, score=2 states default to Tier 2b. This isn't
+independently evidenced (no data connects rubric score to punitive-vs-compensatory outcome
+directly) but is a reasonable design choice: score=2 states in this cluster (e.g.
+`disparate_impact_architecture`, `the_arbitrary_standard`) already carry language describing
+clearer, more provable patterns — closer to what actually draws punitive exposure in real
+cases — while score=1 states (e.g. `pay_exposure`, `the_inside_track`) are explicitly framed
+as contingent/secondary. Flagging this mapping as a design choice, not a sourced finding, so
+it's not mistaken for verified evidence later.
+
+Per-capita base (either tier) still applies to the plausibly affected subgroup for that
+condition, not full headcount, per Addendum 1.
+
+### Cluster 3 — now fully sourced
+
+Using the corrected FLSA multiplier above and the DOL WHD average already sourced earlier this
+session (citation-audit.md: $259M recovered / ~177,000 workers FY2025 = ~$1,465/worker average
+back wages):
+
+- **Administrative path (1x, no liquidated damages per DOL's June 2025 policy change):**
+  affected_workers x $1,465
+- **Litigation path (2x, federal liquidated damages):** affected_workers x $2,930
+
+Scoped to the affected subgroup (hourly/non-exempt staff specifically), same per-capita logic
+as cluster 2. Both paths should probably be presented as a low/high pair (administrative floor,
+litigation ceiling) rather than picking one, since a client doesn't know in advance which path
+a real dispute would take — consistent with how the rest of the instrument already presents
+low/high rather than a single point estimate.
+
+### Status: all five clusters sourced
+
+1. Individual/isolated claim — $50K-$450K (parent doc)
+2. Class/systemic discrimination — two-tier, $1,800-2,500 (compensatory) / $25,000-31,000
+   (punitive), per-capita on affected subgroup
+3. Wage-and-hour — $1,465/worker (administrative) to $2,930/worker (litigation), per-capita
+   on affected subgroup
+4. Whistleblower/regulatory — $25,000 floor (EEOC mediation average) to uncapped (SEC
+   whistleblower awards, $1.9B+ since 2012)
+5. Safety/regulatory — $16,550 (serious violation) to $165,514 (willful) to $500K+
+   (aggregate multi-violation), per-incident
+
+### Still open
+
+- Cluster 2 tier-selection logic (rubric score — tier) is a design choice, not evidenced —
+  worth Gemini's and/or Pete's explicit sign-off as a judgment call, not treated as settled
+  by data.
+- How each cluster's dollar curve responds to the state's 0-2 rubric score within a tier
+  (linear vs. log-scale, matching the attritional design's precedent) — not yet decided for
+  any cluster.
+- Cluster 3's "affected subgroup" definition (hourly/non-exempt staff) needs to be confirmed
+  as computable from data PRV3 actually collects, not just conceptually correct.
 
 ## Structural implications (bigger than Option A)
 
