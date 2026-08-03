@@ -6,12 +6,17 @@ Computes an estimated financial consequence range for the identified
 organizational state cluster. All three calibration axes are now
 populated: PAYROLL_BASELINE_GRID (all 54 cells, industry_wage x
 headcount_midpoint), ORG_TYPE_SCALARS, and STATE_MULTIPLIERS (all 57
-states scored across the 4-criterion rubric -- see
-prompts/friction-tax-state-multiplier-methodology.md).
+states scored across a 3-criterion attritional rubric -- turnover,
+productivity, decision_quality; Legal/Compliance is fully split out to
+its own mechanism-aware design, prompts/friction-tax-legal-compliance-
+methodology.md, and is no longer part of this rubric's raw score or
+multiplier -- see prompts/friction-tax-state-multiplier-methodology.md).
 calibration_complete now returns True for any real, recognized
 (org_size, industry, org_type, state_ids) combination. ORG_TYPE_SCALARS
 and HEADCOUNT_MIDPOINTS were finalized 2026-08-01, STATE_MULTIPLIERS
-2026-08-02 -- see the source note on each entry.
+2026-08-02, rescaled (Option A) and multi-state compounding redesign
+implemented 2026-08-03 -- see the source note on each entry and
+prompts/friction-tax-multistate-compounding-methodology.md.
 
 Output: {"low": float, "high": float, "currency": "USD"}
   high = low * 1.4  (range spread, LOCKED)
@@ -391,12 +396,20 @@ ORG_TYPE_SCALARS: dict[str, OrgTypeScalarEntry] = {
 
 
 # -- State multiplier table -------------------------------------------------------
-# Per-state friction multiplier applied to the adjusted payroll baseline
+# Per-state attritional_fraction applied to the adjusted payroll baseline
 # (payroll basis, not revenue -- see prompts/friction-tax-unit-decision.md).
-# FINALIZED 2026-08-02 -- all 57 states scored across a 4-criterion rubric
-# (turnover/retention, productivity/output, decision-quality/velocity,
-# legal/compliance), each 0-2, min-max interpolated onto [1.0, 1.4]. See
-# prompts/friction-tax-state-multiplier-methodology.md for full methodology.
+# FINALIZED 2026-08-02, RESCALED 2026-08-03 (Option A) -- all 57 states
+# scored across a 3-criterion attritional rubric (turnover/retention,
+# productivity/output, decision-quality/velocity), each 0-2, min-max
+# interpolated onto [0.05, 0.25] (payroll fraction), replacing the
+# original 4-criterion / [1.0, 1.4] design. Legal/Compliance is no longer
+# part of this rubric's raw_score or multiplier -- each state's
+# StateCriterionScore for "legal" is still recorded below (needed by the
+# separate mechanism-aware design, prompts/friction-tax-legal-compliance-
+# methodology.md) but is excluded from raw_score's sum. See
+# prompts/friction-tax-state-multiplier-methodology.md for full
+# methodology and prompts/friction-tax-multistate-compounding-
+# methodology.md for how multiple identified states combine.
 # Keys: state_id strings matching engine/data/states.py registry (57 states).
 
 @dataclass(frozen=True)
@@ -408,7 +421,14 @@ class StateCriterionScore:
 
 @dataclass(frozen=True)
 class StateMultiplierEntry:
-    """One state's friction multiplier and its 4-criterion scoring basis."""
+    """
+    One state's standalone attritional_fraction (as if it were the only
+    identified state) and its scoring basis. raw_score sums only the 3
+    attritional criteria (turnover, productivity, decision_quality);
+    criteria still carries all 4 keys including "legal", whose score is
+    retained for the separate Legal/Compliance design but excluded from
+    raw_score and multiplier.
+    """
     multiplier: float
     raw_score: int
     criteria: dict[str, StateCriterionScore]
@@ -416,8 +436,8 @@ class StateMultiplierEntry:
 
 STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
     "built_to_fail": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.18333333333333335,
+        raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -438,8 +458,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "invisible_performance_management": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -460,7 +480,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_dormant_talent": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -482,7 +502,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_overloaded_manager": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -504,8 +524,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_paper_tiger": StateMultiplierEntry(
-        multiplier=1.08,
-        raw_score=3,
+        multiplier=0.08333333333333334,
+        raw_score=1,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -526,8 +546,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_undefined_role": StateMultiplierEntry(
-        multiplier=1.32,
-        raw_score=6,
+        multiplier=0.21666666666666667,
+        raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -548,7 +568,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_unformed_leader": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -570,8 +590,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "compression_crisis": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.18333333333333335,
+        raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -592,7 +612,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "decision_paralysis": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -614,8 +634,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "disparate_impact_architecture": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -636,8 +656,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "dueling_narratives": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.18333333333333335,
+        raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -658,8 +678,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "hr_capture": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -680,8 +700,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "heard_and_ignored": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -702,7 +722,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "invisible_influence_architecture": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -724,7 +744,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "leadership_continuity_risk": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -746,7 +766,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "paper_shield": StateMultiplierEntry(
-        multiplier=1,
+        multiplier=0.11666666666666667,
         raw_score=2,
         criteria={
             "turnover": StateCriterionScore(
@@ -768,8 +788,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "pay_exposure": StateMultiplierEntry(
-        multiplier=1.16,
-        raw_score=4,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -790,7 +810,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "planning_authority_gap": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -812,8 +832,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "sequential_decision_blindness": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -834,8 +854,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_exposed": StateMultiplierEntry(
-        multiplier=1.16,
-        raw_score=4,
+        multiplier=0.11666666666666667,
+        raw_score=2,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -856,7 +876,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_founders_grip": StateMultiplierEntry(
-        multiplier=1.32,
+        multiplier=0.25,
         raw_score=6,
         criteria={
             "turnover": StateCriterionScore(
@@ -878,7 +898,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_lost_map": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -900,8 +920,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_pay_fog": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -922,8 +942,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_policy_lag": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -944,8 +964,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_tolerated_violation": StateMultiplierEntry(
-        multiplier=1.16,
-        raw_score=4,
+        multiplier=0.11666666666666667,
+        raw_score=2,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -966,8 +986,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_unexamined_algorithm": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.18333333333333335,
+        raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
                 score=0,
@@ -988,7 +1008,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_uninitiated": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -1010,8 +1030,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_unsolved_problem": StateMultiplierEntry(
-        multiplier=1.16,
-        raw_score=4,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -1032,7 +1052,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "transition_paralysis": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -1054,7 +1074,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "decision_blindness": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -1076,8 +1096,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "distributed_culture_fragmentation": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.18333333333333335,
+        raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
                 score=0,
@@ -1098,7 +1118,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "silosolation": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -1120,8 +1140,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_arbitrary_standard": StateMultiplierEntry(
-        multiplier=1.32,
-        raw_score=6,
+        multiplier=0.18333333333333335,
+        raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -1142,7 +1162,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_fracture": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -1164,7 +1184,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_second_close": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -1186,8 +1206,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_suppression_filter": StateMultiplierEntry(
-        multiplier=1.4,
-        raw_score=7,
+        multiplier=0.25,
+        raw_score=6,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -1208,8 +1228,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "cultural_overtime": StateMultiplierEntry(
-        multiplier=1.16,
-        raw_score=4,
+        multiplier=0.11666666666666667,
+        raw_score=2,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -1230,7 +1250,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "culture_drift": StateMultiplierEntry(
-        multiplier=1.32,
+        multiplier=0.25,
         raw_score=6,
         criteria={
             "turnover": StateCriterionScore(
@@ -1252,8 +1272,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "groundhog_day": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.18333333333333335,
+        raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -1274,7 +1294,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "human_displacement_anxiety": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -1296,7 +1316,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "identity_erosion": StateMultiplierEntry(
-        multiplier=1.08,
+        multiplier=0.15000000000000002,
         raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
@@ -1318,8 +1338,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "invisible_burnout": StateMultiplierEntry(
-        multiplier=1.16,
-        raw_score=4,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -1340,7 +1360,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "leadership_deafness": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -1362,7 +1382,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "motivational_architecture_failure": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -1384,7 +1404,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "narrative_lock": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -1406,8 +1426,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_basement_standard": StateMultiplierEntry(
-        multiplier=1.32,
-        raw_score=6,
+        multiplier=0.21666666666666667,
+        raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -1428,7 +1448,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_broken_compass": StateMultiplierEntry(
-        multiplier=1.24,
+        multiplier=0.21666666666666667,
         raw_score=5,
         criteria={
             "turnover": StateCriterionScore(
@@ -1450,7 +1470,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_burned_credibility": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -1472,7 +1492,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_culture_that_wasnt": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -1494,8 +1514,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_diversity_ceiling": StateMultiplierEntry(
-        multiplier=1,
-        raw_score=2,
+        multiplier=0.08333333333333334,
+        raw_score=1,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -1516,8 +1536,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_inside_track": StateMultiplierEntry(
-        multiplier=1.16,
-        raw_score=4,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=2,
@@ -1538,8 +1558,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_unlocked_door": StateMultiplierEntry(
-        multiplier=1.16,
-        raw_score=4,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -1560,8 +1580,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_unreported_hazard": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -1582,8 +1602,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_untouchable": StateMultiplierEntry(
-        multiplier=1.16,
-        raw_score=4,
+        multiplier=0.15000000000000002,
+        raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -1604,8 +1624,8 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "the_wrong_reward": StateMultiplierEntry(
-        multiplier=1.24,
-        raw_score=5,
+        multiplier=0.18333333333333335,
+        raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
                 score=1,
@@ -1626,7 +1646,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "wellbeing_theater": StateMultiplierEntry(
-        multiplier=1.08,
+        multiplier=0.15000000000000002,
         raw_score=3,
         criteria={
             "turnover": StateCriterionScore(
@@ -1648,7 +1668,7 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
         },
     ),
     "what_nobody_says": StateMultiplierEntry(
-        multiplier=1.16,
+        multiplier=0.18333333333333335,
         raw_score=4,
         criteria={
             "turnover": StateCriterionScore(
@@ -1672,23 +1692,57 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
 }
 
 _STATE_MULTIPLIER_CRITERIA_KEYS = {"turnover", "productivity", "decision_quality", "legal"}
+_ATTRITIONAL_CRITERIA_KEYS = ("turnover", "productivity", "decision_quality")
+# "legal" remains a required key on every state's criteria dict -- its score
+# is still recorded (needed by the separate Legal/Compliance mechanism-aware
+# design, prompts/friction-tax-legal-compliance-methodology.md) but is no
+# longer part of this rubric's raw_score sum or its multiplier -- see
+# prompts/friction-tax-state-multiplier-methodology.md.
 
 for _sid, _entry in STATE_MULTIPLIERS.items():
     assert set(_entry.criteria.keys()) == _STATE_MULTIPLIER_CRITERIA_KEYS, (
         f"{_sid}: criteria keys {set(_entry.criteria.keys())} != "
         f"{_STATE_MULTIPLIER_CRITERIA_KEYS}"
     )
-    _criteria_sum = sum(_c.score for _c in _entry.criteria.values())
+    _criteria_sum = sum(_entry.criteria[_k].score for _k in _ATTRITIONAL_CRITERIA_KEYS)
     assert _criteria_sum == _entry.raw_score, (
-        f"{_sid}: raw_score {_entry.raw_score} != sum of criteria scores {_criteria_sum}"
+        f"{_sid}: raw_score {_entry.raw_score} != sum of the 3 attritional "
+        f"criteria scores {_criteria_sum} (legal excluded from this sum)"
     )
     for _cname, _c in _entry.criteria.items():
         assert 0 <= _c.score <= 2, f"{_sid}.{_cname}: score {_c.score} out of [0, 2]"
-    assert 1.0 <= _entry.multiplier <= 1.4, (
-        f"{_sid}: multiplier {_entry.multiplier} out of [1.0, 1.4]"
+    assert 0.05 <= _entry.multiplier <= 0.25, (
+        f"{_sid}: multiplier {_entry.multiplier} out of [0.05, 0.25]"
     )
 del _sid, _entry, _criteria_sum, _cname, _c
 
+
+_R_MIN: float = 0.0
+_R_MAX: float = 6.0
+_FRACTION_MIN: float = 0.05
+_FRACTION_MAX: float = 0.25
+
+
+# -- Multi-state compounding (Steps 1-3) -------------------------------------------
+# prompts/friction-tax-multistate-compounding-methodology.md. K=0.05 CLOSED
+# (Pete's final decision) -- breadth range [1, 3], Legal/Compliance fully
+# split out (see prompts/friction-tax-legal-compliance-methodology.md), not
+# part of this loop.
+
+_MULTI_CHANNEL_SEVERITY_LOADING_K: float = 0.05
+
+
+def _attritional_fraction(raw_total: float) -> float:
+    """
+    Frozen [0, 6] -> [0.05, 0.25] linear mapping (Option A rescale,
+    prompts/friction-tax-state-multiplier-methodology.md). R_min/R_max are
+    fixed theoretical constants, not derived from observed data, so this
+    same function serves both a single state's own raw_score (0-6) and a
+    multi-state combined_raw_total (Step 1), which can exceed 6 -- in
+    which case this extrapolates linearly past 0.25 rather than clamping,
+    intentionally.
+    """
+    return _FRACTION_MIN + (_FRACTION_MAX - _FRACTION_MIN) * ((raw_total - _R_MIN) / (_R_MAX - _R_MIN))
 
 # -- Core computation ---------------------------------------------------------------
 
@@ -1721,10 +1775,17 @@ def compute_friction_tax(
 
     Sequence: (1) look up (org_size, industry) in PAYROLL_BASELINE_GRID,
     (2) apply ORG_TYPE_SCALARS[org_type].scalar to the grid result, (3)
-    compute mean_multiplier via the existing, unchanged averaging logic
-    across state_ids, (4) apply severity_scalar (unchanged, LOCKED), (5)
-    low = adjusted_baseline * mean_multiplier * severity_scalar,
-    high = low * 1.4 (unchanged, LOCKED).
+    aggregate each of the 3 attritional criteria across identified states
+    via anchor-plus-diminishing-layers (Step 1, geometric decay), (4) map
+    the combined criterion total through the same frozen [0, 6] -> [0.05,
+    0.25] mapping used for a single state (Step 2, extrapolates linearly
+    past 0.25 for combined totals above 6), (5) apply
+    multi_channel_severity_loading (Step 3, K=0.05, breadth 1-3, forced to
+    1.0 when exactly one state is identified), (6) apply severity_scalar
+    (unchanged, LOCKED), (7) low = adjusted_baseline * combined_multiplier
+    * multi_channel_severity_loading * severity_scalar, high = low * 1.4
+    (unchanged, LOCKED). See prompts/friction-tax-multistate-compounding-
+    methodology.md for the full Steps 1-3 design.
 
     Returns low=None, high=None, calibration_complete=False when any
     required value is missing or the (org_size, industry) pair, org_type,
@@ -1739,16 +1800,13 @@ def compute_friction_tax(
     org_type_scalar = org_type_entry.scalar if org_type_entry is not None else None
     severity_scalar = SEVERITY_SCALAR.get(severity_tier, _DEFAULT_SEVERITY_SCALAR)
 
-    state_multiplier_values = [
-        STATE_MULTIPLIERS[sid].multiplier if sid in STATE_MULTIPLIERS else None
-        for sid in state_ids
-    ]
+    state_entries = [STATE_MULTIPLIERS.get(sid) for sid in state_ids]
 
     calibration_complete = (
         payroll_floor is not None
         and org_type_scalar is not None
         and bool(state_ids)
-        and all(v is not None for v in state_multiplier_values)
+        and all(e is not None for e in state_entries)
     )
 
     if not calibration_complete:
@@ -1762,9 +1820,45 @@ def compute_friction_tax(
         }
 
     adjusted_baseline = payroll_floor * org_type_scalar  # type: ignore[operator]
-    mean_multiplier = sum(state_multiplier_values) / len(state_multiplier_values)  # type: ignore[arg-type]
 
-    low = round(adjusted_baseline * mean_multiplier * severity_scalar, 2)
+    # Step 1 (Factor A) -- per-criterion aggregation across identified
+    # states, anchor-plus-diminishing-layers, geometric decay w_i = 0.5**(i-1).
+    # With exactly one identified state this collapses to that state's own
+    # criterion scores untouched (single term, weight 1.0) -- verified by
+    # tools/test_friction_tax.py's continuity assertions, not just assumed.
+    combined_criterion_scores = {
+        k: sum(
+            (0.5 ** i) * score
+            for i, score in enumerate(
+                sorted((e.criteria[k].score for e in state_entries), reverse=True)  # type: ignore[union-attr]
+            )
+        )
+        for k in _ATTRITIONAL_CRITERIA_KEYS
+    }
+    combined_raw_total = sum(combined_criterion_scores.values())
+
+    # Step 2 -- map the combined criterion profile to a payroll-fraction
+    # multiplier via the same frozen [0, 6] -> [0.05, 0.25] mapping used
+    # for a single state (prompts/friction-tax-state-multiplier-
+    # methodology.md). Extrapolates linearly beyond 0.25 if combined_raw_total
+    # exceeds 6 -- intentional, per that doc's frozen-range design.
+    combined_multiplier = _attritional_fraction(combined_raw_total)
+
+    # Step 3 (Factor B) -- multi-channel severity loading. N=1 guard: with
+    # exactly one identified state, loading MUST be exactly 1.0 regardless
+    # of how many criteria that state's own scores touch -- explicit, not
+    # inferred from the breadth formula, so single-state continuity holds
+    # by construction rather than by coincidence.
+    breadth = sum(1 for v in combined_criterion_scores.values() if v > 0)
+    if len(state_entries) == 1:
+        multi_channel_severity_loading = 1.0
+    else:
+        multi_channel_severity_loading = 1.0 + _MULTI_CHANNEL_SEVERITY_LOADING_K * (breadth - 1)
+
+    low = round(
+        adjusted_baseline * combined_multiplier * multi_channel_severity_loading * severity_scalar,
+        2,
+    )
     high = round(low * 1.4, 2)
 
     return {
