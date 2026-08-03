@@ -1,12 +1,16 @@
 # Friction Tax — Legal/Compliance Tail-Risk Methodology (In Progress, Not Locked)
 
 **Status:** Design in progress. Direction has shifted twice already this session as real data
-falsified two earlier approaches. All 30 Legal-scoring states are now classified into 5
-mechanism clusters, and all 5 clusters now have sourced dollar curves (Addenda 1 and 2,
-below) -- ready for Gemini architecture review. NOT yet implemented. Does not supersede the
-Option A attritional-criteria rescale (turnover/productivity/decision-quality), which
-proceeds independently -- this doc is specifically the deferred Legal/Compliance item that
-Option A explicitly excluded.
+falsified two earlier approaches. All 30 Legal-scoring states are classified into 5
+mechanism clusters, with one reclassification still pending (`the_untouchable`, currently
+Cluster 2, likely Cluster 1 per Gemini's review -- unresolved), and all 5 clusters have
+sourced dollar curves (Addenda 1 and 2). A cross-state aggregation design is now proposed
+(Addendum 3, below: within-cluster geometric decay, across-cluster simple addition) but is
+NOT yet ready for Gemini review -- blocked on Cluster 3's interpolation disagreement
+(path-uncertainty pair vs. rubric-score mapping, surfaced by Gemini's review, unresolved)
+resolving first. NOT yet implemented. Does not supersede the Option A attritional-criteria
+rescale (turnover/productivity/decision-quality), which proceeds independently -- this doc
+is specifically the deferred Legal/Compliance item that Option A explicitly excluded.
 
 ## Why Legal/Compliance can't share Option A's mapping
 
@@ -323,6 +327,102 @@ low/high rather than a single point estimate.
   any cluster.
 - Cluster 3's "affected subgroup" definition (hourly/non-exempt staff) needs to be confirmed
   as computable from data PRV3 actually collects, not just conceptually correct.
+
+## Addendum 3 — Cross-State Legal/Compliance Aggregation
+
+**Status:** Proposed design. Addresses a gap Gemini's architecture review surfaced that no
+prior document in this series addressed: dollar curves were designed per individual state,
+but nothing specified how multiple simultaneously-identified Legal-scoring states combine.
+Depends on the within-cluster score-to-dollar interpolation formulas (see Addendum 2's
+"still open" list and Gemini's review) being finalized, especially Cluster 3's unresolved
+disagreement (path-uncertainty pair vs. rubric-score mapping) — this doc specifies the
+aggregation shape, not final numbers, and cannot fully lock until that resolves. NOT yet
+reviewed by Gemini. NOT implemented.
+
+### The problem
+
+A real client profile can identify multiple Legal-scoring states at once — plausibly, states
+spanning different clusters (e.g. `hr_capture` in Cluster 4 alongside `the_unreported_hazard`
+in Cluster 5). Nothing in the parent doc or either addendum specifies whether the output sums
+every identified state's dollar range independently, which risks the same category of error
+already caught and fixed once this session on the attritional side (unbounded compounding
+producing an implausible aggregate).
+
+### Core distinction: within-cluster and across-cluster need different treatment
+
+This isn't an arbitrary design choice — it follows from what the clusters actually represent
+legally.
+
+**Within a cluster**, multiple identified states usually reflect the same underlying legal
+theory, with multiple states serving as multiple pieces of evidence for one broader claim. Two
+Cluster 2 states (e.g. `disparate_impact_architecture` and `the_pay_fog`) aren't two separate
+discrimination lawsuits — in practice, multiple discriminatory patterns strengthen one
+pattern-or-practice case. The org faces a more provable, probably more severe version of ONE
+exposure, not two independent ones.
+
+**Across clusters**, this reasoning doesn't hold. A Cluster 2 discrimination exposure and a
+Cluster 5 OSHA safety exposure are different bodies of law, different enforcing agencies,
+different plaintiffs, different courts. There's no legal-theory basis for these to merge —
+real organizations face both as genuinely separate, cumulative liabilities.
+
+### Proposed structure
+
+**Within-cluster: geometric decay, reusing the attritional design's Step 1 math exactly.**
+Primary (highest-dollar) state in a cluster contributes at full weight; each additional
+same-cluster state contributes at decaying weight, w_i = 0.5^(i-1). No new math — this is the
+same shape already locked and implemented for Factor A on the attritional side, applied to a
+different input (per-cluster dollar position instead of per-criterion raw score).
+
+**Across-cluster: simple addition. No breadth premium, deliberately, unlike the attritional
+design's Factor B.** This is a real departure from the attritional precedent and needs to be
+justified explicitly rather than assumed to carry over:
+
+The attritional side's multi_channel_severity_loading (K=0.05) exists because breadth across
+criteria measures something beyond any individual criterion's depth — systemic organizational
+coupling, fragility from multiple systems failing simultaneously. Legal/Compliance clusters
+don't have an equivalent "extra" story: if an org faces a discrimination claim AND a safety
+violation, the real-world cost genuinely is close to the sum of both, because they are
+literally separate cases with separate remedies, not one entangled condition.
+
+A weaker counter-argument exists — facing many different kinds of legal exposure could signal
+broader compliance dysfunction and raise the probability that any single exposure actually
+gets litigated — but that's a probability-of-litigation argument, and this entire Legal/
+Compliance design has stayed deterministic (if-present, here's the exposure range) rather than
+probability-weighted, consistent with open question #3 in the parent doc never having been
+resolved toward probability-weighting. Simple addition across clusters is the version
+consistent with everything else already built. If the design ever moves toward probability-
+weighting, this decision should be revisited alongside that larger change, not patched in
+isolation.
+
+**Continuity requirement, same shape as the attritional N=1 guard:** if exactly one Legal-
+scoring state is identified across the entire profile, output must collapse exactly to that
+state's own individual dollar range from its cluster's curve — no aggregation logic engaged,
+regardless of how many clusters a single state's own description might touch.
+
+### Why this can't fully lock yet
+
+Within-cluster decay requires each identified state to have an actual dollar *position* within
+its cluster to decay-weight against other same-cluster states. That position depends on the
+score-to-dollar interpolation formula for that cluster, which is not yet finalized — Gemini's
+review proposed logarithmic interpolation for Clusters 1, 4, and 5, linear-within-tier for
+Cluster 2, and a binary step function for Cluster 3 that conflicts with Addendum 2's
+path-uncertainty design for that cluster. Cluster 3's resolution specifically changes what
+there even is to decay-weight for states in that cluster (a fixed point per score, vs. a
+low/high pair regardless of score) — this aggregation design should not be treated as final
+until that's resolved.
+
+### Open questions
+
+1. Does simple across-cluster addition hold once real worked-dollar examples are run against
+   it (the same plausibility-check standard applied to every other part of this design), or
+   does summing a Cluster 2 range and a Cluster 5 range produce something that needs its own
+   sanity check the way the original attritional ceiling did?
+2. Should the within-cluster decay weight (0.5^(i-1)) be reused as-is from the attritional
+   design, or does Legal/Compliance's evidence-strengthening logic (more states = more
+   provable, not just more severe) argue for a different decay rate specific to this context?
+3. Once Cluster 3's interpolation resolves, revisit whether its within-cluster aggregation
+   needs different treatment than the other four clusters, given its output shape may differ
+   fundamentally (a range vs. a point) depending on how that disagreement resolves.
 
 ## Structural implications (bigger than Option A)
 
