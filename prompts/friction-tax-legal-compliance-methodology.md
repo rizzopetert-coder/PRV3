@@ -1,18 +1,20 @@
 # Friction Tax — Legal/Compliance Tail-Risk Methodology (In Progress, Not Locked)
 
-**Status:** Design in progress. Direction has shifted twice already this session as real data
-falsified two earlier approaches. All 30 Legal-scoring states are classified into 5
-mechanism clusters -- `the_untouchable` reclassified Cluster 2 -> Cluster 1 (Addendum 4,
-resolving Gemini's review flag). Cluster 3's interpolation is locked: scope-modulated (rubric
-score sets affected-worker-count via Cluster 2's existing per-capita mechanism), not
-path-modulated (administrative/litigation stays a fixed low/high pair regardless of score),
-resolving the Addendum 2 vs. Gemini's-review disagreement. All 5 clusters have sourced dollar
-curves (Addenda 1 and 2). The cross-state aggregation design (Addendum 3: within-cluster
-geometric decay, across-cluster simple addition) is now UNBLOCKED and ready for Gemini
-review, alongside a fresh review of both resolutions above. NOT yet implemented. Does not
-supersede the Option A attritional-criteria rescale (turnover/productivity/decision-quality),
-which proceeds independently -- this doc is specifically the deferred Legal/Compliance item
-that Option A explicitly excluded.
+**Status:** Design in progress. Direction has shifted several times this session as real data
+falsified earlier approaches. All 30 Legal-scoring states are classified into 5 mechanism
+clusters -- `the_untouchable` reclassified Cluster 2 -> Cluster 1 (Addendum 4, resolving
+Gemini's review flag). Cluster 3's interpolation is locked: scope-modulated, not
+path-modulated (Addendum 4). **Cluster 4 fully resolved this session into three org_type-
+gated sub-tracks (Addendum 5) -- a structural reframe, not a minor edit:** 4a SEC/Dodd-Frank
+(org_type=Publicly traded), 4b general private-sector retaliation (org_type=Founder-led /
+Privately held professional leadership / Nonprofit / most PE-VC-backed, statutory-cap-
+anchored), 4c government (org_type=Government, qualitative only, no dollar figure -- thin
+MSPB data). All 5 clusters now have sourced dollar curves, and the cross-state aggregation
+design (Addendum 3) is UNBLOCKED and ready for Gemini review, alongside the rest of the
+Legal/Compliance package. NOT yet implemented. Does not supersede the Option A attritional-
+criteria rescale (turnover/productivity/decision-quality), which proceeds independently --
+this doc is specifically the deferred Legal/Compliance item that Option A explicitly
+excluded.
 
 ## Why Legal/Compliance can't share Option A's mapping
 
@@ -480,6 +482,108 @@ cross-state aggregation proposal is ready for its own Gemini review as originall
 `distributed_culture_fragmentation`
 
 All other cluster memberships (3, 4, 5) unchanged from Addendum 1.
+
+## Addendum 5 — Cluster 4 Resolved: Three Sub-Tracks Replace the Single Uncapped Curve
+
+**Status:** Closes Cluster 4. This is a genuine reframe, not a patch — the original "uncapped,
+sanction-driven" design only ever accurately described one org_type's reality (publicly
+traded companies subject to SEC jurisdiction). Applying the Demographic Applicability Filter
+(prompts/demographic-applicability-filter-protocol.md) surfaced that most of PRV3's actual
+clients need a fundamentally different, capped, statute-grounded curve instead. Ready for
+Gemini review alongside the rest of the Legal/Compliance package.
+
+### Why the original single curve was wrong, restated precisely
+
+Cluster 4's ceiling was anchored to SEC whistleblower award data (up to $279M single award,
+$1.9B+ since 2012). That data is real and correctly sourced — but the SEC only has
+jurisdiction over public companies, investment advisers, and broker-dealers. For the org_type
+values that cover most of PRV3's actual client base (`Founder-led`, `PE or VC-backed` in most
+cases, `Privately held professional leadership`, `Nonprofit`), this mechanism doesn't exist at
+all — not a magnitude error, an applicability error. A nonprofit or founder-led company was
+never going to face SEC-scale exposure regardless of how severe its Cluster 4 states scored,
+and the original design had no way to reflect that.
+
+### The three sub-tracks, gated on `org_type` (engine/accumulation.py's IntakeData field)
+
+### 4a — SEC/Dodd-Frank (org_type = "Publicly traded")
+
+Unchanged from the original design, correctly scoped now to the org_type it actually
+describes:
+- Floor: ~$25,000 (EEOC National Mediation Program average, sourced Addendum 1)
+- Ceiling: uncapped, sanction-driven — average award ~$4.95M (computed directly from SEC's own
+  FY2024 data: $2.2B / 444 whistleblowers since 2011), average total organizational sanction
+  ~$16.5M-$49.5M (award represents only 10-30% of total sanctions collected, per SEC's own
+  stated award-percentage rule), historic outlier ceiling $279M (largest single award, 2023).
+
+**Edge case, not fully resolved:** `org_type = "PE or VC-backed"` may belong here if the
+company itself (or its ownership structure) is a registered investment adviser or
+broker-dealer — not determinable from `org_type` alone, would need cross-referencing
+`industry = "Financial Services"`. Flagged, not built, pending further scoping.
+
+### 4b — General private-sector retaliation (org_type = "Founder-led", "Privately held
+professional leadership", "Nonprofit", and "PE or VC-backed" outside the 4a edge case)
+
+Replaces the SEC anchor entirely with a real federal statute: 42 U.S.C. Sec 1981a(b)(3), the
+Title VII/ADA compensatory-and-punitive damages cap, verified identically across seven
+independent legal sources with zero discrepancy. Maps directly onto PRV3's existing headcount
+buckets:
+
+| PRV3 headcount bucket | Statutory cap |
+|---|---|
+| Under 25 | $50,000 (see coverage-threshold caveat below) |
+| 25-99 | $50,000 |
+| 100-249 | $50,000-$100,000 (bucket straddles the 100-employee statutory line) |
+| 250-499 | $200,000 |
+| 500-999 | $300,000 |
+| 1000+ | $300,000 |
+
+Floor: $25,000 (EEOC mediation average, same as 4a — the pre-litigation resolution path is
+the same regardless of org_type).
+
+**Two caveats built into this track, not glossed over:**
+- The statutory cap covers compensatory and punitive damages only — excludes back pay, front
+  pay, and attorneys' fees, which stack on top and can be substantial (attorneys' fees alone
+  can exceed $100,000 in a contested case, per sourced legal commentary).
+- **California's FEHA imposes no statutory cap at all.** A client with CA in `jurisdictions`
+  faces genuinely uncapped exposure at the state level regardless of the federal Title VII
+  figure. This is the first concrete instance of `jurisdictions` overriding a headcount-based
+  cap — worth treating as a live example when the systematic filter pass runs across the
+  other four clusters, since state-law overrides may exist elsewhere and haven't been checked.
+
+**Coverage-threshold caveat:** Title VII/ADA apply at 15+ employees (ADA) and generally 15+
+(Title VII). The "Under 25" bucket may include employers below this threshold who aren't
+covered by this track at all — mirrors the same threshold issue flagged for Clusters 1 and 2,
+not yet resolved, part of the systematic pass.
+
+### 4c — Government (org_type = "Government")
+
+**No dollar figure — genuinely thin data, not a research shortfall.** The federal Whistleblower
+Protection Act runs through the MSPB, and a specialized legal source states directly: "there
+is no published average MSPB settlement amount." The underlying data explains why: only 6 of
+118 whistleblower-reprisal cases were found to have merit in FY2025 (~5%), and only 14-20% of
+appeals even reach settlement. This mechanism doesn't produce the kind of data the other four
+tracks do. Handled the same way the earlier "genuinely unclassifiable" states were handled
+before Pete's manual sort resolved them: flagged qualitatively (mechanism named, statute
+cited, no dollar range implied), rather than forcing a number onto data that doesn't support
+one.
+
+### What this means for cross-state aggregation (Addendum 3)
+
+Addendum 3's within-cluster decay logic needs a per-state dollar position to decay-weight.
+Cluster 4 states now need to know which sub-track applies (via the client's own org_type)
+before that position exists — this wasn't a consideration when Addendum 3 was written, since
+Cluster 4 was still a single curve at that point. Addendum 3 doesn't need structural changes,
+but implementation needs to resolve org_type-gating before within-cluster decay can run for
+any Cluster 4 state.
+
+### Immediate next step
+
+The Demographic Applicability Filter is being run systematically across the remaining four
+clusters next, starting from two live leads already surfaced: a headcount coverage-threshold
+issue likely affecting Clusters 1 and 2 (ADA at 15+, FMLA at 50+ employees), and the
+`is_high_hazard` property already live in `engine/accumulation.py` (checking `industry`
+against `HIGH_HAZARD_INDUSTRIES`) that Cluster 5 should probably hook into rather than
+remaining industry-blind.
 
 ## Structural implications (bigger than Option A)
 
