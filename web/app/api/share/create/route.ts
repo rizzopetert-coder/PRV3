@@ -229,6 +229,7 @@ export async function POST(request: NextRequest) {
     resolution_family: getPrimaryFamily(selectedStateIds),
 
     friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
+    legal_tail_risk_band: engineResult.private_output.legal_tail_risk_exposure?.band ?? null,
 
     intake: mapIntake(engineResult.intake as Record<string, unknown>),
 

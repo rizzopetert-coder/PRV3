@@ -1062,6 +1062,59 @@ check(
 )
 
 
+
+# -- 32. _legal_exposure_band() -- exact boundary-threshold behavior -------------
+# Confirms the real inequality direction matches Addendum 11's "Under $100K" /
+# "$100K-$500K" / "$500K-$2M" / "$2M+" wording -- each cutoff value itself
+# lands in the HIGHER band, not the lower one.
+
+check(
+    "_legal_exposure_band(None) -> None",
+    _ft._legal_exposure_band(None) is None,
+    f"got {_ft._legal_exposure_band(None)}",
+)
+check(
+    "_legal_exposure_band(0.0) -> Minor (zero floor, still a real number)",
+    _ft._legal_exposure_band(0.0) == "Minor",
+    f"got {_ft._legal_exposure_band(0.0)}",
+)
+check(
+    "_legal_exposure_band(99_999.99) -> Minor (just under $100K)",
+    _ft._legal_exposure_band(99_999.99) == "Minor",
+    f"got {_ft._legal_exposure_band(99_999.99)}",
+)
+check(
+    "_legal_exposure_band(100_000.0) -> Moderate ($100K itself, not Minor)",
+    _ft._legal_exposure_band(100_000.0) == "Moderate",
+    f"got {_ft._legal_exposure_band(100_000.0)}",
+)
+check(
+    "_legal_exposure_band(499_999.99) -> Moderate (just under $500K)",
+    _ft._legal_exposure_band(499_999.99) == "Moderate",
+    f"got {_ft._legal_exposure_band(499_999.99)}",
+)
+check(
+    "_legal_exposure_band(500_000.0) -> Elevated ($500K itself, not Moderate)",
+    _ft._legal_exposure_band(500_000.0) == "Elevated",
+    f"got {_ft._legal_exposure_band(500_000.0)}",
+)
+check(
+    "_legal_exposure_band(1_999_999.99) -> Elevated (just under $2M)",
+    _ft._legal_exposure_band(1_999_999.99) == "Elevated",
+    f"got {_ft._legal_exposure_band(1_999_999.99)}",
+)
+check(
+    "_legal_exposure_band(2_000_000.0) -> Significant ($2M itself, not Elevated)",
+    _ft._legal_exposure_band(2_000_000.0) == "Significant",
+    f"got {_ft._legal_exposure_band(2_000_000.0)}",
+)
+check(
+    "_legal_exposure_band(50_000_000.0) -> Significant (well above $2M)",
+    _ft._legal_exposure_band(50_000_000.0) == "Significant",
+    f"got {_ft._legal_exposure_band(50_000_000.0)}",
+)
+
+
 # -- Results ---------------------------------------------------------------------
 
 print(f"\nPASS: {len(PASS)}   FAIL: {len(FAIL)}")

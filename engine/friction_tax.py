@@ -2194,6 +2194,28 @@ def _legal_exposure_band(low: Optional[float]) -> Optional[str]:
     return "Significant"
 
 
+# Architecture note (confirmed via a real worked-example plausibility
+# pass, 2026-08-04, Gemini structural review): this function's dollar
+# output is deliberately headcount-independent -- Legal/Compliance
+# claims don't scale with org size the way attritional costs do
+# (Addendum 1's original rationale for rejecting a payroll-fraction
+# mapping here). One real consequence, confirmed with actual numbers,
+# not theoretical: a severe multi-cluster profile on a very small org
+# (e.g. "Under 25" headcount) can produce a low figure that exceeds
+# that org's own total payroll baseline -- by a wide margin at the
+# extreme tail (observed up to ~2.5x payroll stacking every real
+# Legal-scoring state at once, and far higher for the structurally
+# valid but practically unlikely combination of a tiny headcount with
+# org_type == "Publicly traded", since Cluster 4a's ceiling is not
+# headcount-scaled either). This is an accepted, understood property
+# of the design, not a bug -- Legal/Compliance is priced by mechanism
+# and severity, not by ability to pay. Cluster 4's org_type gating
+# (Addendum 5) is the other half of this picture: the SAME severity
+# profile can differ by >20x between "Publicly traded" (Cluster 4a,
+# SEC-anchored, ceiling $33M) and every other org_type (Cluster 4b,
+# Title VII-capped, max $300K) -- also intentional, and the main
+# driver of when the "Significant" band (_legal_exposure_band()
+# above) is actually reachable in practice for a realistic profile.
 def compute_legal_compliance_exposure(
     state_ids: list[str],
     org_size: str,

@@ -463,6 +463,7 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
             "low":                     legal_result["low"],
             "high":                    legal_result["high"],
             "currency":                legal_result["currency"],
+            "band":                    legal_result["band"],
             "caveat":                  LEGAL_TAIL_RISK_CAVEAT_TEXT,
             "has_unpriced_conditions": legal_result["has_unpriced_conditions"],
         }

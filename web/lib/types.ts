@@ -83,27 +83,29 @@ export interface FrictionTaxEstimate {
  * Non-null when either a real dollar range exists or at least one
  * identified state carries real-but-unpriced exposure
  * (has_unpriced_conditions) -- see compute_legal_compliance_exposure()
- * in engine/friction_tax.py for the exact trigger logic.
+ * in engine/friction_tax.py for the exact trigger logic. band is the
+ * same qualitative value ShareableOutputPayload.legal_tail_risk_band
+ * carries publicly -- present here too so the shareable-path builder
+ * (web/app/api/share/create/route.ts) can read it straight off
+ * engineResult.private_output without a separate computation.
  */
 export interface LegalTailRiskExposure {
   low: number;
   high: number;
   currency: string;
+  band: LegalTailRiskBand | null;
   caveat: string;
   has_unpriced_conditions: boolean;
 }
 
 /**
- * Qualitative severity band for legal tail-risk exposure in the
- * shareable output only -- no dollar figure exposed publicly (Addendum
- * 11: a specific number in a shareable artifact could function as
- * documented notice of a contingent liability). Deliberately a bare
- * string union rather than a {low, high, caveat}-shaped interface like
- * LegalTailRiskExposure -- the shareable path has no caveat text of its
- * own yet (Finding 1: friction_tax_estimate is still hardcoded null
- * there). Revisit this shape once Finding 1's fix builds out real
- * shareable-path caveat copy -- a bare string may no longer be enough
- * once that lands.
+ * Qualitative severity band for legal tail-risk exposure. Computed
+ * server-side in engine/friction_tax.py's _legal_exposure_band() and
+ * carried through LegalTailRiskExposure.band (private output) into
+ * ShareableOutputPayload.legal_tail_risk_band (shareable output) --
+ * the shareable path never gets a dollar figure, only this band
+ * (Addendum 11: a specific number in a shareable artifact could
+ * function as documented notice of a contingent liability).
  */
 export type LegalTailRiskBand = "Minor" | "Moderate" | "Elevated" | "Significant";
 
@@ -252,12 +254,10 @@ export interface ShareableOutputPayload {
   // Economic (nullable — Option B rendering when null)
   friction_tax_estimate: FrictionTaxEstimate | null;
 
-  // Legal/Compliance qualitative band (nullable, optional) -- Addendum 11.
-  // Optional because web/app/api/share/create/route.ts isn't wired to
-  // populate this yet (deferred alongside Finding 1's fix) -- present
-  // in the type now so that wiring is a small addition later, not a
-  // schema change.
-  legal_tail_risk_band?: LegalTailRiskBand | null;
+  // Legal/Compliance qualitative band (nullable) -- Addendum 11.
+  // web/app/api/share/create/route.ts populates this from
+  // engineResult.private_output.legal_tail_risk_exposure?.band.
+  legal_tail_risk_band: LegalTailRiskBand | null;
 
   // Intake echo — grounds friction_tax_estimate math for external audience
   intake: IntakeEcho;
