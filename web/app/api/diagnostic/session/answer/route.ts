@@ -369,6 +369,7 @@ export async function POST(request: NextRequest) {
     resolution_routing: engineResult.private_output.resolution_routing,
 
     friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
+    legal_tail_risk_exposure: engineResult.private_output.legal_tail_risk_exposure,
 
     cascade_risk: engineResult.private_output.cascade_risk,
     causation_pattern: engineResult.private_output.causation_pattern,

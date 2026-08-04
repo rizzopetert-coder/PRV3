@@ -831,7 +831,7 @@ _r_n1 = compute_legal_compliance_exposure(
 check(
     "N=1 guard: single Legal-scoring state (built_to_fail, Cluster 1, score=1) collapses to its own floor exactly",
     _r_n1 == {
-        "low": 50_000.0, "high": 50_000.0, "currency": "USD",
+        "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"got {_r_n1}",
@@ -854,7 +854,7 @@ _expected_cross = round(50_000.0 + 165_514.0, 2)
 check(
     "Cross-cluster addition: built_to_fail (C1, $50,000) + the_unreported_hazard (C5, $165,514) sums directly, no breadth premium",
     _r_cross == {
-        "low": _expected_cross, "high": _expected_cross, "currency": "USD",
+        "low": _expected_cross, "high": _expected_cross, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"expected low=high={_expected_cross}, got {_r_cross}",
@@ -876,7 +876,7 @@ _expected_decay = round(450_000.0 * 1.0 + 50_000.0 * 0.5, 2)
 check(
     "Within-cluster decay: the_paper_tiger ($450,000) full weight + built_to_fail ($50,000) at 0.5x, both Cluster 1",
     _r_decay == {
-        "low": _expected_decay, "high": _expected_decay, "currency": "USD",
+        "low": _expected_decay, "high": _expected_decay, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"expected low=high={_expected_decay}, got {_r_decay}",
@@ -894,7 +894,7 @@ _r_tier_2b = compute_legal_compliance_exposure(
 check(
     "Cluster 2: disparate_impact_architecture (score=2) selects Tier 2b ($25,000-31,000), not the log-scale formula",
     _r_tier_2b == {
-        "low": 25_000.0, "high": 31_000.0, "currency": "USD",
+        "low": 25_000.0, "high": 31_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"got {_r_tier_2b}",
@@ -908,7 +908,7 @@ _r_tier_2a = compute_legal_compliance_exposure(
 check(
     "Cluster 2: pay_exposure (score=1) selects Tier 2a ($1,800-2,500)",
     _r_tier_2a == {
-        "low": 1_800.0, "high": 2_500.0, "currency": "USD",
+        "low": 1_800.0, "high": 2_500.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"got {_r_tier_2a}",
@@ -937,7 +937,7 @@ check(
     "Cluster 3 per-capita math: cultural_overtime (Manufacturing, 250-499) matches hand-derived "
     "headcount_midpoint x non_exempt_ratio x scope_fraction x per-worker rate",
     _r_cluster3 == {
-        "low": _co_expected_low, "high": _co_expected_high, "currency": "USD",
+        "low": _co_expected_low, "high": _co_expected_high, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"expected low={_co_expected_low}, high={_co_expected_high}, got {_r_cluster3}",
@@ -955,7 +955,7 @@ _r_4a = compute_legal_compliance_exposure(
 check(
     "Cluster 4, org_type='Publicly traded' routes to 4a: hr_capture (score=2) -> ceiling $33,000,000",
     _r_4a == {
-        "low": 33_000_000.0, "high": 33_000_000.0, "currency": "USD",
+        "low": 33_000_000.0, "high": 33_000_000.0, "currency": "USD", "band": "Significant",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"got {_r_4a}",
@@ -969,7 +969,7 @@ _r_4b = compute_legal_compliance_exposure(
 check(
     "Cluster 4, org_type='Founder-led' routes to 4b: hr_capture (score=2), 250-499 bucket -> $200,000 statutory cap",
     _r_4b == {
-        "low": 200_000.0, "high": 200_000.0, "currency": "USD",
+        "low": 200_000.0, "high": 200_000.0, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"got {_r_4b}",
@@ -989,7 +989,7 @@ _r_4b_floor = compute_legal_compliance_exposure(
 check(
     "Cluster 4b floor: dueling_narratives (score=1) -> $25,000 EEOC mediation floor, regardless of headcount bucket",
     _r_4b_floor == {
-        "low": 25_000.0, "high": 25_000.0, "currency": "USD",
+        "low": 25_000.0, "high": 25_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"got {_r_4b_floor}",
@@ -1004,7 +1004,7 @@ check(
     "Cluster 4, org_type='Government' routes to 4c: no dollar figure -- None, not zero, "
     "and now surfaced via has_unpriced_conditions/unpriced_state_ids rather than silently vanishing",
     _r_4c == {
-        "low": None, "high": None, "currency": "USD",
+        "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": True, "unpriced_state_ids": ["hr_capture"],
     },
     f"got {_r_4c}",
@@ -1022,7 +1022,7 @@ _r_never_classified = compute_legal_compliance_exposure(
 check(
     "the_dormant_talent (never classified into any Legal/Compliance cluster) -> None/None",
     _r_never_classified == {
-        "low": None, "high": None, "currency": "USD",
+        "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"got {_r_never_classified}",
@@ -1044,7 +1044,7 @@ _r_zero_score = compute_legal_compliance_exposure(
 check(
     "built_to_fail classified into Cluster 1 but monkey-patched to legal score=0 -> None/None, not a floor value",
     _r_zero_score == {
-        "low": None, "high": None, "currency": "USD",
+        "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     f"got {_r_zero_score}",
@@ -1055,7 +1055,7 @@ check(
     "compute_legal_compliance_exposure returns None/None for an empty state_ids list",
     compute_legal_compliance_exposure([], "100-249", "Professional Services", "Founder-led")
     == {
-        "low": None, "high": None, "currency": "USD",
+        "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
     },
     "expected None/None for empty state_ids",

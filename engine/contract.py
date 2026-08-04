@@ -24,7 +24,20 @@ from engine.accumulation import IntakeData, StateRanking, compute_cascade_risk
 from engine.checkpoint import CheckpointResult
 from engine.narrative import NarrativeExtractionResult
 from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
-from engine.friction_tax import compute_friction_tax
+from engine.friction_tax import compute_friction_tax, compute_legal_compliance_exposure
+
+# Addendum 11 -- caveat text for legal_tail_risk_exposure (private_output only).
+LEGAL_TAIL_RISK_CAVEAT_TEXT = (
+    "This estimate reflects contingent exposure -- a range of what could be at "
+    "stake if this pattern were ever formally challenged, not a prediction that "
+    "it will be. Most organizations carrying a similar pattern never face an "
+    "actual claim. This figure combines identified conditions across legal and "
+    "regulatory categories, using publicly available case outcomes, agency "
+    "enforcement data, and statutory penalty schedules as reference points -- "
+    "not a legal opinion, and not specific to your organization's actual risk "
+    "of being challenged. If any of these conditions concern you, this is worth "
+    "a conversation with employment counsel, not just this number."
+)
 from engine.output import OutputPackage, OutputRouting, compute_causation_pattern
 
 
@@ -439,12 +452,30 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
         if friction_tax_result["calibration_complete"]
         else None
     )
+    legal_result = compute_legal_compliance_exposure(
+        state_ids=[s["state_id"] for s in identified_states],
+        org_size=session.intake.headcount,
+        industry=session.intake.industry,
+        org_type=session.intake.org_type,
+    )
+    legal_tail_risk_exposure = (
+        {
+            "low":                     legal_result["low"],
+            "high":                    legal_result["high"],
+            "currency":                legal_result["currency"],
+            "caveat":                  LEGAL_TAIL_RISK_CAVEAT_TEXT,
+            "has_unpriced_conditions": legal_result["has_unpriced_conditions"],
+        }
+        if legal_result["low"] is not None or legal_result["has_unpriced_conditions"]
+        else None
+    )
     private_output = {
-        "opening_text":          priv.state_name if priv else "",
-        "resolution_routing":    priv.resolution_family if priv else "",
-        "friction_tax_estimate": friction_tax_estimate,
-        "cascade_risk":          compute_cascade_risk(session.accumulated_vector),
-        "causation_pattern":     compute_causation_pattern(session.accumulated_vector, routing),
+        "opening_text":            priv.state_name if priv else "",
+        "resolution_routing":      priv.resolution_family if priv else "",
+        "friction_tax_estimate":   friction_tax_estimate,
+        "legal_tail_risk_exposure": legal_tail_risk_exposure,
+        "cascade_risk":            compute_cascade_risk(session.accumulated_vector),
+        "causation_pattern":       compute_causation_pattern(session.accumulated_vector, routing),
         "trajectory":            trajectory_result,
     }
 
@@ -553,8 +584,8 @@ _JURISDICTION_FLAGS_FIELDS = {
     "transparency", "retaliation", "procedural", "applied_multipliers",
 }
 _PRIVATE_OUTPUT_FIELDS = {
-    "opening_text", "resolution_routing", "friction_tax_estimate", "cascade_risk",
-    "causation_pattern", "trajectory",
+    "opening_text", "resolution_routing", "friction_tax_estimate",
+    "legal_tail_risk_exposure", "cascade_risk", "causation_pattern", "trajectory",
 }
 _SHAREABLE_OUTPUT_FIELDS = {
     "attribution_text",

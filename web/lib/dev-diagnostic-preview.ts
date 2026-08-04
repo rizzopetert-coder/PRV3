@@ -6,6 +6,7 @@ import type {
   SeverityTier,
   ResolutionFamily,
   FrictionTaxEstimate,
+  LegalTailRiskExposure,
   IntakeEcho,
   DimensionSummary,
 } from "@/lib/types";
@@ -40,6 +41,7 @@ export interface DevDiagnosticPreviewPayload {
   resolution_family: ResolutionFamily;
   resolution_routing: string;
   friction_tax_estimate: FrictionTaxEstimate | null;
+  legal_tail_risk_exposure: LegalTailRiskExposure | null;
   intake: IntakeEcho;
   dimension_summary: DimensionSummary;
   primary_asset_domain: string;

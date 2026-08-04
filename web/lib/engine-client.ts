@@ -1,4 +1,4 @@
-import type { IntakeEcho, FrictionTaxEstimate } from "@/lib/types";
+import type { IntakeEcho, FrictionTaxEstimate, LegalTailRiskExposure } from "@/lib/types";
 import type { AccumulatedVector, AnswerLogEntry } from "@/lib/session-store";
 
 const ENGINE_SECRET = process.env.ENGINE_SECRET ?? "";
@@ -129,6 +129,7 @@ export interface EngineResult {
     opening_text: string;
     resolution_routing: string;
     friction_tax_estimate: FrictionTaxEstimate | null;
+    legal_tail_risk_exposure: LegalTailRiskExposure | null;
     cascade_risk: number;
     causation_pattern: {
       pattern: "single_point" | "diffuse" | "insufficient_signal";

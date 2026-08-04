@@ -60,16 +60,52 @@ export interface IntakeEcho {
 
 /**
  * Friction tax estimate.
- * Always null in Path B (calibration target — no multipliers set).
- * Components render Option B treatment when null:
+ * Populated with a real computed value in both private-output paths
+ * (web/app/api/result/route.ts, web/app/api/diagnostic/session/answer/route.ts
+ * both read engineResult.private_output.friction_tax_estimate directly)
+ * now that STATE_MULTIPLIERS is fully calibrated (Option A rescale,
+ * 2026-08-03) -- no longer a "Phase 3" TODO. Still hardcoded null in the
+ * shareable path (web/app/api/share/create/route.ts) -- a known,
+ * separate bug (prompts/friction-tax-legal-compliance-methodology.md,
+ * Addendum 11, Finding 1), not a calibration gap. Components render
+ * Option B treatment when null:
  * "Economic impact estimate available after full diagnostic."
- * Phase 3 work: calibrate STATE_MULTIPLIERS, populate this field.
  */
 export interface FrictionTaxEstimate {
   low: number;
   high: number;
   currency: string;
 }
+
+/**
+ * Legal/Compliance tail-risk exposure (private output only).
+ * prompts/friction-tax-legal-compliance-methodology.md, Addendum 11.
+ * Non-null when either a real dollar range exists or at least one
+ * identified state carries real-but-unpriced exposure
+ * (has_unpriced_conditions) -- see compute_legal_compliance_exposure()
+ * in engine/friction_tax.py for the exact trigger logic.
+ */
+export interface LegalTailRiskExposure {
+  low: number;
+  high: number;
+  currency: string;
+  caveat: string;
+  has_unpriced_conditions: boolean;
+}
+
+/**
+ * Qualitative severity band for legal tail-risk exposure in the
+ * shareable output only -- no dollar figure exposed publicly (Addendum
+ * 11: a specific number in a shareable artifact could function as
+ * documented notice of a contingent liability). Deliberately a bare
+ * string union rather than a {low, high, caveat}-shaped interface like
+ * LegalTailRiskExposure -- the shareable path has no caveat text of its
+ * own yet (Finding 1: friction_tax_estimate is still hardcoded null
+ * there). Revisit this shape once Finding 1's fix builds out real
+ * shareable-path caveat copy -- a bare string may no longer be enough
+ * once that lands.
+ */
+export type LegalTailRiskBand = "Minor" | "Moderate" | "Elevated" | "Significant";
 
 /**
  * Per-axis normalized asset ratio (aptitude/authority/alliance/attitude),
@@ -140,6 +176,9 @@ export interface PrivateOutputPayload {
 
   // Economic (nullable)
   friction_tax_estimate: FrictionTaxEstimate | null;
+
+  // Legal/Compliance tail-risk exposure (nullable) -- Addendum 11.
+  legal_tail_risk_exposure: LegalTailRiskExposure | null;
 
   // Cross-Dimensional Cascade Risk -- Shannon-entropy liability dispersion
   // x session intensity, [0.0, 1.0]. Optional: Path 1 populates this
@@ -212,6 +251,13 @@ export interface ShareableOutputPayload {
 
   // Economic (nullable — Option B rendering when null)
   friction_tax_estimate: FrictionTaxEstimate | null;
+
+  // Legal/Compliance qualitative band (nullable, optional) -- Addendum 11.
+  // Optional because web/app/api/share/create/route.ts isn't wired to
+  // populate this yet (deferred alongside Finding 1's fix) -- present
+  // in the type now so that wiring is a small addition later, not a
+  // schema change.
+  legal_tail_risk_band?: LegalTailRiskBand | null;
 
   // Intake echo — grounds friction_tax_estimate math for external audience
   intake: IntakeEcho;

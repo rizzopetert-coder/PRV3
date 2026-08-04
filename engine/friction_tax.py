@@ -2173,6 +2173,27 @@ def _single_state_legal_pricing(
     return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
 
 
+def _legal_exposure_band(low: Optional[float]) -> Optional[str]:
+    """
+    Addendum 11's qualitative severity band for the shareable output --
+    no dollar figure exposed publicly (a specific number in a shareable
+    artifact could function as documented notice of a contingent
+    liability). Applied to "low" only. Boundaries are a first pass, not
+    yet stress-tested against real multi-cluster worked examples
+    (Addendum 11's own open item #3) -- treat as provisional until that
+    check runs.
+    """
+    if low is None:
+        return None
+    if low < 100_000.0:
+        return "Minor"
+    if low < 500_000.0:
+        return "Moderate"
+    if low < 2_000_000.0:
+        return "Elevated"
+    return "Significant"
+
+
 def compute_legal_compliance_exposure(
     state_ids: list[str],
     org_size: str,
@@ -2236,16 +2257,19 @@ def compute_legal_compliance_exposure(
             "low": None,
             "high": None,
             "currency": "USD",
+            "band": _legal_exposure_band(None),
             "has_unpriced_conditions": has_unpriced_conditions,
             "unpriced_state_ids": unpriced_state_ids,
         }
 
     if len(per_state_ranges) == 1:
         low, high = next(iter(per_state_ranges.values()))
+        rounded_low = round(low, 2)
         return {
-            "low": round(low, 2),
+            "low": rounded_low,
             "high": round(high, 2),
             "currency": "USD",
+            "band": _legal_exposure_band(rounded_low),
             "has_unpriced_conditions": has_unpriced_conditions,
             "unpriced_state_ids": unpriced_state_ids,
         }
@@ -2261,10 +2285,12 @@ def compute_legal_compliance_exposure(
         total_low += sum((0.5 ** i) * low for i, (low, _high) in enumerate(ranges_sorted))
         total_high += sum((0.5 ** i) * high for i, (_low, high) in enumerate(ranges_sorted))
 
+    rounded_total_low = round(total_low, 2)
     return {
-        "low": round(total_low, 2),
+        "low": rounded_total_low,
         "high": round(total_high, 2),
         "currency": "USD",
+        "band": _legal_exposure_band(rounded_total_low),
         "has_unpriced_conditions": has_unpriced_conditions,
         "unpriced_state_ids": unpriced_state_ids,
     }
