@@ -6,20 +6,24 @@ clusters -- `the_untouchable` reclassified Cluster 2 -> Cluster 1 (Addendum 4, r
 Gemini's review flag). Cluster 3's interpolation is locked: scope-modulated, not
 path-modulated (Addendum 4). Cluster 4 fully resolved into three org_type-gated sub-tracks
 (Addendum 5). All 5 clusters now have sourced dollar curves, and the cross-state aggregation
-design (Addendum 3) is UNBLOCKED and ready for Gemini review. Systematic jurisdictions
-pass complete for California across all 5 clusters (Addendum 6). **OSHA State Plan research
-for Cluster 5 IN PROGRESS, 7 of 22 states (Addendum 7)** -- California, Washington, Oregon,
-Alaska, Hawaii, Arizona, Indiana researched; variation confirmed genuinely bidirectional
-(exceeds federal flat, exceeds federal conditionally/outcome-triggered, clean statutory
-parity, statutory parity with documented under-enforcement, and genuinely below federal, all
-represented across just 7 states) -- NOT a finished input for implementation, 15 states
-remain. Explicitly scoped, not assumed complete: the other 49 states outside Cluster 5's OSHA
-research, and the 15 remaining OSHA State Plan states specifically, have NOT been checked --
-flagged in the design as known-incomplete jurisdictional treatment, not silently treated as
-accurate everywhere outside what's actually been researched. NOT yet implemented. Does not
-supersede the Option A attritional-criteria rescale (turnover/productivity/decision-quality),
-which proceeds independently -- this doc is specifically the deferred Legal/Compliance item
-that Option A explicitly excluded.
+design (Addendum 3) is UNBLOCKED and ready for Gemini review. Systematic jurisdictions pass
+complete for California across all 5 clusters (Addendum 6). **Cluster 5 design decision
+LOCKED (Addendum 8): models both statutory maximum (worst-case ceiling) and actual average
+assessed penalty (realistic expected value) as a low/high pair**, consistent with how every
+other part of this design already presents a range rather than a single point estimate --
+the two numbers can diverge enormously within the same state (Oregon: $16,131 statutory vs.
+$604 actual average, a ~27x gap). OSHA State Plan research now 11 of 22 states touched
+(Addendum 7 + Addendum 8) -- but locking the both-numbers design expanded scope rather than
+closing it: only Oregon currently has both figures confirmed; the other 10 touched states
+need actual-average data backfilled, on top of the ~11 states still fully unresearched.
+Explicitly scoped, not assumed complete: the other 49 states outside Cluster 5's OSHA
+research, the ~11 remaining fully-unresearched OSHA State Plan states, and the actual-average
+backfill for the 10 already-touched states, have NOT been completed -- flagged in the design
+as known-incomplete jurisdictional treatment, not silently treated as accurate everywhere
+outside what's actually been researched. NOT yet implemented. Does not supersede the Option A
+attritional-criteria rescale (turnover/productivity/decision-quality), which proceeds
+independently -- this doc is specifically the deferred Legal/Compliance item that Option A
+explicitly excluded.
 
 ## Why Legal/Compliance can't share Option A's mapping
 
@@ -776,6 +780,75 @@ Continue state-by-state research through the remaining 15 states at the same rig
 real complexity found in 7 of 7 states checked so far (every single state researched has
 produced a genuine, non-trivial, distinct finding -- none has been a simple confirmed match
 requiring no further note), there is no indication the remaining 15 will be faster or simpler.
+
+## Addendum 8 — Cluster 5 Models Both Statutory Max and Actual Average, Scope Expanded
+
+**Status:** Locks a design decision and documents its consequence for research scope. NOT
+yet reviewed by Gemini. NOT implemented. Continues the OSHA State Plan research from
+Addendum 7, now 11 of 22 states touched (10 fully researched plus one bonus data point),
+with a corrected Washington finding and a newly identified data gap.
+
+### Design decision: Cluster 5 models both statutory maximum and actual average
+
+Confirmed this session: rather than picking one, Cluster 5's low/high range should represent
+statutory maximum (worst-case ceiling) and actual average assessed penalty (realistic
+expected value), consistent with how every other part of this design already presents a
+low/high pair rather than a single point estimate.
+
+### Why this matters more than it might look like
+
+These two numbers can diverge enormously within the same state. Oregon's statutory serious-
+violation maximum is $16,131 (near federal parity) -- but its actual average assessed penalty
+is $604, per a 2023 union petition citing OSHA's own audit findings. That's a ~27x gap between
+the two figures for the identical state and violation category. Treating either number alone
+as "Oregon's penalty" would be materially misleading in one direction or the other.
+
+### Consequence: most states researched so far only have one of the two numbers
+
+| State | Statutory max | Actual average |
+|---|---|---|
+| California | Confirmed: $25,000 serious (Cal/OSHA) | Not researched |
+| Washington | Confirmed: parity with federal (corrected from Addendum 7's original error -- see that addendum's correction note) | Not researched |
+| Oregon | Confirmed: $16,131 serious / $20K-50K and $50K-250K fatality tiers | Confirmed: $604 average |
+| Alaska | Confirmed: parity, statutorily required | Not researched |
+| Hawaii | Confirmed: parity, statutorily required | Not researched |
+| Arizona | Confirmed: parity (statutory) | Partial -- specific case examples only (e.g. $18,500 reduced to $4,750), not a clean average figure |
+| Indiana | Confirmed: $7,000 serious (materially below federal) | Not researched |
+| Iowa | Confirmed: parity by legislative design (auto-tracks federal) | Not researched |
+| Kentucky | Confirmed: $7,000 serious (materially below federal), HB 398 (2025) makes penalties discretionary going forward | Not researched |
+| Maryland | Partial -- confirmed "not raised since 2016" but exact current statutory figure not captured | Confirmed: $862-892 average (OSHA's own FY2020 FAME report plus 2023 corroboration) |
+| South Carolina | Partial -- exact current statutory figure not captured; governor unsuccessfully sued OSHA over the 2022 requirement to raise penalties | Confirmed: $2,019 average |
+| Minnesota (bonus, not yet formally researched) | Confirmed near-parity as of July 2023 effective date ($15,625/$156,259, matching that year's federal levels) | Not researched |
+
+**Only Oregon has both numbers.** Completing the "both, as a range" design means going back to
+fill the average-penalty gap in the 10 other states already touched, not just continuing
+forward through the remaining ~11 unresearched states (Nevada, New Mexico, North Carolina,
+Puerto Rico, Tennessee, Utah, Vermont, Virginia, Wyoming, plus formally confirming Minnesota
+and Michigan -- Michigan specifically needs its actual-average figure since its statutory
+picture is already confirmed materially low).
+
+### Useful primary source found this round, worth reusing
+
+OSHA's own official adoption-tracking table (osha.gov/stateplans/adoption/standards/2016-07-01,
+last updated 1/30/2023) records each state's stated intent to adopt the 2016 federal penalty
+increase. Important caveat, confirmed by direct contradiction: Michigan's entry shows
+"Yes/Adopt Identical: Yes" in this table, but Michigan's actual current penalties (confirmed
+via Michigan's own current-year sources) remain at pre-2016 levels -- Michigan stated intent
+and never followed through, and the table doesn't distinguish stated intent from verified
+completion (blank "Effective Date" is the tell for entries that didn't actually complete,
+versus states like Arizona with a specific completion date). This table is useful for
+prioritizing which states to check first (explicit "No" or "Pending" entries are strong
+signals for materially-lower states, already confirmed accurate for Indiana, Kentucky, and
+Maryland) but cannot be trusted as a standalone source of current truth for any single state.
+
+### Also worth carrying forward: an aggregate figure with real value
+
+The same union petition source states "current state plan penalties for a serious violation
+average $2,372 for all state plans put together" against a "national average of $3,259" --
+a real, if secondary-sourced, aggregate comparison suggesting state-plan actual averages run
+meaningfully below the broader national average as a general pattern, not just in the specific
+low states already found. Worth citing as context, not as a substitute for individual state
+figures.
 
 ## Structural implications (bigger than Option A)
 
