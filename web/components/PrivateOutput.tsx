@@ -85,7 +85,7 @@ export default function PrivateOutput({
       {/* Block 1a — Headline (omit entirely if empty) */}
       {headline && (
         <div className="pb-4">
-          <p className="text-base font-medium leading-relaxed text-ink">{headline}</p>
+          <p className="text-base font-medium leading-relaxed text-charcoal">{headline}</p>
         </div>
       )}
 
@@ -110,7 +110,7 @@ export default function PrivateOutput({
 
       {/* Block 2 — Liability condition */}
       <div className="py-4">
-        <p className="text-sm leading-[1.65] text-ink">
+        <p className="text-sm leading-[1.65] text-charcoal">
           {liabilityText || payload.resolution_routing}
         </p>
       </div>
@@ -120,7 +120,7 @@ export default function PrivateOutput({
       {framingText && (
         <>
           <div className="py-4">
-            <p className="text-sm leading-[1.65] text-ink">{framingText}</p>
+            <p className="text-sm leading-[1.65] text-charcoal">{framingText}</p>
           </div>
           <Rule />
         </>
@@ -168,7 +168,7 @@ export default function PrivateOutput({
         <p className="text-[11px] uppercase tracking-wide text-gray-400">
           Resolution pathway
         </p>
-        <p className="text-[13px] font-medium text-ink">
+        <p className="text-[13px] font-medium text-charcoal">
           {payload.resolution_family}
         </p>
         {resolutionFramingText ? (

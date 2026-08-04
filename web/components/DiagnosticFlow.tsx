@@ -106,13 +106,13 @@ function IntakeForm({
   ) {
     return (
       <div className="mb-5">
-        <label className="block font-ui text-sm font-medium text-ink mb-1.5">
+        <label className="block font-ui text-sm font-medium text-charcoal mb-1.5">
           {label}
         </label>
         <select
           value={intake[key]}
           onChange={(e) => onChange({ ...intake, [key]: e.target.value })}
-          className="w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-ink focus:outline-none focus:border-ink"
+          className="w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-charcoal focus:outline-none focus:border-charcoal"
         >
           <option value="">Select…</option>
           {options.map((opt) => (
@@ -130,7 +130,7 @@ function IntakeForm({
       <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">
         Before you start
       </p>
-      <h2 className="font-serif text-2xl text-ink mb-8">
+      <h2 className="font-display text-2xl text-charcoal mb-8">
         A few things about your organization.
       </h2>
 
@@ -144,7 +144,7 @@ function IntakeForm({
       <button
         onClick={onSubmit}
         disabled={!isComplete}
-        className="w-full bg-ink text-white font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-3"
+        className="w-full bg-charcoal text-white font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-3"
       >
         Begin the diagnostic
       </button>
@@ -170,7 +170,7 @@ function QuestionView({
           ? `Question ${label.position} of ${label.total}`
           : `Follow-up ${label.label}`}
       </p>
-      <h2 className="font-serif text-xl md:text-2xl text-ink mb-8 leading-snug">
+      <h2 className="font-display text-xl md:text-2xl text-charcoal mb-8 leading-snug">
         {question.question_text}
       </h2>
       <div className="space-y-3">
@@ -178,7 +178,7 @@ function QuestionView({
           <button
             key={opt.option_id}
             onClick={() => onAnswer(opt.option_id)}
-            className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white hover:border-ink transition-colors font-ui text-sm text-ink"
+            className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-colors font-ui text-sm text-charcoal"
           >
             {opt.option_text}
           </button>
@@ -333,10 +333,10 @@ export default function DiagnosticFlow() {
   if (state.phase === "error") {
     return (
       <div className="max-w-2xl mx-auto px-6 py-16 text-center">
-        <p className="font-serif text-2xl text-ink mb-4">{state.message}</p>
+        <p className="font-display text-2xl text-charcoal mb-4">{state.message}</p>
         <button
           onClick={() => setState({ phase: "intake" })}
-          className="bg-ink text-white font-ui text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
+          className="bg-charcoal text-white font-ui text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
         >
           Start over
         </button>

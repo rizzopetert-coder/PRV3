@@ -72,24 +72,24 @@ describe("pointsAttr", () => {
 // --- Stage 3: live mode ------------------------------------------------
 
 describe("severityAccentTokens", () => {
-  it("uses --urgency tokens only for genuine Endemic severity", () => {
+  it("uses the v1 rust token only for genuine Endemic severity", () => {
     expect(severityAccentTokens("Endemic")).toEqual({
-      stroke: "var(--urgency)",
-      text: "var(--urgency-text)",
+      stroke: "var(--color-rust)",
+      text: "var(--color-rust)",
     });
   });
 
-  it("uses --oxide tokens for Entrenched", () => {
+  it("uses the v1 slate token for Entrenched", () => {
     expect(severityAccentTokens("Entrenched")).toEqual({
-      stroke: "var(--oxide)",
-      text: "var(--oxide-text)",
+      stroke: "var(--color-slate)",
+      text: "var(--color-slate)",
     });
   });
 
-  it("uses --oxide tokens for Emerging", () => {
+  it("uses the v1 slate token for Emerging", () => {
     expect(severityAccentTokens("Emerging")).toEqual({
-      stroke: "var(--oxide)",
-      text: "var(--oxide-text)",
+      stroke: "var(--color-slate)",
+      text: "var(--color-slate)",
     });
   });
 });

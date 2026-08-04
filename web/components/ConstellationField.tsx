@@ -10,9 +10,9 @@ import type { SeverityTier } from "@/lib/types";
 // mockups/pr-ambient-constellation-animation.html: linear interpolation
 // (not eased, see TRANSITION_MS below), overflow-carried segment timing,
 // dominant-axis point recalculated continuously each frame. HARD CAP:
-// never uses --urgency/--urgency-text, enforced structurally — render()
-// hardcodes stroke to var(--oxide) unconditionally, no code path in
-// ambient mode can ever reference --urgency. A decorative loop cycling
+// never uses --color-rust, enforced structurally — render()
+// hardcodes stroke to var(--color-slate) unconditionally, no code path in
+// ambient mode can ever reference --color-rust. A decorative loop cycling
 // through "Endemic" with nothing actually wrong would devalue the signal
 // the reserved token exists to protect. Respects prefers-reduced-motion:
 // renders once at the resting keyframe, no animation loop, checked once
@@ -20,15 +20,15 @@ import type { SeverityTier } from "@/lib/types";
 //
 // "live" (Stage 3) — static, results-page use, real per-dimension weights
 // and severity tier as props. Ported from
-// mockups/pr-results-constellation-mockup.html. --urgency/--urgency-text
-// ONLY when severityTier is genuinely "Endemic"; --oxide/--oxide-text at
+// mockups/pr-results-constellation-mockup.html. --color-rust
+// ONLY when severityTier is genuinely "Endemic"; --color-slate at
 // Emerging/Entrenched. Confirmed from the mockup (only one severity
 // example shown, cross-checked against its own weight percentages, not
 // guessed): ring visibility/count/opacity is a FIXED 5-ring pattern that
 // does NOT vary by severity tier at all — severity only ever changes
 // which color token is used, never ring count or intensity. The weighted
 // shape itself (fill/stroke) and non-dominant vertex dots/labels are
-// ALWAYS --oxide/--slate, never severity-conditional — only the dominant
+// ALWAYS --color-slate, never severity-conditional — only the dominant
 // vertex's rings + center dot + axis label switch color.
 //
 // weights prop is a PLACEHOLDER interface pending a real dimension_summary
@@ -167,7 +167,7 @@ export const LIVE_CENTER = { x: 300, y: 300 };
 export const LIVE_MAX_R = 220;
 
 // Reference guide diamonds at 25% / 50% / 75% of LIVE_MAX_R — always
-// --line, never severity-conditional.
+// #e5e7eb, never severity-conditional.
 const LIVE_GUIDE_RING_FRACTIONS = [0.25, 0.5, 0.75];
 
 // Fixed 5-ring pattern — does NOT vary by severity tier. Confirmed from
@@ -183,8 +183,8 @@ const AXIS_LABELS: Record<AxisKey, string> = {
   att: "ATT",
 };
 
-// --urgency/--urgency-text ONLY when severityTier is genuinely "Endemic".
-// --oxide/--oxide-text at Emerging/Entrenched. This is the one piece of
+// --color-rust ONLY when severityTier is genuinely "Endemic".
+// --color-slate at Emerging/Entrenched. This is the one piece of
 // real branching logic live mode introduces — pure function, tested in
 // isolation (ConstellationField.test.ts).
 export function severityAccentTokens(tier: SeverityTier): {
@@ -192,9 +192,9 @@ export function severityAccentTokens(tier: SeverityTier): {
   text: string;
 } {
   if (tier === "Endemic") {
-    return { stroke: "var(--urgency)", text: "var(--urgency-text)" };
+    return { stroke: "var(--color-rust)", text: "var(--color-rust)" };
   }
-  return { stroke: "var(--oxide)", text: "var(--oxide-text)" };
+  return { stroke: "var(--color-slate)", text: "var(--color-slate)" };
 }
 
 function AmbientField() {
@@ -219,8 +219,8 @@ function AmbientField() {
         "transform",
         `translate(${domPoint.x - CENTER.x}, ${domPoint.y - CENTER.y})`,
       );
-      // HARD CAP: always --oxide, never --urgency. See file header.
-      ringGroup.setAttribute("stroke", "var(--oxide)");
+      // HARD CAP: always --color-slate, never --color-rust. See file header.
+      ringGroup.setAttribute("stroke", "var(--color-slate)");
 
       ringRefs.current.forEach((el, i) => {
         if (!el) return;
@@ -301,15 +301,15 @@ function AmbientField() {
           />
         </filter>
       </defs>
-      <g stroke="var(--line)" strokeWidth="1" fill="none">
+      <g stroke="#e5e7eb" strokeWidth="1" fill="none">
         <line x1={CENTER.x} y1={CENTER.y - 190} x2={CENTER.x} y2={CENTER.y + 190} />
         <line x1={CENTER.x - 190} y1={CENTER.y} x2={CENTER.x + 190} y2={CENTER.y} />
       </g>
       <polygon
         ref={shapeRef}
         points={pointsAttr(RESTING_FRAME)}
-        fill="color-mix(in srgb, var(--oxide) 10%, transparent)"
-        stroke="var(--oxide)"
+        fill="color-mix(in srgb, var(--color-slate) 10%, transparent)"
+        stroke="var(--color-slate)"
         strokeWidth="1.4"
         opacity="0.8"
       />
@@ -317,7 +317,7 @@ function AmbientField() {
         ref={ringGroupRef}
         filter={`url(#${filterId})`}
         fill="none"
-        stroke="var(--oxide)"
+        stroke="var(--color-slate)"
         strokeWidth="1"
       >
         {RING_RADII.map((r, i) => (
@@ -394,8 +394,8 @@ function LiveField({ weights, severityTier }: LiveFieldProps) {
         </filter>
       </defs>
 
-      {/* Reference grid — always --line, never severity-conditional. */}
-      <g stroke="var(--line)" strokeWidth="1" fill="none">
+      {/* Reference grid — always #e5e7eb, never severity-conditional. */}
+      <g stroke="#e5e7eb" strokeWidth="1" fill="none">
         <line
           x1={LIVE_CENTER.x}
           y1={LIVE_CENTER.y - LIVE_MAX_R}
@@ -426,7 +426,7 @@ function LiveField({ weights, severityTier }: LiveFieldProps) {
         })}
       </g>
 
-      {/* Axis labels — always --slate, except the dominant axis, which
+      {/* Axis labels — always --color-slate, except the dominant axis, which
           takes the severity-conditional accent text color. */}
       {(Object.keys(AXES) as AxisKey[]).map((k) => (
         <text
@@ -434,7 +434,7 @@ function LiveField({ weights, severityTier }: LiveFieldProps) {
           x={labelPositions[k].x}
           y={labelPositions[k].y}
           textAnchor={labelPositions[k].anchor}
-          fill={k === domKey ? accent.text : "var(--slate)"}
+          fill={k === domKey ? accent.text : "var(--color-slate)"}
           className="font-mono"
           fontSize="11"
           letterSpacing="1"
@@ -443,26 +443,26 @@ function LiveField({ weights, severityTier }: LiveFieldProps) {
         </text>
       ))}
 
-      {/* The weighted shape — ALWAYS --oxide, never severity-conditional.
+      {/* The weighted shape — ALWAYS --color-slate, never severity-conditional.
           Confirmed from the mockup: only the dominant vertex's rings,
-          center dot, and axis label switch to --urgency at Endemic. */}
+          center dot, and axis label switch to --color-rust at Endemic. */}
       <polygon
         points={shapePoints}
-        fill="color-mix(in srgb, var(--oxide) 14%, transparent)"
-        stroke="var(--oxide)"
+        fill="color-mix(in srgb, var(--color-slate) 14%, transparent)"
+        stroke="var(--color-slate)"
         strokeWidth="1.5"
       />
 
-      {/* Non-dominant vertex dots — always --slate. */}
+      {/* Non-dominant vertex dots — always --color-slate. */}
       {(Object.keys(AXES) as AxisKey[])
         .filter((k) => k !== domKey)
         .map((k) => (
-          <circle key={k} cx={points[k].x} cy={points[k].y} r={4} fill="var(--slate)" />
+          <circle key={k} cx={points[k].x} cy={points[k].y} r={4} fill="var(--color-slate)" />
         ))}
 
       {/* Severity rings — fixed 5-ring pattern, radii/opacity never vary
-          by severity tier. Only the color varies (accent.stroke: --oxide
-          at Emerging/Entrenched, --urgency only at genuine Endemic). */}
+          by severity tier. Only the color varies (accent.stroke: --color-slate
+          at Emerging/Entrenched, --color-rust only at genuine Endemic). */}
       <g filter={`url(#${filterId})`} fill="none" stroke={accent.stroke} strokeWidth="1">
         {LIVE_RING_RADII.map((r, i) => (
           <circle
