@@ -4,17 +4,18 @@
 falsified earlier approaches. All 30 Legal-scoring states are classified into 5 mechanism
 clusters -- `the_untouchable` reclassified Cluster 2 -> Cluster 1 (Addendum 4, resolving
 Gemini's review flag). Cluster 3's interpolation is locked: scope-modulated, not
-path-modulated (Addendum 4). **Cluster 4 fully resolved this session into three org_type-
-gated sub-tracks (Addendum 5) -- a structural reframe, not a minor edit:** 4a SEC/Dodd-Frank
-(org_type=Publicly traded), 4b general private-sector retaliation (org_type=Founder-led /
-Privately held professional leadership / Nonprofit / most PE-VC-backed, statutory-cap-
-anchored), 4c government (org_type=Government, qualitative only, no dollar figure -- thin
-MSPB data). All 5 clusters now have sourced dollar curves, and the cross-state aggregation
-design (Addendum 3) is UNBLOCKED and ready for Gemini review, alongside the rest of the
-Legal/Compliance package. NOT yet implemented. Does not supersede the Option A attritional-
-criteria rescale (turnover/productivity/decision-quality), which proceeds independently --
-this doc is specifically the deferred Legal/Compliance item that Option A explicitly
-excluded.
+path-modulated (Addendum 4). Cluster 4 fully resolved into three org_type-gated sub-tracks
+(Addendum 5). All 5 clusters now have sourced dollar curves, and the cross-state aggregation
+design (Addendum 3) is UNBLOCKED and ready for Gemini review. **Systematic jurisdictions
+pass complete for California across all 5 clusters (Addendum 6)** -- FEHA/PAGA/Cal-OSHA
+findings sourced and ready to build. Explicitly scoped, not assumed complete: the other 49
+states, and the other ~21 OSHA-approved State Plan states specifically for Cluster 5 (federal
+OSHA figures confirmed as a floor, not a national accuracy figure, across those states), have
+NOT been checked -- flagged in the design as known-incomplete jurisdictional treatment, not
+silently treated as accurate everywhere outside California. NOT yet implemented. Does not
+supersede the Option A attritional-criteria rescale (turnover/productivity/decision-quality),
+which proceeds independently -- this doc is specifically the deferred Legal/Compliance item
+that Option A explicitly excluded.
 
 ## Why Legal/Compliance can't share Option A's mapping
 
@@ -584,6 +585,92 @@ issue likely affecting Clusters 1 and 2 (ADA at 15+, FMLA at 50+ employees), and
 `is_high_hazard` property already live in `engine/accumulation.py` (checking `industry`
 against `HIGH_HAZARD_INDUSTRIES`) that Cluster 5 should probably hook into rather than
 remaining industry-blind.
+
+## Addendum 6 — Systematic Jurisdictions Pass: California Confirmed as a Cross-Cluster Outlier
+
+**Status:** Applies the Demographic Applicability Filter's `jurisdictions` field systematically
+across all five clusters, following the pattern first found in Cluster 4 (FEHA's uncapped
+damages) and confirmed a second time in Cluster 3 (PAGA). California is now confirmed as a
+material outlier in all five clusters, not two. NOT yet reviewed by Gemini. NOT implemented.
+Deliberately scoped to California only -- see "Explicitly out of scope" below.
+
+### Why California specifically, and why this matters beyond one state
+
+`jurisdictions` (a list of state abbreviations) is collected at intake but nothing built this
+session has used it to modify any cluster's dollar curve. California is the first jurisdiction
+checked because it kept surfacing unprompted across unrelated research (FEHA in Cluster 4's
+work, then independently again investigating Cluster 3). That's a real signal, not
+coincidence -- California consistently legislates stronger worker protections than federal
+baseline across nearly every area of employment law. Whether this generalizes to a smaller
+number of other high-protection states (NY, MA, IL, WA are common candidates in employment law
+commentary) is unverified this session -- flagged as scope, not assumed.
+
+### Findings by cluster, all sourced this session
+
+**Cluster 1 (Individual/isolated claim):** FEHA lowers the coverage threshold from federal
+Title VII/ADA's 15 employees to 5 -- and to ANY size for harassment specifically. This closes
+part of the coverage-threshold gap flagged in the earlier Clusters 1/2 pass: a California
+client in the "Under 25" bucket that federal law might not cover at all is very likely covered
+under FEHA regardless of exact headcount. FEHA also applies no damages cap, relevant to
+wrongful-termination-type claims within this cluster.
+
+**Cluster 2 (Class/systemic discrimination):** FEHA's uncapped damages already indirectly
+reflected in this cluster's real-settlement-based per-claimant rates (Boeing, Sterling,
+Novartis all likely include state-law claims stacked into their real outcomes) -- flagged as
+already-captured, not a new gap requiring a fix, unlike the other four clusters below.
+
+**Cluster 3 (Wage-and-hour):** California's PAGA adds $100-200 per aggrieved employee, PER PAY
+PERIOD -- a fundamentally different shape of exposure than the federal FLSA's flat 2x
+multiplier. Stacks on top of back wages and federal liquidated damages, compounds with time.
+Worked example: 50 employees, 26 pay periods/year, base tier = $130,000/year in PAGA penalties
+alone, before back wages. Confirmed via statute and multiple consistent legal sources.
+
+**Cluster 4 (Whistleblower/regulatory):** Already resolved in Addendum 5's 4b caveat -- FEHA's
+uncapped damages apply to CA clients in the general private-sector retaliation track regardless
+of the federal statutory cap table.
+
+**Cluster 5 (Safety/regulatory):** Cal/OSHA's serious-violation cap is $25,000 vs. federal
+OSHA's $16,550 -- about 51% higher. Willful/repeat is close to parity ($162,851 vs. $165,514).
+Confirmed directly from California's Department of Industrial Relations press releases.
+
+### The bigger finding: this isn't just a California problem
+
+**22 states operate their own OSHA-approved State Plans**, required by federal law to be "at
+least as effective" as federal OSHA -- meaning equal or higher penalties, never lower.
+Cluster 5's flat federal figures are confirmed as a floor across roughly 22 states' worth of
+clients, not an accurate number nationally. This is a materially bigger gap than the
+California-specific findings above, and it's currently completely unaddressed in the design.
+
+### Explicitly out of scope for this pass
+
+Pulling all 22 OSHA State Plan states' actual penalty schedules, and checking whether other
+high-protection states (NY, MA, IL, WA, etc.) have FEHA/PAGA-equivalent statutes in the other
+four clusters, is real, substantial research this session did not do. California was checked
+because it kept surfacing organically, not because it's confirmed as the only or the most
+extreme outlier. Treating California as "the" jurisdictional exception rather than "a"
+jurisdictional exception risks the same category error already caught twice this session
+(McKinsey's F500 data, Beck v. Boeing's ceiling) -- a real, verified finding that doesn't
+generalize as far as it might look like it does.
+
+### Proposed treatment given this scope limit
+
+Build California as a confirmed, sourced exception across all applicable clusters now (real
+findings, ready to implement), while explicitly flagging in the design that this is a known-
+incomplete jurisdictional treatment -- not "California and defaults everywhere else are
+accurate," but "California is verified, everywhere else uses federal baseline and has NOT been
+checked for its own state-level exceptions." Recommend this distinction be visible in the
+architecture itself (e.g. a documented TODO or explicit confidence flag), not just in this doc,
+so a future session doesn't mistake "we checked California" for "we checked all 50 states."
+
+### Open questions
+
+1. Should the design proactively flag other likely-high-protection states (NY, MA, IL, WA) as
+   priority candidates for the same research pass, or wait until a specific client's
+   jurisdiction surfaces a gap organically the way California did?
+2. For Cluster 5 specifically: is a full 22-state OSHA State Plan research pass worth doing
+   before implementation, given it's confirmed as a real, non-trivial national accuracy gap --
+   or does California's confirmed example plus an honest "federal baseline, not state-verified"
+   flag suffice for a first implementation?
 
 ## Structural implications (bigger than Option A)
 
