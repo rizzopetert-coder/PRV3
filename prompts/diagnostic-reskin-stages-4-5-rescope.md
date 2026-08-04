@@ -1,5 +1,7 @@
 # /diagnostic Visual Identity Reskin — Stages 4-5 Rescope
 
+**SUPERSEDED (2026-08-03):** The reskin direction reversed after this session's design review of OD-07 live on the three Stage 3 files. Stages 4/5 as originally conceived below -- extending v2/OD-07 tokens outward to the rest of the site -- no longer apply: OD-07 was rolled back to v1 across all four files that had it (commit b8860b5), so there is nothing left to extend. The files listed below as still needing the v2 rename (NavBar, AssemblyPanel, SignatureCard, StateDrawer, ShareButton, ShareableOutput, /about, /ask, /book, /share) were already correct on v1 and do not need touching. This plan is superseded, not completed -- do not pick Stage 4 back up as the next step.
+
 **Status:** Rescoped from commit evidence after the original plan was confirmed permanently
 lost to compaction (commit `99e729a`). No surviving plan doc existed; this was reconstructed
 by Claude Code from file-touch chronology and confirmed by Pete as trustworthy (no independent
