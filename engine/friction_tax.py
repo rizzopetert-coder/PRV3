@@ -60,8 +60,12 @@ Spec reference: PRV3 Output Layer Brief -- Step 2
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
+from enum import Enum
 from typing import Optional
+
+_logger = logging.getLogger(__name__)
 
 
 # -- Severity scalars (LOCKED) --------------------------------------------------
@@ -2002,6 +2006,35 @@ def _legal_score_fraction(curve: LegalDollarCurve, score: int) -> float:
     return curve.floor * (curve.ceiling / curve.floor) ** (score - 1)
 
 
+class LegalPricingStatus(Enum):
+    """
+    Distinguishes why a given state did or didn't contribute a dollar
+    range, so callers can tell "real exposure, genuinely unpriced" apart
+    from "not applicable at all" and from "a data problem" -- all three
+    previously collapsed to a bare None.
+    """
+    PRICED = "priced"
+    NOT_APPLICABLE = "not_applicable"
+    QUALITATIVE_ONLY = "qualitative_only"
+    DATA_INTEGRITY_GAP = "data_integrity_gap"
+
+
+@dataclass(frozen=True)
+class LegalPricingResult:
+    """One state's pricing outcome. dollar_range is populated only when
+    status is PRICED."""
+    status: LegalPricingStatus
+    dollar_range: Optional[tuple[float, float]]
+
+
+@dataclass(frozen=True)
+class LegalCurveLookup:
+    """Result of resolving a Cluster 4 sub-track curve. curve is
+    populated only when status is PRICED."""
+    curve: Optional[LegalDollarCurve]
+    status: LegalPricingStatus
+
+
 # Cluster 1 -- Individual/isolated claim (Addendum 1).
 _CLUSTER_1_CURVE = LegalDollarCurve(floor=50_000.0, ceiling=450_000.0)
 
@@ -2046,23 +2079,29 @@ _CLUSTER_5_CURVE = LegalDollarCurve(floor=16_550.0, ceiling=165_514.0)
 
 def _cluster_4_curve_for_org_type(
     org_type: str, org_size: str
-) -> Optional[LegalDollarCurve]:
+) -> LegalCurveLookup:
     """
-    Addendum 5's three org_type-gated sub-tracks. Returns None for
-    "Government" (4c) -- genuinely no dollar figure (thin MSPB data), not
-    a zero -- and for any unrecognized org_size in the 4b bracket table.
-    "PE or VC-backed" defaults to 4b -- the possible 4a edge case (a
-    registered investment adviser/broker-dealer) isn't determinable from
-    org_type alone, per Addendum 5, and isn't resolved here.
+    Addendum 5's three org_type-gated sub-tracks. Status is
+    QUALITATIVE_ONLY for "Government" (4c) -- genuinely no dollar figure
+    (thin MSPB data), a real, expected outcome, not a data problem.
+    Status is DATA_INTEGRITY_GAP for any unrecognized org_size in the 4b
+    bracket table -- that should never happen against real IntakeData
+    values, so it signals something is wrong, unlike the Government
+    case. "PE or VC-backed" defaults to 4b -- the possible 4a edge case
+    (a registered investment adviser/broker-dealer) isn't determinable
+    from org_type alone, per Addendum 5, and isn't resolved here.
     """
     if org_type == "Publicly traded":
-        return _CLUSTER_4A_CURVE
+        return LegalCurveLookup(curve=_CLUSTER_4A_CURVE, status=LegalPricingStatus.PRICED)
     if org_type == "Government":
-        return None
+        return LegalCurveLookup(curve=None, status=LegalPricingStatus.QUALITATIVE_ONLY)
     ceiling = _CLUSTER_4B_CEILING_BY_HEADCOUNT.get(org_size)
     if ceiling is None:
-        return None
-    return LegalDollarCurve(floor=_CLUSTER_4B_FLOOR, ceiling=ceiling)
+        return LegalCurveLookup(curve=None, status=LegalPricingStatus.DATA_INTEGRITY_GAP)
+    return LegalCurveLookup(
+        curve=LegalDollarCurve(floor=_CLUSTER_4B_FLOOR, ceiling=ceiling),
+        status=LegalPricingStatus.PRICED,
+    )
 
 
 def _cluster_3_affected_workers(org_size: str, industry: str, score: int) -> float:
@@ -2082,48 +2121,56 @@ def _cluster_3_affected_workers(org_size: str, industry: str, score: int) -> flo
     return subgroup * scope_fraction
 
 
-def _single_state_legal_range(
+def _single_state_legal_pricing(
     state_id: str,
     org_size: str,
     industry: str,
     org_type: str,
-) -> Optional[tuple[float, float]]:
+) -> LegalPricingResult:
     """
-    (low, high) for one Legal-scoring state in isolation, or None if the
-    state isn't Legal-scoring, its "legal" score is 0 (no exposure), or
-    (Cluster 4 + org_type == "Government") -- genuinely no dollar figure.
+    One Legal-scoring state's pricing outcome in isolation. status is
+    NOT_APPLICABLE (dollar_range=None) if the state isn't Legal-scoring
+    at all or its "legal" score is 0 (no exposure) -- both silent,
+    unchanged from the prior bare-None behavior. For Cluster 4, status
+    is forwarded directly from _cluster_4_curve_for_org_type()
+    (QUALITATIVE_ONLY for Government, DATA_INTEGRITY_GAP for an
+    unrecognized org_size), distinguishing real-but-unpriced exposure
+    from a genuine data gap -- previously both collapsed to None here
+    too.
     """
     cluster = LEGAL_COMPLIANCE_CLUSTER.get(state_id)
     if cluster is None:
-        return None
+        return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
     entry = STATE_MULTIPLIERS.get(state_id)
     if entry is None:
-        return None
+        return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
     score = entry.criteria["legal"].score
     if score == 0:
-        return None
+        return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
 
     if cluster == 1:
         v = _legal_score_fraction(_CLUSTER_1_CURVE, score)
-        return (v, v)
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v))
     if cluster == 2:
-        return _CLUSTER_2_TIER_2A if score == 1 else _CLUSTER_2_TIER_2B
+        r = _CLUSTER_2_TIER_2A if score == 1 else _CLUSTER_2_TIER_2B
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r)
     if cluster == 3:
         affected = _cluster_3_affected_workers(org_size, industry, score)
-        return (
+        r = (
             affected * _CLUSTER_3_ADMIN_RATE_PER_WORKER,
             affected * _CLUSTER_3_LITIGATION_RATE_PER_WORKER,
         )
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r)
     if cluster == 4:
-        curve = _cluster_4_curve_for_org_type(org_type, org_size)
-        if curve is None:
-            return None
-        v = _legal_score_fraction(curve, score)
-        return (v, v)
+        lookup = _cluster_4_curve_for_org_type(org_type, org_size)
+        if lookup.curve is None:
+            return LegalPricingResult(status=lookup.status, dollar_range=None)
+        v = _legal_score_fraction(lookup.curve, score)
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v))
     if cluster == 5:
         v = _legal_score_fraction(_CLUSTER_5_CURVE, score)
-        return (v, v)
-    return None
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v))
+    return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
 
 
 def compute_legal_compliance_exposure(
@@ -2146,22 +2193,62 @@ def compute_legal_compliance_exposure(
     per Addendum 9. Cluster 5 uses the statutory-max curve only (Addendum
     10) -- actual-average deferred alongside that same paused research.
 
-    Returns {"low": float | None, "high": float | None, "currency": "USD"}.
+    NOT_APPLICABLE states (not Legal-scoring, or a "legal" score of 0)
+    are silently excluded, unchanged from before this status system
+    existed. QUALITATIVE_ONLY states (real exposure, genuinely no dollar
+    figure -- Cluster 4c/Government) and DATA_INTEGRITY_GAP states (a
+    lookup that should have succeeded didn't) are both collected into
+    unpriced_state_ids; a DATA_INTEGRITY_GAP additionally logs a
+    warning, since it signals a real data problem rather than an
+    intentional design outcome. The N=1 guard above triggers on exactly
+    one PRICED state -- QUALITATIVE_ONLY/DATA_INTEGRITY_GAP states never
+    enter the aggregation, regardless of how many are also present.
+
+    Returns {"low": float | None, "high": float | None, "currency": "USD",
+    "has_unpriced_conditions": bool, "unpriced_state_ids": list[str]}.
     low/high are None if no identified state carries real, priceable
-    Legal/Compliance exposure.
+    Legal/Compliance exposure -- has_unpriced_conditions can still be
+    True in that case if every identified Legal-scoring state was
+    QUALITATIVE_ONLY/DATA_INTEGRITY_GAP.
     """
     per_state_ranges: dict[str, tuple[float, float]] = {}
+    unpriced_state_ids: list[str] = []
     for sid in state_ids:
-        r = _single_state_legal_range(sid, org_size, industry, org_type)
-        if r is not None:
-            per_state_ranges[sid] = r
+        result = _single_state_legal_pricing(sid, org_size, industry, org_type)
+        if result.status == LegalPricingStatus.PRICED:
+            per_state_ranges[sid] = result.dollar_range
+        elif result.status == LegalPricingStatus.QUALITATIVE_ONLY:
+            unpriced_state_ids.append(sid)
+        elif result.status == LegalPricingStatus.DATA_INTEGRITY_GAP:
+            unpriced_state_ids.append(sid)
+            _logger.warning(
+                "Legal/Compliance pricing data-integrity gap for state_id=%r "
+                "(org_size=%r, industry=%r, org_type=%r) -- expected a "
+                "priceable curve but none was found",
+                sid, org_size, industry, org_type,
+            )
+        # NOT_APPLICABLE: silently excluded, unchanged from before.
+
+    has_unpriced_conditions = bool(unpriced_state_ids)
 
     if not per_state_ranges:
-        return {"low": None, "high": None, "currency": "USD"}
+        return {
+            "low": None,
+            "high": None,
+            "currency": "USD",
+            "has_unpriced_conditions": has_unpriced_conditions,
+            "unpriced_state_ids": unpriced_state_ids,
+        }
 
     if len(per_state_ranges) == 1:
         low, high = next(iter(per_state_ranges.values()))
-        return {"low": round(low, 2), "high": round(high, 2), "currency": "USD"}
+        return {
+            "low": round(low, 2),
+            "high": round(high, 2),
+            "currency": "USD",
+            "has_unpriced_conditions": has_unpriced_conditions,
+            "unpriced_state_ids": unpriced_state_ids,
+        }
 
     by_cluster: dict[int, list[tuple[float, float]]] = {}
     for sid, r in per_state_ranges.items():
@@ -2174,4 +2261,10 @@ def compute_legal_compliance_exposure(
         total_low += sum((0.5 ** i) * low for i, (low, _high) in enumerate(ranges_sorted))
         total_high += sum((0.5 ** i) * high for i, (_low, high) in enumerate(ranges_sorted))
 
-    return {"low": round(total_low, 2), "high": round(total_high, 2), "currency": "USD"}
+    return {
+        "low": round(total_low, 2),
+        "high": round(total_high, 2),
+        "currency": "USD",
+        "has_unpriced_conditions": has_unpriced_conditions,
+        "unpriced_state_ids": unpriced_state_ids,
+    }
