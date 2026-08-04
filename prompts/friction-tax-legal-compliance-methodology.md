@@ -850,6 +850,62 @@ meaningfully below the broader national average as a general pattern, not just i
 low states already found. Worth citing as context, not as a substitute for individual state
 figures.
 
+## Addendum 9 — Jurisdictional Research: Scoped Backlog, Not Lost
+
+**Status:** Administrative closeout. Legal/Compliance's five-cluster package (classification,
+dollar curves, cross-state aggregation, Cluster 4's org_type reframe) is ready for Gemini
+review as-is. The OSHA jurisdictional research below is real, valuable, and deliberately
+paused -- not abandoned -- given other priorities (notably /diagnostic Stages 4-5) likely
+warrant attention first. This doc exists so the remaining scope doesn't require
+rediscovery when it's picked back up.
+
+### What's done and durable (Addenda 6, 7, 8)
+
+- California confirmed as a cross-cluster outlier (all 5 Legal/Compliance clusters)
+- 11 of 22 OSHA State Plan states researched for Cluster 5 specifically: California,
+  Washington, Oregon, Alaska, Hawaii, Arizona, Indiana, Iowa, Kentucky, Maryland, South
+  Carolina, plus a bonus Minnesota data point
+- Design decision locked: Cluster 5 models both statutory maximum and actual average
+  assessed penalty, as a range
+- A reusable primary source identified: OSHA's own adoption-tracking table
+  (osha.gov/stateplans/adoption/standards/2016-07-01), with the important caveat that it
+  records stated intent circa 2016-2023, not verified current status (confirmed via
+  Michigan's direct contradiction -- table says adopted, current reality says not)
+
+### Exact remaining scope, so it's pickable up without rediscovery
+
+**Fully unresearched (11 states):** Nevada, New Mexico, North Carolina, Puerto Rico,
+Tennessee, Utah, Vermont, Virginia, Wyoming, plus formal confirmation of Minnesota and
+Michigan (Michigan's statutory picture is confirmed materially low via direct current
+sources; needs its actual-average figure and formal write-up).
+
+**Needs actual-average backfill (10 of the 11 already-researched states):** California,
+Washington, Alaska, Hawaii, Arizona (partial -- has case examples, not a clean average),
+Indiana, Iowa, Kentucky, Maryland (partial -- has average, needs precise current statutory
+figure), South Carolina (partial -- has average, needs precise current statutory figure).
+Only Oregon currently has both numbers complete.
+
+**Priority order if resumed:** the explicit "No" or "Pending" entries in OSHA's adoption
+table are the strongest signal for likely-materially-lower states worth checking first
+(South Carolina already confirmed this pattern); "Yes/Identical" entries need individual
+verification regardless, per the Michigan false-positive.
+
+### Why this is being paused here, not because the work isn't valuable
+
+Legal/Compliance as a whole is still entirely in design -- nothing in this package is
+implemented yet. Jurisdictional precision on a not-yet-shipped feature is lower leverage
+right now than a live, user-facing gap elsewhere in the product (/diagnostic Stages 4-5,
+which has no surviving plan doc and needs a full rescope). This isn't a judgment that the
+research was unproductive -- 11 of 11 states checked produced a genuine, distinct finding,
+a real self-correction was caught, and a real design ambiguity (statutory max vs. actual
+average) got surfaced and resolved. It's a sequencing call, not a merit call.
+
+### What "picking this back up" should look like
+
+Continue directly from the "exact remaining scope" section above -- no rescoping needed,
+unlike /diagnostic's Stages 4-5, which lost its plan entirely to compaction. This doc is
+written specifically so that doesn't happen here too.
+
 ## Structural implications (bigger than Option A)
 
 This is a larger build than the attritional rescale: it likely means `compute_friction_tax()`
