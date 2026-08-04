@@ -6,13 +6,17 @@ clusters -- `the_untouchable` reclassified Cluster 2 -> Cluster 1 (Addendum 4, r
 Gemini's review flag). Cluster 3's interpolation is locked: scope-modulated, not
 path-modulated (Addendum 4). Cluster 4 fully resolved into three org_type-gated sub-tracks
 (Addendum 5). All 5 clusters now have sourced dollar curves, and the cross-state aggregation
-design (Addendum 3) is UNBLOCKED and ready for Gemini review. **Systematic jurisdictions
-pass complete for California across all 5 clusters (Addendum 6)** -- FEHA/PAGA/Cal-OSHA
-findings sourced and ready to build. Explicitly scoped, not assumed complete: the other 49
-states, and the other ~21 OSHA-approved State Plan states specifically for Cluster 5 (federal
-OSHA figures confirmed as a floor, not a national accuracy figure, across those states), have
-NOT been checked -- flagged in the design as known-incomplete jurisdictional treatment, not
-silently treated as accurate everywhere outside California. NOT yet implemented. Does not
+design (Addendum 3) is UNBLOCKED and ready for Gemini review. Systematic jurisdictions
+pass complete for California across all 5 clusters (Addendum 6). **OSHA State Plan research
+for Cluster 5 IN PROGRESS, 7 of 22 states (Addendum 7)** -- California, Washington, Oregon,
+Alaska, Hawaii, Arizona, Indiana researched; variation confirmed genuinely bidirectional
+(exceeds federal flat, exceeds federal conditionally/outcome-triggered, clean statutory
+parity, statutory parity with documented under-enforcement, and genuinely below federal, all
+represented across just 7 states) -- NOT a finished input for implementation, 15 states
+remain. Explicitly scoped, not assumed complete: the other 49 states outside Cluster 5's OSHA
+research, and the 15 remaining OSHA State Plan states specifically, have NOT been checked --
+flagged in the design as known-incomplete jurisdictional treatment, not silently treated as
+accurate everywhere outside what's actually been researched. NOT yet implemented. Does not
 supersede the Option A attritional-criteria rescale (turnover/productivity/decision-quality),
 which proceeds independently -- this doc is specifically the deferred Legal/Compliance item
 that Option A explicitly excluded.
@@ -671,6 +675,107 @@ so a future session doesn't mistake "we checked California" for "we checked all 
    before implementation, given it's confirmed as a real, non-trivial national accuracy gap --
    or does California's confirmed example plus an honest "federal baseline, not state-verified"
    flag suffice for a first implementation?
+
+## Addendum 7 — OSHA State Plan Research, 7 of 22 States (In Progress)
+
+**Status:** Durable record of state-by-state jurisdictional research into Cluster 5's OSHA
+State Plan variation, continuing from Addendum 6's California findings. 7 of 22
+full private-sector State Plans researched with primary-source rigor. NOT complete -- 15
+states remain. NOT yet reviewed by Gemini. Written now per the standing durable-write
+protocol given the volume and structural significance of findings so far.
+
+### The full 22-state list (confirmed, primary-sourced: osha.gov)
+
+Alaska, Arizona, California, Hawaii, Indiana, Iowa, Kentucky, Maryland, Michigan, Minnesota,
+Nevada, New Mexico, North Carolina, Oregon, Puerto Rico, South Carolina, Tennessee, Utah,
+Vermont, Virginia, Washington, Wyoming.
+
+**Researched (7):** California, Washington, Oregon, Alaska, Hawaii, Arizona, Indiana.
+**Remaining (15):** Iowa, Kentucky, Maryland, Michigan, Minnesota, Nevada, New Mexico, North
+Carolina, Puerto Rico, South Carolina, Tennessee, Utah, Vermont, Virginia, Wyoming.
+
+### Key finding: variation from federal baseline is genuinely bidirectional, not just upward
+
+The original hypothesis (a few states exceed federal, most match) undersold the real
+complexity found once actually checked. Five distinct patterns confirmed across 7 states
+(originally reported as six in this addendum's first pass -- Washington's finding was
+corrected this session and folded into the existing clean-parity pattern below, not left as
+its own separate category; see the CORRECTION note under Washington):
+
+**Exceeds federal, flat higher cap:**
+- **California (Cal/OSHA):** Serious violation cap $25,000 vs. federal $16,550 (~51% higher).
+  Willful/repeat close to parity ($162,851 vs. $165,514).
+
+**Exceeds federal, but only conditionally (outcome-triggered, not a blanket cap):**
+- **Oregon:** Ordinary serious violations sit at near-parity ($16,131 vs. federal $16,550).
+  Senate Bill 592 (effective May 2023) creates a separate, much higher tier triggered
+  specifically by a workplace fatality: serious-with-fatality $20,000-$50,000, willful/repeat-
+  with-fatality $50,000-$250,000 (vs. federal's flat $165,514 max regardless of outcome).
+
+**Clean parity, statutorily required:**
+- **Alaska:** Alaska Dept. of Labor policy directive states explicitly: "Alaska's maximum
+  penalties must be the same as those for federal OSHA." Confirmed via current posting
+  ($16,131, matching federal's cycle with minor timing lag).
+- **Hawaii (HIOSH):** Statutorily required (Act 396, HRS) to mirror federal exactly. Confirmed
+  current: $16,550 serious, $165,514 willful/repeat -- identical to federal 2025 levels.
+- **Washington (WISHA):** **CORRECTION (this session) -- the original version of this addendum
+  placed Washington in the "exceeds federal" category. That was incorrect, not a refinement.**
+  WAC 296-900-14010 governs serious violations (maximum penalty: the maximum civil penalty
+  established by federal OSHA, or $7,000, whichever is more). WAC 296-900-14020 separately
+  governs willful/repeat violations (federal max, or $70,000, whichever is more) -- these are
+  two different violation categories with two different statutory floors, not two competing
+  figures for the same category as originally implied. Both floors currently sit BELOW
+  federal's own current maximums ($16,550 serious, $165,514 willful/repeat), so Washington's
+  EFFECTIVE current penalties equal federal's exactly -- Washington is at parity right now,
+  not exceeding federal. The floor mechanism only matters if a future federal reduction ever
+  drops federal's own maximums below $7,000/$70,000, which is not the current state of the
+  world.
+
+**Statutory parity, but documented under-enforcement (a new category, not anticipated at the
+start of this research):**
+- **Arizona (ADOSH):** Statutory maximums track federal via legislated requirement. However,
+  Arizona's Industrial Commission is "the only state or federal OSHA program in the country"
+  with an independent body that reviews and frequently reduces proposed penalties after the
+  fact -- one documented case cut $18,500 to $4,750 (~74% reduction). Federal OSHA has formally
+  investigated this practice as undermining deterrence and potentially exceeding the
+  commission's legal authority. Effective real-world exposure likely runs below the statutory
+  maximum, the opposite direction from California/Oregon. This practice is under active
+  federal scrutiny as of research date -- may not be a stable long-term feature.
+
+**Genuinely, confirmedly lower than federal (the first and only state found in this direction
+so far):**
+- **Indiana (IOSHA):** Current official Indiana Dept. of Labor page (in.gov/dol) confirms
+  active maximums of $7,000 for serious violations -- less than half of federal's $16,550.
+  Deliberate, controversial, longstanding: Indiana has resisted adopting federal's post-2016
+  inflation-adjusted structure, retaining pre-2016 levels ($7,000/$70,000). Federal OSHA
+  formally found Indiana out of compliance with the "at least as effective" requirement
+  (Finding FY 2021-05); Indiana's response states it cannot unilaterally change penalties
+  without state legislative action, which has not occurred. Note: multiple third-party
+  compliance-training sites incorrectly claim Indiana "mirrors federal" at higher figures --
+  contradicted directly by Indiana's own current official government source. State primary
+  source resolved this conflict, consistent with citation-verification practice used
+  throughout this session.
+
+### Implication for Cluster 5's design
+
+A single "does this state exceed federal" binary is insufficient. At minimum, three axes are
+now confirmed as real and independent: (1) does the state's *statutory* maximum exceed,
+match, or fall below federal, (2) is any escalation *conditional* on a specific outcome
+(Oregon's fatality trigger) rather than blanket, and (3) does *effective* enforcement diverge
+from the *statutory* figure (Arizona's under-enforcement pattern). A design that only checks
+"jurisdiction = CA, apply a flat multiplier" would miss Oregon's conditional structure,
+Arizona's enforcement gap, and Indiana's genuine downward deviation entirely. Washington's
+corrected finding adds a fourth, related caution: a state's statutory mechanism (a floor tied
+to federal's own maximum) can look like it should exceed federal on paper while resolving to
+exact parity in practice, given federal's own current figures -- read the actual effective
+number, not just the formula's structure, before classifying a state.
+
+### Next steps
+
+Continue state-by-state research through the remaining 15 states at the same rigor. Given the
+real complexity found in 7 of 7 states checked so far (every single state researched has
+produced a genuine, non-trivial, distinct finding -- none has been a simple confirmed match
+requiring no further note), there is no indication the remaining 15 will be faster or simpler.
 
 ## Structural implications (bigger than Option A)
 
