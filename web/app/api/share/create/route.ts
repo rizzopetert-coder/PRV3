@@ -228,8 +228,7 @@ export async function POST(request: NextRequest) {
 
     resolution_family: getPrimaryFamily(selectedStateIds),
 
-    // friction_tax_estimate: null in Path B (CALIBRATION TARGET)
-    friction_tax_estimate: null,
+    friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
 
     intake: mapIntake(engineResult.intake as Record<string, unknown>),
 
