@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.95
+\\\#\\\# MOB v4.96
 
   
 
@@ -1345,7 +1345,7 @@ Priority order for next session, in sequence:
 6. Intake industry taxonomy expansion -- PROPOSED, NOT REVIEWED, NOT IMPLEMENTED (prompts/intake-industry-taxonomy-expansion.md). SCHEMA-LEVEL SCOPE, same flag as item 5 -- second intake-schema proposal this session, kept deliberately separate from the headcount-precision redesign per Pete's direction, not combined. Adds "Construction" (NAICS Sector 23) and "Transportation & Warehousing" (NAICS Sectors 48-49) to INTAKE_FIELDS["industry"], expanding 9 -> 11 values. Originates from the Demographic Applicability Filter's Cluster 5 finding that is_high_hazard (HIGH_HAZARD_INDUSTRIES) can only ever fire for 2 of the 9 current industry values, while BLS ranks construction and transportation/warehousing among the highest injury/fatality-rate industries nationally -- both currently fall into "Other," indistinguishable from anything else that doesn't fit. REAL DEPENDENCY, not just a code change: PAYROLL_BASELINE_GRID expands from 6x9=54 cells to 6x11=66 cells -- 12 new cells (Construction and Transportation & Warehousing x all 6 headcount buckets) need genuine SUSB/BLS payroll-baseline research sourced before this is implementation-ready, comparable in scope to the original 54-cell population work, not trivial. HIGH_HAZARD_INDUSTRIES update itself is straightforward (add both new values to the existing set).
 7. causation_pattern -> resolution_families.py routing influence -- split off from Diagnostic Dimension Expansion, not started, no scoping doc.
 8. The seven-experiments-to-methodology-series workstream (citation audit prioritizing E2/E5/E7, two-question test pass, consolidation-mapping against 57-state taxonomy, PCD-as-editorial-throughline framing decision).
-10. Infrastructure housekeeping, opportunistic/lower priority: weak-profile test limitation (generate_answers() weak branch ignoring target_state), calibration runner's untested severity follow-on questions (parked, do not raise unless Pete reopens), test_contract.py pre-existing liability_block KeyError, MemPalace drawer-write issue.
+9. Infrastructure housekeeping, opportunistic/lower priority: weak-profile test limitation (generate_answers() weak branch ignoring target_state), calibration runner's untested severity follow-on questions (parked, do not raise unless Pete reopens), test_contract.py pre-existing liability_block KeyError, MemPalace drawer-write issue.
 
 Closed since last update, not on the active list: /book Step 5 (Schema.org JSON-LD) -- shipped, commit a91a28c.
 
