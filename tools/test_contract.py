@@ -42,6 +42,7 @@ from engine.severity import SeverityEngine, SeverityResult, SEVERITY_TIER_DESCRI
 from engine.checkpoint import CheckpointResult
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.narrative import NarrativeExtractionResult
+from engine.output_synthesis import SynthesisResult
 
 PASS = []
 FAIL = []
@@ -149,7 +150,17 @@ session = SessionData(
     checkpoint_q27=cp27,
 )
 
-output = assemble_output(session)
+synthesis_result = SynthesisResult(
+    liability_condition_text="test liability condition text",
+    asset_resolution_anchor_text="test asset resolution anchor text",
+    framing_text="test framing text",
+    observable_indicators=["test indicator one", "test indicator two"],
+    resolution_framing_text="test resolution framing text",
+    headline="test headline",
+    synthesis_confidence=0.75,
+)
+
+output = assemble_output(session, synthesis_result=synthesis_result)
 
 
 # ── 1. assemble_output: 16 top-level fields ───────────────────────────────────
@@ -418,10 +429,10 @@ print("\n12. private_output")
 priv = output["private_output"]
 check("private_output.opening_text is string",
       isinstance(priv["opening_text"], str))
-check("private_output.liability_block is string",
-      isinstance(priv["liability_block"], str))
-check("private_output.asset_anchor_text is string",
-      isinstance(priv["asset_anchor_text"], str))
+check("synthesis.liability_condition_text is string",
+      isinstance(output["synthesis"]["liability_condition_text"], str))
+check("synthesis.asset_resolution_anchor_text is string",
+      isinstance(output["synthesis"]["asset_resolution_anchor_text"], str))
 check("private_output.resolution_routing is string",
       isinstance(priv["resolution_routing"], str))
 check("private_output.friction_tax_estimate is None (CALIBRATION TARGET)",
@@ -436,12 +447,18 @@ if output["output_type"] == "single_state":
 print("\n13. shareable_output")
 
 sha = output["shareable_output"]
-check("shareable_output.framing_text is string",
-      isinstance(sha["framing_text"], str))
-check("shareable_output.observable_indicators is list",
-      isinstance(sha["observable_indicators"], list))
-check("shareable_output.resolution_framing is string",
-      isinstance(sha["resolution_framing"], str))
+# shareable_output's real current shape (confirmed by direct read of
+# engine/contract.py before writing this) is exactly {"attribution_text": str}
+# -- framing_text/observable_indicators/resolution_framing_text all moved to
+# the shared output["synthesis"] dict at the Session 42 migration and were
+# never restored to shareable_output itself; the private/shareable synthesis
+# split happens only in the TypeScript API layer, not in this Python function.
+check("synthesis.framing_text is string",
+      isinstance(output["synthesis"]["framing_text"], str))
+check("synthesis.observable_indicators is list",
+      isinstance(output["synthesis"]["observable_indicators"], list))
+check("synthesis.resolution_framing_text is string",
+      isinstance(output["synthesis"]["resolution_framing_text"], str))
 check("shareable_output.attribution_text non-empty and contains PRV3",
       isinstance(sha["attribution_text"], str) and "PRV3" in sha["attribution_text"],
       f"got {sha['attribution_text']!r}")
