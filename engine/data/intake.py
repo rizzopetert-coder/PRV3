@@ -250,6 +250,8 @@ INTAKE_FIELDS = {
         "Retail & Hospitality",
         "Nonprofit & Education",
         "Government & Public Sector",
+        "Construction",
+        "Transportation & Warehousing",
         "Other",
     ],
     "org_type": [
@@ -282,9 +284,10 @@ INTAKE_FIELDS = {
 }
 
 # Industries that trigger the high-hazard Safety & Wellbeing multiplier
-HIGH_HAZARD_INDUSTRIES = {"Manufacturing & Industrial", "Healthcare & Life Sciences"}
-# Construction and Logistics are not in the current intake industry list.
-# Pending intake list expansion if those industries are added.
+HIGH_HAZARD_INDUSTRIES = {
+    "Manufacturing & Industrial", "Healthcare & Life Sciences",
+    "Construction", "Transportation & Warehousing",
+}
 
 
 # ── Signal reliability coefficient table — Section II.3.1 ─────────────────────

@@ -514,8 +514,8 @@ for (hc, ind), entry in PAYROLL_BASELINE_GRID.items():
         _mismatches.append((hc, ind, entry.payroll_floor_annual, expected))
 
 check(
-    "PAYROLL_BASELINE_GRID has exactly 54 cells (6 headcount x 9 industry)",
-    len(PAYROLL_BASELINE_GRID) == 54,
+    "PAYROLL_BASELINE_GRID has exactly 66 cells (6 headcount x 11 industry)",
+    len(PAYROLL_BASELINE_GRID) == 66,
     f"got {len(PAYROLL_BASELINE_GRID)}",
 )
 expected_keys = {(hc, ind) for hc in HEADCOUNT_BUCKETS for ind in INDUSTRIES}
@@ -543,7 +543,7 @@ _by_industry_sourced = {
     for ind in INDUSTRIES
 }
 check(
-    "All 9 industries carry a source/citation_id across all 6 headcount buckets",
+    "All 11 industries carry a source/citation_id across all 6 headcount buckets",
     all(_by_industry_sourced.values()),
     f"unsourced industries: {[k for k, v in _by_industry_sourced.items() if not v]}",
 )
@@ -726,7 +726,7 @@ check(
 # here too, not just on next import).
 
 check(
-    "INDUSTRY_NON_EXEMPT_RATIO has exactly 9 entries matching INDUSTRIES",
+    "INDUSTRY_NON_EXEMPT_RATIO has exactly 11 entries matching INDUSTRIES",
     set(INDUSTRY_NON_EXEMPT_RATIO.keys()) == set(INDUSTRIES),
     f"got {set(INDUSTRY_NON_EXEMPT_RATIO.keys())}",
 )
@@ -739,6 +739,8 @@ _EXPECTED_NON_EXEMPT_RATIOS = {
     "Technology": 0.280,
     "Government & Public Sector": 0.44,
     "Nonprofit & Education": 0.135,
+    "Construction": 0.554,
+    "Transportation & Warehousing": 0.422,
     "Other": 0.556,
 }
 check(

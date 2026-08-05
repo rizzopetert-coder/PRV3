@@ -96,6 +96,8 @@ INDUSTRIES: tuple[str, ...] = (
     "Retail & Hospitality",
     "Nonprofit & Education",
     "Government & Public Sector",
+    "Construction",
+    "Transportation & Warehousing",
     "Other",
 )
 
@@ -291,11 +293,48 @@ _INDUSTRY_WAGE_DATA: dict[str, tuple[float, str, str]] = {
         "sector aggregate).",
         "BLS_OEWS_2023_sector99_government",
     ),
+    "Construction": (
+        67430.0,
+        "BLS OEWS May 2023 mean annual wage: $67,430. Sector 23 "
+        "(Construction), All Occupations. Employment 7,921,080. CONFIRMED "
+        "exact.",
+        "BLS_OEWS_2023_naics2_23",
+    ),
+    "Transportation & Warehousing": (
+        59320.0,
+        "BLS OEWS May 2023 mean annual wage: $59,320. Sectors 48-49 "
+        "(Transportation and Warehousing), All Occupations. Employment "
+        "7,333,400. CONFIRMED exact.",
+        "BLS_OEWS_2023_naics2_48-49",
+    ),
     "Other": (
-        65470.0,
-        "BLS OEWS May 2023 national estimate, All Occupations (SOC 00-0000): "
-        "$65,470. CONFIRMED exact.",
-        "BLS_OEWS_2023_national_all_occupations",
+        63446.0,
+        "BLS OEWS May 2023 employment-weighted mean wage across nine real "
+        "components, genuinely excluding every industry already claimed "
+        "elsewhere in this grid (rebuilt from the prior single SOC 00-0000 "
+        "national-all-occupations lookup, which structurally overlapped with "
+        "Construction and Transportation & Warehousing once those became "
+        "their own columns): Agriculture, Forestry, Fishing and Hunting "
+        "(Sector 11) $43,010 wage / 413,580 employment; Mining, Quarrying, "
+        "and Oil and Gas Extraction (Sector 21) $77,020 wage / 571,160 "
+        "employment; Utilities (Sector 22) $97,250 wage / 564,750 employment; "
+        "Wholesale Trade (Sector 42) $71,410 wage / 6,013,210 employment; "
+        "Real Estate and Rental and Leasing (Sector 53) $61,630 wage / "
+        "2,388,050 employment; Management of Companies and Enterprises "
+        "(Sector 55) $106,640 wage / 2,771,010 employment; Administrative and "
+        "Support and Waste Management and Remediation Services (Sector 56) "
+        "$52,650 wage / 9,496,560 employment; Arts, Entertainment, and "
+        "Recreation (Sector 71) $50,550 wage / 2,523,660 employment; Other "
+        "Services except Public Administration (Sector 81) MINUS NAICS 813000 "
+        "(Religious, Grantmaking, Civic, Professional, and Similar "
+        "Organizations, already claimed by the Nonprofit & Education entry) "
+        "-- residual $47,664 wage / 2,951,060 employment, computed by "
+        "subtracting 813000's wage bill and employment from Sector 81's full "
+        "total ($54,090 wage / 4,316,400 employment) and re-deriving the "
+        "residual mean. Weighted mean across all nine = sum(wage x "
+        "employment) / sum(employment) = $63,445.66, rounds to $63,446. "
+        "Verified independently (two-pass computation, no discrepancy).",
+        "BLS_OEWS_2023_other_nine_component_residual",
     ),
 }
 
@@ -1886,13 +1925,29 @@ def compute_friction_tax(
 # 6-9) is explicitly NOT implemented here -- deferred per Addendum 9.
 
 # -- Industry non-exempt ratio ----------------------------------------------------
-# Real BLS data (Addendum 10, source of record). Feeds Cluster 3's
+# KNOWN CITATION-ACCURACY GAP, not a resolved sourcing question. The 9
+# original entries below (all industries except Construction and
+# Transportation & Warehousing) arrived in a single commit (0912a30)
+# already citing "BLS CPS cpsaat18c.pdf and cpsaat45.pdf (hourly-paid
+# workers by industry)" as their source. Confirmed this session:
+# cpsaat45.pdf is NOT a general hourly-paid-by-industry table -- it is
+# specifically "Wage and salary workers paid hourly rates with earnings
+# at or below the prevailing Federal minimum wage by occupation and
+# industry" (a sub-minimum-wage table, national aggregate ~1.0%),
+# confirmed consistent across every annual edition checked (2016-2025) --
+# no year where this table number meant something else. The 9 ratios
+# below (0.557, 0.556, 0.662, etc.) do not match that sub-minimum-wage
+# concept at all -- they match the general "percent of workers paid
+# hourly" concept instead. Git history shows the ratios and this
+# citation arrived together already in final form -- no earlier draft or
+# intermediate work product (pulled figures, a numerator/denominator
+# calculation) survives anywhere in this repo to confirm what the real
+# original source actually was. The values are RETAINED, not
+# recomputed, because they independently corroborate against real BLS
+# published aggregates: "Other": 0.556 nearly exactly matches BLS's 2024
+# national "percent paid hourly" figure of 55.6%. Feeds Cluster 3's
 # affected-subgroup calculation: headcount_midpoint x
-# INDUSTRY_NON_EXEMPT_RATIO[industry]. Sources: BLS CPS cpsaat18c.pdf
-# (total employed by industry, 2025) and cpsaat45.pdf (hourly-paid
-# workers by industry, 2025); BLS CES (state/local government
-# employment, June 2026); BLS nonprofit sector research data (2022,
-# most recent available).
+# INDUSTRY_NON_EXEMPT_RATIO[industry].
 
 INDUSTRY_NON_EXEMPT_RATIO: dict[str, float] = {
     "Manufacturing & Industrial": 0.557,
@@ -1909,6 +1964,34 @@ INDUSTRY_NON_EXEMPT_RATIO: dict[str, float] = {
     # BLS (confirmed via a 2024 Senate oversight letter to DOL), not a
     # research gap on this project's end.
     "Nonprofit & Education": 0.135,
+    # BLS CPS, 2025: 5,655,000 hourly-paid workers (FRED
+    # LEU0204837400A, "Weekly and Hourly Earnings from the CPS" release)
+    # / 10,210,000 total at work (cpsaat21.htm, "People at work in
+    # nonagricultural industries by class of worker," 2025 annual
+    # average). Both figures same survey family (CPS household survey),
+    # matching population (private wage and salary workers, Construction
+    # industry). Closely corroborates existing Manufacturing figure
+    # (0.557). Note: 2025 CPS annual averages are an 11-month average
+    # excluding October (federal shutdown) and reflect a mid-year NAICS
+    # reclassification -- not strictly comparable to prior years per
+    # BLS's own caveat on this table.
+    "Construction": 0.554,
+    # BLS CPS, 2025: 3,861,000 hourly-paid workers, Transportation &
+    # Warehousing specifically (FRED LEU0204838200A) / 9,156,000 total
+    # at work, "Transportation and utilities" COMBINED (cpsaat21.htm,
+    # 2025 -- this CPS table does not break Transportation & Warehousing
+    # out separately from Utilities at any point in its published
+    # history, confirmed across multiple years checked this session;
+    # this is a genuine limitation of the published table, not a
+    # citation gap). KNOWN LIMITATION: this ratio's denominator is
+    # broader than its numerator's industry (includes Utilities
+    # workers, who are not part of Transportation & Warehousing), which
+    # structurally understates the true Transportation & Warehousing-
+    # specific ratio. Flagged explicitly, not silently approximated --
+    # if this materially affects Cluster 3 exposure figures for
+    # Transportation & Warehousing orgs, it should be revisited with CPS
+    # microdata directly rather than a published aggregate table.
+    "Transportation & Warehousing": 0.422,
     # Real national aggregate, BLS 2025.
     "Other": 0.556,
 }
