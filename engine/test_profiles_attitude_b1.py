@@ -30,7 +30,7 @@ ATT_UT_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_untouchable",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -58,7 +58,7 @@ ATT_UT_02 = TestCase(
     profile_type="moderate",
     target_state="the_untouchable",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -83,7 +83,7 @@ ATT_UT_03 = TestCase(
     profile_type="weak",
     target_state="the_untouchable",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -116,7 +116,7 @@ ATT_DC_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_diversity_ceiling",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -143,7 +143,7 @@ ATT_DC_02 = TestCase(
     profile_type="moderate",
     target_state="the_diversity_ceiling",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -168,7 +168,7 @@ ATT_DC_03 = TestCase(
     profile_type="weak",
     target_state="the_diversity_ceiling",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -202,7 +202,7 @@ ATT_BC_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_burned_credibility",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Manufacturing & Industrial",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -229,7 +229,7 @@ ATT_BC_02 = TestCase(
     profile_type="moderate",
     target_state="the_burned_credibility",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -254,7 +254,7 @@ ATT_BC_03 = TestCase(
     profile_type="weak",
     target_state="the_burned_credibility",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -286,7 +286,7 @@ ATT_IB_01 = TestCase(
     profile_type="high_confidence",
     target_state="invisible_burnout",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -313,7 +313,7 @@ ATT_IB_02 = TestCase(
     profile_type="moderate",
     target_state="invisible_burnout",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -338,7 +338,7 @@ ATT_IB_03 = TestCase(
     profile_type="weak",
     target_state="invisible_burnout",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -370,7 +370,7 @@ ATT_BS_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_basement_standard",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Manufacturing & Industrial",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -397,7 +397,7 @@ ATT_BS_02 = TestCase(
     profile_type="moderate",
     target_state="the_basement_standard",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -422,7 +422,7 @@ ATT_BS_03 = TestCase(
     profile_type="weak",
     target_state="the_basement_standard",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -456,7 +456,7 @@ ATT_IT_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_inside_track",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -483,7 +483,7 @@ ATT_IT_02 = TestCase(
     profile_type="moderate",
     target_state="the_inside_track",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -508,7 +508,7 @@ ATT_IT_03 = TestCase(
     profile_type="weak",
     target_state="the_inside_track",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -542,7 +542,7 @@ ATT_NL_01 = TestCase(
     profile_type="high_confidence",
     target_state="narrative_lock",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -570,7 +570,7 @@ ATT_NL_02 = TestCase(
     profile_type="moderate",
     target_state="narrative_lock",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -595,7 +595,7 @@ ATT_NL_03 = TestCase(
     profile_type="weak",
     target_state="narrative_lock",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -629,7 +629,7 @@ ATT_GD_01 = TestCase(
     profile_type="high_confidence",
     target_state="groundhog_day",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Manufacturing & Industrial",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -656,7 +656,7 @@ ATT_GD_02 = TestCase(
     profile_type="moderate",
     target_state="groundhog_day",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -681,7 +681,7 @@ ATT_GD_03 = TestCase(
     profile_type="weak",
     target_state="groundhog_day",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -716,7 +716,7 @@ ATT_WR_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_wrong_reward",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -744,7 +744,7 @@ ATT_WR_02 = TestCase(
     profile_type="moderate",
     target_state="the_wrong_reward",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -769,7 +769,7 @@ ATT_WR_03 = TestCase(
     profile_type="weak",
     target_state="the_wrong_reward",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -803,7 +803,7 @@ ATT_BCP_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_broken_compass",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -831,7 +831,7 @@ ATT_BCP_02 = TestCase(
     profile_type="moderate",
     target_state="the_broken_compass",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -856,7 +856,7 @@ ATT_BCP_03 = TestCase(
     profile_type="weak",
     target_state="the_broken_compass",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],

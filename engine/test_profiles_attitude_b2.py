@@ -32,7 +32,7 @@ ATT_WNS_01 = TestCase(
     profile_type="high_confidence",
     target_state="what_nobody_says",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -61,7 +61,7 @@ ATT_WNS_02 = TestCase(
     profile_type="moderate",
     target_state="what_nobody_says",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -86,7 +86,7 @@ ATT_WNS_03 = TestCase(
     profile_type="weak",
     target_state="what_nobody_says",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -122,7 +122,7 @@ ATT_UH_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_unreported_hazard",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Manufacturing & Industrial",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -150,7 +150,7 @@ ATT_UH_02 = TestCase(
     profile_type="moderate",
     target_state="the_unreported_hazard",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Manufacturing & Industrial",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -175,7 +175,7 @@ ATT_UH_03 = TestCase(
     profile_type="weak",
     target_state="the_unreported_hazard",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Manufacturing & Industrial",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -211,7 +211,7 @@ ATT_UD_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_unlocked_door",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Healthcare & Life Sciences",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -237,7 +237,7 @@ ATT_UD_02 = TestCase(
     profile_type="moderate",
     target_state="the_unlocked_door",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -262,7 +262,7 @@ ATT_UD_03 = TestCase(
     profile_type="weak",
     target_state="the_unlocked_door",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -298,7 +298,7 @@ ATT_LD_01 = TestCase(
     profile_type="high_confidence",
     target_state="leadership_deafness",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -327,7 +327,7 @@ ATT_LD_02 = TestCase(
     profile_type="moderate",
     target_state="leadership_deafness",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -351,7 +351,7 @@ ATT_LD_03 = TestCase(
     profile_type="weak",
     target_state="leadership_deafness",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],

@@ -34,7 +34,7 @@ EXP_CC_01 = TestCase(
     profile_type="high_confidence",
     target_state="compression_crisis",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Technology",
         "org_type":           "PE or VC-backed",
         "jurisdictions":      ["CA"],
@@ -59,7 +59,7 @@ EXP_CC_02 = TestCase(
     profile_type="moderate",
     target_state="compression_crisis",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Healthcare & Life Sciences",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      ["CA"],
@@ -84,7 +84,7 @@ EXP_CC_03 = TestCase(
     profile_type="weak",
     target_state="compression_crisis",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Retail & Hospitality",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -116,7 +116,7 @@ EXP_SDB_01 = TestCase(
     profile_type="high_confidence",
     target_state="sequential_decision_blindness",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Financial Services",
         "org_type":           "Publicly traded",
         "jurisdictions":      [],
@@ -142,7 +142,7 @@ EXP_SDB_02 = TestCase(
     profile_type="moderate",
     target_state="sequential_decision_blindness",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Other",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -168,7 +168,7 @@ EXP_SDB_03 = TestCase(
     profile_type="weak",
     target_state="sequential_decision_blindness",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Nonprofit & Education",
         "org_type":           "Nonprofit",
         "jurisdictions":      [],
@@ -198,7 +198,7 @@ EXP_DIA_01 = TestCase(
     profile_type="high_confidence",
     target_state="disparate_impact_architecture",
     intake={
-        "headcount":          "500-999",
+        "headcount":          692,
         "industry":           "Manufacturing & Industrial",
         "org_type":           "Publicly traded",
         "jurisdictions":      [],
@@ -223,7 +223,7 @@ EXP_DIA_02 = TestCase(
     profile_type="moderate",
     target_state="disparate_impact_architecture",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -248,7 +248,7 @@ EXP_DIA_03 = TestCase(
     profile_type="weak",
     target_state="disparate_impact_architecture",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -278,7 +278,7 @@ EXP_PAG_01 = TestCase(
     profile_type="high_confidence",
     target_state="planning_authority_gap",
     intake={
-        "headcount":          "500-999",
+        "headcount":          692,
         "industry":           "Retail & Hospitality",
         "org_type":           "Publicly traded",
         "jurisdictions":      [],
@@ -303,7 +303,7 @@ EXP_PAG_02 = TestCase(
     profile_type="moderate",
     target_state="planning_authority_gap",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "PE or VC-backed",
         "jurisdictions":      [],
@@ -328,7 +328,7 @@ EXP_PAG_03 = TestCase(
     profile_type="weak",
     target_state="planning_authority_gap",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Nonprofit & Education",
         "org_type":           "Nonprofit",
         "jurisdictions":      [],
@@ -358,7 +358,7 @@ EXP_WT_01 = TestCase(
     profile_type="high_confidence",
     target_state="wellbeing_theater",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -383,7 +383,7 @@ EXP_WT_02 = TestCase(
     profile_type="moderate",
     target_state="wellbeing_theater",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Healthcare & Life Sciences",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -408,7 +408,7 @@ EXP_WT_03 = TestCase(
     profile_type="weak",
     target_state="wellbeing_theater",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Other",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -438,7 +438,7 @@ EXP_HDA_01 = TestCase(
     profile_type="high_confidence",
     target_state="human_displacement_anxiety",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Technology",
         "org_type":           "PE or VC-backed",
         "jurisdictions":      [],
@@ -463,7 +463,7 @@ EXP_HDA_02 = TestCase(
     profile_type="moderate",
     target_state="human_displacement_anxiety",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -488,7 +488,7 @@ EXP_HDA_03 = TestCase(
     profile_type="weak",
     target_state="human_displacement_anxiety",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Other",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -518,7 +518,7 @@ EXP_MAF_01 = TestCase(
     profile_type="high_confidence",
     target_state="motivational_architecture_failure",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Other",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -543,7 +543,7 @@ EXP_MAF_02 = TestCase(
     profile_type="moderate",
     target_state="motivational_architecture_failure",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Other",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -568,7 +568,7 @@ EXP_MAF_03 = TestCase(
     profile_type="weak",
     target_state="motivational_architecture_failure",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Other",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -597,7 +597,7 @@ EXP_CO_01 = TestCase(
     profile_type="high_confidence",
     target_state="cultural_overtime",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Other",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      ["CA"],
@@ -622,7 +622,7 @@ EXP_CO_02 = TestCase(
     profile_type="moderate",
     target_state="cultural_overtime",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Retail & Hospitality",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -646,7 +646,7 @@ EXP_CO_03 = TestCase(
     profile_type="weak",
     target_state="cultural_overtime",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -676,7 +676,7 @@ EXP_IPM_01 = TestCase(
     profile_type="high_confidence",
     target_state="invisible_performance_management",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -701,7 +701,7 @@ EXP_IPM_02 = TestCase(
     profile_type="moderate",
     target_state="invisible_performance_management",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Healthcare & Life Sciences",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -725,7 +725,7 @@ EXP_IPM_03 = TestCase(
     profile_type="weak",
     target_state="invisible_performance_management",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Other",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -755,7 +755,7 @@ EXP_DCF_01 = TestCase(
     profile_type="high_confidence",
     target_state="distributed_culture_fragmentation",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Technology",
         "org_type":           "PE or VC-backed",
         "jurisdictions":      [],
@@ -780,7 +780,7 @@ EXP_DCF_02 = TestCase(
     profile_type="moderate",
     target_state="distributed_culture_fragmentation",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -804,7 +804,7 @@ EXP_DCF_03 = TestCase(
     profile_type="weak",
     target_state="distributed_culture_fragmentation",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Other",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],

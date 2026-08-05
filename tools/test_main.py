@@ -19,7 +19,7 @@ FAIL = []
 VALID_PAYLOAD = {
     "selectedStateIds": ["decision_paralysis"],
     "intake": {
-        "headcount": "51-200",
+        "headcount": 152,
         "industry": "Technology",
         "orgType": "private",
         "jurisdictions": ["US-CA"],
@@ -31,7 +31,7 @@ VALID_PAYLOAD = {
 EMPTY_STATES_PAYLOAD = {
     "selectedStateIds": [],
     "intake": {
-        "headcount": "51-200",
+        "headcount": 152,
         "industry": "Technology",
         "orgType": "private",
         "jurisdictions": [],
@@ -205,7 +205,7 @@ print("run_accumulated_engine — checkpoint_results -> SessionData -> checkpoin
 print("=" * 64)
 
 _LOCKED_INTAKE = {
-    "organization_size": "51-200",
+    "organization_size": 152,
     "industry": "Technology",
     "role_level": "CEO",
     "jurisdiction": "US-CA",
@@ -305,7 +305,7 @@ print("Severity follow-on wiring — accumulate_one_answer + run_accumulated_eng
 print("=" * 64)
 
 _SEV_INTAKE = {
-    "organization_size": "100-249",
+    "organization_size": 152,
     "industry": "Technology",
     "role_level": "CEO",
     "jurisdiction": "US-CA",

@@ -43,7 +43,7 @@ print("=" * 64)
 # ── Shared test intake fixtures ────────────────────────────────────────────────
 
 INTAKE_BASIC = IntakeData(
-    headcount="100-249",
+    headcount=152,
     industry="Technology",
     org_type="Privately held professional leadership",
     jurisdictions=["TX"],
@@ -52,7 +52,7 @@ INTAKE_BASIC = IntakeData(
 )
 
 INTAKE_EVENT = IntakeData(
-    headcount="25-99",
+    headcount=45,
     industry="Technology",
     org_type="PE or VC-backed",
     jurisdictions=["CA"],
@@ -61,7 +61,7 @@ INTAKE_EVENT = IntakeData(
 )
 
 INTAKE_HEADCOUNT_SMALL = IntakeData(
-    headcount="Under 25",
+    headcount=4,
     industry="Professional Services",
     org_type="Founder-led",
     jurisdictions=["TX"],
@@ -259,7 +259,7 @@ check("C-suite authority_liability scaled by 1.1",
 print("\n9. Q18-E conditional — non-hazard industry (Technology)")
 
 INTAKE_Q18_LOW = IntakeData(
-    headcount="100-249",
+    headcount=152,
     industry="Technology",
     org_type="Privately held professional leadership",
     jurisdictions=["TX"],
@@ -289,7 +289,7 @@ check("Q18-E non-hazard: all other fields 0.00",
 print("\n10. Q18-E conditional — high-hazard industry (Manufacturing & Industrial)")
 
 INTAKE_Q18_HIGH = IntakeData(
-    headcount="100-249",
+    headcount=152,
     industry="Manufacturing & Industrial",
     org_type="Privately held professional leadership",
     jurisdictions=["TX"],

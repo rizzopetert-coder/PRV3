@@ -34,7 +34,7 @@ ALL_FR_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_fracture",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Founder-led",
         "jurisdictions":      [],
@@ -62,7 +62,7 @@ ALL_FR_02 = TestCase(
     profile_type="moderate",
     target_state="the_fracture",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -88,7 +88,7 @@ ALL_FR_03 = TestCase(
     profile_type="weak",
     target_state="the_fracture",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -120,7 +120,7 @@ ALL_SC_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_second_close",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -147,7 +147,7 @@ ALL_SC_02 = TestCase(
     profile_type="moderate",
     target_state="the_second_close",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -173,7 +173,7 @@ ALL_SC_03 = TestCase(
     profile_type="weak",
     target_state="the_second_close",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -205,7 +205,7 @@ ALL_SI_01 = TestCase(
     profile_type="high_confidence",
     target_state="silosolation",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Manufacturing & Industrial",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -232,7 +232,7 @@ ALL_SI_02 = TestCase(
     profile_type="moderate",
     target_state="silosolation",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -257,7 +257,7 @@ ALL_SI_03 = TestCase(
     profile_type="weak",
     target_state="silosolation",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -291,7 +291,7 @@ ALL_SF_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_suppression_filter",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -319,7 +319,7 @@ ALL_SF_02 = TestCase(
     profile_type="moderate",
     target_state="the_suppression_filter",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -344,7 +344,7 @@ ALL_SF_03 = TestCase(
     profile_type="weak",
     target_state="the_suppression_filter",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -377,7 +377,7 @@ ALL_AS_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_arbitrary_standard",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -405,7 +405,7 @@ ALL_AS_02 = TestCase(
     profile_type="moderate",
     target_state="the_arbitrary_standard",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -430,7 +430,7 @@ ALL_AS_03 = TestCase(
     profile_type="weak",
     target_state="the_arbitrary_standard",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -463,7 +463,7 @@ ALL_DB_01 = TestCase(
     profile_type="high_confidence",
     target_state="decision_blindness",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -491,7 +491,7 @@ ALL_DB_02 = TestCase(
     profile_type="moderate",
     target_state="decision_blindness",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -516,7 +516,7 @@ ALL_DB_03 = TestCase(
     profile_type="weak",
     target_state="decision_blindness",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],

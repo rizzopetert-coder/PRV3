@@ -34,7 +34,7 @@ AUT_UN_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_uninitiated",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -61,7 +61,7 @@ AUT_UN_02 = TestCase(
     profile_type="moderate",
     target_state="the_uninitiated",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -86,7 +86,7 @@ AUT_UN_03 = TestCase(
     profile_type="weak",
     target_state="the_uninitiated",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Founder-led",
         "jurisdictions":      [],
@@ -117,7 +117,7 @@ AUT_LC_01 = TestCase(
     profile_type="high_confidence",
     target_state="leadership_continuity_risk",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -144,7 +144,7 @@ AUT_LC_02 = TestCase(
     profile_type="moderate",
     target_state="leadership_continuity_risk",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Healthcare & Life Sciences",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -170,7 +170,7 @@ AUT_LC_03 = TestCase(
     profile_type="weak",
     target_state="leadership_continuity_risk",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -201,7 +201,7 @@ AUT_DP_01 = TestCase(
     profile_type="high_confidence",
     target_state="decision_paralysis",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -229,7 +229,7 @@ AUT_DP_02 = TestCase(
     profile_type="moderate",
     target_state="decision_paralysis",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -254,7 +254,7 @@ AUT_DP_03 = TestCase(
     profile_type="weak",
     target_state="decision_paralysis",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -286,7 +286,7 @@ AUT_PL_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_policy_lag",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -313,7 +313,7 @@ AUT_PL_02 = TestCase(
     profile_type="moderate",
     target_state="the_policy_lag",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -338,7 +338,7 @@ AUT_PL_03 = TestCase(
     profile_type="weak",
     target_state="the_policy_lag",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -369,7 +369,7 @@ AUT_TP_01 = TestCase(
     profile_type="high_confidence",
     target_state="transition_paralysis",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Manufacturing & Industrial",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -396,7 +396,7 @@ AUT_TP_02 = TestCase(
     profile_type="moderate",
     target_state="transition_paralysis",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -421,7 +421,7 @@ AUT_TP_03 = TestCase(
     profile_type="weak",
     target_state="transition_paralysis",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -453,7 +453,7 @@ AUT_DN_01 = TestCase(
     profile_type="high_confidence",
     target_state="dueling_narratives",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -480,7 +480,7 @@ AUT_DN_02 = TestCase(
     profile_type="moderate",
     target_state="dueling_narratives",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -506,7 +506,7 @@ AUT_DN_03 = TestCase(
     profile_type="weak",
     target_state="dueling_narratives",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -538,7 +538,7 @@ AUT_PE_01 = TestCase(
     profile_type="high_confidence",
     target_state="pay_exposure",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -565,7 +565,7 @@ AUT_PE_02 = TestCase(
     profile_type="moderate",
     target_state="pay_exposure",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Healthcare & Life Sciences",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -590,7 +590,7 @@ AUT_PE_03 = TestCase(
     profile_type="weak",
     target_state="pay_exposure",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -623,7 +623,7 @@ AUT_PF_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_pay_fog",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -650,7 +650,7 @@ AUT_PF_02 = TestCase(
     profile_type="moderate",
     target_state="the_pay_fog",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -675,7 +675,7 @@ AUT_PF_03 = TestCase(
     profile_type="weak",
     target_state="the_pay_fog",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],

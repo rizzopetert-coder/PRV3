@@ -32,7 +32,7 @@ AUT_UA_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_unexamined_algorithm",
     intake={
-        "headcount":          "250-499",
+        "headcount":          328,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -60,7 +60,7 @@ AUT_UA_02 = TestCase(
     profile_type="moderate",
     target_state="the_unexamined_algorithm",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -86,7 +86,7 @@ AUT_UA_03 = TestCase(
     profile_type="weak",
     target_state="the_unexamined_algorithm",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -120,7 +120,7 @@ AUT_PS_01 = TestCase(
     profile_type="high_confidence",
     target_state="paper_shield",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Manufacturing & Industrial",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -147,7 +147,7 @@ AUT_PS_02 = TestCase(
     profile_type="moderate",
     target_state="paper_shield",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Healthcare & Life Sciences",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -172,7 +172,7 @@ AUT_PS_03 = TestCase(
     profile_type="weak",
     target_state="paper_shield",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -207,7 +207,7 @@ AUT_IA_01 = TestCase(
     profile_type="high_confidence",
     target_state="invisible_influence_architecture",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -235,7 +235,7 @@ AUT_IA_02 = TestCase(
     profile_type="moderate",
     target_state="invisible_influence_architecture",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -261,7 +261,7 @@ AUT_IA_03 = TestCase(
     profile_type="weak",
     target_state="invisible_influence_architecture",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -295,7 +295,7 @@ AUT_LM_01 = TestCase(
     profile_type="high_confidence",
     target_state="the_lost_map",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Financial Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -321,7 +321,7 @@ AUT_LM_02 = TestCase(
     profile_type="moderate",
     target_state="the_lost_map",
     intake={
-        "headcount":          "100-249",
+        "headcount":          152,
         "industry":           "Technology",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
@@ -346,7 +346,7 @@ AUT_LM_03 = TestCase(
     profile_type="weak",
     target_state="the_lost_map",
     intake={
-        "headcount":          "25-99",
+        "headcount":          45,
         "industry":           "Professional Services",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],

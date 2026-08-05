@@ -67,7 +67,7 @@ class IntakeData:
     Complete intake form result. All six intake fields.
     Spec reference: Section I.3
     """
-    headcount:          str   # from INTAKE_FIELDS["headcount"]
+    headcount:          int   # precise headcount (engine/data/intake.py's HEADCOUNT_FIELD_SPEC)
     industry:           str   # from INTAKE_FIELDS["industry"]
     org_type:           str   # from INTAKE_FIELDS["org_type"]
     jurisdictions:      list  # list of state abbreviations, e.g. ["CA", "TX"]
@@ -109,7 +109,7 @@ def initialize_priors(intake_data: IntakeData) -> dict:
                 priors[sid] *= m
 
     # Headcount < 25: elevate the_founders_grip prior
-    if intake_data.headcount == "Under 25" and "the_founders_grip" in priors:
+    if intake_data.headcount < 25 and "the_founders_grip" in priors:
         modifier = AXIS_MODIFIER_INDEX.get("headcount_small_founders_grip")
         if modifier is not None:
             priors["the_founders_grip"] *= _coeff(modifier.multiplier)

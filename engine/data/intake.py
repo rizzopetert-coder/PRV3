@@ -28,6 +28,40 @@ from typing import Optional
 CALIBRATION_TARGET = None  # Sentinel — treat as 1.0 until Phase 1 data populates value
 
 
+@dataclass(frozen=True)
+class HeadcountIncrementRange:
+    """
+    One segment of the headcount stepper's variable increment schedule.
+    end=None marks the final, open-ended segment (500+, stepped by 100,
+    capped at a "1000+" open-ended display option in the UI).
+    """
+    start: int
+    end:   Optional[int]
+    step:  int
+
+
+# Intake Redesign -- Precise Headcount via "About How Many" Stepper
+# (prompts/intake-headcount-precision-redesign.md). Replaces the old
+# 6-value bucket dropdown. Increment schedule matched to where the real
+# legal thresholds are dense: ADA (15) / FMLA (50) fall in the 1-50
+# step-1 range; OSHA's 25/100/250 reduction tiers and Title VII's low
+# tiers fall in the 50-250 step-5 range; Title VII's 500 boundary falls
+# in the 250-500 step-25 range. HEADCOUNT_BUCKETS/HEADCOUNT_MIDPOINTS
+# (engine/friction_tax.py) are unchanged -- resolve_headcount_bucket()
+# maps a precise int from this spec down to one of those 6 bucket keys
+# wherever bucket-resolution data (Census SUSB) is the only available
+# source.
+HEADCOUNT_FIELD_SPEC = {
+    "min": 1,
+    "increments": (
+        HeadcountIncrementRange(1, 50, 1),
+        HeadcountIncrementRange(50, 250, 5),
+        HeadcountIncrementRange(250, 500, 25),
+        HeadcountIncrementRange(500, None, 100),
+    ),
+}
+
+
 # ── Prior Probability Adjusters — Section I.3.1 ────────────────────────────────
 
 @dataclass
@@ -233,14 +267,7 @@ AXIS_MODIFIER_INDEX: dict[str, AxisModifier] = {
 # Used for validation and routing logic.
 
 INTAKE_FIELDS = {
-    "headcount": [
-        "Under 25",
-        "25-99",
-        "100-249",
-        "250-499",
-        "500-999",
-        "1000+",
-    ],
+    "headcount": HEADCOUNT_FIELD_SPEC,
     "industry": [
         "Professional Services",
         "Healthcare & Life Sciences",

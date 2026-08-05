@@ -93,7 +93,7 @@ def make_rankings(top_score=0.9):
 
 
 intake = IntakeData(
-    headcount="100-249",
+    headcount=152,
     industry="Technology",
     org_type="PE or VC-backed",
     jurisdictions=["CA"],
@@ -464,7 +464,7 @@ valid_tc = {
     "description": "High-confidence Unformed Leader profile",
     "profile_type": "high_confidence",
     "target_state": "the_unformed_leader",
-    "intake": {"headcount": "25-99"},
+    "intake": {"headcount": 45},
     "answers": [{"question_id": "Q01", "selected_option_ids": ["A"]}],
     "expected": {"output_type": "single_state", "identified_states": ["the_unformed_leader"]},
 }
@@ -735,7 +735,7 @@ def _make_db_session(intake_events, q_signal=False, db_score_mult=1.1):
     from engine.accumulation import IntakeData, StateRanking
     from engine.contract import SessionData
     pa_intake = IntakeData(
-        headcount="100-249",
+        headcount=152,
         industry="Technology",
         org_type="PE or VC-backed",
         jurisdictions=["CA"],

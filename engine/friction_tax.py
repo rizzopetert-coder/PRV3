@@ -338,6 +338,27 @@ _INDUSTRY_WAGE_DATA: dict[str, tuple[float, str, str]] = {
     ),
 }
 
+def resolve_headcount_bucket(headcount: int) -> str:
+    """
+    Map a precise headcount int (engine/data/intake.py's
+    HEADCOUNT_FIELD_SPEC) to its HEADCOUNT_BUCKETS bucket string.
+    Boundaries match the field spec's increment schedule exactly.
+    Genuinely new -- confirmed via repo-wide grep that no equivalent
+    function existed anywhere before this.
+    """
+    if headcount < 25:
+        return "Under 25"
+    if headcount < 100:
+        return "25-99"
+    if headcount < 250:
+        return "100-249"
+    if headcount < 500:
+        return "250-499"
+    if headcount < 1000:
+        return "500-999"
+    return "1000+"
+
+
 PAYROLL_BASELINE_GRID: dict[tuple[str, str], PayrollBaselineEntry] = {
     (headcount, industry): PayrollBaselineEntry(
         payroll_floor_annual=round(
@@ -1792,7 +1813,7 @@ def _attritional_fraction(raw_total: float) -> float:
 def compute_friction_tax(
     state_ids: list[str],
     severity_tier: str,
-    org_size: str,
+    org_size: int,
     industry: str,
     org_type: str,
 ) -> dict:
@@ -1802,7 +1823,9 @@ def compute_friction_tax(
     Parameters:
       state_ids:     list of identified state IDs (from identified_states)
       severity_tier: "Emerging" | "Entrenched" | "Endemic"
-      org_size:      IntakeData.headcount value (e.g. "100-249")
+      org_size:      IntakeData.headcount value (a precise int, e.g. 150 --
+                     resolved internally to its "100-249" bucket via
+                     resolve_headcount_bucket() before any lookup)
       industry:      IntakeData.industry value
       org_type:      IntakeData.org_type value
 
@@ -1837,6 +1860,7 @@ def compute_friction_tax(
     STATE_MULTIPLIERS) are fully populated, so calibration_complete now
     returns True for any real, recognized combination.
     """
+    org_size = resolve_headcount_bucket(org_size)
     grid_entry = PAYROLL_BASELINE_GRID.get((org_size, industry))
     payroll_floor = grid_entry.payroll_floor_annual if grid_entry is not None else None
     org_type_entry = ORG_TYPE_SCALARS.get(org_type)
@@ -2301,7 +2325,7 @@ def _legal_exposure_band(low: Optional[float]) -> Optional[str]:
 # above) is actually reachable in practice for a realistic profile.
 def compute_legal_compliance_exposure(
     state_ids: list[str],
-    org_size: str,
+    org_size: int,
     industry: str,
     org_type: str,
 ) -> dict:
@@ -2337,6 +2361,7 @@ def compute_legal_compliance_exposure(
     True in that case if every identified Legal-scoring state was
     QUALITATIVE_ONLY/DATA_INTEGRITY_GAP.
     """
+    org_size = resolve_headcount_bucket(org_size)
     per_state_ranges: dict[str, tuple[float, float]] = {}
     unpriced_state_ids: list[str] = []
     for sid in state_ids:

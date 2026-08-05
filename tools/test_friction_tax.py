@@ -106,6 +106,7 @@ from engine.friction_tax import (
     HEADCOUNT_BUCKETS,
     INDUSTRIES,
     HEADCOUNT_MIDPOINTS,
+    resolve_headcount_bucket,
     compute_friction_tax,
     INDUSTRY_NON_EXEMPT_RATIO,
     LEGAL_COMPLIANCE_CLUSTER,
@@ -182,7 +183,7 @@ check(
 result = compute_friction_tax(
     state_ids=["decision_paralysis"],
     severity_tier="Entrenched",
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Government",
 )
@@ -220,7 +221,7 @@ check(
 result_empty = compute_friction_tax(
     state_ids=[],
     severity_tier="Entrenched",
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Government",
 )
@@ -253,7 +254,7 @@ _fixture_fraction = _ft._attritional_fraction(3)  # 1+2+0 = 3
 result_cal = compute_friction_tax(
     state_ids=["decision_paralysis"],
     severity_tier="Entrenched",
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Government",
 )
@@ -279,7 +280,7 @@ check(
 result_endemic = compute_friction_tax(
     state_ids=["decision_paralysis"],
     severity_tier="Endemic",
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Government",
 )
@@ -310,7 +311,7 @@ for _sid in _continuity_sample:
     _r = compute_friction_tax(
         state_ids=[_sid],
         severity_tier="Entrenched",
-        org_size="100-249",
+        org_size=152,
         industry="Technology",
         org_type="Founder-led",
     )
@@ -335,7 +336,7 @@ _grip_entry = STATE_MULTIPLIERS["the_founders_grip"]
 _r_guard = compute_friction_tax(
     state_ids=["the_founders_grip"],
     severity_tier="Entrenched",
-    org_size="100-249",
+    org_size=152,
     industry="Technology",
     org_type="Founder-led",
 )
@@ -364,7 +365,7 @@ _ft.STATE_MULTIPLIERS["the_exposed"] = _synthetic_entry(turnover=1, productivity
 result_multi_a = compute_friction_tax(
     state_ids=["decision_paralysis", "the_exposed"],
     severity_tier="Entrenched",
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Government",
 )
@@ -391,7 +392,7 @@ _ft.STATE_MULTIPLIERS["the_exposed"] = _synthetic_entry(turnover=1, productivity
 result_multi_b = compute_friction_tax(
     state_ids=["decision_paralysis", "the_exposed"],
     severity_tier="Entrenched",
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Government",
 )
@@ -425,7 +426,7 @@ _ft.STATE_MULTIPLIERS["the_dormant_talent"] = _synthetic_entry(turnover=2, produ
 result_extrap = compute_friction_tax(
     state_ids=["decision_paralysis", "the_exposed", "the_dormant_talent"],
     severity_tier="Entrenched",
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Government",
 )
@@ -467,7 +468,7 @@ _ft.PAYROLL_BASELINE_GRID[_GRID_KEY] = PayrollBaselineEntry(
 result_partial_1 = compute_friction_tax(
     state_ids=["decision_paralysis"],
     severity_tier="Entrenched",
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Government",
 )
@@ -488,7 +489,7 @@ _ft.ORG_TYPE_SCALARS["Founder-led"] = OrgTypeScalarEntry(
 result_partial_2 = compute_friction_tax(
     state_ids=["decision_paralysis"],
     severity_tier="Entrenched",
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Founder-led",
 )
@@ -679,7 +680,7 @@ for hc in HEADCOUNT_BUCKETS:
             r = compute_friction_tax(
                 state_ids=["decision_paralysis"],
                 severity_tier="Entrenched",
-                org_size=hc,
+                org_size=round(HEADCOUNT_MIDPOINTS[hc].employees_per_firm),
                 industry=ind,
                 org_type=ot,
             )
@@ -703,7 +704,7 @@ check(
 result_mixed = compute_friction_tax(
     state_ids=["decision_paralysis", "not_a_real_state"],
     severity_tier="Entrenched",
-    org_size="500-999",
+    org_size=692,
     industry="Technology",
     org_type="Nonprofit",
 )
@@ -826,7 +827,7 @@ check(
 
 _r_n1 = compute_legal_compliance_exposure(
     state_ids=["built_to_fail"],
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Founder-led",
 )
@@ -848,7 +849,7 @@ check(
 
 _r_cross = compute_legal_compliance_exposure(
     state_ids=["built_to_fail", "the_unreported_hazard"],
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Founder-led",
 )
@@ -870,7 +871,7 @@ check(
 
 _r_decay = compute_legal_compliance_exposure(
     state_ids=["built_to_fail", "the_paper_tiger"],
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Founder-led",
 )
@@ -889,7 +890,7 @@ check(
 
 _r_tier_2b = compute_legal_compliance_exposure(
     state_ids=["disparate_impact_architecture"],
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Founder-led",
 )
@@ -903,7 +904,7 @@ check(
 )
 _r_tier_2a = compute_legal_compliance_exposure(
     state_ids=["pay_exposure"],
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Founder-led",
 )
@@ -931,7 +932,7 @@ _co_expected_low = round(_co_affected * 1_465.0, 2)
 _co_expected_high = round(_co_affected * 2_930.0, 2)
 _r_cluster3 = compute_legal_compliance_exposure(
     state_ids=["cultural_overtime"],
-    org_size="250-499",
+    org_size=328,
     industry="Manufacturing & Industrial",
     org_type="Founder-led",
 )
@@ -950,7 +951,7 @@ check(
 
 _r_4a = compute_legal_compliance_exposure(
     state_ids=["hr_capture"],
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Publicly traded",
 )
@@ -964,7 +965,7 @@ check(
 )
 _r_4b = compute_legal_compliance_exposure(
     state_ids=["hr_capture"],
-    org_size="250-499",
+    org_size=328,
     industry="Professional Services",
     org_type="Founder-led",
 )
@@ -984,7 +985,7 @@ check(
 )
 _r_4b_floor = compute_legal_compliance_exposure(
     state_ids=["dueling_narratives"],
-    org_size="250-499",
+    org_size=328,
     industry="Professional Services",
     org_type="Founder-led",
 )
@@ -998,7 +999,7 @@ check(
 )
 _r_4c = compute_legal_compliance_exposure(
     state_ids=["hr_capture"],
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Government",
 )
@@ -1017,7 +1018,7 @@ check(
 
 _r_never_classified = compute_legal_compliance_exposure(
     state_ids=["the_dormant_talent"],
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Founder-led",
 )
@@ -1039,7 +1040,7 @@ _ft.STATE_MULTIPLIERS["built_to_fail"] = _synthetic_entry(
 )
 _r_zero_score = compute_legal_compliance_exposure(
     state_ids=["built_to_fail"],
-    org_size="100-249",
+    org_size=152,
     industry="Professional Services",
     org_type="Founder-led",
 )
@@ -1055,7 +1056,7 @@ _ft.STATE_MULTIPLIERS["built_to_fail"] = _original_btf
 
 check(
     "compute_legal_compliance_exposure returns None/None for an empty state_ids list",
-    compute_legal_compliance_exposure([], "100-249", "Professional Services", "Founder-led")
+    compute_legal_compliance_exposure([], 152, "Professional Services", "Founder-led")
     == {
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
@@ -1115,6 +1116,31 @@ check(
     _ft._legal_exposure_band(50_000_000.0) == "Significant",
     f"got {_ft._legal_exposure_band(50_000_000.0)}",
 )
+
+
+# -- resolve_headcount_bucket() boundary tests -----------------------------------
+# Every real HEADCOUNT_BUCKETS boundary, both sides. Pete's original list also
+# named "15" -- not a bucket boundary (that's the ADA coverage threshold, unrelated
+# to HEADCOUNT_BUCKETS' 25/100/250/500/1000 edges), so no check exists for it.
+for _hc, _expected in [
+    (1, "Under 25"),
+    (24, "Under 25"),
+    (25, "25-99"),
+    (99, "25-99"),
+    (100, "100-249"),
+    (249, "100-249"),
+    (250, "250-499"),
+    (499, "250-499"),
+    (500, "500-999"),
+    (999, "500-999"),
+    (1000, "1000+"),
+    (50_000, "1000+"),
+]:
+    check(
+        f"resolve_headcount_bucket({_hc}) -> {_expected!r}",
+        resolve_headcount_bucket(_hc) == _expected,
+        f"got {resolve_headcount_bucket(_hc)!r}",
+    )
 
 
 # -- Results ---------------------------------------------------------------------
