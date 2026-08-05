@@ -31,7 +31,8 @@ from engine.output import (
     CAUSATION_DISPERSION_THRESHOLD,
     compute_noise_baseline, compute_signal_floors, apply_signal_floor,
     route_output, build_private_block, build_shareable_block,
-    compute_causation_pattern,
+    compute_causation_pattern, derive_time_to_consequence,
+    synthesize_response_window, RESPONSE_WINDOW_EPSILON,
     OutputEngine, OutputPackage, OutputRouting, QualifiedState,
     PrivateOutputBlock, ShareableOutputBlock,
 )
@@ -508,6 +509,103 @@ check("pattern always one of the three allowed values",
           in ("insufficient_signal", "single_point", "diffuse")
           for v in (_v_concentrated, _v_even, _v_two_axes, _v_negative, {})
           for r in (routing_insuff, routing_one, routing_multi)))
+
+
+# ── 17. derive_time_to_consequence (Urgency Window, Component 1) ──────────────
+print("\n17. derive_time_to_consequence — real states, all 9 LIABILITY_CATEGORIES")
+
+_URGENCY_CASES = [
+    # (state_id, expected, note)
+    ("the_paper_tiger", "Acute",
+     "Legal & Compliance present overrides Aptitude's own Medium-Term"),
+    ("the_fracture", "Acute",
+     "Financial & Economic present, Alliance primary would otherwise be Attritional"),
+    ("the_founders_grip", "Medium-Term",
+     "Governance & Authority/Talent & Retention/Strategic, no Legal/Financial, Authority primary"),
+    ("the_overloaded_manager", "Medium-Term",
+     "Talent & Retention/Operational & Structural, no Legal/Financial, Aptitude primary"),
+    ("the_suppression_filter", "Attritional",
+     "Cultural & Behavioral/Governance & Authority/Strategic, no Legal/Financial, Alliance primary"),
+    ("the_wrong_reward", "Attritional",
+     "Cultural & Behavioral/Operational & Structural/Talent & Retention, no Legal/Financial, Attitude primary"),
+    ("the_diversity_ceiling", "Acute",
+     "Legal & Compliance present alongside Reputational & Brand, Attitude primary"),
+    ("invisible_burnout", "Acute",
+     "Financial & Economic present alongside Safety & Wellbeing, Attitude primary"),
+    ("human_displacement_anxiety", "Attritional",
+     "Talent & Retention/Cultural & Behavioral/Strategic, no Legal/Financial, Attitude primary"),
+]
+
+for state_id, expected, note in _URGENCY_CASES:
+    profile = STATE_PROFILES[state_id]
+    got = derive_time_to_consequence(profile)
+    check(f"derive_time_to_consequence({state_id}) == {expected!r}",
+          got == expected,
+          f"got {got!r} -- {note} (liability_axes={profile.liability_axes}, "
+          f"primary_dimension={profile.primary_dimension})")
+
+_covered_categories = set()
+for state_id, _, _ in _URGENCY_CASES:
+    _covered_categories.update(STATE_PROFILES[state_id].liability_axes)
+check("all 9 LIABILITY_CATEGORIES represented across the real-state test sample",
+      len(_covered_categories) == 9,
+      f"got {len(_covered_categories)}: {sorted(_covered_categories)}")
+
+
+# ── 18. synthesize_response_window (Urgency Window, Component 2) ──────────────
+print("\n18. synthesize_response_window — severity x delta x dispersion_delta x duration_band matrix")
+
+_EPS = RESPONSE_WINDOW_EPSILON
+_POS, _NEG, _ZERO = 0.5, -0.5, 0.01  # _ZERO deliberately < _EPS -- noise, not signal
+
+check("trajectory_result is None -> response_window is None (Path B)",
+      synthesize_response_window(None, "Emerging") is None)
+check("trajectory_result is None -> None regardless of severity_tier",
+      all(synthesize_response_window(None, tier) is None
+          for tier in ("Emerging", "Entrenched", "Endemic")))
+
+_MATRIX = [
+    # (severity_tier, delta, dispersion_delta, duration_band, expected, note)
+    ("Emerging",   _POS,  _POS,  None, "Immediate", "both signals worsening -- ceiling from base Extended"),
+    ("Emerging",   _POS,  _NEG,  None, "Extended",  "delta up, dispersion down -- cancel out"),
+    ("Emerging",   _NEG,  _POS,  None, "Extended",  "delta down, dispersion up -- cancel out"),
+    ("Emerging",   _NEG,  _NEG,  None, "Extended",  "both improving -- clamped at floor, can't go below Extended"),
+    ("Emerging",   _ZERO, _ZERO, None, "Extended",  "both near-zero -- epsilon filter holds base tier"),
+    ("Entrenched", _POS,  _POS,  None, "Immediate", "both worsening from Near-Term base"),
+    ("Entrenched", _POS,  _NEG,  None, "Near-Term", "cancel out, base tier holds"),
+    ("Entrenched", _NEG,  _POS,  None, "Near-Term", "cancel out, base tier holds"),
+    ("Entrenched", _NEG,  _NEG,  None, "Extended",  "both improving -- de-escalates one step"),
+    ("Entrenched", _ZERO, _ZERO, None, "Near-Term", "epsilon filter holds base tier at mid-severity"),
+    ("Endemic",    _POS,  _POS,  None, "Immediate", "already at ceiling -- cannot escalate further"),
+    ("Endemic",    _POS,  _NEG,  None, "Immediate", "cancel out, base tier (ceiling) holds"),
+    ("Endemic",    _NEG,  _POS,  None, "Immediate", "cancel out, base tier (ceiling) holds"),
+    ("Endemic",    _NEG,  _NEG,  None, "Extended",  "both improving -- max de-escalation from ceiling"),
+    ("Endemic",    _ZERO, _ZERO, None, "Immediate", "epsilon filter holds ceiling tier"),
+    ("Emerging",   _POS,  _ZERO, None,        "Near-Term", "delta alone tightens one step"),
+    ("Emerging",   _POS,  _ZERO, "18mo_plus", "Immediate",  "18mo_plus + worsening delta tightens one further step"),
+    ("Emerging",   _ZERO, _ZERO, "18mo_plus", "Extended",   "18mo_plus alone, without delta clearing epsilon, adds nothing"),
+    ("Emerging",   _NEG,  _ZERO, "18mo_plus", "Extended",   "18mo_plus does not apply to a negative (improving) delta"),
+    ("Emerging",   _POS,  _ZERO, "12mo_plus", "Near-Term",  "only the literal string '18mo_plus' triggers the bonus step"),
+    ("Emerging",   _EPS,  0.0,   None,        "Extended",  "delta exactly == epsilon does not clear the strict > check"),
+]
+
+for tier, delta, disp, band, expected, note in _MATRIX:
+    tr = {"delta": delta, "dispersion_delta": disp, "duration_band": band, "direction": "ignored"}
+    got = synthesize_response_window(tr, tier)
+    check(f"synthesize_response_window(severity={tier}, delta={delta}, dispersion_delta={disp}, "
+          f"duration_band={band}) == {expected!r}",
+          got == expected,
+          f"got {got!r} -- {note}")
+
+check("result always one of the 3 defined tiers or None",
+      all(synthesize_response_window(tr, tier) in ("Extended", "Near-Term", "Immediate")
+          for tier, delta, disp, band, _, _ in _MATRIX
+          for tr in [{"delta": delta, "dispersion_delta": disp, "duration_band": band}]))
+check("insufficient-answers trajectory_result (delta=0.0, dispersion_delta=0.0) falls back to severity base tier, no crash",
+      synthesize_response_window(
+          {"delta": 0.0, "dispersion_delta": 0.0, "direction": "insufficient_data", "duration_band": None},
+          "Entrenched",
+      ) == "Near-Term")
 
 
 # ── Summary ────────────────────────────────────────────────────────────────────

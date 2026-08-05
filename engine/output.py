@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from math import sqrt
 from typing import Optional
 
-from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS, BASELINE_VALUE
+from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS, BASELINE_VALUE, StateProfile
 from engine.data.questions import QUESTION_LIBRARY
 from engine.accumulation import StateRanking, rank_states, compute_liability_dispersion
 from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
@@ -525,6 +525,132 @@ def compute_causation_pattern(
         "dispersion": round(dispersion, 4),
         "qualified_state_count": qualified_count,
     }
+
+
+def derive_time_to_consequence(profile: StateProfile) -> str:
+    """
+    Urgency Window, Component 1 -- Diagnostic Dimension Expansion,
+    Candidate 5, Gemini-reviewed, CC-verified. Derived from a state's
+    already-real, already-populated static metadata -- zero new intake,
+    zero manual 57-state authoring. Reads liability_axes and
+    primary_dimension only, both confirmed real fields on StateProfile
+    (engine/data/states.py) with a confirmed real vocabulary
+    (LIABILITY_CATEGORIES, 9 values including "Legal & Compliance" and
+    "Financial & Economic" verbatim).
+
+    Classification:
+      "Legal & Compliance" or "Financial & Economic" in liability_axes
+        -> "Acute" (a formal claim, filing, or financial event can
+        crystallize the exposure at any moment -- not a slow-building risk)
+      primary_dimension in ("Authority", "Aptitude")
+        -> "Medium-Term" (structural/decision-quality conditions that
+        compound over a normal business cycle, not overnight)
+      otherwise -> "Attritional" (Alliance/Attitude-primary conditions --
+        cultural and relational erosion, felt cumulatively over time)
+
+    Spec reference: Diagnostic Dimension Expansion decision record
+    (prompts/diagnostic-dimension-expansion.md), Candidate 5.
+    """
+    axes = profile.liability_axes
+    if "Legal & Compliance" in axes or "Financial & Economic" in axes:
+        return "Acute"
+    if profile.primary_dimension in ("Authority", "Aptitude"):
+        return "Medium-Term"
+    return "Attritional"
+
+
+# Noise filter for synthesize_response_window()'s delta/dispersion_delta
+# sign checks -- Pete-requested revision, this session. Deliberately NOT
+# TRAJECTORY_STABILITY_THRESHOLD (0.20, engine/accumulation.py) -- that
+# constant buckets compute_trajectory()'s 3-way direction classification
+# and is already flagged unreliable/unvalidated for that purpose; this is
+# a separate, smaller constant scoped only to filtering near-zero noise
+# here before it swings the tier index, not a full direction threshold.
+# CALIBRATION TARGET -- starting hypothesis, not yet data-validated.
+RESPONSE_WINDOW_EPSILON: float = 0.05  # CALIBRATION TARGET
+
+
+def synthesize_response_window(
+    trajectory_result: Optional[dict],
+    severity_tier: str,
+) -> Optional[str]:
+    """
+    Urgency Window, Component 2 -- Diagnostic Dimension Expansion,
+    Candidate 5, Gemini-reviewed, CC-verified. Synthesized from
+    trajectory_result's RAW delta/dispersion_delta/duration_band plus
+    severity_tier -- deliberately never reads trajectory_result
+    ["direction"]. That field's bucketing threshold
+    (TRAJECTORY_STABILITY_THRESHOLD = 0.20, engine/accumulation.py) is
+    confirmed unvalidated ("CALIBRATION TARGET... Not yet data-validated"
+    per its own comment) with a known false-negative risk -- this function
+    reasons from the raw signals directly rather than inheriting that risk.
+
+    None on Path B (trajectory_result itself is None -- engine/main.py's
+    run_engine() never computes or passes one, confirmed by direct read).
+    Real for Path 1, including the insufficient-answers case
+    (_compute_trajectory_context() returns delta=0.0, dispersion_delta=0.0
+    rather than None there) -- both values then fail every sign check
+    below, so the result falls back to the severity-only base tier with no
+    special-casing needed.
+
+    CALIBRATION TARGET, starting hypothesis, not yet data-validated --
+    same convention as TRAJECTORY_STABILITY_THRESHOLD/
+    MODERATE_PROMINENCE_DELTA elsewhere in this codebase. Sign-based,
+    epsilon-filtered (RESPONSE_WINDOW_EPSILON, above) -- no bare sign
+    check on raw floats: a delta or dispersion_delta of 0.0001 must not
+    swing the tier index as easily as a delta of 5.0 would:
+
+      Base tier, anchored on severity (the one already-established signal):
+        Emerging -> "Extended", Entrenched -> "Near-Term", Endemic -> "Immediate"
+
+      delta > RESPONSE_WINDOW_EPSILON (liability denser in the session's
+      second half -- genuinely worsening within-session, past the noise
+      floor) tightens one step; delta < -RESPONSE_WINDOW_EPSILON loosens
+      one step.
+
+      dispersion_delta > RESPONSE_WINDOW_EPSILON (liability spreading
+      across more axes -- broadening, past the noise floor) tightens one
+      further step, independent of delta's effect since it measures
+      spread, not magnitude; dispersion_delta < -RESPONSE_WINDOW_EPSILON
+      loosens one step.
+
+      duration_band == "18mo_plus" combined with delta > 
+      RESPONSE_WINDOW_EPSILON tightens one additional step -- a condition
+      that has already persisted 18+ months AND is still trending worse
+      is a distinct compounding-over-time concern, not redundant with
+      severity_tier's own point-in-time duration_band contribution.
+
+      Result clamped to the 3 defined tiers -- cannot escalate or de-
+      escalate past "Immediate"/"Extended".
+
+    Spec reference: Diagnostic Dimension Expansion decision record
+    (prompts/diagnostic-dimension-expansion.md), Candidate 5.
+    """
+    if trajectory_result is None:
+        return None
+
+    delta = trajectory_result.get("delta", 0.0)
+    dispersion_delta = trajectory_result.get("dispersion_delta", 0.0)
+    duration_band = trajectory_result.get("duration_band")
+
+    tiers = ["Extended", "Near-Term", "Immediate"]
+    idx = {"Emerging": 0, "Entrenched": 1, "Endemic": 2}.get(severity_tier, 1)
+
+    if delta > RESPONSE_WINDOW_EPSILON:
+        idx += 1
+    elif delta < -RESPONSE_WINDOW_EPSILON:
+        idx -= 1
+
+    if dispersion_delta > RESPONSE_WINDOW_EPSILON:
+        idx += 1
+    elif dispersion_delta < -RESPONSE_WINDOW_EPSILON:
+        idx -= 1
+
+    if duration_band == "18mo_plus" and delta > RESPONSE_WINDOW_EPSILON:
+        idx += 1
+
+    idx = max(0, min(len(tiers) - 1, idx))
+    return tiers[idx]
 
 
 # ── VI.4  Private Output Assembly ─────────────────────────────────────────────

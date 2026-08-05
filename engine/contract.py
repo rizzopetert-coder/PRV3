@@ -38,7 +38,10 @@ LEGAL_TAIL_RISK_CAVEAT_TEXT = (
     "of being challenged. If any of these conditions concern you, this is worth "
     "a conversation with employment counsel, not just this number."
 )
-from engine.output import OutputPackage, OutputRouting, compute_causation_pattern
+from engine.output import (
+    OutputPackage, OutputRouting, compute_causation_pattern,
+    derive_time_to_consequence, synthesize_response_window,
+)
 
 
 # ── Engine version ─────────────────────────────────────────────────────────────
@@ -402,6 +405,13 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
     # ── dimension_summary ──
     dimension_obj = _compute_dimension_summary(session.accumulated_vector)
 
+    # ── urgency_window ── (Diagnostic Dimension Expansion, Candidate 5)
+    lead_profile = STATE_PROFILES.get(lead_id) if lead_id else None
+    urgency_window_obj = {
+        "time_to_consequence": derive_time_to_consequence(lead_profile) if lead_profile else None,
+        "response_window":     synthesize_response_window(trajectory_result, sev.tier),
+    }
+
     # ── narrative_modulation ──
     narr = session.narrative_result
     pre_rankings = session.pre_narrative_rankings or session.final_rankings
@@ -478,6 +488,7 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
         "cascade_risk":            compute_cascade_risk(session.accumulated_vector),
         "causation_pattern":       compute_causation_pattern(session.accumulated_vector, routing),
         "trajectory":            trajectory_result,
+        "urgency_window":        urgency_window_obj,
     }
 
     # ── shareable_output ──
@@ -587,6 +598,7 @@ _JURISDICTION_FLAGS_FIELDS = {
 _PRIVATE_OUTPUT_FIELDS = {
     "opening_text", "resolution_routing", "friction_tax_estimate",
     "legal_tail_risk_exposure", "cascade_risk", "causation_pattern", "trajectory",
+    "urgency_window",
 }
 _SHAREABLE_OUTPUT_FIELDS = {
     "attribution_text",
