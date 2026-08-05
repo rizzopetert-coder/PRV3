@@ -144,12 +144,25 @@ def _neutral_option(question):
 # CALIBRATION TARGET -- Session 70. Weak-branch damped primary-dimension routing.
 WEAK_DAMPED_THRESHOLD: float = 0.25
 
+# CALIBRATION TARGET -- this session's weighted-damping redesign (replaces the
+# reverted hard-gate attempt). Applied only to UNWIRED questions in the weak
+# branch -- scales WEAK_DAMPED_THRESHOLD down further so unwired-question
+# signal is real but weaker than wired-question signal, rather than zeroed.
+# NOTE: the current 172-profile suite is insensitive to this exact value --
+# every value tested from 0.0 to 1.0 produced a byte-for-byte identical
+# by-state result. 0.4 is chosen to honor the qualitative design intent
+# (real, non-zero, meaningfully damped unwired signal), not because this
+# suite can currently discriminate it from other values in range.
+WEAK_UNWIRED_DAMPING_FACTOR: float = 0.4
 
-def _damped_weak_option(question, target_state_id: str):
+
+def _damped_weak_option(question, target_state_id: str, threshold: float = WEAK_DAMPED_THRESHOLD):
     """
-    Weak-branch damped primary-dimension routing -- Session 70.
+    Weak-branch damped primary-dimension routing -- Session 70, weighted-
+    damping redesign this session (threshold parameter, defaults to the
+    original Session 70 value for wired-question callers).
 
-    Prefer the option with the largest positive contribution (<= WEAK_DAMPED_THRESHOLD)
+    Prefer the option with the largest positive contribution (<= threshold)
     on target_state's primary_dimension liability field. Falls back to the real,
     unmodified _neutral_option(question) when no qualifying option exists for this
     question.
@@ -160,15 +173,16 @@ def _damped_weak_option(question, target_state_id: str):
 
     Known limitation, accepted as-is: operates at dimension granularity, not state
     granularity. Any two states sharing a primary_dimension receive byte-for-byte
-    identical weak-branch answer vectors under this rule -- downstream cosine
-    similarity against each state's own distinct profile vector still differentiates
-    them.
+    identical weak-branch answer vectors under this rule (for wired questions;
+    unwired questions now diverge further via the tighter down-weighted threshold)
+    -- downstream cosine similarity against each state's own distinct profile
+    vector still differentiates them.
     """
     profile = STATE_PROFILES.get(target_state_id)
     field = _DIM_TO_LIABILITY_FIELD.get(profile.primary_dimension, "") if profile else ""
     candidates = [
         opt for opt in question.answer_options
-        if 0.0 < opt.dimensional_contributions.get(field, 0.0) <= WEAK_DAMPED_THRESHOLD
+        if 0.0 < opt.dimensional_contributions.get(field, 0.0) <= threshold
     ]
     if not candidates:
         return _neutral_option(question)
@@ -190,9 +204,11 @@ def generate_answers(test_case):
 
     high_confidence/extreme: best_option_for_state() where target in state_targets, neutral elsewhere.
     moderate: best_option_for_state() where target in state_targets, neutral elsewhere.
-    weak: damped primary-dimension routing (Session 70) -- prefers a lightly-loading
-          positive option on target's primary_dimension liability field (<= 0.25),
-          neutral fallback otherwise.
+    weak: weighted-damping redesign, this session -- best_option_for_state() (real,
+          full-strength signal) where target in state_targets; damped primary-
+          dimension routing (Session 70) at a further down-weighted threshold
+          (WEAK_DAMPED_THRESHOLD * WEAK_UNWIRED_DAMPING_FACTOR) where not, neutral
+          fallback only if no qualifying option exists even at that tighter threshold.
 
     Handles Q03A/Q03B and Q27A/Q27B conditional pairs from intake.
     """
@@ -225,7 +241,18 @@ def generate_answers(test_case):
                    if test_case.target_state in (q.state_targets or [])
                    else _neutral_option(q))
         else:
-            opt = _damped_weak_option(q, test_case.target_state)
+            # "weak" -- weighted-damping redesign, this session. Wired
+            # questions get real full-strength signal (same as moderate/
+            # high_confidence); unwired questions keep the Session 70 damped
+            # dimension-level signal but at a further down-weighted threshold,
+            # rather than the reverted hard-gate attempt's zeroed _neutral_option().
+            if test_case.target_state in (q.state_targets or []):
+                opt = best_option_for_state(q, test_case.target_state)
+            else:
+                opt = _damped_weak_option(
+                    q, test_case.target_state,
+                    threshold=WEAK_DAMPED_THRESHOLD * WEAK_UNWIRED_DAMPING_FACTOR,
+                )
         answers.append(TestAnswer(question_id=qid, selected_option_ids=[opt.option_id]))
     return answers
 
