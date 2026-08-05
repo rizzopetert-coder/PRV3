@@ -15,8 +15,14 @@ import type { IntakeEcho } from "@/lib/types";
 function validateIntake(body: unknown): body is IntakeEcho {
   if (typeof body !== "object" || body === null) return false;
   const b = body as Record<string, unknown>;
+  // Soft transition (locked decision) -- accepts a real int from the new
+  // stepper UI or a legacy non-empty bucket string, never hard-rejects
+  // an old-format submission.
+  const validOrgSize =
+    (typeof b.organization_size === "number" && Number.isFinite(b.organization_size)) ||
+    (typeof b.organization_size === "string" && b.organization_size.length > 0);
   return (
-    typeof b.organization_size === "string" &&
+    validOrgSize &&
     typeof b.industry === "string" &&
     typeof b.role_level === "string" &&
     typeof b.tenure_in_role === "string" &&

@@ -29,9 +29,27 @@ type QuestionLabel =
 // than free text that silently falls back to "Other". tenure_in_role,
 // direct_reports, and the jurisdiction list have no engine equivalent —
 // new Phase-1-only fields (session-store.ts / MOB Section 5 locked spec).
-const ORGANIZATION_SIZE_OPTIONS = [
-  "Under 25", "25-99", "100-249", "250-499", "500-999", "1000+",
-];
+// Intake Redesign -- Precise Headcount via "About How Many" Stepper
+// (prompts/intake-headcount-precision-redesign.md). Increment schedule
+// mirrors engine/data/intake.py's HEADCOUNT_FIELD_SPEC exactly. Stepping
+// down uses the CURRENT bracket's increment, same as stepping up -- a
+// real simplification right at a boundary crossing (e.g. 250 - 25 lands
+// on 225, using the 250-500 bracket's step rather than switching to
+// 100-249's), not hidden, flagged for review.
+const HEADCOUNT_MAX = 1000;
+
+function headcountStepSize(value: number): number {
+  if (value < 50) return 1;
+  if (value < 250) return 5;
+  if (value < 500) return 25;
+  return 100;
+}
+
+function stepHeadcount(value: number, direction: 1 | -1): number {
+  const next = value + direction * headcountStepSize(value);
+  return Math.max(1, Math.min(HEADCOUNT_MAX, next));
+}
+
 const INDUSTRY_OPTIONS = [
   "Professional Services", "Healthcare & Life Sciences", "Financial Services",
   "Technology", "Manufacturing & Industrial", "Retail & Hospitality",
@@ -54,7 +72,9 @@ const JURISDICTION_OPTIONS = [
 ];
 
 interface IntakeFormState {
-  organization_size: string;
+  // number once selected; "" is the shared not-yet-selected sentinel,
+  // same convention as every other field below.
+  organization_size: number | "";
   industry: string;
   role_level: string;
   tenure_in_role: string;
@@ -99,6 +119,63 @@ function IntakeForm({
 }) {
   const isComplete = Object.values(intake).every((v) => v !== "");
 
+  function HeadcountStepper({
+    value,
+    onChange,
+  }: {
+    value: number | "";
+    onChange: (next: number | "") => void;
+  }) {
+    const display = value === "" ? "" : value >= HEADCOUNT_MAX ? "1000+" : String(value);
+
+    function handleTextChange(raw: string) {
+      if (raw.trim() === "") {
+        onChange("");
+        return;
+      }
+      const digitsOnly = raw.replace(/[^\d]/g, "");
+      if (digitsOnly === "") return;
+      const parsed = parseInt(digitsOnly, 10);
+      onChange(Math.max(1, Math.min(HEADCOUNT_MAX, parsed)));
+    }
+
+    return (
+      <div className="mb-5">
+        <label className="block font-ui text-sm font-medium text-charcoal mb-1.5">
+          About how many employees?
+        </label>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onChange(value === "" ? 1 : stepHeadcount(value, -1))}
+            disabled={value !== "" && value <= 1}
+            className="w-9 h-9 shrink-0 rounded-lg border border-gray-200 text-charcoal font-ui text-lg disabled:opacity-30"
+            aria-label="Decrease"
+          >
+            \u2212
+          </button>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={display}
+            onChange={(e) => handleTextChange(e.target.value)}
+            placeholder="e.g. 60"
+            className="w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-charcoal text-center focus:outline-none focus:border-charcoal"
+          />
+          <button
+            type="button"
+            onClick={() => onChange(value === "" ? 1 : stepHeadcount(value, 1))}
+            disabled={value === HEADCOUNT_MAX}
+            className="w-9 h-9 shrink-0 rounded-lg border border-gray-200 text-charcoal font-ui text-lg disabled:opacity-30"
+            aria-label="Increase"
+          >
+            +
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   function field(
     label: string,
     key: keyof IntakeFormState,
@@ -134,7 +211,10 @@ function IntakeForm({
         A few things about your organization.
       </h2>
 
-      {field("Organization size", "organization_size", ORGANIZATION_SIZE_OPTIONS)}
+      <HeadcountStepper
+        value={intake.organization_size}
+        onChange={(next) => onChange({ ...intake, organization_size: next })}
+      />
       {field("Industry", "industry", INDUSTRY_OPTIONS)}
       {field("Your role level", "role_level", ROLE_LEVEL_OPTIONS)}
       {field("Tenure in this role", "tenure_in_role", TENURE_OPTIONS)}

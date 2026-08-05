@@ -50,7 +50,11 @@ export interface StateRef {
  * the estimate was calculated.
  */
 export interface IntakeEcho {
-  organization_size: string;
+  // string | number is TEMPORARY -- see the Priority Queue's dated
+  // follow-up to collapse this to number-only once ShareableOutputPayload's
+  // 30-day KV TTL has fully cycled past this deployment and no legacy
+  // string-bucket records remain.
+  organization_size: string | number;
   industry: string;
   role_level: string;
   tenure_in_role: string;

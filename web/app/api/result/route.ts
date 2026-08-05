@@ -107,12 +107,29 @@ function computeWeights(
 // Intake mapping — engine echo fields → IntakeEcho contract
 // ---------------------------------------------------------------------------
 
+// Never throws. Real headcount int passes through unchanged; a numeric
+// string (defensive -- shouldn't occur from the Python side, but the web
+// boundary shouldn't trust that) parses to a number; a legacy bucket
+// string ("100-249") is not numeric and passes through as-is; missing/
+// null falls back to "".
+function parseOrgSize(value: unknown): string | number {
+  if (typeof value === "number") return value;
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return value.trim() !== "" && Number.isFinite(parsed) ? parsed : value;
+  }
+  return "";
+}
+
 function mapIntake(engineIntake: Record<string, unknown>): IntakeEcho {
   const jurisdictions = Array.isArray(engineIntake.jurisdictions)
     ? (engineIntake.jurisdictions as string[])
     : [];
   return {
-    organization_size: (engineIntake.org_size as string) ?? "",
+    // headcount is the real Python IntakeData field; org_size is a
+    // fallback for any caller still on the pre-Phase-1 engine shape.
+    organization_size: parseOrgSize(engineIntake.headcount ?? engineIntake.org_size),
     industry: (engineIntake.industry as string) ?? "",
     role_level: (engineIntake.principal_role as string) ?? "",
     tenure_in_role: "",
