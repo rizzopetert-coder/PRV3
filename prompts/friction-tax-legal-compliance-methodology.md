@@ -881,12 +881,22 @@ rediscovery when it's picked back up.
 
 ### Exact remaining scope, so it's pickable up without rediscovery
 
-**Fully unresearched: NONE remaining.** All states from OSHA's 22-state private-sector
-State Plan roster now have at least a primary-sourced statutory-maximum finding (Addenda
-6-8, 12, 13). Two items remain genuinely open, not closed: Virginia's exact current dollar
-figure (Addendum 13 -- a real conflict between sources, not yet resolved) and New Mexico's
-exact operative dollar figure (Addendum 12 -- conformance mechanism confirmed, actual
-figures in FOM-6-Appendix-A-2024 not located via search).
+Fully unresearched: NONE remaining. All 22 OSHA State Plan states now
+have a confirmed, primary-sourced current statutory-maximum figure with
+zero remaining conflicts (Addenda 6-8, 12, 13, 14). Virginia's conflict
+(Addendum 13) resolved in Addendum 14: $16,287/$162,849 confirmed via
+direct DOLI primary source. New Mexico's operative-figure gap (Addendum
+12) resolved in Addendum 14: FOM-6 Appendix A located directly, current
+effective-April-1-2026 figures are $17,000/$170,019 -- New Mexico now
+exceeds federal parity, a novel finding not seen in any other researched
+state. Wyoming's unlocated current figure (Addendum 13) resolved in
+Addendum 14: confirmed direct federal-FOM incorporation for Chapter 6
+(Penalties specifically not among Wyoming's four exception chapters),
+current figure $16,550/$165,514, identical to federal's 2025 levels
+(unchanged through 2026 per OSHA's own no-CPI-adjustment memo). The OSHA
+statutory-maximum research effort is COMPLETE. Remaining work in this
+area is exclusively actual-average-penalty backfill, tracked separately
+below.
 
 **Needs actual-average backfill, updated:** California, Washington, Alaska, Hawaii, Arizona
 (partial -- case examples only), Indiana, Iowa, Kentucky (figure found, Addendum 12 --
@@ -898,20 +908,22 @@ researched), Tennessee (no average found, AES extreme-case anchor only, explicit
 substitute), Minnesota (now at full statutory parity, separate average likely not a
 meaningful category going forward), Utah (no average found), North Carolina (statutory
 only, no average researched), Puerto Rico (statutory only, no average researched), Vermont
-(statutory only, no average researched), Virginia (statutory itself unresolved -- see
-conflict above, average not researched), Wyoming (current statutory not even confirmed yet
--- average out of scope until that's resolved). South Carolina and Oregon remain the two
+(statutory only, no average researched), Virginia (statutory now resolved, Addendum 14 -- average still not
+researched), Wyoming (statutory now resolved, Addendum 14 -- average still not researched). South Carolina and Oregon remain the two
 states with confirmed actual-average figures from earlier addenda, unchanged.
 
-**Priority order if resumed:** two genuinely unresolved items take priority over any new
-actual-average research: (1) Virginia's dollar-figure conflict (Addendum 13) -- check
-VOSH's current official poster or Field Operations Manual directly; (2) Wyoming's current
-2025 figure (Addendum 13) -- the only researched state where even the current statutory
-maximum, not just the average, remains unconfirmed; check Wyoming DWS's current OSHA
-rules/poster page directly rather than relying on the 2020-era proposed-rule document found
-this pass. After those two: actual-average backfill is now the primary remaining category
-of work, not fresh statutory research -- the full 22-state statutory-maximum roster is
-otherwise complete across Addenda 6-8, 12, and 13.
+**Priority order if resumed:** actual-average-penalty backfill is now the sole priority
+category in this area -- Virginia's dollar-figure conflict and Wyoming's unlocated current
+figure (both Addendum 13) were resolved in Addendum 14; the full 22-state statutory-maximum
+roster is complete across Addenda 6-8, 12, 13, and 14.
+
+The OSHA statutory-maximum roster is now closed -- any future OSHA work should be
+actual-average-penalty backfill exclusively, not further statutory research, unless a
+state's own conformance mechanism produces a new figure worth re-checking (New Mexico's
+April 2026 update is a reminder that even "confirmed" states can have already-scheduled
+future changes -- if this file is revisited well after August 2026, a quick currency check
+on states with known annual conformance cycles, Addendum 14 for the list, is cheap
+insurance before treating any of them as permanently settled).
 
 ### Why this is being paused here, not because the work isn't valuable
 
@@ -1441,6 +1453,139 @@ now be revisited with this definition if useful, though the exact percentage Ken
 FAME report used for that specific metric still was not independently confirmed this pass --
 not assumed to also be -25% just because Michigan's report used that figure for its own
 measure.
+
+## Addendum 14 -- OSHA State Plan Research, Three Final Loose Ends (Virginia, New Mexico, Wyoming)
+
+**Status:** Resolves all three items Addendum 13 left genuinely open --
+Virginia's conflict, New Mexico's operative-figure gap, and Wyoming's
+unlocated current statutory maximum. This closes the OSHA State Plan
+statutory-maximum research effort completely -- all 22 states now have a
+confirmed, primary-sourced current figure with zero remaining conflicts
+or gaps. NOT yet reviewed by Gemini -- research documentation.
+
+### Virginia -- RESOLVED, Addendum 13's conflict decided in favor of the
+lower figure
+
+Direct primary source: "Employer Responsibilities and Courses of Action
+Following a VOSH Inspection" (doli.virginia.gov/wp-content/uploads/
+2025/11/ERCAFVI-8.2025.pdf), Virginia Department of Labor and Industry,
+Revised August 2025, signed by Commissioner of Labor and Industry Gary G.
+Pan. States explicitly: "Serious Violation... The maximum penalty is
+$16,287 per violation." "Other-than-Serious Violation... The maximum
+penalty is $16,287 per violation." "Repeat Violation... The maximum
+penalty is $162,849 per violation." "Willful Violation... The maximum
+penalty is $162,849 per violation." Failure to correct: "up to $16,287
+for each day during which the violation continues."
+
+This resolves Addendum 13's conflict in favor of the LOWER figure
+($16,287/$162,849) -- the LegalClarity and Willcox Savage sources citing
+full federal parity ($16,550/$165,514) were incorrect. Virginia's Va.
+Code Section 40.1-49.4.P conformance cycle (effective August 1 each year,
+confirmed via this same document's context) computes its OWN
+independently-derived figure, not a direct copy of federal's number --
+this explains the divergence structurally, similar in kind to Maryland's
+and North Carolina's independent-mechanism pattern but here producing a
+genuinely different number rather than just a timing lag.
+
+Bonus finding: Virginia has a distinct "Criminal-Willful Violation"
+category (willful violation resulting in employee death) -- "The maximum
+penalty is $70,000 per violation and/or imprisonment for up to six (6)
+months, or by both... doubled for a second conviction" -- a THIRD
+distinct variant of state fatality-specific treatment found across this
+whole research effort (Oregon's SB 592 two-tier civil range, Addendum 7;
+Minnesota's flat $25,000 civil bump, Addendum 12; now Virginia's criminal-
+penalty trigger rather than a civil-dollar enhancement).
+
+Also confirmed, real primary-source detail: Virginia's small-business
+penalty-reduction schedule by headcount -- 1-25 employees: 70% reduction;
+26-100: 40% reduction; 101-250: 20% reduction; 251+: zero reduction.
+
+### New Mexico -- RESOLVED, and the answer is genuinely novel: New
+Mexico now exceeds federal, not just matches it
+
+Direct primary source: New Mexico Field Operations Manual, Chapter 6,
+Appendix A, "Adjustment of OHSB Civil Penalties" (accessed via NM
+Environment Department's official State Plan Index, env.nm.gov/
+occupational_health_safety/state-plan-index -- item IV.A.2), a signed,
+Docusign-verified document (Envelope ID 98FFBB69-167F-4F45-A1CB-
+8FA07235CE64) under the authority of James C. Kenney, Cabinet Secretary,
+New Mexico Environment Department.
+
+This resolves Addendum 12's flagged gap completely -- the actual
+operative dollar figures ARE now located. The document shows two dated
+tables:
+
+Effective April 1, 2025 (now superseded): Willful/Repeat maximum
+$165,549 (minimum $11,858); Serious $16,553 per violation; Other $16,553
+per violation; Failure to Abate $16,553 per day; Posting $16,533 per
+violation. These figures sit essentially at federal parity (within
+single dollars of federal's then-current $16,550/$165,514) -- consistent
+with SB 229's (2017) conformance mandate.
+
+EFFECTIVE APRIL 1, 2026 (current as of this research date): Willful/
+Repeat maximum $170,019 (minimum $12,498); Serious $17,000 per
+violation; Other $17,000 per violation; Failure to Abate $17,000 per
+day; Posting $17,000 per violation.
+
+REAL, NOVEL FINDING: as of April 1, 2026, New Mexico's own independently-
+computed annual adjustment (per NMSA 1978, Section 50-9-24(J), which
+requires the Cabinet Secretary to adjust penalty levels annually) has
+pushed New Mexico's maximums ABOVE federal's current levels ($16,550
+serious / $165,514 willful-repeat) -- not to parity, past it. $17,000 vs.
+$16,550 is roughly 2.7% above federal; $170,019 vs. $165,514 is also
+roughly 2.7% above. This is a genuinely new pattern not seen in any other
+state across this entire research effort (Addenda 6-8, 12, 13) -- every
+other conformance-mechanism state (NC, MD, MN, NV, PR, VT) either matches
+federal exactly or lags slightly behind it; New Mexico is the first
+confirmed case of a state's own independent annual-adjustment formula
+overshooting federal's figure.
+
+### Wyoming -- RESOLVED, direct federal-parity by FOM incorporation,
+not the lagged rulemaking cycle previously assumed
+
+Addendum 13 found only a stale December 2020/January 2021 proposed-rule
+document showing Wyoming updating penalties via periodic rulemaking with
+a documented multi-month-to-year lag, and concluded Wyoming's "Yes/
+Identical" table entry didn't imply real-time tracking. This pass found
+the current, live mechanism directly on Wyoming DWS's own OSHA page
+(dws.wyo.gov/dws-division/osha/, page metadata shows last modified April
+15, 2026, content section shows "Last Updated: May 1, 2024" for the FOM-
+adoption statement specifically): "WY OSH'S distinction to the adoption
+of the Federal OSHA Field Operations Manual (FOM), CPL 02-00-164, June
+30, 2020... Wyoming adopted Federal OSHA's FOM as identical, except for:
+Chapter 7 (Post-Citation Procedures and Abatement Verification), Chapter
+9 (Complaint and Referral Processing), Chapter 16 (FOIA Disclosure),
+Chapter 15 (Legal Issues)."
+
+Chapter 6 (Penalties) is NOT among Wyoming's listed exceptions -- meaning
+Wyoming's penalty structure follows the federal FOM directly, not a
+separately-maintained state schedule subject to its own rulemaking lag.
+This is a real, current mechanism distinct from what the 2020-era
+document suggested (whether Wyoming's incorporation approach changed
+between 2020 and now, or the 2020 document was never the full picture,
+is not resolved by this research -- but the current, live, official
+statement is unambiguous).
+
+Current federal figures, confirmed via OSHA's own May 2026 memo
+(osha.gov/memos/2026-05-21/2026-annual-adjustments-osha-civil-penalties):
+"There are no inflation-based increases to OSHA civil penalties for
+2026, so 2025 penalty amounts remain in effect for 2026" -- the required
+CPI-U data collection was disrupted by the fall 2025 government shutdown,
+and the Federal Civil Penalties Inflation Adjustment Act permits no
+substitute measure. Therefore Wyoming's current confirmed maximum, by
+direct FOM incorporation: $16,550 per violation (serious/other-than-
+serious), $165,514 per violation (willful/repeat) -- identical to
+federal's January 15, 2025 figures, unchanged through 2026.
+
+### Summary: OSHA State Plan statutory-maximum research effort is now
+COMPLETE, all 22 states confirmed
+
+All 22 states in the OSHA State Plan private-sector roster now have a
+confirmed, primary-sourced current statutory-maximum figure, with zero
+remaining conflicts or located-but-unconfirmed gaps. This closes the
+research thread opened at Addendum 6. Remaining work in this area is
+exclusively actual-average-penalty backfill, a different, lower-priority
+category per Addendum 9's existing tracking.
 
 ## Structural implications (bigger than Option A)
 
