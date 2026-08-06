@@ -36,7 +36,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
 from engine.accumulation import IntakeData, AccumulationEngine, rank_states
-from engine.severity import SeverityEngine
+from engine.severity import SeverityEngine, SeverityInput
 from engine.output import OutputEngine, compute_noise_baseline, SCD_WCS_ALIGNMENT_THRESHOLD
 from engine.contract import SessionData, assemble_output
 from engine.test_suite import run_test_case, run_suite, PROFILE_TYPES
@@ -198,6 +198,48 @@ _CORE_QUESTION_IDS = [
 _CONDITIONAL_PAIRS = {"Q03A": "Q03B", "Q27A": "Q27B"}
 
 
+# ── Severity Follow-On Calibration (reopened, scoped to 4 profiles) ───────────
+# Re-investigation finding: every one of the 172 profiles already carries a
+# LOCKED expected.severity_tier (Section VII.2). Cross-referencing all 172
+# against real severity-trigger reachability found only 4 genuinely achievable
+# as spec'd -- the other 168 either already match trivially (Emerging, zero
+# signal) or are structurally unreachable given today's SEVER-## question
+# wiring (a separate, much larger finding, logged as its own Priority Queue
+# item, not addressed here). This table is deliberately sparse and test_id-
+# scoped -- a profile absent from it never gets a follow-on spliced in,
+# preserving pre-build behavior exactly for all 168 untouched profiles.
+_SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
+    "AUT-PL-01":  {"SEVER-04": "18mo_plus"},
+    "AUT-UA-01":  {"SEVER-04": "18mo_plus"},
+    "ATT-IB-01":  {"SEVER-06": "18mo_plus"},
+    "EXP-HDA-01": {"SEVER-06": "18mo_plus"},
+}
+
+
+def select_severity_follow_on_option(question, target_value):
+    """
+    Select the SEVER-## follow-on option whose severity_input_mapping
+    contains target_value. Selects on the actual severity_input_mapping
+    value, not liability-vector contribution -- confirmed during
+    investigation that best_option_for_state() doesn't meaningfully
+    differentiate SEVER-## options (only SEVER-05 has real per-option
+    dimensional_contributions variation; every other SEVER-## question
+    ties all its options at the same seeded per-question uniform value).
+
+    Fail-loud: raises ValueError if no option matches, rather than
+    silently falling back to the first option -- a profile-table mistake
+    (e.g. assigning a duration_band value to a question that only maps to
+    named_condition) should surface immediately, not mask as a neutral pick.
+    """
+    for opt in question.answer_options:
+        if opt.severity_input_mapping and target_value in opt.severity_input_mapping.values():
+            return opt
+    raise ValueError(
+        f"{question.question_id}: no option maps to target_value={target_value!r} "
+        f"-- check the profile table against this question's real severity_input_mapping"
+    )
+
+
 def generate_answers(test_case):
     """
     Generate TestAnswer list from test_case.profile_type and target_state.
@@ -254,6 +296,22 @@ def generate_answers(test_case):
                     threshold=WEAK_DAMPED_THRESHOLD * WEAK_UNWIRED_DAMPING_FACTOR,
                 )
         answers.append(TestAnswer(question_id=qid, selected_option_ids=[opt.option_id]))
+
+        # Severity follow-on simulation -- opt-in only, via
+        # _SEVERITY_FOLLOW_ON_TARGETS. A test_id absent from that table
+        # (168 of 172 profiles) produces byte-for-byte identical answers to
+        # before this build -- no follow-on ever gets spliced in for them.
+        if opt.severity_trigger and opt.severity_follow_on_id:
+            target_value = _SEVERITY_FOLLOW_ON_TARGETS.get(test_case.test_id, {}).get(
+                opt.severity_follow_on_id
+            )
+            if target_value is not None:
+                follow_on_q = QUESTION_LIBRARY[opt.severity_follow_on_id]
+                follow_on_opt = select_severity_follow_on_option(follow_on_q, target_value)
+                answers.append(TestAnswer(
+                    question_id=opt.severity_follow_on_id,
+                    selected_option_ids=[follow_on_opt.option_id],
+                ))
     return answers
 
 
@@ -314,6 +372,20 @@ def run_profile(test_case) -> dict:
             if opt is None:
                 continue
             acc_engine.apply_answer(opt, ans.question_id)
+
+            # Severity follow-on collection -- mirrors engine/main.py's
+            # accumulate_one_answer() exactly, including its own documented
+            # trigger_question_id simplification (defaults to the follow-on's
+            # own question_id when true provenance isn't threaded through --
+            # the same convention already used in the real, live-verified
+            # Path 1 code, not a new one invented for calibration).
+            if opt.severity_input_mapping:
+                severity_input = SeverityInput(
+                    trigger_question_id=ans.question_id,
+                    severity_follow_on_id=ans.question_id,
+                    **opt.severity_input_mapping,
+                )
+                sev_engine.add_input(severity_input)
 
     rankings = acc_engine.rank(SALIENCE_PROFILES)
     sev_result = sev_engine.score()
