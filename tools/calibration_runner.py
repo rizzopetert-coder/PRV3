@@ -277,6 +277,16 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     "ALL-SI-02":  {"SEVER-08": "18mo_plus"},
     "ALL-SI-03":  {"SEVER-08": "18mo_plus"},
     "EXP-DCF-01": {"SEVER-08": "18mo_plus"},
+    # Q02/D second trigger (the_exposed / planning_authority_gap /
+    # hr_capture) -- AUT-EX-01, EXP-PAG-01, AUT-HC-02 are single-trigger
+    # Entrenched-expected, closed by this alone. AUT-HC-01 is
+    # Endemic-expected and genuinely needs a second trigger (candidate:
+    # Q04, separate future review, not part of this fix) -- correctly
+    # lands short at Entrenched (raw 2.00), not a bug.
+    "AUT-EX-01":  {"SEVER-15": "18mo_plus"},
+    "EXP-PAG-01": {"SEVER-15": "18mo_plus"},
+    "AUT-HC-01":  {"SEVER-15": "18mo_plus"},
+    "AUT-HC-02":  {"SEVER-15": "18mo_plus"},
     "APT-UL-01":  {"SEVER-07": "18mo_plus"},
     "APT-DT-01":  {"SEVER-07": "18mo_plus"},
     "AUT-LC-01":  {"SEVER-07": "18mo_plus"},

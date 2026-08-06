@@ -141,7 +141,7 @@ _QDATA = [
             ("A", "Strong and independent — we have dedicated HR leadership that operates with real authority.", False, None),
             ("B", "Adequate — HR handles what it needs to but it's not a strategic function.", False, None),
             ("C", "Thin — HR is a part-time role or shared responsibility.", False, None),
-            ("D", "Absent — we don't have a dedicated HR function right now.", False, None),
+            ("D", "Absent — we don't have a dedicated HR function right now.", True, "SEVER-15"),
             ("E", "We have HR but I sometimes wonder whether it's truly independent.", False, None),
         ],
         ["the_exposed", "hr_capture", "planning_authority_gap"],
@@ -855,6 +855,19 @@ _QDATA = [
             ("D", "I'm not sure — it may have been there longer than I've recognized.", False, None),
         ],
         ["the_fracture", "silosolation"],
+        False,
+    ),
+    (
+        "SEVER-15",
+        "How long has your organization been without a dedicated HR function?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "It's recent — this changed in the past six months.", False, None),
+            ("B", "It's been this way for a year or more.", False, None),
+            ("C", "It's been this way for as long as I can remember.", False, None),
+            ("D", "I'm not sure — it may have been this way longer than I've recognized.", False, None),
+        ],
+        ["the_exposed", "hr_capture", "planning_authority_gap"],
         False,
     ),
     (
@@ -1999,6 +2012,12 @@ def _build_library():
             "E": {"duration_band": "18mo_plus"},
         },
         "SEVER-14": {  # STRONG -- duration (the_fracture / silosolation, Q09-E second trigger)
+            "A": {"duration_band": "0_6mo"},
+            "B": {"duration_band": "6_18mo"},
+            "C": {"duration_band": "18mo_plus"},
+            "D": {"duration_band": "18mo_plus"},
+        },
+        "SEVER-15": {  # STRONG -- duration (the_exposed / planning_authority_gap / hr_capture, Q02-D trigger)
             "A": {"duration_band": "0_6mo"},
             "B": {"duration_band": "6_18mo"},
             "C": {"duration_band": "18mo_plus"},
