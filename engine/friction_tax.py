@@ -206,7 +206,9 @@ HEADCOUNT_MIDPOINTS: dict[str, HeadcountMidpointEntry] = {
 
 
 # -- Payroll baseline grid -------------------------------------------------------
-# Keyed by (headcount, industry). All 54 cells now computed:
+# Keyed by (headcount, industry). All 66 cells now computed (6 headcount
+# buckets x 11 industries, grown from the original 54 by the Industry
+# Taxonomy Expansion, MOB v4.100):
 # payroll_floor_annual = industry_wage x headcount_midpoint. Payroll
 # basis, not revenue -- see prompts/friction-tax-unit-decision.md.
 
