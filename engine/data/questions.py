@@ -407,7 +407,7 @@ _QDATA = [
         [
             ("A", "Both are taken seriously — people report concerns and the organization responds visibly.", False, None),
             ("B", "The policies are there but I'm not confident people actually follow them or report when something is wrong.", False, None),
-            ("C", "We've had incidents that I think could have been prevented if people had spoken up earlier.", False, None),
+            ("C", "We've had incidents that I think could have been prevented if people had spoken up earlier.", True, "SEVER-16"),
             ("D", "Security is a known gap — people work around protocols rather than following them.", False, None),
             ("E", "Safety and security aren't significant concerns for our type of work.", False, None),
         ],
@@ -868,6 +868,19 @@ _QDATA = [
             ("D", "I'm not sure — it may have been this way longer than I've recognized.", False, None),
         ],
         ["the_exposed", "hr_capture", "planning_authority_gap"],
+        False,
+    ),
+    (
+        "SEVER-16",
+        "How long has this been happening?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "It's recent — this started in the past six months.", False, None),
+            ("B", "It's been happening for a year or more.", False, None),
+            ("C", "It's been happening for as long as I can remember.", False, None),
+            ("D", "I'm not sure — it may have been happening longer than I've recognized.", False, None),
+        ],
+        ["the_unreported_hazard", "the_unlocked_door", "what_nobody_says", "the_suppression_filter"],
         False,
     ),
     (
@@ -2018,6 +2031,12 @@ def _build_library():
             "D": {"duration_band": "18mo_plus"},
         },
         "SEVER-15": {  # STRONG -- duration (the_exposed / planning_authority_gap / hr_capture, Q02-D trigger)
+            "A": {"duration_band": "0_6mo"},
+            "B": {"duration_band": "6_18mo"},
+            "C": {"duration_band": "18mo_plus"},
+            "D": {"duration_band": "18mo_plus"},
+        },
+        "SEVER-16": {  # STRONG -- duration (the_unreported_hazard / the_unlocked_door / what_nobody_says / the_suppression_filter, Q18-C trigger)
             "A": {"duration_band": "0_6mo"},
             "B": {"duration_band": "6_18mo"},
             "C": {"duration_band": "18mo_plus"},

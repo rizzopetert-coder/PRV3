@@ -287,6 +287,20 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     "EXP-PAG-01": {"SEVER-15": "18mo_plus"},
     "AUT-HC-01":  {"SEVER-15": "18mo_plus"},
     "AUT-HC-02":  {"SEVER-15": "18mo_plus"},
+    # Q18/C second trigger (the_unreported_hazard / the_unlocked_door /
+    # what_nobody_says / the_suppression_filter) -- ATT-UD-01, ATT-UH-01,
+    # ALL-SF-02, ALL-SF-03 are single-trigger Entrenched-expected, closed
+    # by this alone. ATT-WNS-01 and ALL-SF-01 are Endemic-expected and
+    # genuinely need a second trigger (candidates: Q04 for
+    # what_nobody_says; Q04/Q08/Q12/Q30 for the_suppression_filter --
+    # separate future review, not part of this fix) -- correctly land
+    # short at Entrenched (raw 2.00), not a bug.
+    "ATT-UD-01":  {"SEVER-16": "18mo_plus"},
+    "ATT-UH-01":  {"SEVER-16": "18mo_plus"},
+    "ATT-WNS-01": {"SEVER-16": "18mo_plus"},
+    "ALL-SF-01":  {"SEVER-16": "18mo_plus"},
+    "ALL-SF-02":  {"SEVER-16": "18mo_plus"},
+    "ALL-SF-03":  {"SEVER-16": "18mo_plus"},
     "APT-UL-01":  {"SEVER-07": "18mo_plus"},
     "APT-DT-01":  {"SEVER-07": "18mo_plus"},
     "AUT-LC-01":  {"SEVER-07": "18mo_plus"},
