@@ -142,6 +142,10 @@ export interface EngineResult {
       direction: "escalating" | "stable" | "decelerating" | "insufficient_data";
       duration_band: "0_6mo" | "6_18mo" | "18mo_plus" | null;
     } | null;
+    urgency_window: {
+      time_to_consequence: "Acute" | "Medium-Term" | "Attritional" | null;
+      response_window: "Extended" | "Near-Term" | "Immediate" | null;
+    };
   };
   shareable_output: {
     attribution_text: string;

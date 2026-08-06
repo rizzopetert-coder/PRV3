@@ -213,6 +213,19 @@ export interface PrivateOutputPayload {
     duration_band: "0_6mo" | "6_18mo" | "18mo_plus" | null;
   } | null;
 
+  // Urgency Window (Diagnostic Dimension Expansion, Candidate 5). Same
+  // Path 1 / Path B scoping as the three fields above -- optional, Path B
+  // not wired this commit. Unlike trajectory, the object itself is never
+  // null when present -- engine/contract.py's assemble_output() always
+  // constructs a populated dict for both paths; only the two inner
+  // values can independently be null (time_to_consequence: no lead/
+  // qualified state at all; response_window: trajectory_result is None,
+  // Path B only -- Path 1 always computes a real trajectory_result).
+  urgency_window?: {
+    time_to_consequence: "Acute" | "Medium-Term" | "Attritional" | null;
+    response_window: "Extended" | "Near-Term" | "Immediate" | null;
+  };
+
   // Intake echo — all six fields for recognition framing
   intake: IntakeEcho;
 
