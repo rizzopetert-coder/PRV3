@@ -480,7 +480,7 @@ _QDATA = [
             ("A", "We've built real depth — no single departure would be unmanageable.", True, "SEVER-05"),
             ("B", "We're more dependent than we should be but we haven't felt it yet.", False, None),
             ("C", "We've felt it — a departure exposed how thin we were and recovery was harder than expected.", False, None),
-            ("D", "We have people right now whose loss would be genuinely destabilizing.", False, None),
+            ("D", "We have people right now whose loss would be genuinely destabilizing.", True, "SEVER-05"),
         ],
         ["leadership_continuity_risk", "paper_shield"],
         True,
