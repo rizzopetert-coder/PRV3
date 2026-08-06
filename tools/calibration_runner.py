@@ -120,15 +120,36 @@ def _build_synthetic_vector(target_state: str, profile_type: str) -> dict:
 # ── Phase 2 Answer Generation ─────────────────────────────────────────────────
 
 def best_option_for_state(question, target_state_id: str):
-    """Return option with highest contribution on target state's primary liability field."""
+    """Return option with highest contribution on target state's primary liability field.
+
+    On an exact tie for the max value, prefer an option carrying
+    severity_trigger=True IF it is dimensionally identical to the
+    otherwise-first-picked option across every field, not just the
+    maximized one -- an arbitrary list-order pick was silently discarding
+    real severity signal at zero dimensional cost. Deliberately narrow:
+    confirmed via a full QUESTION_LIBRARY sweep to affect only Q31's 3
+    wired states (the_unsolved_problem, decision_blindness,
+    sequential_decision_blindness). Two other trigger-involved ties exist
+    (Q03A/the_second_close, Q20/decision_paralysis) but differ on other
+    fields and are deliberately excluded by the full-identity check.
+    """
     profile = STATE_PROFILES.get(target_state_id)
     if not profile:
         return question.answer_options[0]
     field = _DIM_TO_LIABILITY_FIELD.get(profile.primary_dimension, "")
-    return max(
+    best = max(
         question.answer_options,
         key=lambda opt: opt.dimensional_contributions.get(field, 0.0),
     )
+    if not best.severity_trigger:
+        for opt in question.answer_options:
+            if (
+                opt is not best
+                and opt.severity_trigger
+                and opt.dimensional_contributions == best.dimensional_contributions
+            ):
+                return opt
+    return best
 
 
 def _neutral_option(question):
@@ -208,11 +229,31 @@ _CONDITIONAL_PAIRS = {"Q03A": "Q03B", "Q27A": "Q27B"}
 # item, not addressed here). This table is deliberately sparse and test_id-
 # scoped -- a profile absent from it never gets a follow-on spliced in,
 # preserving pre-build behavior exactly for all 168 untouched profiles.
+#
+# ALL-DB-01 / EXP-SDB-01 added following the Q31 tie-break fix to
+# best_option_for_state() (below) -- that fix makes Q31's real trigger
+# option (C, severity_trigger=True -> SEVER-11) genuinely selectable for
+# decision_blindness/sequential_decision_blindness for the first time.
+# Opting them in here exercises that real path rather than leaving it
+# silently untested. Confirmed NOT sufficient to reach either profile's
+# locked expected Entrenched tier on its own -- SEVER-11 has no
+# duration_band option (every option maps prior_failed_resolution only),
+# capping the achievable raw contribution at 1.0 (score 16.67, Emerging).
+# Target value True chosen as the semantically-correct "worst case" signal
+# (prior_failed_resolution=True); raw score is identical regardless of
+# True/False today since PRIOR_FAILED_RESOLUTION_WEIGHT is still a
+# CALIBRATION TARGET (None -> 0.0 fallback). Closing the remaining gap to
+# Entrenched needs either a duration_band option added to SEVER-11 or
+# another independent trigger wired to these states -- content work,
+# folded into the Bucket 2 ("wired, insufficient magnitude") discussion,
+# not resolved by this table entry alone.
 _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     "AUT-PL-01":  {"SEVER-04": "18mo_plus"},
     "AUT-UA-01":  {"SEVER-04": "18mo_plus"},
     "ATT-IB-01":  {"SEVER-06": "18mo_plus"},
     "EXP-HDA-01": {"SEVER-06": "18mo_plus"},
+    "ALL-DB-01":  {"SEVER-11": True},
+    "EXP-SDB-01": {"SEVER-11": True},
 }
 
 
