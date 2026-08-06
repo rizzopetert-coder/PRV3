@@ -397,12 +397,18 @@ export default function DiagnosticFlow() {
             ...result.secondary_states.map((s) => s.id),
           ]}
           intake={{
-            headcount: "",
-            industry: "",
+            headcount: String(intake.organization_size),
+            industry: intake.industry,
+            // Not collected by Phase 1's intake form -- matches the locked
+            // server-side default (_locked_intake_to_engine_intake(),
+            // engine/main.py, Session 71 architecture decision).
             orgType: "",
-            jurisdictions: [],
-            significantEvents: [],
-            principalRole: "",
+            jurisdictions: intake.jurisdiction ? [intake.jurisdiction] : [],
+            // Not collected by Phase 1's intake form -- matches the locked
+            // server-side sentinel exactly (same function/decision as
+            // orgType above), not an empty array.
+            significantEvents: ["none"],
+            principalRole: intake.role_level,
           }}
           enableSharing={false}
         />
