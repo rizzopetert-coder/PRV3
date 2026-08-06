@@ -898,21 +898,42 @@ statutory-maximum research effort is COMPLETE. Remaining work in this
 area is exclusively actual-average-penalty backfill, tracked separately
 below.
 
-**California actual-average penalty -- ADDED this session, STALE, replacement needed:**
-$5,503.41 (average initial penalty for serious violations, FY2009 -- October 1, 2008 to
-September 30, 2009). Source: U.S. DOL/OSHA Region IX FAME Report for California, FY2009,
-Table 5 (SAMM 10), https://www.dir.ca.gov/CA_EFAME_with_appendices.pdf. At the time, this
-was the highest actual-average penalty in the nation, well above the FY2009 national average
-of $1,335.20. **Sixteen years old as of this session (August 2026) -- do not treat as
-current.** A current-year figure was actively sought and not located: the FY2023
-Comprehensive FAME Report for California is confirmed to exist on osha.gov (via search), but
-its exact file URL could not be found despite a sustained search -- the predictable naming
-pattern that worked for other states (e.g. California-FY-2023-Comprehensive-FAME-Report.docx)
-did not surface in results, and a hosting site's PDF of the same report blocked automated
-access via robots.txt. A secondary, non-primary source (a 2026-dated industry blog) claims a
-current California average of $2,033 per violation -- NOT independently verified against a
-primary BLS/OSHA source, do not use without that verification. Parked as a future backfill
-task, Priority Queue (Section 13b).
+**California actual-average penalty -- RESOLVED, FY2009 figure replaced with current
+FY2023 data.** Source: California FY2023 Comprehensive FAME Report,
+https://www.osha.gov/sites/default/files/2024-06/CaliforniaFY2023ComprehensiveFAMEReport.docx
+-- direct primary-source extraction from osha.gov's own DOCX, not a third-party
+republication. Confirmed current via osha.gov's own California FAME Reports index:
+https://www.osha.gov/stateplans/famereport/CA. Metric: SAMM 8 -- Average Current Serious
+Penalty in Private Sector.
+
+**Departs from the flat-figure format used for Oregon/South Carolina/Michigan above --
+deliberate, not an oversight.** Pete's decision: record the report's size-segmented
+breakdown rather than collapsing it to a single number, since the report itself presents
+the data this way and the segmentation is informative on its own (California's total
+figure sits well above the national FRL range, a finding the flat number alone wouldn't
+surface). If a future session encounters this inconsistency with the other three states'
+single-figure format, this is why -- not something to "fix" back to a flat number without
+re-raising it with Pete first.
+
+FY2023 data, verbatim from the report:
+
+| Workers | Avg. Current Serious Penalty | 3-Yr National Avg | FRL Range |
+|---|---|---|---|
+| 1-25 | $6,052.00 | $2,348.03 | $1,761.02-$2,935.04 |
+| 26-100 | $8,962.64 | $4,167.28 | not fully extracted -- flagged incomplete, re-verify if needed |
+| 101-250 | $11,410.41 | $6,052.04 | $4,539.03-$7,565.05 |
+| 251+ | $11,493.24 | $7,331.41 | $5,498.56-$9,164.26 |
+| Total (1-250+) | $8,777.88 | $3,625.21 | $2,718.91-$4,531.51 |
+
+California's total figure ($8,777.88) exceeds the total-row national FRL range
+($2,718.91-$4,531.51) considerably -- flagged in the report's own text as an over-FRL
+finding. Worth noting as context for why California's figure runs so far above Oregon
+($604), South Carolina ($2,019), and Michigan ($1,217.24) -- not a data-quality concern,
+a genuine jurisdictional outlier consistent with California's existing cross-cluster
+outlier status (Addendum 6). Supersedes the prior $5,503.41 FY2009 figure (U.S. DOL/OSHA
+Region IX FAME Report for California, FY2009, Table 5/SAMM 10) -- that figure predated
+this replacement by sixteen years and is no longer current; retained here only as
+superseded history, not as an alternate current value.
 
 **Needs actual-average backfill, updated:** Washington, Alaska, Hawaii, Arizona
 (partial -- case examples only), Indiana, Iowa, Kentucky (figure found, Addendum 12 --
@@ -925,10 +946,9 @@ substitute), Minnesota (now at full statutory parity, separate average likely no
 meaningful category going forward), Utah (no average found), North Carolina (statutory
 only, no average researched), Puerto Rico (statutory only, no average researched), Vermont
 (statutory only, no average researched), Virginia (statutory now resolved, Addendum 14 -- average still not
-researched), Wyoming (statutory now resolved, Addendum 14 -- average still not researched), California
-(FY2009 figure added this session, flagged stale above -- current-year figure still needed).
-Oregon, South Carolina, and Michigan remain the three states with confirmed, current
-actual-average figures from earlier addenda, unchanged.
+researched), Wyoming (statutory now resolved, Addendum 14 -- average still not researched).
+Oregon, South Carolina, Michigan, and now California (FY2023 size-segmented data, resolved
+above) are the four states with confirmed, current actual-average figures.
 
 **Priority order if resumed:** actual-average-penalty backfill is now the sole priority
 category in this area -- Virginia's dollar-figure conflict and Wyoming's unlocated current
