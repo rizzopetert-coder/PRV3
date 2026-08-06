@@ -1358,7 +1358,7 @@ Explicitly parked, not on this list, do not resurface unless Pete reopens: confi
 
 Calibration status as of session close: Friction Tax Sets 1 (ORG_TYPE_SCALARS), 2 (PAYROLL_BASELINE_GRID, 66-cell as of this session's industry expansion, commit 0fef4ef), and 3 (STATE_MULTIPLIERS, 57 states) all closed and live. calibration_complete genuinely returns True for real input as of commit 469b148. Multi-state compounding design locked, pushed (242379a), and implemented (Option A rescale, commit 8de807a, MOB v4.80) -- closed, no longer an active priority; see "Closed since last update" above.
 
-Last updated: This session (Claude Code), California OSHA backfill + industry-expansion/Addendum-14 staleness pass, 2026-08-05.
+Last updated: This session (Claude Code), 2026-08-05 -- California OSHA backfill + industry-expansion/Addendum-14 staleness pass, intake headcount precision redesign (3 phases), Section 13b housekeeping (3 items: weak-branch weighted-damping redesign, test_contract.py sections 12/13, MemPalace drawer-write diagnosis), Urgency Window (Diagnostic Dimension Expansion, Candidate 5, 2 phases), causation_pattern -> resolution_families.py routing influence (3 phases, closes Priority Queue item 2), and a Friction Tax status re-verification + stale comment fix (54 -> 66 cells, no functional gap found).
 
 
 \\---
