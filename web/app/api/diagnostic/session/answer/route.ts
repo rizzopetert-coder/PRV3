@@ -22,9 +22,9 @@ import {
 import type {
   PrivateOutputPayload,
   StateRef,
-  ResolutionFamily,
   SynthesisFields,
 } from "@/lib/types";
+import { translateResolutionFamily } from "@/lib/resolution-family";
 
 // Checkpoint ID mapping (Phase 2) — Q27 has two branch IDs (Q27A/Q27B)
 // depending on intake.significant_events; Phase 1's locked intake adapter
@@ -75,67 +75,6 @@ function setCheckpointSlot(
 // than duplicating that pipeline. Weighting differs from Path B on
 // purpose: real normalized cosine scores (Path A), not equal weight.
 // ---------------------------------------------------------------------------
-
-// STATE_RESOLUTION_FAMILY + getPrimaryFamily duplicated here matching the
-// existing convention already established across /api/result and
-// /api/share/create (both already duplicate this same map independently) —
-// per the standing rule against refactoring adjacent files for a
-// same-session build, not extracted into a shared module. Flagged as a
-// pre-existing pattern, not new tech debt introduced by this file.
-const STATE_RESOLUTION_FAMILY: Record<string, ResolutionFamily> = {
-  the_unformed_leader:              "Training & Development",
-  the_overloaded_manager:           "Training & Development",
-  the_dormant_talent:               "Training & Development",
-  built_to_fail:                    "Training & Development",
-  the_uninitiated:                  "Training & Development",
-  groundhog_day:                    "Training & Development",
-  the_undefined_role:               "People Tactics and Strategy",
-  the_paper_tiger:                  "People Tactics and Strategy",
-  the_founders_grip:                "People Tactics and Strategy",
-  leadership_continuity_risk:       "People Tactics and Strategy",
-  decision_paralysis:               "People Tactics and Strategy",
-  the_policy_lag:                   "People Tactics and Strategy",
-  dueling_narratives:                "People Tactics and Strategy",
-  the_unsolved_problem:             "People Tactics and Strategy",
-  transition_paralysis:             "People Tactics and Strategy",
-  the_lost_map:                     "People Tactics and Strategy",
-  invisible_influence_architecture: "People Tactics and Strategy",
-  the_fracture:                     "People Tactics and Strategy",
-  silosolation:                     "People Tactics and Strategy",
-  the_broken_compass:               "People Tactics and Strategy",
-  the_exposed:                      "Intervention",
-  hr_capture:                       "Intervention",
-  the_unexamined_algorithm:         "Intervention",
-  heard_and_ignored:                "Intervention",
-  the_tolerated_violation:          "Intervention",
-  paper_shield:                     "Intervention",
-  pay_exposure:                     "Intervention",
-  the_pay_fog:                      "Intervention",
-  the_second_close:                 "Intervention",
-  the_suppression_filter:           "Intervention",
-  the_arbitrary_standard:           "Intervention",
-  decision_blindness:               "Intervention",
-  the_untouchable:                  "Intervention",
-  what_nobody_says:                 "Intervention",
-  the_diversity_ceiling:            "Intervention",
-  the_unreported_hazard:            "Intervention",
-  the_unlocked_door:                "Intervention",
-  culture_drift:                    "Executive Advisory",
-  identity_erosion:                 "Executive Advisory",
-  the_culture_that_wasnt:           "Executive Advisory",
-  the_burned_credibility:           "Executive Advisory",
-  invisible_burnout:                "Executive Advisory",
-  the_basement_standard:            "Executive Advisory",
-  the_inside_track:                 "Executive Advisory",
-  narrative_lock:                   "Executive Advisory",
-  the_wrong_reward:                 "Executive Advisory",
-  leadership_deafness:              "Executive Advisory",
-};
-
-function getPrimaryFamily(stateId: string | undefined): ResolutionFamily {
-  if (!stateId) return "People Tactics and Strategy";
-  return STATE_RESOLUTION_FAMILY[stateId] ?? "People Tactics and Strategy";
-}
 
 interface AnswerRequest {
   session_id: string;
@@ -365,7 +304,7 @@ export async function POST(request: NextRequest) {
 
     severity: engineResult.severity.tier,
 
-    resolution_family: getPrimaryFamily(stateRefs[0]?.id),
+    resolution_family: translateResolutionFamily(engineResult.private_output.resolution_routing),
     resolution_routing: engineResult.private_output.resolution_routing,
 
     friction_tax_estimate: engineResult.private_output.friction_tax_estimate,

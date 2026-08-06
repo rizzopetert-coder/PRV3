@@ -18,11 +18,19 @@
 export type SeverityTier = "Emerging" | "Entrenched" | "Endemic";
 
 // Commercial service names. Matches ENGINE_TO_COMMERCIAL_NAME in engine/resolution_families.py.
-export type ResolutionFamily =
+// Widened beyond the 4 single names -- translateResolutionFamily()
+// (web/lib/resolution-family.ts) can also produce a compound string
+// (e.g. "People Tactics and Strategy + Intervention") for any state whose
+// real StateProfile.resolution_family is compound, which is the common
+// case (33 of 57 states). SingleResolutionFamily keeps the 4-value union
+// available for call sites that only ever construct a single name.
+export type SingleResolutionFamily =
   | "People Tactics and Strategy"
   | "Training & Development"
   | "Intervention"
   | "Executive Advisory";
+
+export type ResolutionFamily = SingleResolutionFamily | (string & {});
 
 // ---------------------------------------------------------------------------
 // Shared interfaces

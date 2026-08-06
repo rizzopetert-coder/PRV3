@@ -3,10 +3,10 @@ import type {
   PrivateOutputPayload,
   StateRef,
   IntakeEcho,
-  ResolutionFamily,
   SynthesisFields,
 } from "@/lib/types";
 import { invokeEngine } from "@/lib/engine-client";
+import { translateResolutionFamily } from "@/lib/resolution-family";
 
 // ---------------------------------------------------------------------------
 // Payload separation contract:
@@ -14,70 +14,6 @@ import { invokeEngine } from "@/lib/engine-client";
 //   ShareableOutput is never constructed here.
 //   No KV write of any kind occurs in this handler.
 // ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Resolution family map — commercial names (S47)
-// People Tactics and Strategy | Training & Development | Intervention | Executive Advisory
-// ---------------------------------------------------------------------------
-
-const STATE_RESOLUTION_FAMILY: Record<string, ResolutionFamily> = {
-  // Training & Development
-  the_unformed_leader:              "Training & Development",
-  the_overloaded_manager:           "Training & Development",
-  the_dormant_talent:               "Training & Development",
-  built_to_fail:                    "Training & Development",
-  the_uninitiated:                  "Training & Development",
-  groundhog_day:                    "Training & Development",
-  // People Tactics and Strategy
-  the_undefined_role:               "People Tactics and Strategy",
-  the_paper_tiger:                  "People Tactics and Strategy",
-  the_founders_grip:                "People Tactics and Strategy",
-  leadership_continuity_risk:       "People Tactics and Strategy",
-  decision_paralysis:               "People Tactics and Strategy",
-  the_policy_lag:                   "People Tactics and Strategy",
-  dueling_narratives:               "People Tactics and Strategy",
-  the_unsolved_problem:             "People Tactics and Strategy",
-  transition_paralysis:             "People Tactics and Strategy",
-  the_lost_map:                     "People Tactics and Strategy",
-  invisible_influence_architecture: "People Tactics and Strategy",
-  the_fracture:                     "People Tactics and Strategy",
-  silosolation:                     "People Tactics and Strategy",
-  the_broken_compass:               "People Tactics and Strategy",
-  // Intervention
-  the_exposed:                      "Intervention",
-  hr_capture:                       "Intervention",
-  the_unexamined_algorithm:         "Intervention",
-  heard_and_ignored:                "Intervention",
-  the_tolerated_violation:          "Intervention",
-  paper_shield:                     "Intervention",
-  pay_exposure:                     "Intervention",
-  the_pay_fog:                      "Intervention",
-  the_second_close:                 "Intervention",
-  the_suppression_filter:           "Intervention",
-  the_arbitrary_standard:           "Intervention",
-  decision_blindness:               "Intervention",
-  the_untouchable:                  "Intervention",
-  what_nobody_says:                 "Intervention",
-  the_diversity_ceiling:            "Intervention",
-  the_unreported_hazard:            "Intervention",
-  the_unlocked_door:                "Intervention",
-  // Executive Advisory
-  culture_drift:                    "Executive Advisory",
-  identity_erosion:                 "Executive Advisory",
-  the_culture_that_wasnt:           "Executive Advisory",
-  the_burned_credibility:           "Executive Advisory",
-  invisible_burnout:                "Executive Advisory",
-  the_basement_standard:            "Executive Advisory",
-  the_inside_track:                 "Executive Advisory",
-  narrative_lock:                   "Executive Advisory",
-  the_wrong_reward:                 "Executive Advisory",
-  leadership_deafness:              "Executive Advisory",
-};
-
-function getPrimaryFamily(stateIds: string[]): ResolutionFamily {
-  if (stateIds.length === 0) return "People Tactics and Strategy";
-  return STATE_RESOLUTION_FAMILY[stateIds[0]] ?? "People Tactics and Strategy";
-}
 
 // ---------------------------------------------------------------------------
 // Weight computation
@@ -232,12 +168,18 @@ export async function POST(request: NextRequest) {
 
     severity: engineResult.severity.tier,
 
-    resolution_family: getPrimaryFamily(selectedStateIds),
+    resolution_family: translateResolutionFamily(engineResult.private_output.resolution_routing),
     // resolution_routing: legacy service-name string from states.py profile (old naming, pre-S32)
     resolution_routing: engineResult.private_output.resolution_routing,
 
     friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
     legal_tail_risk_exposure: engineResult.private_output.legal_tail_risk_exposure,
+
+    // causation_pattern -- new plumbing this build. Confirmed real,
+    // computed value on Path B (Round 2/3 verification: driven entirely by
+    // qualified_state_count when accumulated_vector={}, single_point/diffuse
+    // are the common case, not just insufficient_signal).
+    causation_pattern: engineResult.private_output.causation_pattern,
 
     intake: mapIntake(engineResult.intake as Record<string, unknown>),
 
