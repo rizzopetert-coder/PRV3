@@ -275,7 +275,7 @@ _QDATA = [
             ("B", "Functional but not cohesive — people do their jobs but don't really operate as a team.", False, None),
             ("C", "There's tension that's mostly contained at the senior level.", False, None),
             ("D", "There's a dynamic that's broken the surface — the organization below us is aware of it.", False, None),
-            ("E", "There's a significant unresolved conflict I'm not sure how to address.", False, None),
+            ("E", "There's a significant unresolved conflict I'm not sure how to address.", True, "SEVER-14"),
         ],
         ["the_fracture", "silosolation"],
         False,
@@ -842,6 +842,19 @@ _QDATA = [
             ("E", "It's simply how things work here — this has been the pattern for years, not a one-time lapse.", False, None),
         ],
         ["narrative_lock", "the_broken_compass"],
+        False,
+    ),
+    (
+        "SEVER-14",
+        "How long has this conflict been present?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "It's recent — it surfaced in the past six months.", False, None),
+            ("B", "It's been building for a year or more.", False, None),
+            ("C", "It's been unresolved for as long as I can remember.", False, None),
+            ("D", "I'm not sure — it may have been there longer than I've recognized.", False, None),
+        ],
+        ["the_fracture", "silosolation"],
         False,
     ),
     (
@@ -1984,6 +1997,12 @@ def _build_library():
             "C": {"prior_failed_resolution": True},
             "D": {"prior_failed_resolution": True},
             "E": {"duration_band": "18mo_plus"},
+        },
+        "SEVER-14": {  # STRONG -- duration (the_fracture / silosolation, Q09-E second trigger)
+            "A": {"duration_band": "0_6mo"},
+            "B": {"duration_band": "6_18mo"},
+            "C": {"duration_band": "18mo_plus"},
+            "D": {"duration_band": "18mo_plus"},
         },
     }
 
