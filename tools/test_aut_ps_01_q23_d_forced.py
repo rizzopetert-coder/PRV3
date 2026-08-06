@@ -142,7 +142,7 @@ def run_real_engine_session(test_case, force_qid, force_option_id):
         if result["severity_follow_on_id"]:
             follow_on_qid = result["severity_follow_on_id"]
             follow_on_q = QUESTION_LIBRARY[follow_on_qid]
-            follow_on_opt = select_severity_follow_on_option(follow_on_q, True)
+            follow_on_opt = select_severity_follow_on_option(follow_on_q, "18mo_plus")
             fresult = accumulate_one_answer(
                 accumulated_vector, follow_on_qid, follow_on_opt.option_id, locked_intake,
                 trigger_question_id=qid,
@@ -191,16 +191,15 @@ if severity_inputs:
     check("severity_input's severity_follow_on_id is SEVER-05", si.get("severity_follow_on_id") == "SEVER-05", str(si))
 
 severity = output.get("severity", {})
-check("Real engine severity raw score is 1.0 (SEVER-05 has no duration_band -- documented shortfall, not a failure)",
-      severity.get("score") == 16.67, f"got {severity}")
+check("Real engine severity raw score is 2.0 (SEVER-05's new duration_band=18mo_plus option, "
+      "added as Track A's 10th question -- was 1.0/Emerging before that content shipped)",
+      severity.get("score") == 33.33, f"got {severity}")
 check(
-    "Real engine severity tier is Emerging (SHORT of locked Entrenched -- SEVER-05 "
-    "needs Track A's duration_band content before this reaches expected.severity_tier; "
-    "update this assertion to Entrenched once that content ships, don't let it silently "
-    "keep passing against a stale expectation)",
-    severity.get("tier") == "Emerging",
-    f"got {severity.get('tier')!r} -- if this now reads Entrenched, SEVER-05's content "
-    f"has changed; update this test's assertions to match, don't just delete the check",
+    "Real engine severity tier is Entrenched -- MATCHES AUT-PS-01's locked expected.severity_tier "
+    "via the real live D-forced -> SEVER-05(E, 18mo_plus) path, confirmed through the real "
+    "engine/main.py production functions, not the calibration harness",
+    severity.get("tier") == "Entrenched",
+    f"got {severity.get('tier')!r}",
 )
 
 print("\n" + "=" * 64)

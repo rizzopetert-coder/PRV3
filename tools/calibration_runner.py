@@ -252,8 +252,46 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     "AUT-UA-01":  {"SEVER-04": "18mo_plus"},
     "ATT-IB-01":  {"SEVER-06": "18mo_plus"},
     "EXP-HDA-01": {"SEVER-06": "18mo_plus"},
-    "ALL-DB-01":  {"SEVER-11": True},
-    "EXP-SDB-01": {"SEVER-11": True},
+    # Track A duration_band additions (10 questions, all confirmed
+    # LIVE-REACHABLE except SEVER-11's Q31 path -- see below). ALL-DB-01/
+    # EXP-SDB-01 updated from True to "18mo_plus" now that SEVER-11 offers
+    # a real duration_band option; still Phase-2-pending (Q31 inert), kept
+    # for calibration-suite internal consistency, not live urgency.
+    "ALL-DB-01":  {"SEVER-11": "18mo_plus"},
+    "EXP-SDB-01": {"SEVER-11": "18mo_plus"},
+    "AUT-UP-01":  {"SEVER-11": "18mo_plus"},
+    "AUT-UP-02":  {"SEVER-11": "18mo_plus"},
+    "AUT-UP-03":  {"SEVER-11": "18mo_plus"},
+    "ATT-BCP-01": {"SEVER-13": "18mo_plus"},
+    "ATT-BCP-02": {"SEVER-13": "18mo_plus"},
+    "ATT-BCP-03": {"SEVER-13": "18mo_plus"},
+    "ATT-GD-01":  {"SEVER-13": "18mo_plus"},
+    "ATT-GD-02":  {"SEVER-13": "18mo_plus"},
+    "ATT-GD-03":  {"SEVER-13": "18mo_plus"},
+    "ATT-NL-01":  {"SEVER-13": "18mo_plus"},
+    "ATT-NL-02":  {"SEVER-13": "18mo_plus"},
+    "ATT-NL-03":  {"SEVER-13": "18mo_plus"},
+    "ALL-FR-01":  {"SEVER-08": "18mo_plus"},
+    "ALL-FR-02":  {"SEVER-08": "18mo_plus"},
+    "ALL-SI-01":  {"SEVER-08": "18mo_plus"},
+    "ALL-SI-02":  {"SEVER-08": "18mo_plus"},
+    "ALL-SI-03":  {"SEVER-08": "18mo_plus"},
+    "EXP-DCF-01": {"SEVER-08": "18mo_plus"},
+    "APT-UL-01":  {"SEVER-07": "18mo_plus"},
+    "APT-DT-01":  {"SEVER-07": "18mo_plus"},
+    "AUT-LC-01":  {"SEVER-07": "18mo_plus"},
+    "APT-BF-01":  {"SEVER-02": "18mo_plus"},
+    "APT-BF-02":  {"SEVER-02": "18mo_plus"},
+    "APT-UR-01":  {"SEVER-02": "18mo_plus"},
+    "ATT-CD-01":  {"SEVER-10": "18mo_plus"},
+    "ATT-IE-01":  {"SEVER-10": "18mo_plus"},
+    "EXP-WT-01":  {"SEVER-10": "18mo_plus"},
+    "AUT-DP-01":  {"SEVER-03": "18mo_plus"},
+    "AUT-LM-01":  {"SEVER-03": "18mo_plus"},
+    "AUT-PF-01":  {"SEVER-01": "18mo_plus"},
+    # ATT-DC-01 needs BOTH to reach its locked Endemic (raw>=4.00) -- either
+    # alone caps at Entrenched (raw=2.00).
+    "ATT-DC-01":  {"SEVER-01": "18mo_plus", "SEVER-12": "18mo_plus"},
 }
 
 
@@ -304,6 +342,17 @@ def generate_answers(test_case):
     }
 
     answers = []
+    # Dedup guard, mirroring the real live app's severityFollowOnAlreadyAsked()
+    # (web/lib/session-store.ts) -- a follow-on with multiple real parent
+    # questions (SEVER-11 via Q28 and Q31, the "dual-parent" case that
+    # module's own header comment already documents) must only ever be
+    # spliced in once per session. Without this, a later core question
+    # that also fires an already-spliced follow-on would double-count its
+    # raw contribution -- confirmed as a real, latent bug via the Track A
+    # regression check (AUT-UP-01/02/03 overshot to Endemic instead of
+    # their locked Entrenched, SEVER-11 fired twice, raw summed to 4.00
+    # instead of the correct single-count 2.00).
+    already_spliced_followons = set()
     for qid in sorted(_CORE_QUESTION_IDS):
         excluded = any(
             (qid == a and a not in include) or (qid == b and b not in include)
@@ -342,7 +391,11 @@ def generate_answers(test_case):
         # _SEVERITY_FOLLOW_ON_TARGETS. A test_id absent from that table
         # (168 of 172 profiles) produces byte-for-byte identical answers to
         # before this build -- no follow-on ever gets spliced in for them.
-        if opt.severity_trigger and opt.severity_follow_on_id:
+        if (
+            opt.severity_trigger
+            and opt.severity_follow_on_id
+            and opt.severity_follow_on_id not in already_spliced_followons
+        ):
             target_value = _SEVERITY_FOLLOW_ON_TARGETS.get(test_case.test_id, {}).get(
                 opt.severity_follow_on_id
             )
@@ -353,6 +406,7 @@ def generate_answers(test_case):
                     question_id=opt.severity_follow_on_id,
                     selected_option_ids=[follow_on_opt.option_id],
                 ))
+                already_spliced_followons.add(opt.severity_follow_on_id)
     return answers
 
 

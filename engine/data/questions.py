@@ -673,6 +673,7 @@ _QDATA = [
             ("B", "Named but not yet addressed — we know it's there but haven't moved on it.", False, None),
             ("C", "Recognized informally but not officially named.", False, None),
             ("D", "I'm not sure leadership has seen it the same way I'm describing it.", False, None),
+            ("E", "It's been recognized in some form for years without real traction.", False, None),
         ],
         ["the_diversity_ceiling"],
         False,
@@ -686,6 +687,7 @@ _QDATA = [
             ("B", "It's a particular function or team.", False, None),
             ("C", "It's broader — multiple functions or levels are affected.", False, None),
             ("D", "It's pervasive — this is how the organization operates generally.", False, None),
+            ("E", "It's been this way for as long as I can remember — not a recent shift.", False, None),
         ],
         ["built_to_fail", "the_undefined_role", "decision_paralysis"],
         False,
@@ -699,6 +701,7 @@ _QDATA = [
             ("B", "It's noticeable — people have named it as a frustration.", False, None),
             ("C", "It's pervasive — it affects how work gets done across the organization.", False, None),
             ("D", "It's become normal — people have built workarounds rather than expecting it to change.", False, None),
+            ("E", "It's been this way for as long as I can remember.", False, None),
         ],
         ["decision_paralysis"],
         False,
@@ -725,6 +728,7 @@ _QDATA = [
             ("B", "We have documented succession plans that we review and update regularly.", False, None),
             ("C", "We've thought about it and we're reasonably confident but haven't really tested it.", False, None),
             ("D", "Honestly, we assume it but I'm not sure we've verified it.", False, None),
+            ("E", "We've been operating on assumption for a long time — this hasn't really been tested or reviewed in years.", False, None),
         ],
         ["paper_shield", "leadership_continuity_risk"],
         False,
@@ -751,6 +755,7 @@ _QDATA = [
             ("B", "We try but we don't always have the right opportunities at the right time.", False, None),
             ("C", "Some leave because they don't see a path — we lose people to growth opportunities elsewhere.", False, None),
             ("D", "We lose our best people regularly to organizations that offer what we can't.", False, None),
+            ("E", "This has been true for years — we've been losing people to this same gap for a long time.", False, None),
         ],
         ["the_dormant_talent", "leadership_continuity_risk"],
         False,
@@ -764,6 +769,7 @@ _QDATA = [
             ("B", "People — specific individuals or teams make cross-functional work harder than it needs to be.", False, None),
             ("C", "Both.", False, None),
             ("D", "I'm not sure.", False, None),
+            ("E", "It's been this way for as long as anyone can remember — nobody experiences it as new.", False, None),
         ],
         ["silosolation", "the_fracture"],
         False,
@@ -791,6 +797,7 @@ _QDATA = [
             ("B", "Leadership is aware but hasn't addressed it directly.", False, None),
             ("C", "The organization knows before leadership does — it's more visible below than above.", False, None),
             ("D", "It's visible at every level and nobody is sure how to change it.", False, None),
+            ("E", "It's been this way long enough that it feels like just how we operate.", False, None),
         ],
         ["culture_drift", "identity_erosion", "the_culture_that_wasnt"],
         False,
@@ -804,6 +811,7 @@ _QDATA = [
             ("B", "We think we know but haven't formally confirmed it or verified the fix held.", False, None),
             ("C", "We have a general sense but haven't done a formal analysis.", False, None),
             ("D", "Not really — we settled and moved on without examining what caused it.", False, None),
+            ("E", "It's been an open question for as long as I can remember — we've never really pinned it down.", False, None),
         ],
         ["the_unsolved_problem"],
         False,
@@ -817,6 +825,7 @@ _QDATA = [
             ("B", "Our selection processes may not be as equitable as we think.", False, None),
             ("C", "Diverse talent is leaving before they have a chance to advance.", False, None),
             ("D", "I genuinely don't know — we haven't examined it closely enough.", False, None),
+            ("E", "This has been the pattern for years, not something new.", False, None),
         ],
         ["the_diversity_ceiling"],
         False,
@@ -830,6 +839,7 @@ _QDATA = [
             ("B", "There was disagreement about whether the findings were accurate.", False, None),
             ("C", "Leadership understood the findings but the will to act on them wasn't there.", False, None),
             ("D", "The findings were addressed in how we talked about them but not in what we did.", False, None),
+            ("E", "It's simply how things work here — this has been the pattern for years, not a one-time lapse.", False, None),
         ],
         ["narrative_lock", "the_broken_compass"],
         False,
@@ -1650,6 +1660,7 @@ def _build_library():
             "B": {**_z},                                                           # Strong — documented; Q23-A base stands
             "C": {**_z, "authority_asset": -0.30, "authority_liability": 0.30},    # Weak — retroactive downgrade
             "D": {**_z, "authority_asset": -0.30, "authority_liability": 0.30},    # Weak — retroactive downgrade
+            "E": {**_z, "authority_asset": -0.30, "authority_liability": 0.30},    # Weak — untested for years, same category as C/D
         },
         # -- Distinguisher questions (Session 30) ----------------------------------
         "DIST-CM-01": {
@@ -1891,18 +1902,21 @@ def _build_library():
             "B": {"named_condition": True},
             "C": {"named_condition": False},
             "D": {"named_condition": False},
+            "E": {"duration_band": "18mo_plus"},
         },
         "SEVER-02": {  # STRONG -- breadth (built_to_fail / the_undefined_role / decision_paralysis)
             "A": {"population_band": "under_10pct"},
             "B": {"population_band": "under_10pct"},
             "C": {"population_band": "10_30pct"},
             "D": {"population_band": "30pct_plus"},
+            "E": {"duration_band": "18mo_plus"},
         },
         "SEVER-03": {  # STRONG -- breadth (decision_paralysis)
             "A": {"population_band": "under_10pct"},
             "B": {"population_band": "10_30pct"},
             "C": {"population_band": "30pct_plus"},
             "D": {"population_band": "30pct_plus"},
+            "E": {"duration_band": "18mo_plus"},
         },
         "SEVER-04": {  # STRONG -- policy review recency as inverse-duration proxy (the_policy_lag)
             "A": {"duration_band": "0_6mo"},
@@ -1915,6 +1929,7 @@ def _build_library():
             "B": {"named_condition": True},           # documented and reviewed
             "C": {"named_condition": False},          # unconfirmed
             "D": {"named_condition": False},          # assumed, unverified
+            "E": {"duration_band": "18mo_plus"},      # untested/unverified for years -- Weak category
         },
         "SEVER-06": {  # STRONG -- duration (invisible_burnout)
             "A": {"duration_band": "0_6mo"},
@@ -1927,12 +1942,14 @@ def _build_library():
             "B": {"financial_indicators": False},
             "C": {"financial_indicators": True},      # real departures already occurred
             "D": {"financial_indicators": True},
+            "E": {"duration_band": "18mo_plus"},
         },
         "SEVER-08": {  # WEAK -- root-cause diagnosis, reinterpreted as named_condition (silosolation / the_fracture)
             "A": {"named_condition": True},
             "B": {"named_condition": True},
             "C": {"named_condition": True},
             "D": {"named_condition": False},          # "I'm not sure" -- no diagnosis given
+            "E": {"duration_band": "18mo_plus"},
         },
         "SEVER-09": {  # MODERATE -- upfront preparation adequacy, reinterpreted as prior_failed_resolution (the_second_close)
             "A": {"prior_failed_resolution": False},
@@ -1945,24 +1962,28 @@ def _build_library():
             "B": {"population_band": "under_10pct"},
             "C": {"population_band": "10_30pct"},
             "D": {"population_band": "30pct_plus"},
+            "E": {"duration_band": "18mo_plus"},
         },
         "SEVER-11": {  # STRONG -- root-cause resolution outcome (the_unsolved_problem)
             "A": {"prior_failed_resolution": False},  # identified and addressed
             "B": {"prior_failed_resolution": True},
             "C": {"prior_failed_resolution": True},
             "D": {"prior_failed_resolution": True},
+            "E": {"duration_band": "18mo_plus"},
         },
         "SEVER-12": {  # WEAK -- only 1 of 4 options discriminates (the_diversity_ceiling)
             "A": {"financial_indicators": False},
             "B": {"financial_indicators": False},
             "C": {"financial_indicators": True},      # realized attrition
             "D": {"financial_indicators": False},
+            "E": {"duration_band": "18mo_plus"},
         },
         "SEVER-13": {  # non-discriminating -- see note above (narrative_lock / the_broken_compass)
             "A": {"prior_failed_resolution": True},
             "B": {"prior_failed_resolution": True},
             "C": {"prior_failed_resolution": True},
             "D": {"prior_failed_resolution": True},
+            "E": {"duration_band": "18mo_plus"},
         },
     }
 
