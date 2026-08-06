@@ -20,18 +20,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
 from engine.resolution_families import (
-    STATE_RESOLUTION_FAMILY,
-    RESOLUTION_FAMILY_DESCRIPTIONS,
     ENGINE_TO_COMMERCIAL_NAME,
     RESOLUTION_FALLBACK_COPY,
     _FALLBACK_GENERIC,
-    get_family,
-    get_primary_family,
-    get_all_families,
     translate_resolution_family,
     get_fallback_copy,
+    STATE_CAUSATION_OVERRIDES,
+    apply_causation_override,
 )
-from engine.data.states import STATE_PROFILES
 
 PASS = []
 FAIL = []
@@ -47,165 +43,6 @@ def check(label, condition, detail=""):
 print("=" * 64)
 print("PRV3 Resolution Families — Unit Tests")
 print("=" * 64)
-
-
-VALID_FAMILIES = {"structural", "developmental", "investigative", "directional"}
-SERVICE_NAMES = {"formation", "practicum", "counsel", "navigation"}
-
-
-# ── 1. 57 entries ─────────────────────────────────────────────────────────────
-
-check(
-    "STATE_RESOLUTION_FAMILY has 57 entries",
-    len(STATE_RESOLUTION_FAMILY) == 57,
-    f"got {len(STATE_RESOLUTION_FAMILY)}",
-)
-
-
-# ── 2. All state IDs match registry ───────────────────────────────────────────
-
-registry_ids = set(STATE_PROFILES.keys())
-family_ids = set(STATE_RESOLUTION_FAMILY.keys())
-missing = registry_ids - family_ids
-extra = family_ids - registry_ids
-
-check(
-    "All registry states covered in family map",
-    len(missing) == 0,
-    f"missing: {missing}",
-)
-check(
-    "No extra IDs not in registry",
-    len(extra) == 0,
-    f"extra: {extra}",
-)
-
-
-# ── 3. All family values valid ────────────────────────────────────────────────
-
-invalid_families = {
-    sid: fid
-    for sid, fid in STATE_RESOLUTION_FAMILY.items()
-    if fid not in VALID_FAMILIES
-}
-check(
-    "All family values in valid set",
-    len(invalid_families) == 0,
-    f"invalid: {invalid_families}",
-)
-
-
-# ── 4. All four families have at least one state ──────────────────────────────
-
-assigned_families = set(STATE_RESOLUTION_FAMILY.values())
-for fam in VALID_FAMILIES:
-    check(
-        f"Family '{fam}' has at least one state assigned",
-        fam in assigned_families,
-        f"'{fam}' has 0 states",
-    )
-
-
-# ── 5. RESOLUTION_FAMILY_DESCRIPTIONS has all four ────────────────────────────
-
-for fam in VALID_FAMILIES:
-    check(
-        f"RESOLUTION_FAMILY_DESCRIPTIONS has '{fam}' key",
-        fam in RESOLUTION_FAMILY_DESCRIPTIONS,
-        f"missing key '{fam}'",
-    )
-    if fam in RESOLUTION_FAMILY_DESCRIPTIONS:
-        check(
-            f"RESOLUTION_FAMILY_DESCRIPTIONS[{fam}] has family_id field",
-            RESOLUTION_FAMILY_DESCRIPTIONS[fam].get("family_id") == fam,
-            f"family_id mismatch: {RESOLUTION_FAMILY_DESCRIPTIONS[fam].get('family_id')}",
-        )
-
-
-# ── 6. get_family: known state ────────────────────────────────────────────────
-
-fam_dict = get_family("decision_paralysis")
-check(
-    "get_family('decision_paralysis') returns structural",
-    fam_dict.get("family_id") == "structural",
-    f"got family_id={fam_dict.get('family_id')}",
-)
-check(
-    "get_family result has description field",
-    "description" in fam_dict,
-    "no description field",
-)
-
-
-# ── 7. get_family: unknown state fallback ────────────────────────────────────
-
-fallback = get_family("not_a_real_state")
-check(
-    "get_family fallback returns structural for unknown state",
-    fallback.get("family_id") == "structural",
-    f"got {fallback.get('family_id')}",
-)
-
-
-# ── 8. get_primary_family: first state's family ───────────────────────────────
-
-primary = get_primary_family(["the_exposed", "decision_paralysis"])
-check(
-    "get_primary_family returns family of first state",
-    primary.get("family_id") == "investigative",
-    f"expected investigative, got {primary.get('family_id')}",
-)
-
-
-# ── 9. get_primary_family: empty list ─────────────────────────────────────────
-
-empty_primary = get_primary_family([])
-check(
-    "get_primary_family returns structural for empty list",
-    empty_primary.get("family_id") == "structural",
-    f"got {empty_primary.get('family_id')}",
-)
-
-
-# ── 10. get_all_families: deduplicated, order preserved ──────────────────────
-
-all_fams = get_all_families(["decision_paralysis", "the_fracture", "the_exposed"])
-all_fam_ids = [f["family_id"] for f in all_fams]
-
-check(
-    "get_all_families result has no duplicates",
-    len(all_fam_ids) == len(set(all_fam_ids)),
-    f"got {all_fam_ids}",
-)
-check(
-    "get_all_families first entry is structural (first state is structural)",
-    all_fam_ids[0] == "structural",
-    f"got {all_fam_ids[0]}",
-)
-check(
-    "get_all_families includes investigative for the_exposed",
-    "investigative" in all_fam_ids,
-    f"got {all_fam_ids}",
-)
-
-all_single = get_all_families(["decision_paralysis", "transition_paralysis"])
-check(
-    "get_all_families deduplicates same-family states",
-    len(all_single) == 1,
-    f"got {len(all_single)} families for 2 structural states",
-)
-
-
-# ── 11. No service names in family descriptions ───────────────────────────────
-
-for fam_id, fam_dict in RESOLUTION_FAMILY_DESCRIPTIONS.items():
-    desc_lower = fam_dict.get("description", "").lower()
-    found_service_names = [sn for sn in SERVICE_NAMES if sn in desc_lower]
-    check(
-        f"No service names in {fam_id} description",
-        len(found_service_names) == 0,
-        f"found service names: {found_service_names}",
-    )
 
 
 # ── 12. ENGINE_TO_COMMERCIAL_NAME mapping ────────────────────────────────────
@@ -340,6 +177,97 @@ for key, copy_str in RESOLUTION_FALLBACK_COPY.items():
         ";" not in copy_str,
         "contains semicolon",
     )
+
+
+# ── 17. apply_causation_override ──────────────────────────────────────────────
+# Priority Queue item 2, Diagnostic Dimension Expansion follow-on. Real
+# grounding data: "culture_drift" (single-family default "Intervention"),
+# "decision_paralysis" (compound default "Roadmap + Intervention").
+# STATE_CAUSATION_OVERRIDES ships empty -- override-present cases save/
+# mutate/restore the real module-level dict directly, since
+# apply_causation_override() reads it as module state, not a parameter.
+
+_SINGLE_DEFAULT = "Intervention"       # culture_drift's real default
+_COMPOUND_DEFAULT = "Roadmap + Intervention"  # decision_paralysis's real default
+
+check(
+    "no override entry -- falls through to default_family unchanged",
+    apply_causation_override("culture_drift", _SINGLE_DEFAULT, "single_point") == _SINGLE_DEFAULT,
+    f"got {apply_causation_override('culture_drift', _SINGLE_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "compound default -- immune, unchanged regardless of pattern",
+    apply_causation_override("decision_paralysis", _COMPOUND_DEFAULT, "single_point") == _COMPOUND_DEFAULT
+    and apply_causation_override("decision_paralysis", _COMPOUND_DEFAULT, "diffuse") == _COMPOUND_DEFAULT,
+    "compound default was altered",
+)
+
+check(
+    "priv-None case -- default_family='' stays '' regardless of pattern/state_id",
+    apply_causation_override("culture_drift", "", "single_point") == ""
+    and apply_causation_override(None, "", "diffuse") == "",
+    "empty default_family was altered",
+)
+
+check(
+    "insufficient_signal pattern -- falls through to default_family",
+    apply_causation_override("culture_drift", _SINGLE_DEFAULT, "insufficient_signal") == _SINGLE_DEFAULT,
+    f"got {apply_causation_override('culture_drift', _SINGLE_DEFAULT, 'insufficient_signal')!r}",
+)
+
+check(
+    "missing causation_pattern (None) -- falls through to default_family",
+    apply_causation_override("culture_drift", _SINGLE_DEFAULT, None) == _SINGLE_DEFAULT,
+    f"got {apply_causation_override('culture_drift', _SINGLE_DEFAULT, None)!r}",
+)
+
+check(
+    "missing state_id (None) -- falls through to default_family",
+    apply_causation_override(None, _SINGLE_DEFAULT, "diffuse") == _SINGLE_DEFAULT,
+    f"got {apply_causation_override(None, _SINGLE_DEFAULT, 'diffuse')!r}",
+)
+
+_saved_overrides = dict(STATE_CAUSATION_OVERRIDES)
+try:
+    STATE_CAUSATION_OVERRIDES["culture_drift"] = {
+        "single_point": "Executive Counsel",
+        "diffuse":      "Development",
+    }
+    check(
+        "single-family default + single_point override present -- override applies",
+        apply_causation_override("culture_drift", _SINGLE_DEFAULT, "single_point") == "Executive Counsel",
+        f"got {apply_causation_override('culture_drift', _SINGLE_DEFAULT, 'single_point')!r}",
+    )
+    check(
+        "single-family default + diffuse override present -- override applies",
+        apply_causation_override("culture_drift", _SINGLE_DEFAULT, "diffuse") == "Development",
+        f"got {apply_causation_override('culture_drift', _SINGLE_DEFAULT, 'diffuse')!r}",
+    )
+    check(
+        "override dict present for state, but not for this pattern key -- falls through",
+        apply_causation_override("culture_drift", _SINGLE_DEFAULT, "insufficient_signal") == _SINGLE_DEFAULT,
+        f"got {apply_causation_override('culture_drift', _SINGLE_DEFAULT, 'insufficient_signal')!r}",
+    )
+    check(
+        "override present for a DIFFERENT state -- unaffected state falls through",
+        apply_causation_override("identity_erosion", _SINGLE_DEFAULT, "single_point") == _SINGLE_DEFAULT,
+        f"got {apply_causation_override('identity_erosion', _SINGLE_DEFAULT, 'single_point')!r}",
+    )
+    check(
+        "override still respects the compound-default guard even if an entry exists",
+        apply_causation_override("culture_drift", _COMPOUND_DEFAULT, "single_point") == _COMPOUND_DEFAULT,
+        f"got {apply_causation_override('culture_drift', _COMPOUND_DEFAULT, 'single_point')!r}",
+    )
+finally:
+    STATE_CAUSATION_OVERRIDES.clear()
+    STATE_CAUSATION_OVERRIDES.update(_saved_overrides)
+
+check(
+    "STATE_CAUSATION_OVERRIDES ships empty",
+    len(STATE_CAUSATION_OVERRIDES) == 0,
+    f"got {len(STATE_CAUSATION_OVERRIDES)} entries -- expected 0 on ship",
+)
 
 
 # ── Results ───────────────────────────────────────────────────────────────────

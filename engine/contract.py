@@ -25,6 +25,7 @@ from engine.checkpoint import CheckpointResult
 from engine.narrative import NarrativeExtractionResult
 from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
 from engine.friction_tax import compute_friction_tax, compute_legal_compliance_exposure
+from engine.resolution_families import apply_causation_override
 
 # Addendum 11 -- caveat text for legal_tail_risk_exposure (private_output only).
 LEGAL_TAIL_RISK_CAVEAT_TEXT = (
@@ -446,6 +447,25 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
 
     # ── private_output ──
     priv = session.output_package.private
+
+    # causation_pattern routing override (Priority Queue item 2, Diagnostic
+    # Dimension Expansion follow-on) -- reuses the routing/lead_id already
+    # computed above (lines ~328/~400), not redeclared. causation_pattern is
+    # computed once here and reused below for the private_output dict, rather
+    # than calling compute_causation_pattern() a second time.
+    causation_pattern_obj = compute_causation_pattern(session.accumulated_vector, routing)
+    pattern_type = (
+        causation_pattern_obj.get("pattern")
+        if isinstance(causation_pattern_obj, dict)
+        else None
+    )
+    default_routing_str = priv.resolution_family if priv else ""
+    effective_resolution_routing = apply_causation_override(
+        state_id=lead_id,
+        default_family=default_routing_str,
+        causation_pattern=pattern_type,
+    )
+
     friction_tax_result = compute_friction_tax(
         state_ids=[s["state_id"] for s in identified_states],
         severity_tier=sev.tier,
@@ -482,11 +502,11 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
     )
     private_output = {
         "opening_text":            priv.state_name if priv else "",
-        "resolution_routing":      priv.resolution_family if priv else "",
+        "resolution_routing":      effective_resolution_routing,
         "friction_tax_estimate":   friction_tax_estimate,
         "legal_tail_risk_exposure": legal_tail_risk_exposure,
         "cascade_risk":            compute_cascade_risk(session.accumulated_vector),
-        "causation_pattern":       compute_causation_pattern(session.accumulated_vector, routing),
+        "causation_pattern":       causation_pattern_obj,
         "trajectory":            trajectory_result,
         "urgency_window":        urgency_window_obj,
     }

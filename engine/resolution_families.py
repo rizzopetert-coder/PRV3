@@ -17,6 +17,8 @@ Spec reference: PRV3 Output Layer Brief — Step 3
 
 from __future__ import annotations
 
+from typing import Optional
+
 
 # ── Resolution family definitions ──────────────────────────────────────────────
 # Four families. Descriptions are COPY PENDING — placeholders below.
@@ -66,83 +68,69 @@ def translate_resolution_family(engine_family_str: str) -> str:
     return " + ".join(translated)
 
 
-# ── State → resolution family mapping ─────────────────────────────────────────
-# All 47 states. One family per state.
-# Assignment reflects the primary resolution modality, not the only one.
-
-STATE_RESOLUTION_FAMILY: dict[str, str] = {
-    # ── Developmental — capability, talent, performance architecture ───────────
-    "the_unformed_leader":              "developmental",
-    "the_overloaded_manager":           "developmental",
-    "the_dormant_talent":               "developmental",
-    "built_to_fail":                    "developmental",
-    "the_uninitiated":                  "developmental",
-    "groundhog_day":                    "developmental",
-
-    # ── Structural — organizational design, authority, governance ──────────────
-    "the_undefined_role":               "structural",
-    "the_paper_tiger":                  "structural",
-    "the_founders_grip":                "structural",
-    "leadership_continuity_risk":       "structural",
-    "decision_paralysis":               "structural",
-    "the_policy_lag":                   "structural",
-    "dueling_narratives":               "structural",
-    "the_unsolved_problem":             "structural",
-    "transition_paralysis":             "structural",
-    "the_lost_map":                     "structural",
-    "invisible_influence_architecture": "structural",
-    "the_fracture":                     "structural",
-    "silosolation":                     "structural",
-    "the_broken_compass":               "structural",
-
-    # ── Investigative — compliance, legal exposure, protected concerns ─────────
-    "the_exposed":                      "investigative",
-    "hr_capture":                       "investigative",
-    "the_unexamined_algorithm":         "investigative",
-    "heard_and_ignored":                "investigative",
-    "the_tolerated_violation":          "investigative",
-    "paper_shield":                     "investigative",
-    "pay_exposure":                     "investigative",
-    "the_pay_fog":                      "investigative",
-    "the_second_close":                 "investigative",
-    "the_suppression_filter":           "investigative",
-    "the_arbitrary_standard":           "investigative",
-    "decision_blindness":               "investigative",
-    "the_untouchable":                  "investigative",
-    "what_nobody_says":                 "investigative",
-    "the_diversity_ceiling":            "investigative",
-    "the_unreported_hazard":            "investigative",
-    "the_unlocked_door":                "investigative",
-
-    # ── Directional — culture, identity, strategic and behavioral realignment ──
-    "culture_drift":                    "directional",
-    "identity_erosion":                 "directional",
-    "the_culture_that_wasnt":           "directional",
-    "the_burned_credibility":           "directional",
-    "invisible_burnout":                "directional",
-    "the_basement_standard":            "directional",
-    "the_inside_track":                 "directional",
-    "narrative_lock":                   "directional",
-    "the_wrong_reward":                 "directional",
-    "leadership_deafness":              "directional",
-
-    # ── Taxonomy expansion (Session 67 draft, Session 68 Gemini review) ─────────
-    "invisible_performance_management":  "structural",
-    "compression_crisis":                "investigative",
-    "sequential_decision_blindness":     "investigative",
-    "disparate_impact_architecture":     "investigative",
-    "planning_authority_gap":            "structural",
-    "distributed_culture_fragmentation": "directional",
-    "wellbeing_theater":                 "structural",  # revised S68: was "directional" in S67 draft
-    "human_displacement_anxiety":        "structural",  # revised S68: was "directional" in S67 draft
-    "motivational_architecture_failure": "directional",
-    "cultural_overtime":                 "investigative",
+# ── causation_pattern routing override ─────────────────────────────────────────
+# Priority Queue item 2, Diagnostic Dimension Expansion follow-on. Per-state
+# authored overrides letting a session's causation_pattern (single_point vs.
+# diffuse) route to a different resolution_family than the state's static
+# default. Keyed sparsely by state_id -- most states carry no override.
+# Naturally inert for states whose default resolution_family is compound
+# (contains " + "), by design -- no separate allowlist needed, see
+# apply_causation_override()'s own guard.
+#
+# Values MUST be raw base engine family names -- "Roadmap" | "Development" |
+# "Intervention" | "Executive Counsel" -- matching ENGINE_TO_COMMERCIAL_NAME's
+# keys above, never already-translated commercial names. This dict operates
+# in the same untranslated namespace as StateProfile.resolution_family itself
+# (confirmed: private_output["resolution_routing"] is never translated before
+# reaching the output contract -- translate_resolution_family() is called
+# exactly once in the live pipeline, engine/main.py, for a separate
+# LLM-synthesis-input purpose, not for this field).
+#
+# EMPTY ON SHIP -- this build ships the mechanism only. Per-state override
+# decisions are Pete's own clinical judgment, authored in a future session.
+STATE_CAUSATION_OVERRIDES: dict[str, dict[str, str]] = {
+    # "state_id": {"single_point": "Intervention", "diffuse": "Roadmap"},
 }
 
-# Verify count at import — must be 57
-assert len(STATE_RESOLUTION_FAMILY) == 57, (
-    f"STATE_RESOLUTION_FAMILY has {len(STATE_RESOLUTION_FAMILY)} entries, expected 57"
-)
+
+def apply_causation_override(
+    state_id: Optional[str],
+    default_family: str,
+    causation_pattern: Optional[str],
+) -> str:
+    """
+    Apply a causation_pattern override to a state's raw resolution_family
+    string. Operates entirely in the untranslated (raw engine name) space --
+    output must remain a valid input to translate_resolution_family(), never
+    pre-translated at this site.
+
+    Guarantees, in check order:
+      - default_family == "" (priv was None -- multi-mode or
+        insufficient_signal routing, confirmed via direct trace neither mode
+        ever builds a private block) -> returns "" unchanged. The override
+        mechanism never turns on a field that is structurally silent for an
+        entire routing mode today.
+      - default_family contains " + " (a compound default) -> returned
+        unchanged. Compound states are immune by construction, not by an
+        explicit allowlist -- STATE_CAUSATION_OVERRIDES entries only ever
+        apply to single-family defaults.
+      - state_id is None, or causation_pattern is None/"insufficient_signal"
+        -> returns default_family unchanged. insufficient_signal means the
+        causation-pattern read itself isn't trustworthy (too few qualified
+        states); nothing for an override to respond to.
+      - state_id has no entry in STATE_CAUSATION_OVERRIDES, or the entry has
+        no key for this specific causation_pattern value -> falls through to
+        default_family via dict.get()'s own fallback, same effect as no
+        override existing.
+    """
+    if not default_family or " + " in default_family:
+        return default_family
+
+    if not state_id or not causation_pattern or causation_pattern == "insufficient_signal":
+        return default_family
+
+    state_overrides = STATE_CAUSATION_OVERRIDES.get(state_id, {})
+    return state_overrides.get(causation_pattern, default_family)
 
 
 # ── Static fallback copy ───────────────────────────────────────────────────────
@@ -260,38 +248,3 @@ def get_fallback_copy(commercial_name: str, severity_tier: str | None = None) ->
     return RESOLUTION_FALLBACK_COPY.get((commercial_name, severity_tier), _FALLBACK_GENERIC)
 
 
-# ── Lookup helpers ─────────────────────────────────────────────────────────────
-
-def get_family(state_id: str) -> dict:
-    """
-    Return the resolution family dict for a state_id.
-    Falls back to structural if state_id is not in the registry.
-    """
-    family_id = STATE_RESOLUTION_FAMILY.get(state_id, "structural")
-    return RESOLUTION_FAMILY_DESCRIPTIONS[family_id]
-
-
-def get_primary_family(state_ids: list[str]) -> dict:
-    """
-    Return the resolution family for the primary (first) identified state.
-    Used when a single family must be surfaced to the principal.
-    """
-    if not state_ids:
-        return RESOLUTION_FAMILY_DESCRIPTIONS["structural"]
-    return get_family(state_ids[0])
-
-
-def get_all_families(state_ids: list[str]) -> list[dict]:
-    """
-    Return a deduplicated list of resolution family dicts for a state cluster,
-    preserving order of first occurrence.
-    """
-    seen: set[str] = set()
-    result = []
-    for sid in state_ids:
-        fam = get_family(sid)
-        fid = fam["family_id"]
-        if fid not in seen:
-            seen.add(fid)
-            result.append(fam)
-    return result
