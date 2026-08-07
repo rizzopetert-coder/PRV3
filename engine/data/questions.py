@@ -349,7 +349,7 @@ _QDATA = [
             ("A", "We're confident we're competitive and internally consistent.", False, None),
             ("B", "We're competitive externally but I'm not sure we're consistent internally.", False, None),
             ("C", "We're consistent internally but I'm not sure we're competitive externally.", False, None),
-            ("D", "We have concerns about both — consistency and competitiveness are issues.", False, None),
+            ("D", "We have concerns about both — consistency and competitiveness are issues.", True, "SEVER-17"),
             ("E", "Honestly, we haven't looked closely enough to know.", False, None),
         ],
         ["pay_exposure", "the_pay_fog", "compression_crisis"],
@@ -881,6 +881,19 @@ _QDATA = [
             ("D", "I'm not sure — it may have been happening longer than I've recognized.", False, None),
         ],
         ["the_unreported_hazard", "the_unlocked_door", "what_nobody_says", "the_suppression_filter"],
+        False,
+    ),
+    (
+        "SEVER-17",
+        "How long has this been the case?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "It's recent — this started in the past six months.", False, None),
+            ("B", "It's been this way for a year or more.", False, None),
+            ("C", "It's been this way for as long as I can remember.", False, None),
+            ("D", "I'm not sure — it may have been this way longer than I've recognized.", False, None),
+        ],
+        ["pay_exposure", "compression_crisis"],
         False,
     ),
     (
@@ -2037,6 +2050,12 @@ def _build_library():
             "D": {"duration_band": "18mo_plus"},
         },
         "SEVER-16": {  # STRONG -- duration (the_unreported_hazard / the_unlocked_door / what_nobody_says / the_suppression_filter, Q18-C trigger)
+            "A": {"duration_band": "0_6mo"},
+            "B": {"duration_band": "6_18mo"},
+            "C": {"duration_band": "18mo_plus"},
+            "D": {"duration_band": "18mo_plus"},
+        },
+        "SEVER-17": {  # STRONG -- duration (compression_crisis / pay_exposure, Q14-D trigger; the_pay_fog deliberately excluded)
             "A": {"duration_band": "0_6mo"},
             "B": {"duration_band": "6_18mo"},
             "C": {"duration_band": "18mo_plus"},

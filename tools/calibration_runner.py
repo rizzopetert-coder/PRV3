@@ -301,6 +301,14 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     "ALL-SF-01":  {"SEVER-16": "18mo_plus"},
     "ALL-SF-02":  {"SEVER-16": "18mo_plus"},
     "ALL-SF-03":  {"SEVER-16": "18mo_plus"},
+    # Q14/D second trigger (compression_crisis / pay_exposure) --
+    # EXP-CC-01 and AUT-PE-01 are single-trigger Entrenched-expected,
+    # closed by this alone. the_pay_fog (AUT-PF-01) is deliberately NOT
+    # added here -- it is a separate, already-known open gap
+    # (WIRED_INSUFFICIENT via its own Q16/SEVER-01), out of scope for
+    # this fix, must stay unaffected.
+    "EXP-CC-01":  {"SEVER-17": "18mo_plus"},
+    "AUT-PE-01":  {"SEVER-17": "18mo_plus"},
     "APT-UL-01":  {"SEVER-07": "18mo_plus"},
     "APT-DT-01":  {"SEVER-07": "18mo_plus"},
     "AUT-LC-01":  {"SEVER-07": "18mo_plus"},
