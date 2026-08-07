@@ -642,7 +642,7 @@ _QDATA = [
             ("A", "Current — we have plans, we test them, and they reflect how we actually operate.", False, None),
             ("B", "Plans exist but I'm not sure they're current or would hold up under pressure.", False, None),
             ("C", "Thin — we have some documentation but it's not something we maintain actively.", False, None),
-            ("D", "We don't have this infrastructure in place.", False, None),
+            ("D", "We don't have this infrastructure in place.", True, "SEVER-19"),
         ],
         ["paper_shield", "invisible_influence_architecture", "leadership_continuity_risk"],
         False,
@@ -907,6 +907,19 @@ _QDATA = [
             ("D", "I'm not sure — it may have been this way longer than I've recognized.", False, None),
         ],
         ["dueling_narratives"],
+        False,
+    ),
+    (
+        "SEVER-19",
+        "How long has this infrastructure been missing?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "It's recent — this changed in the past six months.", False, None),
+            ("B", "It's been this way for a year or more.", False, None),
+            ("C", "It's been this way for as long as I can remember.", False, None),
+            ("D", "I'm not sure — it may have been this way longer than I've recognized.", False, None),
+        ],
+        ["invisible_influence_architecture"],
         False,
     ),
     (
@@ -2075,6 +2088,12 @@ def _build_library():
             "D": {"duration_band": "18mo_plus"},
         },
         "SEVER-18": {  # STRONG -- duration (dueling_narratives, Q19-C trigger; the_pay_fog/the_policy_lag deliberately excluded)
+            "A": {"duration_band": "0_6mo"},
+            "B": {"duration_band": "6_18mo"},
+            "C": {"duration_band": "18mo_plus"},
+            "D": {"duration_band": "18mo_plus"},
+        },
+        "SEVER-19": {  # STRONG -- duration (invisible_influence_architecture, Q33-D trigger; paper_shield/leadership_continuity_risk deliberately excluded)
             "A": {"duration_band": "0_6mo"},
             "B": {"duration_band": "6_18mo"},
             "C": {"duration_band": "18mo_plus"},

@@ -316,6 +316,13 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     # already-known/already-tracked items with their own levers, out
     # of scope for this fix, must stay unaffected.
     "AUT-DN-01":  {"SEVER-18": "18mo_plus"},
+    # Q33/D second trigger (invisible_influence_architecture) --
+    # AUT-IA-01 is single-trigger Entrenched-expected, closed by this
+    # alone. paper_shield (AUT-PS-01) and leadership_continuity_risk
+    # (AUT-LC-01) are deliberately NOT added here -- both are
+    # separate, already-known/already-tracked items with their own
+    # levers, out of scope for this fix, must stay unaffected.
+    "AUT-IA-01":  {"SEVER-19": "18mo_plus"},
     "APT-UL-01":  {"SEVER-07": "18mo_plus"},
     "APT-DT-01":  {"SEVER-07": "18mo_plus"},
     "AUT-LC-01":  {"SEVER-07": "18mo_plus"},
