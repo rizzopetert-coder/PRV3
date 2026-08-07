@@ -265,10 +265,10 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     "ATT-BCP-01": {"SEVER-13": "18mo_plus"},
     "ATT-BCP-02": {"SEVER-13": "18mo_plus"},
     "ATT-BCP-03": {"SEVER-13": "18mo_plus"},
-    "ATT-GD-01":  {"SEVER-13": "18mo_plus"},
+    "ATT-GD-01":  {"SEVER-13": "18mo_plus", "SEVER-23": "18mo_plus"},
     "ATT-GD-02":  {"SEVER-13": "18mo_plus"},
     "ATT-GD-03":  {"SEVER-13": "18mo_plus"},
-    "ATT-NL-01":  {"SEVER-13": "18mo_plus"},
+    "ATT-NL-01":  {"SEVER-13": "18mo_plus", "SEVER-24": "18mo_plus"},
     "ATT-NL-02":  {"SEVER-13": "18mo_plus"},
     "ATT-NL-03":  {"SEVER-13": "18mo_plus"},
     "ALL-FR-01":  {"SEVER-08": "18mo_plus", "SEVER-14": "18mo_plus"},
@@ -298,7 +298,7 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     "ATT-UD-01":  {"SEVER-16": "18mo_plus"},
     "ATT-UH-01":  {"SEVER-16": "18mo_plus"},
     "ATT-WNS-01": {"SEVER-16": "18mo_plus", "SEVER-22": "18mo_plus"},
-    "ALL-SF-01":  {"SEVER-16": "18mo_plus"},
+    "ALL-SF-01":  {"SEVER-16": "18mo_plus", "SEVER-26": "18mo_plus"},
     "ALL-SF-02":  {"SEVER-16": "18mo_plus"},
     "ALL-SF-03":  {"SEVER-16": "18mo_plus"},
     # Q14/D second trigger (compression_crisis / pay_exposure) --
@@ -352,7 +352,7 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     # short at Entrenched, not a bug.
     "AUT-HI-01":  {"SEVER-22": "18mo_plus"},
     "AUT-HI-02":  {"SEVER-22": "18mo_plus"},
-    "ATT-LD-01":  {"SEVER-22": "18mo_plus"},
+    "ATT-LD-01":  {"SEVER-22": "18mo_plus", "SEVER-26": "18mo_plus"},
     "ATT-LD-02":  {"SEVER-22": "18mo_plus"},
     "ATT-LD-03":  {"SEVER-22": "18mo_plus"},
     # Q11/D second/first trigger (the_basement_standard /
@@ -363,13 +363,18 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     # and genuinely need a second trigger (candidate: Q05, pending
     # Pete's content call on C vs D, separate future work) --
     # correctly land short at Entrenched, not a bug.
-    "ATT-BS-01":  {"SEVER-20": "18mo_plus"},
+    "ATT-BS-01":  {"SEVER-20": "18mo_plus", "SEVER-25": "18mo_plus"},
     "ATT-BS-02":  {"SEVER-20": "18mo_plus"},
     "ATT-BS-03":  {"SEVER-20": "18mo_plus"},
-    "ATT-IT-01":  {"SEVER-20": "18mo_plus"},
+    "ATT-IT-01":  {"SEVER-20": "18mo_plus", "SEVER-25": "18mo_plus"},
     "ATT-IT-02":  {"SEVER-20": "18mo_plus"},
     "ATT-IT-03":  {"SEVER-20": "18mo_plus"},
     "ATT-WR-01":  {"SEVER-20": "18mo_plus"},
+    "ATT-BC-01":  {"SEVER-23": "18mo_plus", "SEVER-24": "18mo_plus"},
+    "ATT-BC-02":  {"SEVER-24": "18mo_plus"},
+    "ATT-UT-01":  {"SEVER-25": "18mo_plus"},
+    "ATT-UT-02":  {"SEVER-25": "18mo_plus"},
+    "ATT-UT-03":  {"SEVER-25": "18mo_plus"},
     "APT-UL-01":  {"SEVER-07": "18mo_plus"},
     "APT-DT-01":  {"SEVER-07": "18mo_plus"},
     "AUT-LC-01":  {"SEVER-07": "18mo_plus"},
