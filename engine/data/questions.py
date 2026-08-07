@@ -318,7 +318,7 @@ _QDATA = [
             ("A", "Strong — most managers develop their people and produce results.", False, None),
             ("B", "Uneven — we have some strong managers and some who are struggling.", False, None),
             ("C", "Thin — managers are capable individually but stretched beyond what they can handle.", False, None),
-            ("D", "There are specific managers who are a real problem — not the whole layer, but concentrated issues.", False, None),
+            ("D", "There are specific managers who are a real problem — not the whole layer, but concentrated issues.", True, "SEVER-29"),
             ("E", "I don't have great visibility into how managers are actually performing.", False, None),
         ],
         ["the_unformed_leader", "the_overloaded_manager", "the_dormant_talent",
@@ -1037,6 +1037,19 @@ _QDATA = [
             ("D", "I'm not sure — it may have been this way longer than I've recognized.", False, None),
         ],
         ["the_founders_grip"],
+        False,
+    ),
+    (
+        "SEVER-29",
+        "How long has this been the case?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "It's recent — this started in the past six months.", False, None),
+            ("B", "It's been this way for a year or more.", False, None),
+            ("C", "It's been this way for as long as I can remember.", False, None),
+            ("D", "I'm not sure — it may have been this way longer than I've recognized.", False, None),
+        ],
+        ["the_untouchable"],
         False,
     ),
     (
@@ -2265,6 +2278,12 @@ def _build_library():
             "D": {"duration_band": "18mo_plus"},
         },
         "SEVER-28": {  # STRONG -- duration (the_founders_grip, Q01-D trigger; decision_paralysis/the_lost_map/sequential_decision_blindness deliberately excluded, tie-break reroute confirmed safe -- dimensionally identical, not opted in)
+            "A": {"duration_band": "0_6mo"},
+            "B": {"duration_band": "6_18mo"},
+            "C": {"duration_band": "18mo_plus"},
+            "D": {"duration_band": "18mo_plus"},
+        },
+        "SEVER-29": {  # STRONG -- duration (the_untouchable, Q12-D trigger; leadership_deafness deliberately excluded, tie-break reroute confirmed safe -- dimensionally identical, already-closed via Q04+Q08, not opted in)
             "A": {"duration_band": "0_6mo"},
             "B": {"duration_band": "6_18mo"},
             "C": {"duration_band": "18mo_plus"},

@@ -350,7 +350,7 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     # are Endemic-expected and genuinely need a second trigger (no
     # candidate identified, separate future work) -- correctly land
     # short at Entrenched, not a bug.
-    "AUT-HI-01":  {"SEVER-22": "18mo_plus"},
+    "AUT-HI-01":  {"SEVER-22": "18mo_plus", "SEVER-27": "18mo_plus"},
     "AUT-HI-02":  {"SEVER-22": "18mo_plus"},
     "ATT-LD-01":  {"SEVER-22": "18mo_plus", "SEVER-26": "18mo_plus"},
     "ATT-LD-02":  {"SEVER-22": "18mo_plus"},
@@ -372,7 +372,7 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     "ATT-WR-01":  {"SEVER-20": "18mo_plus"},
     "ATT-BC-01":  {"SEVER-23": "18mo_plus", "SEVER-24": "18mo_plus"},
     "ATT-BC-02":  {"SEVER-24": "18mo_plus"},
-    "ATT-UT-01":  {"SEVER-25": "18mo_plus"},
+    "ATT-UT-01":  {"SEVER-25": "18mo_plus", "SEVER-29": "18mo_plus"},
     "ATT-UT-02":  {"SEVER-25": "18mo_plus"},
     "ATT-UT-03":  {"SEVER-25": "18mo_plus"},
     # Q06/A trigger (the_tolerated_violation / disparate_impact_
