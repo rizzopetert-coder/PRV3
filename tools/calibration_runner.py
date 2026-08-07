@@ -285,7 +285,7 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     # lands short at Entrenched (raw 2.00), not a bug.
     "AUT-EX-01":  {"SEVER-15": "18mo_plus"},
     "EXP-PAG-01": {"SEVER-15": "18mo_plus"},
-    "AUT-HC-01":  {"SEVER-15": "18mo_plus"},
+    "AUT-HC-01":  {"SEVER-15": "18mo_plus", "SEVER-22": "18mo_plus"},
     "AUT-HC-02":  {"SEVER-15": "18mo_plus"},
     # Q18/C second trigger (the_unreported_hazard / the_unlocked_door /
     # what_nobody_says / the_suppression_filter) -- ATT-UD-01, ATT-UH-01,
@@ -297,7 +297,7 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     # short at Entrenched (raw 2.00), not a bug.
     "ATT-UD-01":  {"SEVER-16": "18mo_plus"},
     "ATT-UH-01":  {"SEVER-16": "18mo_plus"},
-    "ATT-WNS-01": {"SEVER-16": "18mo_plus"},
+    "ATT-WNS-01": {"SEVER-16": "18mo_plus", "SEVER-22": "18mo_plus"},
     "ALL-SF-01":  {"SEVER-16": "18mo_plus"},
     "ALL-SF-02":  {"SEVER-16": "18mo_plus"},
     "ALL-SF-03":  {"SEVER-16": "18mo_plus"},
@@ -323,6 +323,53 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     # separate, already-known/already-tracked items with their own
     # levers, out of scope for this fix, must stay unaffected.
     "AUT-IA-01":  {"SEVER-19": "18mo_plus"},
+    # Q11/D second trigger (motivational_architecture_failure /
+    # cultural_overtime) -- EXP-MAF-02, EXP-MAF-03, EXP-CO-01 are
+    # single-trigger Entrenched-expected, closed by this alone.
+    # EXP-MAF-01 is Endemic-expected and genuinely needs a second
+    # trigger (no candidate identified, separate future work, not
+    # part of this fix) -- correctly lands short at Entrenched (raw
+    # 2.00), not a bug. culture_drift, the_wrong_reward,
+    # the_inside_track, the_arbitrary_standard, the_basement_standard,
+    # and the_broken_compass are deliberately NOT added -- out of
+    # scope for this fix, must stay unaffected.
+    "EXP-MAF-01": {"SEVER-20": "18mo_plus"},
+    "EXP-MAF-02": {"SEVER-20": "18mo_plus"},
+    "EXP-MAF-03": {"SEVER-20": "18mo_plus"},
+    "EXP-CO-01":  {"SEVER-20": "18mo_plus"},
+    # Q06/D second trigger (the_paper_tiger) -- APT-PT-00/01/02/03 are
+    # single-trigger Entrenched-expected, closed by this alone. Zero
+    # blast radius -- D is unique to the_paper_tiger on Q06.
+    "APT-PT-00":  {"SEVER-21": "18mo_plus"},
+    "APT-PT-01":  {"SEVER-21": "18mo_plus"},
+    "APT-PT-02":  {"SEVER-21": "18mo_plus"},
+    "APT-PT-03":  {"SEVER-21": "18mo_plus"},
+    # Q04/D first trigger (heard_and_ignored / leadership_deafness) --
+    # AUT-HI-02, ATT-LD-02, ATT-LD-03 are single-trigger
+    # Entrenched-expected, closed by this alone. AUT-HI-01, ATT-LD-01
+    # are Endemic-expected and genuinely need a second trigger (no
+    # candidate identified, separate future work) -- correctly land
+    # short at Entrenched, not a bug.
+    "AUT-HI-01":  {"SEVER-22": "18mo_plus"},
+    "AUT-HI-02":  {"SEVER-22": "18mo_plus"},
+    "ATT-LD-01":  {"SEVER-22": "18mo_plus"},
+    "ATT-LD-02":  {"SEVER-22": "18mo_plus"},
+    "ATT-LD-03":  {"SEVER-22": "18mo_plus"},
+    # Q11/D second/first trigger (the_basement_standard /
+    # the_inside_track / the_wrong_reward), reusing the existing
+    # SEVER-20 -- no new content, pure table addition. ATT-BS-02/03,
+    # ATT-IT-02/03, ATT-WR-01 are single-trigger Entrenched-expected,
+    # closed by this alone. ATT-BS-01, ATT-IT-01 are Endemic-expected
+    # and genuinely need a second trigger (candidate: Q05, pending
+    # Pete's content call on C vs D, separate future work) --
+    # correctly land short at Entrenched, not a bug.
+    "ATT-BS-01":  {"SEVER-20": "18mo_plus"},
+    "ATT-BS-02":  {"SEVER-20": "18mo_plus"},
+    "ATT-BS-03":  {"SEVER-20": "18mo_plus"},
+    "ATT-IT-01":  {"SEVER-20": "18mo_plus"},
+    "ATT-IT-02":  {"SEVER-20": "18mo_plus"},
+    "ATT-IT-03":  {"SEVER-20": "18mo_plus"},
+    "ATT-WR-01":  {"SEVER-20": "18mo_plus"},
     "APT-UL-01":  {"SEVER-07": "18mo_plus"},
     "APT-DT-01":  {"SEVER-07": "18mo_plus"},
     "AUT-LC-01":  {"SEVER-07": "18mo_plus"},
