@@ -422,7 +422,7 @@ _QDATA = [
         [
             ("A", "Consistent. What we say publicly is what we live internally.", False, None),
             ("B", "Mostly consistent but there are some gaps we're aware of.", False, None),
-            ("C", "There's a meaningful gap — our external narrative is ahead of our internal reality.", False, None),
+            ("C", "There's a meaningful gap — our external narrative is ahead of our internal reality.", True, "SEVER-18"),
             ("D", "I don't think we've really looked at whether they align.", False, None),
         ],
         ["dueling_narratives", "the_pay_fog", "the_policy_lag"],
@@ -894,6 +894,19 @@ _QDATA = [
             ("D", "I'm not sure — it may have been this way longer than I've recognized.", False, None),
         ],
         ["pay_exposure", "compression_crisis"],
+        False,
+    ),
+    (
+        "SEVER-18",
+        "How long has this gap been present?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "It's recent — this started in the past six months.", False, None),
+            ("B", "It's been this way for a year or more.", False, None),
+            ("C", "It's been this way for as long as I can remember.", False, None),
+            ("D", "I'm not sure — it may have been this way longer than I've recognized.", False, None),
+        ],
+        ["dueling_narratives"],
         False,
     ),
     (
@@ -2056,6 +2069,12 @@ def _build_library():
             "D": {"duration_band": "18mo_plus"},
         },
         "SEVER-17": {  # STRONG -- duration (compression_crisis / pay_exposure, Q14-D trigger; the_pay_fog deliberately excluded)
+            "A": {"duration_band": "0_6mo"},
+            "B": {"duration_band": "6_18mo"},
+            "C": {"duration_band": "18mo_plus"},
+            "D": {"duration_band": "18mo_plus"},
+        },
+        "SEVER-18": {  # STRONG -- duration (dueling_narratives, Q19-C trigger; the_pay_fog/the_policy_lag deliberately excluded)
             "A": {"duration_band": "0_6mo"},
             "B": {"duration_band": "6_18mo"},
             "C": {"duration_band": "18mo_plus"},

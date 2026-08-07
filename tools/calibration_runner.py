@@ -309,6 +309,13 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     # this fix, must stay unaffected.
     "EXP-CC-01":  {"SEVER-17": "18mo_plus"},
     "AUT-PE-01":  {"SEVER-17": "18mo_plus"},
+    # Q19/C second trigger (dueling_narratives) -- AUT-DN-01 is
+    # single-trigger Entrenched-expected, closed by this alone.
+    # the_pay_fog (AUT-PF-01) and the_policy_lag (AUT-PL-01) are
+    # deliberately NOT added here -- both are separate,
+    # already-known/already-tracked items with their own levers, out
+    # of scope for this fix, must stay unaffected.
+    "AUT-DN-01":  {"SEVER-18": "18mo_plus"},
     "APT-UL-01":  {"SEVER-07": "18mo_plus"},
     "APT-DT-01":  {"SEVER-07": "18mo_plus"},
     "AUT-LC-01":  {"SEVER-07": "18mo_plus"},
