@@ -375,6 +375,24 @@ _SEVERITY_FOLLOW_ON_TARGETS: dict[str, dict[str, object]] = {
     "ATT-UT-01":  {"SEVER-25": "18mo_plus"},
     "ATT-UT-02":  {"SEVER-25": "18mo_plus"},
     "ATT-UT-03":  {"SEVER-25": "18mo_plus"},
+    # Q06/A trigger (the_tolerated_violation / disparate_impact_
+    # architecture) -- content call confirmed by Pete, A already the
+    # winning option. AUT-TV-02, EXP-DIA-02, EXP-DIA-03 (Entrenched)
+    # close outright. AUT-TV-01, EXP-DIA-01 (Endemic) land correctly
+    # short pending a second trigger (no candidate identified, separate
+    # future work). heard_and_ignored, the_unsolved_problem,
+    # decision_blindness, the_policy_lag deliberately NOT added --
+    # already closed/tracked via other levers, out of scope.
+    "AUT-TV-01":  {"SEVER-27": "18mo_plus"},
+    "AUT-TV-02":  {"SEVER-27": "18mo_plus"},
+    "EXP-DIA-01": {"SEVER-27": "18mo_plus"},
+    "EXP-DIA-02": {"SEVER-27": "18mo_plus"},
+    "EXP-DIA-03": {"SEVER-27": "18mo_plus"},
+    # Q01/D trigger (the_founders_grip) -- AUT-FG-02 (Entrenched)
+    # closes outright. AUT-FG-01 (Endemic) lands correctly short
+    # pending a second trigger, no candidate identified.
+    "AUT-FG-01":  {"SEVER-28": "18mo_plus"},
+    "AUT-FG-02":  {"SEVER-28": "18mo_plus"},
     "APT-UL-01":  {"SEVER-07": "18mo_plus"},
     "APT-DT-01":  {"SEVER-07": "18mo_plus"},
     "AUT-LC-01":  {"SEVER-07": "18mo_plus"},
