@@ -45,13 +45,14 @@ n = len(STATE_PROFILES)
 print(f"  Total states: {n}")
 check("State count is 58", n == 58, f"got {n}")
 
-# Dimensional vectors all at baseline
-bad_vectors = [
+# No state should remain fully at baseline post-calibration (catches a
+# future state added to STATE_PROFILES without a real calibration override)
+fully_baseline_vectors = [
     sid for sid, p in STATE_PROFILES.items()
-    if any(getattr(p.dimensional_vector, f) != BASELINE_VALUE for f in DIMENSIONAL_FIELDS)
+    if all(getattr(p.dimensional_vector, f) == BASELINE_VALUE for f in DIMENSIONAL_FIELDS)
 ]
-check("All dimensional vectors at 0.25 baseline", not bad_vectors,
-      f"non-baseline: {bad_vectors}")
+check("No state's dimensional vector remains fully at 0.25 baseline", not fully_baseline_vectors,
+      f"still fully baseline: {fully_baseline_vectors}")
 
 # signal_weight values
 bad_sw = [sid for sid, p in STATE_PROFILES.items() if p.signal_weight not in SIGNAL_WEIGHTS]
