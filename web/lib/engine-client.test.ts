@@ -19,6 +19,7 @@ const BASE_INTAKE = {
   tenure_in_role: "",
   direct_reports: "",
   jurisdiction: "US-CA",
+  significant_events: ["none"],
 };
 
 describe("CompletePayload shape (Stage 4 — checkpoint_results addition)", () => {

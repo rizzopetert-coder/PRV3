@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSession, resolveQuestionLabel } from "@/lib/session-store";
 import { invokeQuestionCopy } from "@/lib/engine-client";
-import type { IntakeEcho } from "@/lib/types";
+import { SIGNIFICANT_EVENT_OPTIONS, type IntakeEcho } from "@/lib/types";
+
+const VALID_SIGNIFICANT_EVENTS = new Set(SIGNIFICANT_EVENT_OPTIONS.map((o) => o.value));
 
 // ---------------------------------------------------------------------------
 // Path 1 (Session 71, Phase 1) — session/start
@@ -21,13 +23,20 @@ function validateIntake(body: unknown): body is IntakeEcho {
   const validOrgSize =
     (typeof b.organization_size === "number" && Number.isFinite(b.organization_size)) ||
     (typeof b.organization_size === "string" && b.organization_size.length > 0);
+  const validSignificantEvents =
+    Array.isArray(b.significant_events) &&
+    b.significant_events.length > 0 &&
+    b.significant_events.every(
+      (v): v is string => typeof v === "string" && VALID_SIGNIFICANT_EVENTS.has(v)
+    );
   return (
     validOrgSize &&
     typeof b.industry === "string" &&
     typeof b.role_level === "string" &&
     typeof b.tenure_in_role === "string" &&
     typeof b.direct_reports === "string" &&
-    typeof b.jurisdiction === "string"
+    typeof b.jurisdiction === "string" &&
+    validSignificantEvents
   );
 }
 

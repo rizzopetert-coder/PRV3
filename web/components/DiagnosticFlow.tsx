@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import type { PrivateOutputPayload } from "@/lib/types";
+import { SIGNIFICANT_EVENT_OPTIONS } from "@/lib/types";
 import PrivateOutput from "@/components/PrivateOutput";
 
 // ---------------------------------------------------------------------------
@@ -73,13 +74,16 @@ const JURISDICTION_OPTIONS = [
 
 interface IntakeFormState {
   // number once selected; "" is the shared not-yet-selected sentinel,
-  // same convention as every other field below.
+  // same convention as every other field below. significant_events is the
+  // one array-valued field -- [] is its own not-yet-selected sentinel,
+  // handled separately in isComplete below since [] !== "" trivially.
   organization_size: number | "";
   industry: string;
   role_level: string;
   tenure_in_role: string;
   direct_reports: string;
   jurisdiction: string;
+  significant_events: string[];
 }
 
 const EMPTY_INTAKE: IntakeFormState = {
@@ -89,6 +93,7 @@ const EMPTY_INTAKE: IntakeFormState = {
   tenure_in_role: "",
   direct_reports: "",
   jurisdiction: "",
+  significant_events: [],
 };
 
 interface QuestionCopy {
@@ -117,7 +122,18 @@ function IntakeForm({
   onChange: (next: IntakeFormState) => void;
   onSubmit: () => void;
 }) {
-  const isComplete = Object.values(intake).every((v) => v !== "");
+  // Explicit field-by-field rather than the prior Object.values().every()
+  // pattern -- that pattern silently broke once significant_events became
+  // array-valued ([] !== "" is trivially true, so it would never have
+  // blocked submission on its own).
+  const isComplete =
+    intake.organization_size !== "" &&
+    intake.industry !== "" &&
+    intake.role_level !== "" &&
+    intake.tenure_in_role !== "" &&
+    intake.direct_reports !== "" &&
+    intake.jurisdiction !== "" &&
+    intake.significant_events.length > 0;
 
   function HeadcountStepper({
     value,
@@ -202,6 +218,55 @@ function IntakeForm({
     );
   }
 
+  // None/other-events mutual exclusivity: checking "none" clears any other
+  // selections, checking anything else clears "none" -- both being checked
+  // simultaneously would be a logical contradiction the data model
+  // shouldn't allow.
+  function SignificantEventsField({
+    value,
+    onChange,
+  }: {
+    value: string[];
+    onChange: (next: string[]) => void;
+  }) {
+    function toggle(eventValue: string) {
+      if (eventValue === "none") {
+        onChange(value.includes("none") ? [] : ["none"]);
+        return;
+      }
+      const withoutNone = value.filter((v) => v !== "none");
+      onChange(
+        withoutNone.includes(eventValue)
+          ? withoutNone.filter((v) => v !== eventValue)
+          : [...withoutNone, eventValue]
+      );
+    }
+
+    return (
+      <div className="mb-5">
+        <label className="block font-ui text-sm font-medium text-charcoal mb-1.5">
+          Any significant events in the past 18 months?
+        </label>
+        <div className="space-y-2.5 border border-gray-200 rounded-lg px-3 py-3 bg-white">
+          {SIGNIFICANT_EVENT_OPTIONS.map((opt) => (
+            <label
+              key={opt.value}
+              className="flex items-start gap-2 font-ui text-sm text-charcoal cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={value.includes(opt.value)}
+                onChange={() => toggle(opt.value)}
+                className="mt-0.5 shrink-0"
+              />
+              <span>{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-md mx-auto px-6 py-16">
       <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">
@@ -220,6 +285,10 @@ function IntakeForm({
       {field("Tenure in this role", "tenure_in_role", TENURE_OPTIONS)}
       {field("Direct reports", "direct_reports", DIRECT_REPORTS_OPTIONS)}
       {field("Primary jurisdiction", "jurisdiction", JURISDICTION_OPTIONS)}
+      <SignificantEventsField
+        value={intake.significant_events}
+        onChange={(next) => onChange({ ...intake, significant_events: next })}
+      />
 
       <button
         onClick={onSubmit}

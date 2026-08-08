@@ -57,6 +57,32 @@ export interface StateRef {
  * the shareable document must state the organizational parameters under which
  * the estimate was calculated.
  */
+export interface SignificantEventOption {
+  value: string;
+  label: string;
+}
+
+// Canonical significant-events vocabulary -- mirrors engine/data/intake.py's
+// PRIOR_ADJUSTERS event_id/event_label pairs. Mechanism 1 (prior-probability
+// scoring) was deprecated this session (Decision Register); these 9 values
+// now flow through as synthesis-only narrative metadata, never a scoring
+// input. Two labels lightly trimmed for checkbox-length readability
+// (attitude_departure, aptitude_redesign) -- see Decision Register for the
+// approved copy; the other 7 are verbatim. Single source of truth, imported
+// by both the intake UI (web/components/DiagnosticFlow.tsx) and server-side
+// validation (web/app/api/diagnostic/session/start/route.ts).
+export const SIGNIFICANT_EVENT_OPTIONS: readonly SignificantEventOption[] = [
+  { value: "acquisition_or_merger", label: "Acquisition or merger" },
+  { value: "external_legal_claim", label: "External legal claim or regulatory inquiry" },
+  { value: "restructuring_or_layoff", label: "Restructuring or layoff" },
+  { value: "rapid_growth", label: "Rapid growth 25%+" },
+  { value: "leadership_departure", label: "Leadership departure or transition" },
+  { value: "attitude_conduct", label: "A known performance or conduct issue involving a specific individual remains unresolved." },
+  { value: "attitude_departure", label: "A termination or unexpected departure revealed something about how the organization operates that you're still addressing." },
+  { value: "aptitude_redesign", label: "A role, team, or function was created, redesigned, or eliminated in the past 18 months." },
+  { value: "none", label: "None" },
+];
+
 export interface IntakeEcho {
   // string | number is TEMPORARY -- see the Priority Queue's dated
   // follow-up to collapse this to number-only once ShareableOutputPayload's
@@ -68,6 +94,7 @@ export interface IntakeEcho {
   tenure_in_role: string;
   direct_reports: string;
   jurisdiction: string;
+  significant_events: string[];
 }
 
 /**

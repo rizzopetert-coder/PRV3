@@ -53,6 +53,9 @@ function mapIntake(engineIntake: Record<string, unknown>): IntakeEcho {
   const jurisdictions = Array.isArray(engineIntake.jurisdictions)
     ? (engineIntake.jurisdictions as string[])
     : [];
+  const significantEvents = Array.isArray(engineIntake.significant_events)
+    ? (engineIntake.significant_events as string[])
+    : ["none"];
   return {
     organization_size: (engineIntake.org_size as string) ?? "",
     industry: (engineIntake.industry as string) ?? "",
@@ -60,6 +63,7 @@ function mapIntake(engineIntake: Record<string, unknown>): IntakeEcho {
     tenure_in_role: "",
     direct_reports: "",
     jurisdiction: jurisdictions[0] ?? "",
+    significant_events: significantEvents,
   };
 }
 

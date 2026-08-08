@@ -62,6 +62,9 @@ function mapIntake(engineIntake: Record<string, unknown>): IntakeEcho {
   const jurisdictions = Array.isArray(engineIntake.jurisdictions)
     ? (engineIntake.jurisdictions as string[])
     : [];
+  const significantEvents = Array.isArray(engineIntake.significant_events)
+    ? (engineIntake.significant_events as string[])
+    : ["none"];
   return {
     // headcount is the real Python IntakeData field; org_size is a
     // fallback for any caller still on the pre-Phase-1 engine shape.
@@ -71,6 +74,7 @@ function mapIntake(engineIntake: Record<string, unknown>): IntakeEcho {
     tenure_in_role: "",
     direct_reports: "",
     jurisdiction: jurisdictions[0] ?? "",
+    significant_events: significantEvents,
   };
 }
 

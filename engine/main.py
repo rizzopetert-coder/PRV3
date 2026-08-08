@@ -133,31 +133,31 @@ def _locked_intake_to_engine_intake(intake: dict) -> IntakeData:
     """
     Adapts the locked canonical intake schema (Section 5 of the MOB:
     organization_size, industry, role_level, tenure_in_role, direct_reports,
-    jurisdiction -- also web/lib/types.ts IntakeEcho) to the engine's
-    IntakeData contract (headcount, industry, org_type, jurisdictions,
-    significant_events, principal_role).
+    jurisdiction, significant_events -- also web/lib/types.ts IntakeEcho) to
+    the engine's IntakeData contract (headcount, industry, org_type,
+    jurisdictions, significant_events, principal_role).
 
-    Phase 1's intake form does not collect org_type or significant_events --
-    neither has a locked-spec equivalent. Both default to values confirmed
-    inert for Phase 1 (Session 71 architecture decision, confirmed with Pete
-    before this build):
-      - org_type defaults to "" -- the org_type_founder_led axis modifier
-        (engine/accumulation.py _apply_axis_modifiers) only fires on the
-        literal value "Founder-led", so any other string is a safe no-op.
-      - significant_events defaults to ["none"] -- no PRIOR_ADJUSTER_INDEX
-        entry matches "none" (a no-op for prior initialization, which is
-        itself never consumed downstream by rank_states/severity/output --
-        see AccumulationEngine.priors), and it means Q03A/Q27A conditional
-        routing never fires in Phase 1 -- always the Q03B/Q27B "no
-        significant event" branch (see web/lib/session-store.ts
-        PHASE_1_QUESTION_SEQUENCE, which hardcodes this same assumption).
+    significant_events is now collected directly by the intake form
+    (web/components/DiagnosticFlow.tsx's checkbox multi-select, validated
+    server-side against the 9 canonical PRIOR_ADJUSTER_INDEX keys in
+    validateIntake()) and passed through here. This session's Mechanism 1
+    deprecation (Decision Register) means it no longer drives any scoring
+    math -- initialize_priors() (engine/accumulation.py) is now an
+    unconditional flat baseline -- but it IS now real, user-submitted
+    synthesis-only narrative metadata rather than a hardcoded ["none"]
+    default. Falls back to ["none"] only if the field is absent or empty
+    (defensive -- the validated web path always sends a non-empty list, but
+    this adapter has no way to enforce that on its own callers).
+
+    org_type has no locked-spec intake equivalent -- unrelated to
+    significant_events, unchanged: still defaults to "" (Session 71
+    architecture decision) -- the org_type_founder_led axis modifier only
+    fires on the literal value "Founder-led", so any other string
+    (including "") is a safe no-op.
 
     tenure_in_role and direct_reports have no IntakeData equivalent at all --
     stored in the session for calibration/analytics purposes only (Task 1),
     never consumed by engine math.
-
-    Revisit if a richer Phase 2+ intake form ever collects org_type or
-    significant_events directly.
     """
     jurisdiction = intake.get("jurisdiction", "")
     return IntakeData(
@@ -165,7 +165,7 @@ def _locked_intake_to_engine_intake(intake: dict) -> IntakeData:
         industry=intake.get("industry", ""),
         org_type="",
         jurisdictions=[jurisdiction] if jurisdiction else [],
-        significant_events=["none"],
+        significant_events=intake.get("significant_events") or ["none"],
         principal_role=intake.get("role_level", ""),
     )
 
