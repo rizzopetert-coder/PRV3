@@ -1,6 +1,6 @@
 # Friction Tax — STATE_MULTIPLIERS Methodology (Calibration Set 3)
 
-**Status:** Scoring complete, all 57 states populated (Calibration Set 3, commit 469b148). Combination function rescaled this session (Option A, below) -- Gemini-reviewed and cleared (structural check + worked dollar-figure plausibility check across mild/typical/severe scenarios, all landing in a defensible 3%-49% of payroll range). Not yet implemented in compute_friction_tax().
+**Status:** Scoring complete, all 57 states populated (Calibration Set 3, commit 469b148). Combination function rescaled (Option A, below) -- Gemini-reviewed and cleared (structural check + worked dollar-figure plausibility check across mild/typical/severe scenarios, all landing in a defensible 3%-49% of payroll range), then implemented in compute_friction_tax() -- commit 8de807a (2026-08-03), MOB v4.80. (Documentation correction made in a later session -- this status line previously read "Not yet implemented," describing a step that had already happened and passed.)
 
 ## Purpose
 

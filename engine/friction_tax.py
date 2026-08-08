@@ -1755,6 +1755,28 @@ STATE_MULTIPLIERS: dict[str, StateMultiplierEntry] = {
             ),
         },
     ),
+    "the_inner_circle": StateMultiplierEntry(
+        multiplier=0.15000000000000002,
+        raw_score=3,
+        criteria={
+            "turnover": StateCriterionScore(
+                score=1,
+                rationale="Those excluded from the protected in-group face reduced advancement and visibility, driving moderate voluntary attrition; the in-group itself is insulated, limiting the signal's reach.",
+            ),
+            "productivity": StateCriterionScore(
+                score=0,
+                rationale="Decisions within the circle can be efficient on their own terms even when damaging elsewhere; no direct organizational output drag scored.",
+            ),
+            "decision_quality": StateCriterionScore(
+                score=2,
+                rationale="Core to the state — decisions are consequence-shielded and groupthink-protected by design, the clearest and strongest signal of the three criteria.",
+            ),
+            "legal": StateCriterionScore(
+                score=1,
+                rationale="Exclusionary in-group dynamics create moderate disparate-treatment and retaliation exposure for those shut out, though the state's core mechanism is protective self-dealing rather than a direct regulatory or compliance violation.",
+            ),
+        },
+    ),
 }
 
 _STATE_MULTIPLIER_CRITERIA_KEYS = {"turnover", "productivity", "decision_quality", "legal"}

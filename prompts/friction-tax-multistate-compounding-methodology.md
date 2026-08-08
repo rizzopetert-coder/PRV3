@@ -1,6 +1,6 @@
-# Friction Tax — Multi-State Compounding Methodology (Proposed, Not Yet Implemented)
+# Friction Tax — Multi-State Compounding Methodology (Implemented)
 
-**Status:** Design proposed and confirmed with Pete this session. NOT yet reviewed by Gemini, NOT yet implemented. Do not build against this until both have happened.
+**Status:** Implemented and verified. Gemini-reviewed and cleared, then implemented in compute_friction_tax() -- commit 8de807a (2026-08-03), MOB v4.80. tools/test_friction_tax.py rewritten 37->45 checks, 45/45 passing at the time of that commit. (Documentation correction made in a later session -- this status line previously read as pending/not-yet-reviewed, describing a step that had already happened and passed.)
 
 ## Problem being solved
 

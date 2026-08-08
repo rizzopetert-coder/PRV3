@@ -612,9 +612,9 @@ check(
     f"still-None entries: {non_populated}",
 )
 check(
-    "STATE_MULTIPLIERS has exactly 57 entries",
-    len(STATE_MULTIPLIERS) == 57,
-    f"got {len(STATE_MULTIPLIERS)}",
+    "STATE_MULTIPLIERS has exactly len(STATE_PROFILES) entries",
+    len(STATE_MULTIPLIERS) == len(STATE_PROFILES),
+    f"got {len(STATE_MULTIPLIERS)}, expected {len(STATE_PROFILES)}",
 )
 check(
     "Every STATE_MULTIPLIERS value is a StateMultiplierEntry with a real multiplier in [0.05, 0.25] (Option A)",
