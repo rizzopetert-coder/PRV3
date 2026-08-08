@@ -32,6 +32,9 @@ Verifies the 5-field contract migration (S42), now 6 fields (Tier 4 headline):
   28. _parse_synthesis_response: bare JSON still works post-fix (regression guard)
   29. _parse_synthesis_response: JSON embedded in surrounding prose recovered via regex fallback
   30. _parse_synthesis_response: genuinely broken fenced response still falls back correctly
+  31. _build_synthesis_prompt: includes significant_events full label text when present
+  32. _build_synthesis_prompt: omits significant_events section when ["none"]
+  33. _build_synthesis_prompt: omits significant_events section when absent from intake
 """
 
 import sys
@@ -448,6 +451,60 @@ check(
     "_build_synthesis_prompt: includes narrative_response",
     "Leadership keeps deferring the hard calls." in prompt_text,
     "narrative_response not found",
+)
+
+
+# ── 31–33. _build_synthesis_prompt: significant_events (Mechanism 1 deprecation) ──
+
+prompt_with_events = _build_synthesis_prompt(
+    state_name="Decision Paralysis",
+    severity_tier="Entrenched",
+    resolution_family="Groundwork",
+    asset_score=0.15,
+    liability_score=0.60,
+    narrative_response="Leadership keeps deferring the hard calls.",
+    intake={
+        "organization_size": "medium", "industry": "healthcare", "role_level": "director",
+        "significant_events": ["acquisition_or_merger"],
+    },
+)
+check(
+    "_build_synthesis_prompt: includes significant_events full label text when present",
+    "Acquisition or merger" in prompt_with_events,
+    "acquisition_or_merger label not found",
+)
+
+prompt_none_event = _build_synthesis_prompt(
+    state_name="Decision Paralysis",
+    severity_tier="Entrenched",
+    resolution_family="Groundwork",
+    asset_score=0.15,
+    liability_score=0.60,
+    narrative_response="Leadership keeps deferring the hard calls.",
+    intake={
+        "organization_size": "medium", "industry": "healthcare", "role_level": "director",
+        "significant_events": ["none"],
+    },
+)
+check(
+    "_build_synthesis_prompt: omits significant_events section when [\"none\"]",
+    "significant_events" not in prompt_none_event,
+    "significant_events section present despite [\"none\"]",
+)
+
+prompt_missing_event = _build_synthesis_prompt(
+    state_name="Decision Paralysis",
+    severity_tier="Entrenched",
+    resolution_family="Groundwork",
+    asset_score=0.15,
+    liability_score=0.60,
+    narrative_response="Leadership keeps deferring the hard calls.",
+    intake={"organization_size": "medium", "industry": "healthcare", "role_level": "director"},
+)
+check(
+    "_build_synthesis_prompt: omits significant_events section when absent from intake",
+    "significant_events" not in prompt_missing_event,
+    "significant_events section present despite missing intake field",
 )
 
 

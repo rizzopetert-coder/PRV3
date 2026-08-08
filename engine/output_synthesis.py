@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from engine.data.fallback_synthesis import get_fallback_synthesis
+from engine.data.intake import PRIOR_ADJUSTER_INDEX
 
 
 # ── System prompt ──────────────────────────────────────────────────────────────
@@ -250,6 +251,25 @@ def _build_synthesis_prompt(
         f"  industry: {intake.get('industry', '')}\n"
         f"  role: {intake.get('role_level', intake.get('principal_role', ''))}"
     )
+    # significant_events is now real, user-submitted synthesis-only
+    # narrative metadata (Mechanism 1 deprecation, this session -- Decision
+    # Register). Mapped through PRIOR_ADJUSTER_INDEX's full, untrimmed
+    # clinical text (not web/lib/types.ts's SIGNIFICANT_EVENT_OPTIONS
+    # checkbox-trimmed copy -- no UI-space constraint here, and the fuller
+    # specificity gives Sonnet more to ground the narrative in). Omitted
+    # entirely when missing, empty, or exactly ["none"] -- a literal
+    # "None" or empty section would read as an unknown value rather than
+    # "nothing significant happened."
+    significant_events = intake.get("significant_events") or []
+    event_labels = [
+        PRIOR_ADJUSTER_INDEX[e].event_label
+        for e in significant_events
+        if e != "none" and e in PRIOR_ADJUSTER_INDEX
+    ]
+    if event_labels:
+        intake_lines += "\n  significant_events:\n" + "\n".join(
+            f"    - {label}" for label in event_labels
+        )
     parts = [
         f"state_name: {state_name}",
         f"severity_tier: {severity_tier}",

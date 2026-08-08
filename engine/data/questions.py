@@ -147,6 +147,22 @@ _QDATA = [
         ["the_exposed", "hr_capture", "planning_authority_gap"],
         False,
     ),
+    # PARKED (Mechanism 1 deprecation, this session): Q03A and its
+    # follow-up Q03A-D-FOLLOW were authored assuming significant_events
+    # would be collected mid-session and could branch live question
+    # routing -- structurally excluded from web/lib/session-store.ts's
+    # PHASE_1_QUESTION_SEQUENCE from the start (Phase 1's locked intake
+    # adapter always took the Q03B branch; confirmed no code anywhere
+    # ever branched core-question routing on significant_events).
+    # significant_events is now collected for real at intake (Phase 2),
+    # but as synthesis-only narrative metadata (see
+    # _build_synthesis_prompt(), engine/output_synthesis.py), never as a
+    # session-routing trigger. Real content preserved here, not deleted:
+    # tools/calibration_runner.py's generate_answers() (_CONDITIONAL_PAIRS)
+    # still exercises Q03A/Q03B for calibration-only scoring signal --
+    # deliberately untouched by this session's work. Possible future
+    # reactivation if live intake-driven question branching is ever
+    # built; not scheduled, not designed.
     (
         "Q03A",
         "You mentioned some significant changes in the past 18 months."
@@ -525,6 +541,14 @@ _QDATA = [
         ["silosolation", "the_fracture", "distributed_culture_fragmentation"],
         True,
     ),
+    # PARKED (Mechanism 1 deprecation, this session): same treatment as
+    # Q03A above -- structurally excluded from PHASE_1_QUESTION_SEQUENCE,
+    # real content preserved for tools/calibration_runner.py's
+    # generate_answers() (_CONDITIONAL_PAIRS -- "Q27A" is selected there
+    # for any profile whose significant_events includes
+    # acquisition_or_merger) and possible future reactivation. SEVER-09
+    # remains wired to this question's B/C/D options, untouched --
+    # calibration-only today, not reachable in production.
     (
         "Q27A",
         "How would you describe where the integration stands right now?",
@@ -606,6 +630,14 @@ _QDATA = [
     # real distinguishing condition is found or authored (not the current
     # self-contradicting one). See tools/_mob.txt Section 14 for the full
     # investigation.
+    #
+    # ADDENDUM (Mechanism 1 deprecation, this session): unrelated to the
+    # self-contradicting-condition reason above, but grouped here for
+    # consistency -- Q31 gets the same "parked, not deleted" documentation
+    # pass as Q03A/Q03A-D-FOLLOW/Q27A this session, all four structurally
+    # excluded from PHASE_1_QUESTION_SEQUENCE for their own distinct
+    # reasons. Real content preserved for tools/calibration_runner.py's
+    # calibration-only use, untouched by this session's work.
     (
         "Q31",
         "Thinking back to the matter you mentioned earlier — what came out of the process?",
