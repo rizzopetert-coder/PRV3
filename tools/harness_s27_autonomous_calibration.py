@@ -58,8 +58,12 @@ LOG_PATH         = os.path.join(PROJECT_ROOT, "tools", "harness_log_s27.md")
 ACCUMULATION_PATH = os.path.join(PROJECT_ROOT, "engine", "accumulation.py")
 RUNNER_PATH      = os.path.join(PROJECT_ROOT, "tools", "calibration_runner.py")
 
-# Known v23 sinks — new sinks outside this set trigger escalation
-V23_SINKS = {"built_to_fail", "leadership_deafness", "the_fracture", "the_diversity_ceiling"}
+# Sink baseline is no longer a static set -- captured dynamically at
+# harness startup (see baseline_sink_counts in main()). Precedent
+# (tools/_mob.txt, S17-S29 campaign): the dominant sink changed almost
+# every session historically; a hand-maintained list goes stale fast
+# (confirmed this session: 3 of the 4 V23_SINKS entries were no longer
+# real sinks, while a 46-capture sink existed undetected outside the set).
 
 # Test scripts to run after each parameter change (pytest not installed)
 TEST_SCRIPTS = [
@@ -399,12 +403,29 @@ def main():
         return
     print(f"[HARNESS] Test suite: OK\n")
 
+    # ── Baseline sink-count capture (dynamic, replaces V23_SINKS) ────────────
+    # Real empirical snapshot against the freshly-applied initial
+    # scalars/window, taken fresh every harness run rather than hand-
+    # maintained -- see module-level comment above for why a static set
+    # goes stale. Used as the reference point for significant_new_sinks
+    # in every round of the loop below.
+    print("\n[HARNESS] Baseline sink-count capture...")
+    baseline_cal = run_calibration_pass()
+    if baseline_cal is None:
+        print("[HARNESS] ESCALATE: Baseline calibration pass returned no parseable output. Stop.")
+        return
+    baseline_sink_counts = baseline_cal["sink_counts"]
+    print(f"[HARNESS] Baseline sinks (>=5 captures): "
+          f"{ {s: c for s, c in baseline_sink_counts.items() if c >= 5} }")
+
     # Log initial state
     with open(LOG_PATH, "a", encoding="utf-8") as fh:
         fh.write(f"Starting scalars (source={scalar_source}):\n")
         for f, v in scalars.items():
             fh.write(f"  {f}: {v:.4f}\n")
-        fh.write(f"Starting window: {window}\n\n")
+        fh.write(f"Starting window: {window}\n")
+        fh.write(f"Baseline sinks (>=5 captures): "
+                 f"{ {s: c for s, c in baseline_sink_counts.items() if c >= 5} }\n\n")
 
     # ── Main calibration loop ──────────────────────────────────────────────────
     round_num        = 0
@@ -447,10 +468,18 @@ def main():
         # Regression list
         regressions_list = sorted(set(prev_hc_passing) - set(hc_passing))
 
-        # Sink emergence check (exclude v23 known sinks and currently-passing states)
+        # Sink emergence check -- dynamic baseline (captured at harness
+        # startup), not a static hardcoded set or hc_passing membership
+        # (the latter was structurally unreachable once hc_passing hit
+        # 57/57 -- no sink could ever be "new" regardless of severity).
+        # A state counts as a genuinely new/escalating sink only if it is
+        # significant NOW (>=5 captures) and was NOT already significant
+        # at startup (<5 captures at baseline) -- catches sinks the tuning
+        # loop itself creates or worsens, without re-flagging chronic
+        # sinks that predate this run.
         significant_new_sinks = {
             s: c for s, c in sink_counts.items()
-            if s not in V23_SINKS and c >= 5 and s not in hc_passing
+            if c >= 5 and baseline_sink_counts.get(s, 0) < 5
         }
 
         # Status determination
