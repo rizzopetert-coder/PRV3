@@ -43,7 +43,7 @@ print("\nSTATE PROFILES")
 
 n = len(STATE_PROFILES)
 print(f"  Total states: {n}")
-check("State count is 57", n == 57, f"got {n}")
+check("State count is 58", n == 58, f"got {n}")
 
 # Dimensional vectors all at baseline
 bad_vectors = [
@@ -117,7 +117,7 @@ print(f"\n  States per dimension: {dim_counts}")
 check("Aptitude count = 7",  dim_counts.get("Aptitude",  0) == 7,  f"got {dim_counts.get('Aptitude',0)}")
 check("Authority count = 22", dim_counts.get("Authority", 0) == 22, f"got {dim_counts.get('Authority',0)}")
 check("Alliance count = 7",  dim_counts.get("Alliance",  0) == 7,  f"got {dim_counts.get('Alliance',0)}")
-check("Attitude count = 21", dim_counts.get("Attitude",  0) == 21, f"got {dim_counts.get('Attitude',0)}")
+check("Attitude count = 22", dim_counts.get("Attitude",  0) == 22, f"got {dim_counts.get('Attitude',0)}")
 
 
 # ── Question library ───────────────────────────────────────────────────────────
@@ -131,8 +131,13 @@ print("\nINTAKE TABLES")
 
 # Prior adjusters
 print(f"  Prior adjusters: {len(PRIOR_ADJUSTERS)}")
-check("Prior adjuster for none event exists", "none" in PRIOR_ADJUSTER_INDEX)
-check("None event multiplier is 1.0", PRIOR_ADJUSTER_INDEX["none"].multiplier == 1.0)
+# Prior adjuster "none" event existence/multiplier checks removed this
+# session (Mechanism 1 deprecation follow-up, Priority Queue item 7) --
+# both tested deprecated scoring-mechanism semantics with zero live
+# consumer (engine/output_synthesis.py's PRIOR_ADJUSTER_INDEX usage
+# explicitly skips "none" and never reads .multiplier). Referential-
+# integrity check below kept -- different in kind, still useful
+# regardless of Mechanism 1's live/dormant status. See Decision Register.
 
 # All elevated state_ids in prior adjusters exist in STATE_PROFILES
 bad_pa = []

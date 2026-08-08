@@ -182,7 +182,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | MOB version | v4.129 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
-| Engine state count | 57 (locked) |
+| Engine state count | 58 (locked) |
 | Test suite minimum (Phase 1) | 171 profiles across 57 states |
 | Checkpoints | Q11 · Q19 · Q27 |
 | Shannon Entropy max (57 states) | 5.83 bits |
