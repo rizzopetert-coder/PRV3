@@ -188,6 +188,23 @@ def derive_scalars():
     return scalars, "cold_start"
 
 
+def derive_starting_window() -> tuple[float, str]:
+    """
+    Dynamically read the committed SCD_WCS_CLUSTER_WINDOW from tools/calibration_runner.py.
+
+    Returns:
+        tuple[float, str]: (window_value, source_description)
+    """
+    try:
+        from tools.calibration_runner import SCD_WCS_CLUSTER_WINDOW
+        if SCD_WCS_CLUSTER_WINDOW is not None and isinstance(SCD_WCS_CLUSTER_WINDOW, (int, float)):
+            return float(SCD_WCS_CLUSTER_WINDOW), "tools.calibration_runner (warm-start)"
+    except (ImportError, AttributeError):
+        pass
+
+    return 0.20, "hardcoded_default (cold-start fallback)"
+
+
 # ── Step 2: Write CENTROID_FIELD_SCALARS to accumulation.py ───────────────────
 
 def apply_scalars(scalars: dict, dry_run: bool = True) -> bool:
@@ -411,7 +428,9 @@ def main():
 
     # ── Derive starting scalars ────────────────────────────────────────────────
     scalars, scalar_source = derive_scalars()
-    window = 0.20  # v23 starting value
+    window, window_source = derive_starting_window()
+    print(f"[HARNESS] Loaded cluster window from: {window_source}")
+    print(f"[HARNESS] Initial window: {window:.4f}")
 
     # ── Round 0: dry-run smoke test ────────────────────────────────────────────
     print("\n[HARNESS] Round 0: dry-run smoke test")
