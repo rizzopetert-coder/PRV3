@@ -24,22 +24,36 @@ from engine.data.intake import (
 )
 
 # Empirical noise centroid — per-field mean of accumulated vector across N=1000
-# random simulations, seed=42, Q01-Q39, v20 clean engine state.
+# random simulations, seed=42, across the 44 live PHASE_1_QUESTION_SEQUENCE
+# questions (web/lib/session-store.ts, read live at generation time) --
+# regenerated this session after Q40-Q51 were added (32 -> 44 live questions).
+# Original values (37 real questions -- Q03/Q27 were silently unreachable
+# under the old range-based generation, not 39 despite the name; see
+# tools/_mob.txt Decision Register for the full MC_CENTROID_39/core-
+# question-count coupling finding): aptitude_liability 3.9565, aptitude_
+# asset 0.6800, authority_liability 5.3601, authority_asset 1.6503,
+# alliance_liability 2.9859, alliance_asset 0.1924, attitude_liability
+# 4.8137, attitude_asset 0.9795.
+# Name intentionally NOT changed to reflect 44 -- separate rename decision
+# (Gemini suggested MC_CENTROID_LIVE), not yet signed off by Pete.
 # Derived from tools/diag_v21_accumulated_centroid.py. LOCKED.
 MC_CENTROID_39: dict = {
-    "aptitude_liability":  3.9565,
-    "aptitude_asset":      0.6800,
-    "authority_liability": 5.3601,
-    "authority_asset":     1.6503,
-    "alliance_liability":  2.9859,
-    "alliance_asset":      0.1924,
-    "attitude_liability":  4.8137,
-    "attitude_asset":      0.9795,
+    "aptitude_liability":  3.5307,
+    "aptitude_asset":      0.5296,
+    "authority_liability": 6.2624,
+    "authority_asset":     1.3872,
+    "alliance_liability":  3.0468,
+    "alliance_asset":      0.4396,
+    "attitude_liability":  6.3701,
+    "attitude_asset":      1.3307,
 }
 
 # Field-specific centroid displacement scalars — Path B, Session 27.
-# Scales MC_CENTROID_39 per field: mu_focused[f] = MC_CENTROID_39[f] * scalar[f] * (N/39).
-# Derived from state_targets coverage per dimension / 39 questions.
+# Scales MC_CENTROID_39 per field: mu_focused[f] = MC_CENTROID_39[f] * scalar[f] * (N/44).
+# Derived from state_targets coverage per dimension / 44 live questions
+# (updated this session -- was /39, see MC_CENTROID_39 comment above).
+# Values below are stale pending Step 4 (harness reconvergence) -- not
+# updated by this step, per Pete's explicit Step 3 scope.
 # Managed by tools/harness_s27_autonomous_calibration.py — do not hand-edit.
 # All 1.0 = undamped (current SCD-WCS behavior). Harness writes derived values at round 0.
 CENTROID_FIELD_SCALARS = {
@@ -525,7 +539,7 @@ def rank_states(
       native space. This measures the session's deviation from expected noise
       in the direction of each state profile.
 
-      mu_N    = MC_CENTROID_39 * (answered_question_count / 39.0)
+      mu_N    = MC_CENTROID_39 * (answered_question_count / 44.0)
       A_d     = accumulated - mu_N     (session: centroid-displaced)
       B       = profile                 (profile: undisplaced, native space)
       sim = WCS(A_d, B, W) if salience_weights else cosine(A_d, B)
@@ -541,7 +555,7 @@ def rank_states(
     """
     fields = list(DIMENSIONAL_FIELDS)
     N = float(answered_question_count)
-    scale = N / 39.0
+    scale = N / 44.0
 
     mu_N = np.array([MC_CENTROID_39[f] * CENTROID_FIELD_SCALARS.get(f, 1.0) * scale for f in fields])
     vec_A = np.array([accumulated_vector.get(f, 0.0) for f in fields])
