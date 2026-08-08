@@ -23,6 +23,7 @@ Pete is pinged (loop stops) on:
 import sys
 import os
 import re
+import argparse
 import copy
 import json
 import datetime
@@ -415,10 +416,32 @@ def write_kpi_report(
 # ── Main loop ──────────────────────────────────────────────────────────────────
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="PRV3 S27 Autonomous Calibration Harness"
+    )
+    parser.add_argument(
+        "--acknowledge-sink",
+        action="append",
+        default=[],
+        metavar="STATE_ID",
+        help=(
+            "Acknowledge a specific state as a diagnosed, non-blocking sink "
+            "for THIS RUN ONLY -- excludes it from the significant_new_sinks "
+            "escalation check; every other stop condition (a different new "
+            "sink, Rule A, Rule B, IMPASSE) stays fully active. Does not "
+            "raise or disable the >=5 capture threshold, does not persist "
+            "across runs or add to any allowlist. Repeatable."
+        ),
+    )
+    args = parser.parse_args()
+    acknowledged_sinks = set(args.acknowledge_sink)
+
     print("\n[HARNESS] PRV3 Session 27 — Autonomous Calibration Harness")
     print(f"[HARNESS] Target: {RESOLUTION_TARGET}/{RESOLUTION_TARGET} HC | "
           f"Impasse limit: {IMPASSE_ROUNDS} flat rounds | "
           f"Scalar step: {SCALAR_STEP} | Window step: {WINDOW_STEP}")
+    if acknowledged_sinks:
+        print(f"[HARNESS] Acknowledged sinks (this run only): {sorted(acknowledged_sinks)}")
     print()
 
     # Init log file
@@ -542,10 +565,28 @@ def main():
         # at startup (<5 captures at baseline) -- catches sinks the tuning
         # loop itself creates or worsens, without re-flagging chronic
         # sinks that predate this run.
-        significant_new_sinks = {
+        raw_significant_new_sinks = {
             s: c for s, c in sink_counts.items()
             if c >= 5 and baseline_sink_counts.get(s, 0) < 5
         }
+        significant_new_sinks = {
+            s: c for s, c in raw_significant_new_sinks.items()
+            if s not in acknowledged_sinks
+        }
+        overridden_sinks = {
+            s: c for s, c in raw_significant_new_sinks.items()
+            if s in acknowledged_sinks
+        }
+        if overridden_sinks:
+            override_msg = (
+                f"[HARNESS] OVERRIDE: acknowledged sink(s) {overridden_sinks} "
+                f"excluded from escalation this round -- diagnosed clean this "
+                f"session, scoped to this run only via --acknowledge-sink, not "
+                f"a threshold change, not a permanent allowlist."
+            )
+            print(override_msg)
+            with open(LOG_PATH, "a", encoding="utf-8") as fh:
+                fh.write(f"\n{override_msg}\n")
 
         # Rule A -- overall suite floor: halt if overall_passed drops more
         # than RULE_A_FLOOR_PCT below the Round-0 baseline. Rule B --
