@@ -45,6 +45,14 @@ from engine.data.states import STATE_PROFILES
 RESOLUTION_TARGET       = len(STATE_PROFILES)  # HC states that must pass to declare resolution
 IMPASSE_ROUNDS          = 5       # consecutive flat rounds before impasse
 REGRESSION_LIMIT        = 3       # HC regressions in one round → escalate immediately
+# Rule A/B -- added this session after the MC_CENTROID_39 finding: HC-
+# pass-count-only stop conditions let 16 rounds run while 51 pre-existing,
+# unrelated test cases silently regressed (mostly moderate-tier, mostly
+# Authority-dimension). Both compare against the Round-0 baseline
+# calibration pass, not round-to-round, so gradual drift across many
+# rounds is caught the same as a single sharp drop.
+RULE_A_FLOOR_PCT        = 0.05    # halt if overall_passed drops >5% below Round-0 baseline
+RULE_B_TIER_CAP         = 3       # halt if moderate or weak tier loses >3 passing profiles vs Round-0
 SCALAR_FLOOR            = 0.10    # minimum displacement scalar
 SCALAR_CEILING          = 1.00    # maximum displacement scalar (undamped = 1.0)
 SCALAR_STEP             = 0.02    # liability scalar reduction per round
@@ -81,28 +89,26 @@ _ENV["PYTHONPATH"] = PROJECT_ROOT
 
 # ── Step 1: Derive starting scalars from live QUESTION_LIBRARY ─────────────────
 
-def derive_scalars():
+def compute_primary_target_counts():
     """
-    Count questions that target each primary dimension (via state_targets).
-    Scalar = count / N, where N is the live core-question count.
-    Falls back to Gemini hardcoded values if library is empty.
-    Returns (scalars_dict, source_label).
+    Cold-start only (called from derive_scalars() when
+    engine.accumulation.CENTROID_FIELD_SCALARS is empty). Counts questions
+    targeting each primary dimension directly from engine/data/questions.py's
+    _QDATA -- index 6 is state_targets, confirmed this session against
+    _build_library()'s own unpacking order:
+        for (qid, text, fmt, pos, seg, opts, targets, sev) in _QDATA:
+    Index 3 is sequence_position (int or None), not state_targets -- a bug
+    in an earlier draft of this function, caught before implementation.
 
-    N source, confirmed this session: len(QUESTION_LIBRARY) is NOT usable
-    directly -- it includes SEVER-##, DIST-##, VERIFY-Q##, and FOLLOW
-    variants, not just core questions (87 vs. 41 core, confirmed by direct
-    count). Uses tools.calibration_runner._CORE_QUESTION_IDS instead --
-    the closest existing "core question" concept in this codebase, and the
-    one this harness's own calibration loop actually iterates over via
-    generate_answers(). Note this is NOT identical to the live product's
-    respondent-facing PHASE_1_QUESTION_SEQUENCE (32, defined in
-    web/lib/session-store.ts, not importable from Python, and already on
-    record as diverging from _CORE_QUESTION_IDS by excluding the Q35-39
-    Aptitude addenda) -- this value is internally consistent with what the
-    calibration harness itself simulates, which is what this scalar seed is
-    for.
+    Denominator N = len(_CORE_QUESTION_IDS), the already-locked fixed
+    per-question count. NOT sum(dim_counts.values()) -- that double-counts
+    any question whose state_targets span multiple primary dimensions
+    (confirmed ~2.5x discrepancy on live data: 134 vs. 53).
+
+    Returns a scalars dict (not a tuple) -- derive_scalars() attaches the
+    "cold_start" source label.
     """
-    from engine.data.questions import QUESTION_LIBRARY
+    from engine.data.questions import _QDATA
     from engine.data.states import STATE_PROFILES
     from tools.calibration_runner import _CORE_QUESTION_IDS
 
@@ -110,12 +116,13 @@ def derive_scalars():
     dim_counts = {"Aptitude": 0, "Authority": 0, "Alliance": 0, "Attitude": 0}
     q_with_targets = 0
 
-    for q in QUESTION_LIBRARY.values():
-        if not q.state_targets:
+    for entry in _QDATA:
+        state_targets = entry[6]
+        if not state_targets:
             continue
         q_with_targets += 1
         touched_dims = set()
-        for sid in q.state_targets:
+        for sid in state_targets:
             d = dim_map.get(sid)
             if d in dim_counts:
                 touched_dims.add(d)
@@ -123,7 +130,7 @@ def derive_scalars():
             dim_counts[d] += 1
 
     if q_with_targets == 0:
-        print("[HARNESS] WARNING: QUESTION_LIBRARY empty — using Gemini hardcoded scalars")
+        print("[HARNESS] WARNING: _QDATA empty — using Gemini hardcoded scalars")
         return {
             "aptitude_liability":  0.2564,
             "aptitude_asset":      0.4000,
@@ -133,7 +140,7 @@ def derive_scalars():
             "alliance_asset":      0.4000,
             "attitude_liability":  0.3846,
             "attitude_asset":      0.4000,
-        }, "fallback"
+        }
 
     N = len(_CORE_QUESTION_IDS)
     scalars = {
@@ -146,12 +153,39 @@ def derive_scalars():
         "attitude_liability":  round(dim_counts["Attitude"]  / N, 4),
         "attitude_asset":      0.4000,
     }
-
-    print(f"[HARNESS] Derived scalars from library (questions with state_targets: {q_with_targets}):")
-    print(f"  dim_counts: {dim_counts}")
+    print(f"[HARNESS] Cold-start dim_counts (questions with state_targets: {q_with_targets}, N={N}): {dim_counts}")
     for f, v in scalars.items():
         print(f"  {f:<30} {v:.4f}")
-    return scalars, "derived"
+    return scalars
+
+
+def derive_scalars():
+    """
+    Warm-start unconditionally from engine.accumulation.CENTROID_FIELD_SCALARS
+    when populated -- returned as-is, no Delta-Share adjustment (Rule A/B
+    in main() supersede that mechanism). Preserves whatever configuration
+    last converged/was committed, avoiding the discontinuous from-scratch
+    re-derivation that caused an 84-test-case regression jump when this
+    harness last ran (documented in tools/_mob.txt's MC_CENTROID_39 finding
+    and the Round-16 ESCALATING replay analysis, same session).
+
+    Cold-start fallback (CENTROID_FIELD_SCALARS empty): see
+    compute_primary_target_counts().
+
+    Returns (scalars_dict, source_label). Zero-arg signature, tuple
+    return -- unchanged, no call-site changes needed.
+    """
+    from engine.accumulation import CENTROID_FIELD_SCALARS
+
+    if CENTROID_FIELD_SCALARS:
+        print("[HARNESS] Warm-start from engine.accumulation.CENTROID_FIELD_SCALARS:")
+        for f, v in CENTROID_FIELD_SCALARS.items():
+            print(f"  {f:<30} {v:.4f}")
+        return dict(CENTROID_FIELD_SCALARS), "warm_start"
+
+    print("[HARNESS] CENTROID_FIELD_SCALARS empty — cold-start from _QDATA")
+    scalars = compute_primary_target_counts()
+    return scalars, "cold_start"
 
 
 # ── Step 2: Write CENTROID_FIELD_SCALARS to accumulation.py ───────────────────
@@ -419,8 +453,13 @@ def main():
         print("[HARNESS] ESCALATE: Baseline calibration pass returned no parseable output. Stop.")
         return
     baseline_sink_counts = baseline_cal["sink_counts"]
+    baseline_overall_pass = baseline_cal["overall_passing"]
+    baseline_overall_total = baseline_cal["overall_total"]
+    baseline_tier_counts = baseline_cal.get("tier_counts", {})
     print(f"[HARNESS] Baseline sinks (>=5 captures): "
           f"{ {s: c for s, c in baseline_sink_counts.items() if c >= 5} }")
+    print(f"[HARNESS] Baseline overall: {baseline_overall_pass}/{baseline_overall_total}")
+    print(f"[HARNESS] Baseline tier_counts: {baseline_tier_counts}")
 
     # Log initial state
     with open(LOG_PATH, "a", encoding="utf-8") as fh:
@@ -429,7 +468,9 @@ def main():
             fh.write(f"  {f}: {v:.4f}\n")
         fh.write(f"Starting window: {window}\n")
         fh.write(f"Baseline sinks (>=5 captures): "
-                 f"{ {s: c for s, c in baseline_sink_counts.items() if c >= 5} }\n\n")
+                 f"{ {s: c for s, c in baseline_sink_counts.items() if c >= 5} }\n")
+        fh.write(f"Baseline overall: {baseline_overall_pass}/{baseline_overall_total}\n")
+        fh.write(f"Baseline tier_counts: {baseline_tier_counts}\n\n")
 
     # ── Main calibration loop ──────────────────────────────────────────────────
     round_num        = 0
@@ -458,6 +499,7 @@ def main():
         # worth surfacing immediately, not papering over.
         overall_total = cal["overall_total"]
         sink_counts   = cal.get("sink_counts", {})
+        tier_counts   = cal.get("tier_counts", {})
 
         hc_count  = len(hc_passing)
         prev_count = len(prev_hc_passing)
@@ -486,8 +528,40 @@ def main():
             if c >= 5 and baseline_sink_counts.get(s, 0) < 5
         }
 
+        # Rule A -- overall suite floor: halt if overall_passed drops more
+        # than RULE_A_FLOOR_PCT below the Round-0 baseline. Rule B --
+        # secondary tier cap: halt if moderate or weak tier loses more than
+        # RULE_B_TIER_CAP passing profiles vs Round-0 baseline. Both checked
+        # before RESOLVED -- a "resolution" built on a collapsed overall
+        # suite is exactly the failure mode this session's MC_CENTROID_39
+        # finding documented (HC gains bought by silent, unrelated
+        # regressions), so a floor/cap breach halts even if RESOLUTION_
+        # TARGET is hit the same round.
+        rule_a_breach = (
+            baseline_overall_pass > 0
+            and overall_pass < baseline_overall_pass * (1 - RULE_A_FLOOR_PCT)
+        )
+        rule_b_breach = []
+        for tier in ("moderate", "weak"):
+            base_tier_passed = baseline_tier_counts.get(tier, {}).get("passed", 0)
+            cur_tier_passed = tier_counts.get(tier, {}).get("passed", 0)
+            if base_tier_passed - cur_tier_passed > RULE_B_TIER_CAP:
+                rule_b_breach.append(
+                    f"{tier} {base_tier_passed}\u2192{cur_tier_passed} "
+                    f"(-{base_tier_passed - cur_tier_passed})"
+                )
+
         # Status determination
-        if hc_count >= RESOLUTION_TARGET:
+        if rule_a_breach:
+            drop_pct = (baseline_overall_pass - overall_pass) / baseline_overall_pass
+            status = (
+                f"ESCALATING — Rule A overall suite floor breached: "
+                f"{overall_pass}/{overall_total} vs baseline "
+                f"{baseline_overall_pass}/{baseline_overall_total} ({drop_pct:.1%} drop)"
+            )
+        elif rule_b_breach:
+            status = f"ESCALATING — Rule B secondary tier cap breached: {rule_b_breach}"
+        elif hc_count >= RESOLUTION_TARGET:
             status = "RESOLVED"
         elif consecutive_flat >= IMPASSE_ROUNDS:
             status = "IMPASSE"
