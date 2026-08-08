@@ -935,6 +935,17 @@ Region IX FAME Report for California, FY2009, Table 5/SAMM 10) -- that figure pr
 this replacement by sixteen years and is no longer current; retained here only as
 superseded history, not as an alternate current value.
 
+**Separate measure, do not conflate with the SAMM 8 figure above:** the same FY2023
+Comprehensive FAME Report also gives an average penalty PER INSPECTION WITH VIOLATIONS
+ISSUED (not per-serious-violation) of $5,906.03 for California, versus an $8,861.84
+national average -- LOWER than the national figure, the opposite direction from the
+per-violation measure above. This is not a contradiction: California's SWRU (serious/
+willful/repeat/unclassified) classification rate is unusually low relative to other
+states, which pulls the per-inspection average down even though the per-violation
+average runs well above the national FRL range. Recorded here for completeness only --
+the per-serious-violation SAMM 8 figure above remains the relevant measure for this
+methodology's actual-average-penalty backfill purposes.
+
 **Needs actual-average backfill, updated:** Washington, Alaska, Hawaii, Arizona
 (partial -- case examples only), Indiana, Iowa, Kentucky (figure found, Addendum 12 --
 'within the FRL' -- now that Michigan's report defines FRL as a computed national-average-
