@@ -59,11 +59,11 @@ MC_CENTROID_39: dict = {
 CENTROID_FIELD_SCALARS = {
     "aptitude_liability": 0.2415,
     "aptitude_asset": 0.4000,
-    "authority_liability": 0.3318,
+    "authority_liability": 0.2318,
     "authority_asset": 0.4000,
     "alliance_liability": 0.2185,
     "alliance_asset": 0.4000,
-    "attitude_liability": 0.4267,
+    "attitude_liability": 0.3067,
     "attitude_asset": 0.4000,
 }
 

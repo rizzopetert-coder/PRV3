@@ -71,7 +71,7 @@ ALL_PROFILES = (
 _NOISE_BASELINE: dict = {}
 
 # v23 calibration cluster window -- HC/extreme pass criterion: target within SCD_WCS_CLUSTER_WINDOW of rank-1
-SCD_WCS_CLUSTER_WINDOW:      float = 0.3500  # CALIBRATION TARGET -- Session 26
+SCD_WCS_CLUSTER_WINDOW: float = 0.3500  # CALIBRATION TARGET -- Session 26
 MODERATE_PROMINENCE_DELTA:   float = 0.26   # CALIBRATION TARGET -- Session 29 (was 0.20, S28)
 WEAK_PROMINENCE_DELTA:       float = 0.50   # CALIBRATION TARGET -- Session 28
 
