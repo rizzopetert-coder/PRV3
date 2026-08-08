@@ -62,6 +62,18 @@ HEADCOUNT_FIELD_SPEC = {
 }
 
 
+# DEPRECATED (Mechanism 1) -- this session. PRIOR_ADJUSTER_INDEX/
+# PRIOR_ADJUSTERS/PriorAdjuster below are no longer consumed by
+# initialize_priors() (engine/accumulation.py) or any live scoring path.
+# Confirmed before deprecating: AccumulationEngine.priors's one getter has
+# zero callers repo-wide, so this data never reached real ranking/output --
+# this change makes that structural rather than incidental.
+# significant_events is now synthesis-only narrative metadata (Phase 3),
+# never a scoring input. Kept in place, not deleted: engine/data/validate.py
+# still imports these names for two structural checks ("none" event exists,
+# its multiplier is 1.0) that remain harmless but check a now-deprecated
+# mechanism -- flagged in tools/_mob.txt's Priority Queue, not addressed
+# here. See Decision Register for the full deprecation record.
 # ── Prior Probability Adjusters — Section I.3.1 ────────────────────────────────
 
 @dataclass

@@ -17,7 +17,6 @@ from typing import Optional
 
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.data.intake import (
-    PRIOR_ADJUSTER_INDEX,
     ROLE_COEFFICIENTS,
     AXIS_MODIFIER_INDEX,
     HIGH_HAZARD_INDUSTRIES,
@@ -96,44 +95,26 @@ class IntakeData:
 
 # ── II.1  Prior Probability Initialization ─────────────────────────────────────
 
-def initialize_priors(intake_data: IntakeData) -> dict:
+def initialize_priors() -> dict:
     """
-    Build the initial state probability distribution from intake data.
-    Returns {state_id: prior_probability} normalized to sum 1.0.
+    Flat, neutral baseline prior distribution -- 1/n for every state,
+    unconditionally. Mechanism 1 (Prior Probability Adjusters, Section
+    I.3.1 -- significant-events-driven and headcount-driven prior
+    elevation) is DEPRECATED this session: confirmed nothing in the real
+    ranking/output pipeline ever reads AccumulationEngine.priors (its one
+    getter, below, has zero callers repo-wide), so elevating this
+    distribution never affected live scoring output. significant_events is
+    now synthesis-only narrative metadata (Phase 3), never a scoring input.
 
-    Steps:
-      1. Equal baseline prior: 1/n across all states.
-      2. Significant event multipliers applied to elevated state lists.
-      3. Headcount < 25 elevates the_founders_grip (CALIBRATION TARGET value).
-      4. Proportional normalization.
+    Kept as a real function, not inlined at its one call site, to preserve
+    AccumulationSession.priors's existing contract (dict[state_id, float]
+    summing to 1.0) for AccumulationEngine.priors's getter, even though
+    nothing currently reads it.
 
-    Spec reference: Section II.1
+    Spec reference: Section II.1 (superseded -- see Decision Register).
     """
     n = len(STATE_PROFILES)
-    priors = {sid: 1.0 / n for sid in STATE_PROFILES}
-
-    # Significant event adjustments (Section I.3.1)
-    for event_id in intake_data.significant_events:
-        adjuster = PRIOR_ADJUSTER_INDEX.get(event_id)
-        if adjuster is None:
-            continue
-        m = _coeff(adjuster.multiplier)
-        for sid in adjuster.elevated_states:
-            if sid in priors:
-                priors[sid] *= m
-
-    # Headcount < 25: elevate the_founders_grip prior
-    if intake_data.headcount < 25 and "the_founders_grip" in priors:
-        modifier = AXIS_MODIFIER_INDEX.get("headcount_small_founders_grip")
-        if modifier is not None:
-            priors["the_founders_grip"] *= _coeff(modifier.multiplier)
-
-    # Proportional normalization — full distribution must sum to 1.0
-    total = sum(priors.values())
-    if total > 0:
-        priors = {sid: v / total for sid, v in priors.items()}
-
-    return priors
+    return {sid: 1.0 / n for sid in STATE_PROFILES}
 
 
 # ── II.3  Signal Reliability Coefficient Application ──────────────────────────
@@ -618,7 +599,7 @@ class AccumulationEngine:
     def __init__(self, intake_data: IntakeData):
         self.intake_data = intake_data
         self.session = AccumulationSession(
-            priors=initialize_priors(intake_data),
+            priors=initialize_priors(),
         )
 
     def apply_answer(self, answer_option, question_id: str = "") -> None:

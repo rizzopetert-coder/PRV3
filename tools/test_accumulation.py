@@ -60,20 +60,20 @@ INTAKE_EVENT = IntakeData(
     principal_role="C-suite",
 )
 
-INTAKE_HEADCOUNT_SMALL = IntakeData(
-    headcount=4,
-    industry="Professional Services",
-    org_type="Founder-led",
-    jurisdictions=["TX"],
-    significant_events=["none"],
-    principal_role="Owner or founder",
-)
+# ── 1. Baseline prior — flat, unconditional (Mechanism 1 deprecated) ──────────
+print("\n1. Prior initialization — flat baseline, unconditional")
 
-
-# ── 1. Baseline prior — equal probability ─────────────────────────────────────
-print("\n1. Prior initialization — baseline (no events)")
-
-priors_basic = initialize_priors(INTAKE_BASIC)
+# initialize_priors() no longer takes intake_data -- Mechanism 1 (Prior
+# Probability Adjusters: significant-events-driven and headcount-driven
+# prior elevation) was deprecated this session (Decision Register):
+# confirmed nothing in the real ranking/output pipeline ever read
+# AccumulationEngine.priors, so this is now a pure equal-baseline function,
+# always. The former sections 2/3 (event elevation, headcount elevation)
+# are removed -- there's no mechanism left to test. INTAKE_EVENT/
+# INTAKE_BASIC are still exercised below by AccumulationEngine's own
+# constructor tests, which still takes intake_data (only the pass-through
+# into initialize_priors() was removed).
+priors_basic = initialize_priors()
 n = len(STATE_PROFILES)
 expected = 1.0 / n
 
@@ -81,40 +81,9 @@ check("Prior dict covers all states", len(priors_basic) == n, f"got {len(priors_
 check("Prior sums to 1.0",
       isclose(sum(priors_basic.values()), 1.0, rel_tol=1e-9),
       f"sum={sum(priors_basic.values())}")
-check("None-event: uniform prior (all states equal)",
+check("Flat baseline: uniform prior (all states equal)",
       all(isclose(v, expected, rel_tol=1e-9) for v in priors_basic.values()),
       f"non-uniform: sample={list(priors_basic.values())[:3]}")
-
-
-# ── 2. Significant event — elevated states then normalized ─────────────────────
-print("\n2. Prior initialization — significant event (acquisition_or_merger)")
-
-priors_event = initialize_priors(INTAKE_EVENT)
-# acquisition_or_merger elevates: the_second_close, identity_erosion, transition_paralysis
-# multiplier is CALIBRATION_TARGET (None) → treated as 1.0 → distribution stays uniform
-elevated_ids = ["the_second_close", "identity_erosion", "transition_paralysis"]
-
-check("Event prior sums to 1.0",
-      isclose(sum(priors_event.values()), 1.0, rel_tol=1e-9),
-      f"sum={sum(priors_event.values())}")
-
-# With CALIBRATION_TARGET multiplier (1.0), distribution is still uniform
-check("CALIBRATION_TARGET multiplier = 1.0 → uniform prior preserved",
-      all(isclose(priors_event[sid], expected, rel_tol=1e-9)
-          for sid in elevated_ids),
-      f"non-uniform: {[(s, priors_event[s]) for s in elevated_ids]}")
-
-
-# ── 3. Headcount < 25 — founders_grip elevated (CALIBRATION_TARGET = 1.0) ─────
-print("\n3. Prior initialization — headcount Under 25")
-
-priors_small = initialize_priors(INTAKE_HEADCOUNT_SMALL)
-check("Headcount prior sums to 1.0",
-      isclose(sum(priors_small.values()), 1.0, rel_tol=1e-9),
-      f"sum={sum(priors_small.values())}")
-check("Headcount CALIBRATION_TARGET (1.0) → founders_grip at baseline",
-      isclose(priors_small["the_founders_grip"], expected, rel_tol=1e-9),
-      f"founders_grip={priors_small['the_founders_grip']}, expected={expected}")
 
 
 # ── 4. Baseline rank_states — zero accumulated vector ─────────────────────────
