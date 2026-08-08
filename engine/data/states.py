@@ -1674,3 +1674,30 @@ STATE_PROFILES["cultural_overtime"].dimensional_vector = DimensionalVector(
     attitude_asset=0.15,
 )
 STATE_PROFILES["cultural_overtime"].descriptive_prose = "Extended hours have become an unstated cultural expectation rather than an occasional operational necessity, and the organization is carrying real legal and financial exposure from that norm without having decided, on paper, that it wants to run this way."
+
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║  ATTITUDE  (MC_CENTROID_39 recalibration, Step 1 -- 58th state)            ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+
+_reg(_profile(
+    state_id="the_inner_circle",
+    state_name="The Inner Circle",
+    primary_dimension="Attitude",
+    signal_weight="high",
+    cluster_id=None,
+    liability_axes=["Cultural & Behavioral", "Talent & Retention", "Governance & Authority"],
+    asset_axes=["Accountability Architecture", "Governance Discipline"],
+    sev_min="Emerging", sev_max="Endemic",
+    resolution_family="Intervention + Executive Counsel",
+))
+STATE_PROFILES["the_inner_circle"].dimensional_vector = DimensionalVector(
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
+    authority_liability=0.10,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
+    attitude_liability=0.60,
+    attitude_asset=0.10,
+)
+STATE_PROFILES["the_inner_circle"].descriptive_prose = "There's a group at the top of this organization who look out for each other first. Decisions get made in rooms you're not in, by people who protect each other's mistakes as readily as their own. It isn't about one person getting away with something — it's a whole layer that answers to itself instead of any standard. The people outside the circle have figured out exactly what that means for them."

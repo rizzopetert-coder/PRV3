@@ -81,6 +81,12 @@ export const PHASE_1_QUESTION_SEQUENCE: readonly string[] = [
   "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17", "Q18", "Q19", "Q20",
   "Q21", "Q22", "Q23", "Q24", "Q25", "Q26", "Q27B", "Q29", "Q30",
   "Q32", "Q33", "Q34",
+  // MC_CENTROID_39 recalibration, Step 1 core expansion (this session) --
+  // Q40-Q49 close severity-tier reachability for 7 states; Q50-Q51 are
+  // the_inner_circle's own two questions (58th state). Full content/
+  // rationale: tools/gemini_handoff_11_states_package.md.
+  "Q40", "Q41", "Q42", "Q43", "Q44", "Q45", "Q46", "Q47", "Q48", "Q49",
+  "Q50", "Q51",
 ];
 
 // ---------------------------------------------------------------------------

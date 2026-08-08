@@ -1131,6 +1131,178 @@ _QDATA = [
         ["the_paper_tiger", "the_unformed_leader", "built_to_fail"],
         False,
     ),
+    # -- MC_CENTROID_39 recalibration, Step 1 core expansion (this session) -----
+    # Q40-Q49: 10-question batch closing severity-tier reachability for 7
+    # states. Q50-Q51: the_inner_circle's own 2 questions (58th state).
+    # severity_follow_on_id deliberately None on every D option this step --
+    # SEVER-## authoring is a separate, later step. Full content/rationale:
+    # tools/gemini_handoff_11_states_package.md.
+    (
+        "Q40",
+        "How many people have held this exact role before you,"
+        " and what's the organization's read on why they left?",
+        "forced_choice", 40, "late",
+        [
+            ("A", "This is a new role, or my predecessor left for an unrelated reason (promotion, relocation).", False, None),
+            ("B", "One person left before me, and it seemed like a one-off.", False, None),
+            ("C", "I'm at least the second person in this role where the reasons started to look similar.", False, None),
+            ("D", "Multiple people have left this exact role for the same reasons, and the organization keeps hiring for it as if that's not happening.", True, None),
+        ],
+        ["built_to_fail"],
+        True,
+    ),
+    (
+        "Q41",
+        "When you've raised the gap between the scope and the resources"
+        " you actually have, what's happened?",
+        "forced_choice", 41, "late",
+        [
+            ("A", "It got acknowledged and something changed.", False, None),
+            ("B", "It got acknowledged, but nothing's changed yet.", False, None),
+            ("C", "I was told to figure it out — the responsibility landed on me, not the structure.", False, None),
+            ("D", "I've been told that directly, and I know the person before me was told the same thing — it's clearly the standard answer to this role, not advice specific to me.", True, None),
+        ],
+        ["built_to_fail"],
+        True,
+    ),
+    (
+        "Q42",
+        "When a decision needs that one person's approval and they're"
+        " unavailable, what happens?",
+        "forced_choice", 42, "late",
+        [
+            ("A", "Someone else is empowered to decide, and it holds.", False, None),
+            ("B", "It waits, but not for long.", False, None),
+            ("C", "It waits for a while, and people route around it when they can.", False, None),
+            ("D", "Everything stops until they're reachable, no matter how long that takes — there's no real delegation, just waiting.", True, None),
+        ],
+        ["the_founders_grip"],
+        True,
+    ),
+    (
+        "Q43",
+        "Have senior people left specifically because of how concentrated"
+        " decision-making is here?",
+        "forced_choice", 43, "late",
+        [
+            ("A", "Not that I'm aware of.", False, None),
+            ("B", "Maybe — it's come up, but I'm not certain it was the deciding factor.", False, None),
+            ("C", "Yes, at least one departure, and the reason was fairly clear.", False, None),
+            ("D", "Yes, more than one, and it's become something people acknowledge openly as why they left or are thinking about leaving.", True, None),
+        ],
+        ["the_founders_grip"],
+        True,
+    ),
+    (
+        "Q44",
+        "Who actually knows about this, and what's happened as a result?",
+        "forced_choice", 44, "late",
+        [
+            ("A", "It's known and being actively addressed by people with the authority to fix it.", False, None),
+            ("B", "It's known within the team or area it affects, but no real action has followed yet.", False, None),
+            ("C", "It's common knowledge well beyond the people directly affected — but it's never really reached anyone with the authority to act on it.", False, None),
+            ("D", "It's known all the way up, including by people who could act on it — and nothing has changed. It's simply tolerated.", True, None),
+        ],
+        ["the_tolerated_violation"],
+        True,
+    ),
+    (
+        "Q45",
+        "What's the honest reason this hasn't been addressed?",
+        "forced_choice", 45, "late",
+        [
+            ("A", "It's genuinely complicated and being worked through carefully.", False, None),
+            ("B", "It's been deprioritized behind other things.", False, None),
+            ("C", "Addressing it would be uncomfortable, and that discomfort has been enough to stall it.", False, None),
+            ("D", "The person at the center of it is protected in some way — by relationships, position, or value to the organization — and that protection is the actual reason nothing's happened.", True, None),
+        ],
+        ["the_tolerated_violation"],
+        True,
+    ),
+    (
+        "Q46",
+        "How would you describe the workforce's response to this pattern?",
+        "forced_choice", 46, "late",
+        [
+            ("A", "Outcomes were basically consistent, even if not identical.", False, None),
+            ("B", "Some variation exists, but explainable by real differences.", False, None),
+            ("C", "People have noticed a real pattern and talk about it — but it hasn't changed how they operate. It's recognition, not yet a lived strategy.", False, None),
+            ("D", "People have started making real decisions because of it — who they trust, whether they bother reporting things, what risks they're willing to take. The unequal treatment has become something people actively navigate around, not just something they've noticed.", True, None),
+        ],
+        ["the_arbitrary_standard"],
+        True,
+    ),
+    (
+        "Q47",
+        "Has anything changed for this manager — additional support,"
+        " delegated authority, or reduced scope — since it became clear"
+        " they were stretched?",
+        "forced_choice", 47, "late",
+        [
+            ("A", "Yes, and it's made a real difference.", False, None),
+            ("B", "Something was discussed, but hasn't materialized yet.", False, None),
+            ("C", "No, despite the strain being visible to others.", False, None),
+            ("D", "No — and it's been raised more than once, with no real response. The organization can see it and hasn't acted.", True, None),
+        ],
+        ["the_overloaded_manager"],
+        True,
+    ),
+    (
+        "Q48",
+        "Has this pattern in the data ever been raised internally"
+        " — through HR, legal, or leadership?",
+        "forced_choice", 48, "late",
+        [
+            ("A", "No, and there's no indication anyone else has noticed it either.", False, None),
+            ("B", "It hasn't been raised formally, but it's been noticed informally.", False, None),
+            ("C", "It's been raised, and it's currently being looked into.", False, None),
+            ("D", "It's been raised formally, with the data behind it, and the response was to defend the existing policy rather than examine it.", True, None),
+        ],
+        ["disparate_impact_architecture"],
+        True,
+    ),
+    (
+        "Q49",
+        "Has anyone tried to fix or refresh the reward system,"
+        " and what happened?",
+        "forced_choice", 49, "late",
+        [
+            ("A", "Yes, and it made a real difference.", False, None),
+            ("B", "Yes, but it hasn't landed yet — too early to tell.", False, None),
+            ("C", "There's been talk about it, but no real change has followed.", False, None),
+            ("D", "It's been tried more than once, and nothing has changed — people have stopped believing another attempt will be any different.", True, None),
+        ],
+        ["motivational_architecture_failure"],
+        True,
+    ),
+    (
+        "Q50",
+        "When someone in this group makes a costly mistake,"
+        " what happens to them?",
+        "forced_choice", 50, "late",
+        [
+            ("A", "They're held to the same standard as anyone else — real consequences, same as elsewhere.", False, None),
+            ("B", "There's usually some response, though it can feel softer than what others would face.", False, None),
+            ("C", "Very little happens — it gets quietly absorbed or explained away.", False, None),
+            ("D", "Nothing happens, and everyone knows it wouldn't. The group protects its own as a matter of course, not exception.", True, None),
+        ],
+        ["the_inner_circle"],
+        True,
+    ),
+    (
+        "Q51",
+        "How would you describe who gets included in the decisions"
+        " that matter here?",
+        "forced_choice", 51, "late",
+        [
+            ("A", "It's based on role and relevance — the right people are in the room for the right reasons.", False, None),
+            ("B", "It leans toward a familiar group, but it's not rigid.", False, None),
+            ("C", "It's a consistent, recognizable group — and being outside it means being out of the real conversations.", False, None),
+            ("D", "It's the same small group every time, regardless of who's actually closest to the issue — and everyone else has stopped expecting to be included.", True, None),
+        ],
+        ["the_inner_circle"],
+        True,
+    ),
     # -- Verification probes (Session 14) ----------------------------------------
     (
         "VERIFY-Q16",
@@ -1894,6 +2066,84 @@ def _build_library():
             "B": {**_z, "alliance_liability": 0.40, "attitude_liability": 0.40},
             "C": {**_z, "authority_liability": 0.40, "attitude_liability": 0.40},
             "D": {**_z, "attitude_liability": 0.15},
+        },
+        # -- MC_CENTROID_39 recalibration, Step 1 core expansion (this session) -
+        # A: all-zero (guarantees correct _neutral_option() selection for every
+        # profile this question isn't wired to -- confirmed necessary via a
+        # full-suite regression this session, see module docstring). B: 0.25
+        # liability. C: 0.5 liability. D: 0.75 liability (trigger). Single-
+        # dimension only, per tools/gemini_handoff_11_states_package.md.
+        "Q40": {
+            "A": dict(_z),
+            "B": {**_z, "aptitude_liability":  0.25},
+            "C": {**_z, "aptitude_liability":  0.50},
+            "D": {**_z, "aptitude_liability":  0.75},
+        },
+        "Q41": {
+            "A": dict(_z),
+            "B": {**_z, "aptitude_liability":  0.25},
+            "C": {**_z, "aptitude_liability":  0.50},
+            "D": {**_z, "aptitude_liability":  0.75},
+        },
+        "Q42": {
+            "A": dict(_z),
+            "B": {**_z, "authority_liability":  0.25},
+            "C": {**_z, "authority_liability":  0.50},
+            "D": {**_z, "authority_liability":  0.75},
+        },
+        "Q43": {
+            "A": dict(_z),
+            "B": {**_z, "authority_liability":  0.25},
+            "C": {**_z, "authority_liability":  0.50},
+            "D": {**_z, "authority_liability":  0.75},
+        },
+        "Q44": {
+            "A": dict(_z),
+            "B": {**_z, "authority_liability":  0.25},
+            "C": {**_z, "authority_liability":  0.50},
+            "D": {**_z, "authority_liability":  0.75},
+        },
+        "Q45": {
+            "A": dict(_z),
+            "B": {**_z, "authority_liability":  0.25},
+            "C": {**_z, "authority_liability":  0.50},
+            "D": {**_z, "authority_liability":  0.75},
+        },
+        "Q46": {
+            "A": dict(_z),
+            "B": {**_z, "alliance_liability":  0.25},
+            "C": {**_z, "alliance_liability":  0.50},
+            "D": {**_z, "alliance_liability":  0.75},
+        },
+        "Q47": {
+            "A": dict(_z),
+            "B": {**_z, "aptitude_liability":  0.25},
+            "C": {**_z, "aptitude_liability":  0.50},
+            "D": {**_z, "aptitude_liability":  0.75},
+        },
+        "Q48": {
+            "A": dict(_z),
+            "B": {**_z, "authority_liability":  0.25},
+            "C": {**_z, "authority_liability":  0.50},
+            "D": {**_z, "authority_liability":  0.75},
+        },
+        "Q49": {
+            "A": dict(_z),
+            "B": {**_z, "attitude_liability":  0.25},
+            "C": {**_z, "attitude_liability":  0.50},
+            "D": {**_z, "attitude_liability":  0.75},
+        },
+        "Q50": {
+            "A": dict(_z),
+            "B": {**_z, "attitude_liability":  0.25},
+            "C": {**_z, "attitude_liability":  0.50},
+            "D": {**_z, "attitude_liability":  0.75},
+        },
+        "Q51": {
+            "A": dict(_z),
+            "B": {**_z, "attitude_liability":  0.25},
+            "C": {**_z, "attitude_liability":  0.50},
+            "D": {**_z, "attitude_liability":  0.75},
         },
     }
 
