@@ -992,12 +992,31 @@ def main() -> None:
             for pred, cnt in preds.items():
                 if pred != tgt:
                     sink_j[pred] = sink_j.get(pred, 0) + cnt
+        # tier_counts -- Rule A/B input (harness_s27_autonomous_calibration.py).
+        # hc combines high_confidence + extreme_high_confidence, matching how
+        # RESOLUTION_TARGET/hc_passing already treat the two as one tier.
+        by_pt = suite["by_profile_type"]
+        tier_counts = {
+            "hc": {
+                "passed": by_pt["high_confidence"]["passed"] + by_pt["extreme_high_confidence"]["passed"],
+                "total":  by_pt["high_confidence"]["total"] + by_pt["extreme_high_confidence"]["total"],
+            },
+            "moderate": {
+                "passed": by_pt["moderate"]["passed"],
+                "total":  by_pt["moderate"]["total"],
+            },
+            "weak": {
+                "passed": by_pt["weak"]["passed"],
+                "total":  by_pt["weak"]["total"],
+            },
+        }
         print(json.dumps({
             "hc_passing":      hc_passing_j,
             "hc_failing":      hc_failing_j,
             "overall_passing": suite["passed"],
             "overall_total":   suite["total"],
             "sink_counts":     sink_j,
+            "tier_counts":     tier_counts,
         }))
         sys.exit(0)
 
