@@ -820,6 +820,90 @@ EXP_DCF_03 = TestCase(
 )
 
 
+# -- Attitude: The Inner Circle (MC_CENTROID_39 follow-up, this session) --------
+
+EXP_IC_01 = TestCase(
+    test_id="EXP-IC-01",
+    description=(
+        "400-person financial services firm. A small group of senior leaders "
+        "has covered for each other's costly mistakes for years -- one "
+        "director's failed initiative was quietly absorbed, another's "
+        "compliance shortcut was never escalated. Decisions on budget and "
+        "promotion are made among this same small group regardless of who "
+        "is closest to the issue. Staff outside the group have stopped "
+        "expecting to be included."
+    ),
+    profile_type="high_confidence",
+    target_state="the_inner_circle",
+    intake={
+        "headcount":          412,
+        "industry":           "Financial Services",
+        "org_type":           "Privately held professional leadership",
+        "jurisdictions":      [],
+        "significant_events": ["none"],
+        "principal_role":     "C-suite",
+    },
+    answers=[],
+    expected=ExpectedOutput(
+        output_type="single_state",
+        identified_states=["the_inner_circle"],
+        severity_tier="Endemic",
+    ),
+)
+
+EXP_IC_02 = TestCase(
+    test_id="EXP-IC-02",
+    description=(
+        "180-person healthcare organization. A senior leadership group has "
+        "started to notice their own mistakes get less scrutiny than "
+        "others', and there's some sense that decisions cluster among a "
+        "familiar few. Not yet a fixed pattern across every major call."
+    ),
+    profile_type="moderate",
+    target_state="the_inner_circle",
+    intake={
+        "headcount":          184,
+        "industry":           "Healthcare",
+        "org_type":           "Nonprofit",
+        "jurisdictions":      [],
+        "significant_events": ["none"],
+        "principal_role":     "HR leader",
+    },
+    answers=[],
+    expected=ExpectedOutput(
+        output_type="single_state",
+        identified_states=["the_inner_circle"],
+        severity_tier="Entrenched",
+    ),
+)
+
+EXP_IC_03 = TestCase(
+    test_id="EXP-IC-03",
+    description=(
+        "55-person professional services firm. One senior leader mentioned "
+        "offhand that a peer's error was handled quietly. No pattern "
+        "confirmed, no sense that decisions are concentrated among a "
+        "specific group."
+    ),
+    profile_type="weak",
+    target_state="the_inner_circle",
+    intake={
+        "headcount":          55,
+        "industry":           "Professional Services",
+        "org_type":           "Privately held professional leadership",
+        "jurisdictions":      [],
+        "significant_events": ["none"],
+        "principal_role":     "Owner or founder",
+    },
+    answers=[],
+    expected=ExpectedOutput(
+        output_type="single_state",
+        identified_states=["the_inner_circle"],
+        severity_tier="Emerging",
+    ),
+)
+
+
 EXPANSION_PROFILES = [
     EXP_CC_01, EXP_CC_02, EXP_CC_03,
     EXP_SDB_01, EXP_SDB_02, EXP_SDB_03,
@@ -831,4 +915,5 @@ EXPANSION_PROFILES = [
     EXP_CO_01, EXP_CO_02, EXP_CO_03,
     EXP_IPM_01, EXP_IPM_02, EXP_IPM_03,
     EXP_DCF_01, EXP_DCF_02, EXP_DCF_03,
+    EXP_IC_01, EXP_IC_02, EXP_IC_03,
 ]
