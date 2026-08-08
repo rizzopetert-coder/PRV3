@@ -435,8 +435,17 @@ check("synthesis.asset_resolution_anchor_text is string",
       isinstance(output["synthesis"]["asset_resolution_anchor_text"], str))
 check("private_output.resolution_routing is string",
       isinstance(priv["resolution_routing"], str))
-check("private_output.friction_tax_estimate is None (CALIBRATION TARGET)",
-      priv["friction_tax_estimate"] is None)
+# Friction Tax calibration (Sets 1-3) is complete as of this session --
+# was previously asserted None ("CALIBRATION TARGET"); now checks the
+# real computed structure instead.
+fte = priv["friction_tax_estimate"]
+check("private_output.friction_tax_estimate is a calibrated {low, high, currency} dict",
+      isinstance(fte, dict)
+      and isinstance(fte.get("low"), (int, float))
+      and isinstance(fte.get("high"), (int, float))
+      and fte.get("low") <= fte.get("high")
+      and isinstance(fte.get("currency"), str),
+      f"got {fte!r}")
 if output["output_type"] == "single_state":
     check("single_state: opening_text = state name",
           len(priv["opening_text"]) > 0,
@@ -526,7 +535,8 @@ def make_output(rank1_state, output_type, severity_tier, above_floor_states=None
     d["severity"]["tier"] = severity_tier
     d["severity"]["anchor_text"] = SEVERITY_TIER_DESCRIPTIONS[severity_tier]
     d["identified_states"] = [{"state_id": rank1_state, "state_name": "X",
-                                "score": 0.9, "distinguishing_language": None}]
+                                "score": 0.9, "distinguishing_language": None,
+                                "descriptive_prose": "Test descriptive prose."}]
     # Rebuild distribution with correct ranks and above_floor
     for i, entry in enumerate(d["state_distribution"]):
         if entry["state_id"] == rank1_state:
