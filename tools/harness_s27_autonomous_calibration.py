@@ -54,6 +54,16 @@ REGRESSION_LIMIT        = 3       # HC regressions in one round → escalate imm
 # rounds is caught the same as a single sharp drop.
 RULE_A_FLOOR_PCT        = 0.05    # halt if overall_passed drops >5% below Round-0 baseline
 RULE_B_TIER_CAP         = 3       # halt if moderate or weak tier loses >3 passing profiles vs Round-0
+# Chronic-sink hybrid threshold -- Gemini-approved this session, added
+# because invisible_performance_management (33 captures at Round-0
+# baseline, peaked at 55) was structurally invisible to the new-sink
+# check: it was already >=5 at that one fixed snapshot, so it could
+# never cross into "new" no matter how much worse it got. Requires
+# BOTH a relative and an absolute growth threshold so a small sink
+# doubling (e.g. 2->4) doesn't trip it, but a large sink growing
+# substantially in both senses does.
+CHRONIC_SINK_GROWTH_PCT = 0.25    # halt if a baseline sink grows >=25% vs Round-0 baseline
+CHRONIC_SINK_GROWTH_DELTA = 8     # AND grows by >=8 captures vs Round-0 baseline
 SCALAR_FLOOR            = 0.10    # minimum displacement scalar
 SCALAR_CEILING          = 1.00    # maximum displacement scalar (undamped = 1.0)
 SCALAR_STEP             = 0.02    # liability scalar reduction per round
@@ -588,6 +598,50 @@ def main():
             with open(LOG_PATH, "a", encoding="utf-8") as fh:
                 fh.write(f"\n{override_msg}\n")
 
+        # Chronic-sink check -- Gemini-approved hybrid threshold (this
+        # session): a state already significant at the fixed Round-0
+        # baseline (>=5 captures, the complement of the new-sink check's
+        # <5 condition) that has since grown by BOTH >=25% relative AND
+        # >=8 absolute captures. Added because invisible_performance_
+        # management (33 at baseline, peaked at 55 during reconvergence)
+        # was structurally invisible to significant_new_sinks -- already
+        # >=5 at that one fixed snapshot, so it could never cross into
+        # "new" no matter how much worse it got. Same fixed-baseline
+        # comparison as the new-sink check (not a rolling window), same
+        # ESCALATING severity, same acknowledged_sinks set --
+        # --acknowledge-sink applies to both checks identically.
+        raw_chronic_sinks = {}
+        for s, c in sink_counts.items():
+            base_c = baseline_sink_counts.get(s, 0)
+            if base_c < 5:
+                continue
+            growth = c - base_c
+            growth_pct = growth / base_c if base_c > 0 else 0.0
+            if growth_pct >= CHRONIC_SINK_GROWTH_PCT and growth >= CHRONIC_SINK_GROWTH_DELTA:
+                raw_chronic_sinks[s] = {
+                    "baseline": base_c, "current": c,
+                    "delta": growth, "pct": round(growth_pct, 4),
+                }
+        chronic_sinks = {
+            s: d for s, d in raw_chronic_sinks.items()
+            if s not in acknowledged_sinks
+        }
+        overridden_chronic_sinks = {
+            s: d for s, d in raw_chronic_sinks.items()
+            if s in acknowledged_sinks
+        }
+        if overridden_chronic_sinks:
+            override_chronic_msg = (
+                f"[HARNESS] OVERRIDE (chronic): acknowledged sink(s) "
+                f"{overridden_chronic_sinks} excluded from chronic-growth "
+                f"escalation this round -- diagnosed clean this session, "
+                f"scoped to this run only via --acknowledge-sink, not a "
+                f"threshold change, not a permanent allowlist."
+            )
+            print(override_chronic_msg)
+            with open(LOG_PATH, "a", encoding="utf-8") as fh:
+                fh.write(f"\n{override_chronic_msg}\n")
+
         # Rule A -- overall suite floor: halt if overall_passed drops more
         # than RULE_A_FLOOR_PCT below the Round-0 baseline. Rule B --
         # secondary tier cap: halt if moderate or weak tier loses more than
@@ -627,10 +681,16 @@ def main():
             status = "IMPASSE"
         elif len(regressions_list) >= REGRESSION_LIMIT:
             status = f"ESCALATING — regression cascade: {regressions_list}"
-        elif significant_new_sinks:
-            status = f"ESCALATING — new sink emerged: {list(significant_new_sinks.keys())}"
         else:
-            status = "CONTINUING"
+            reasons = []
+            if significant_new_sinks:
+                reasons.append(f"new sink emerged: {list(significant_new_sinks.keys())}")
+            if chronic_sinks:
+                reasons.append(f"chronic sink worsening: {chronic_sinks}")
+            if reasons:
+                status = "ESCALATING — " + " | ".join(reasons)
+            else:
+                status = "CONTINUING"
 
         # Next adjustment (only if continuing)
         if status == "CONTINUING":
