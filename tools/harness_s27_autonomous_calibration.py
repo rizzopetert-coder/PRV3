@@ -2,7 +2,8 @@
 PRV3 Session 27 — Autonomous Calibration Harness
 
 Iterates on CENTROID_FIELD_SCALARS (Path B) and SCD_WCS_CLUSTER_WINDOW (Path C)
-until 47/47 HC, 5 consecutive flat rounds (impasse), or an escalation trigger.
+until every HC-tier state passes (RESOLUTION_TARGET, derived from the live
+state registry), 5 consecutive flat rounds (impasse), or an escalation trigger.
 
 Files modified in-loop:
   engine/accumulation.py       — CENTROID_FIELD_SCALARS dict
@@ -14,7 +15,7 @@ Never modifies: engine/data/states.py, engine/data/questions.py,
 Round KPI reports written to: tools/harness_log_s27.md
 
 Pete is pinged (loop stops) on:
-  RESOLVED   — 47/47 HC
+  RESOLVED   — RESOLUTION_TARGET/RESOLUTION_TARGET HC
   IMPASSE    — 5 consecutive flat rounds
   ESCALATING — regression cascade, new sink, or test suite failure
 """
@@ -33,9 +34,15 @@ sys.stdout.reconfigure(encoding="utf-8")
 PROJECT_ROOT = str(Path(__file__).parents[1])
 sys.path.insert(0, PROJECT_ROOT)
 
+from engine.data.states import STATE_PROFILES
+
 # ── Configuration ───────────────────────────────────────────────────────────────
 
-RESOLUTION_TARGET       = 47      # HC states that must pass to declare resolution
+# Derived dynamically from the live state registry (was hardcoded 47, the
+# pre-taxonomy-expansion state count) -- confirmed this resolves to 57 today,
+# and confirmed all 57 states have at least one high_confidence-tier profile
+# in the suite, so the target is achievable, not aspirational.
+RESOLUTION_TARGET       = len(STATE_PROFILES)  # HC states that must pass to declare resolution
 IMPASSE_ROUNDS          = 5       # consecutive flat rounds before impasse
 REGRESSION_LIMIT        = 3       # HC regressions in one round → escalate immediately
 SCALAR_FLOOR            = 0.10    # minimum displacement scalar
@@ -73,12 +80,27 @@ _ENV["PYTHONPATH"] = PROJECT_ROOT
 def derive_scalars():
     """
     Count questions that target each primary dimension (via state_targets).
-    Scalar = count / 39 (question sequence length).
+    Scalar = count / N, where N is the live core-question count.
     Falls back to Gemini hardcoded values if library is empty.
     Returns (scalars_dict, source_label).
+
+    N source, confirmed this session: len(QUESTION_LIBRARY) is NOT usable
+    directly -- it includes SEVER-##, DIST-##, VERIFY-Q##, and FOLLOW
+    variants, not just core questions (87 vs. 41 core, confirmed by direct
+    count). Uses tools.calibration_runner._CORE_QUESTION_IDS instead --
+    the closest existing "core question" concept in this codebase, and the
+    one this harness's own calibration loop actually iterates over via
+    generate_answers(). Note this is NOT identical to the live product's
+    respondent-facing PHASE_1_QUESTION_SEQUENCE (32, defined in
+    web/lib/session-store.ts, not importable from Python, and already on
+    record as diverging from _CORE_QUESTION_IDS by excluding the Q35-39
+    Aptitude addenda) -- this value is internally consistent with what the
+    calibration harness itself simulates, which is what this scalar seed is
+    for.
     """
     from engine.data.questions import QUESTION_LIBRARY
     from engine.data.states import STATE_PROFILES
+    from tools.calibration_runner import _CORE_QUESTION_IDS
 
     dim_map = {sid: p.primary_dimension for sid, p in STATE_PROFILES.items()}
     dim_counts = {"Aptitude": 0, "Authority": 0, "Alliance": 0, "Attitude": 0}
@@ -109,7 +131,7 @@ def derive_scalars():
             "attitude_asset":      0.4000,
         }, "fallback"
 
-    N = 39
+    N = len(_CORE_QUESTION_IDS)
     scalars = {
         "aptitude_liability":  round(dim_counts["Aptitude"]  / N, 4),
         "aptitude_asset":      0.4000,
@@ -305,7 +327,7 @@ def write_kpi_report(
     new_passes  = sorted(set(hc_passing) - set(prev_hc_passing))
     regressions = sorted(set(prev_hc_passing) - set(hc_passing))
     hc_count    = len(hc_passing)
-    hc_pct      = round(hc_count / 47 * 100, 1)
+    hc_pct      = round(hc_count / RESOLUTION_TARGET * 100, 1)
     overall_pct = round(overall_pass / overall_total * 100, 1) if overall_total else 0
     top_sink     = max(sink_counts, key=sink_counts.get) if sink_counts else "none"
     top_sink_cnt = sink_counts.get(top_sink, 0) if sink_counts else 0
@@ -314,7 +336,7 @@ def write_kpi_report(
         f"\n{'─'*44}",
         f"ROUND {round_num} — {version_tag}  [{datetime.datetime.now().strftime('%H:%M:%S')}]",
         f"{'─'*44}",
-        f"• HC pass rate:            {hc_count}/47 ({hc_pct}%)",
+        f"• HC pass rate:            {hc_count}/{RESOLUTION_TARGET} ({hc_pct}%)",
         f"• Overall pass rate:       {overall_pass}/{overall_total} ({overall_pct}%)",
         f"• New HC passes:           {', '.join(new_passes) or 'none'}",
         f"• HC regressions:          {', '.join(regressions) or 'none'}",
@@ -335,7 +357,7 @@ def write_kpi_report(
 
 def main():
     print("\n[HARNESS] PRV3 Session 27 — Autonomous Calibration Harness")
-    print(f"[HARNESS] Target: {RESOLUTION_TARGET}/47 HC | "
+    print(f"[HARNESS] Target: {RESOLUTION_TARGET}/{RESOLUTION_TARGET} HC | "
           f"Impasse limit: {IMPASSE_ROUNDS} flat rounds | "
           f"Scalar step: {SCALAR_STEP} | Window step: {WINDOW_STEP}")
     print()
@@ -404,7 +426,12 @@ def main():
         hc_passing    = cal.get("hc_passing", [])
         hc_failing    = cal.get("hc_failing", [])
         overall_pass  = cal.get("overall_passing", 0)
-        overall_total = cal.get("overall_total", 142)
+        # Fail loudly rather than silently fall back to a stale hardcoded
+        # count -- confirmed this key is unconditionally set by
+        # calibration_runner.py's --output-json branch (suite["total"]),
+        # never omitted, so a KeyError here means a real schema mismatch
+        # worth surfacing immediately, not papering over.
+        overall_total = cal["overall_total"]
         sink_counts   = cal.get("sink_counts", {})
 
         hc_count  = len(hc_passing)
@@ -459,7 +486,7 @@ def main():
         if status != "CONTINUING":
             print(f"\n[HARNESS] ═══════════════════════════════════════")
             print(f"[HARNESS] STOP. Status: {status}")
-            print(f"[HARNESS] Final HC: {hc_count}/47")
+            print(f"[HARNESS] Final HC: {hc_count}/{RESOLUTION_TARGET}")
             print(f"[HARNESS] Failing:  {sorted(hc_failing)}")
             print(f"[HARNESS] Final scalars:")
             for f, v in scalars.items():
