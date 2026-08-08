@@ -195,7 +195,11 @@ def apply_window(window: float, dry_run: bool = True) -> bool:
     Matches the ': float =' annotation format used in that file.
     """
     content = Path(RUNNER_PATH).read_text(encoding="utf-8")
-    pattern = r"SCD_WCS_CLUSTER_WINDOW: float = [\d\.]+"
+    # \\s* tolerates calibration_runner.py's column-aligned spacing
+    # ("SCD_WCS_CLUSTER_WINDOW:      float = 0.3500") -- a literal
+    # single-space pattern here escalated at the Round 0 smoke test
+    # this session before any tuning began, confirmed via a live run.
+    pattern = r"SCD_WCS_CLUSTER_WINDOW:\s*float\s*=\s*[\d\.]+"
 
     if not re.search(pattern, content):
         print("[HARNESS] ERROR: SCD_WCS_CLUSTER_WINDOW pattern not found in calibration_runner.py")
