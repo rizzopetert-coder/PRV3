@@ -112,6 +112,14 @@ building a new third label category ("linear but continuing," distinct from both
 **Status:** no fix proposed. Needs a design decision from Pete before any engineering
 -- and the decision differs by which of the six is in question. Not scheduled.
 
+**Closure (2026-08-09):** all six rewritten -- Pete-approved stem changes to Q40,
+Q41 (question_text and option D text), Q42, Q44, Q47, and Q50, removing every
+dangling pronoun. dimensional_contributions unchanged on every option across all
+six questions -- confirmed via diff before commit, not assumed. Full 172(+3)-profile
+calibration suite held at 170/175 (58/58 HC), zero movement. Commit 52e99ac. Push
+held pending Pete's live browser re-walk to confirm all six render correctly before
+this goes to production.
+
 ## C. Report UX and copy
 1. Sequencing: the two-paragraph synthesis description currently appears before the
    observable indicators list -- this ordering reads harsher than intended. Consider
