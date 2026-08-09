@@ -1171,8 +1171,8 @@ _QDATA = [
     # tools/gemini_handoff_11_states_package.md.
     (
         "Q40",
-        "How many people have held this exact role before you,"
-        " and what's the organization's read on why they left?",
+        "Has anyone held your role prior to you — and if so, what's the"
+        " organization's read on why they left?",
         "forced_choice", 40, "late",
         [
             ("A", "This is a new role, or my predecessor left for an unrelated reason (promotion, relocation).", False, None),
@@ -1185,22 +1185,22 @@ _QDATA = [
     ),
     (
         "Q41",
-        "When you've raised the gap between the scope and the resources"
-        " you actually have, what's happened?",
+        "When you've raised the gap between what this role is responsible"
+        " for and the resources you actually have to do it, what's happened?",
         "forced_choice", 41, "late",
         [
             ("A", "It got acknowledged and something changed.", False, None),
             ("B", "It got acknowledged, but nothing's changed yet.", False, None),
             ("C", "I was told to figure it out — the responsibility landed on me, not the structure.", False, None),
-            ("D", "I've been told that directly, and I know the person before me was told the same thing — it's clearly the standard answer to this role, not advice specific to me.", True, None),
+            ("D", "I've been told that directly — and it's clearly the standard response to this role, not advice specific to my situation.", True, None),
         ],
         ["built_to_fail"],
         True,
     ),
     (
         "Q42",
-        "When a decision needs that one person's approval and they're"
-        " unavailable, what happens?",
+        "When a decision needs approval from one specific person — and that"
+        " person is unavailable — what happens?",
         "forced_choice", 42, "late",
         [
             ("A", "Someone else is empowered to decide, and it holds.", False, None),
@@ -1228,7 +1228,9 @@ _QDATA = [
     ),
     (
         "Q44",
-        "Who actually knows about this, and what's happened as a result?",
+        "Think of something in your organization that's been allowed to"
+        " continue even though it's a known problem. Who actually knows about"
+        " it, and what's happened as a result?",
         "forced_choice", 44, "late",
         [
             ("A", "It's known and being actively addressed by people with the authority to fix it.", False, None),
@@ -1267,9 +1269,9 @@ _QDATA = [
     ),
     (
         "Q47",
-        "Has anything changed for this manager — additional support,"
-        " delegated authority, or reduced scope — since it became clear"
-        " they were stretched?",
+        "Think of a manager you'd describe as stretched thin or overloaded."
+        " Has anything changed for them — additional support, delegated"
+        " authority, or reduced scope — since that became clear?",
         "forced_choice", 47, "late",
         [
             ("A", "Yes, and it's made a real difference.", False, None),
@@ -1310,8 +1312,9 @@ _QDATA = [
     ),
     (
         "Q50",
-        "When someone in this group makes a costly mistake,"
-        " what happens to them?",
+        "Every organization has a group of people who are especially trusted"
+        " or protected — an inner circle. When someone in that group makes a"
+        " costly mistake, what happens to them?",
         "forced_choice", 50, "late",
         [
             ("A", "They're held to the same standard as anyone else — real consequences, same as elsewhere.", False, None),
