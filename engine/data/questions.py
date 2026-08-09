@@ -1207,6 +1207,7 @@ _QDATA = [
             ("B", "It waits, but not for long.", False, None),
             ("C", "It waits for a while, and people route around it when they can.", False, None),
             ("D", "Everything stops until they're reachable, no matter how long that takes — there's no real delegation, just waiting.", True, None),
+            ("E", "This doesn't apply to us — there's no single person whose approval everything depends on.", False, None),
         ],
         ["the_founders_grip"],
         True,
@@ -2122,6 +2123,7 @@ def _build_library():
             "B": {**_z, "authority_liability":  0.25},
             "C": {**_z, "authority_liability":  0.50},
             "D": {**_z, "authority_liability":  0.75},
+            "E": dict(_z),
         },
         "Q43": {
             "A": dict(_z),
