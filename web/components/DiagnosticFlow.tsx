@@ -51,6 +51,70 @@ function stepHeadcount(value: number, direction: 1 | -1): number {
   return Math.max(1, Math.min(HEADCOUNT_MAX, next));
 }
 
+// Hoisted to module scope (was nested inside IntakeForm) -- a nested
+// function component is redeclared on every parent render, which made
+// React remount this <input> (destroying and recreating the DOM node)
+// on every keystroke, racing against the browser's native input
+// handling. Closes over nothing from IntakeForm's scope (HEADCOUNT_MAX
+// and stepHeadcount are already module-level), so hoisting is a pure
+// move, zero logic change.
+function HeadcountStepper({
+  value,
+  onChange,
+}: {
+  value: number | "";
+  onChange: (next: number | "") => void;
+}) {
+  const display = value === "" ? "" : value >= HEADCOUNT_MAX ? "1000+" : String(value);
+
+  function handleTextChange(raw: string) {
+    if (raw.trim() === "") {
+      onChange("");
+      return;
+    }
+    const digitsOnly = raw.replace(/[^\d]/g, "");
+    if (digitsOnly === "") return;
+    const parsed = parseInt(digitsOnly, 10);
+    onChange(Math.max(1, Math.min(HEADCOUNT_MAX, parsed)));
+  }
+
+  return (
+    <div className="mb-5">
+      <label className="block font-ui text-sm font-medium text-charcoal mb-1.5">
+        About how many employees?
+      </label>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => onChange(value === "" ? 1 : stepHeadcount(value, -1))}
+          disabled={value !== "" && value <= 1}
+          className="w-9 h-9 shrink-0 rounded-lg border border-gray-200 text-charcoal font-ui text-lg disabled:opacity-30"
+          aria-label="Decrease"
+        >
+          {"\u2212"}
+        </button>
+        <input
+          type="text"
+          inputMode="numeric"
+          value={display}
+          onChange={(e) => handleTextChange(e.target.value)}
+          placeholder="e.g. 60"
+          className="w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-charcoal text-center focus:outline-none focus:border-charcoal"
+        />
+        <button
+          type="button"
+          onClick={() => onChange(value === "" ? 1 : stepHeadcount(value, 1))}
+          disabled={value === HEADCOUNT_MAX}
+          className="w-9 h-9 shrink-0 rounded-lg border border-gray-200 text-charcoal font-ui text-lg disabled:opacity-30"
+          aria-label="Increase"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const INDUSTRY_OPTIONS = [
   "Professional Services", "Healthcare & Life Sciences", "Financial Services",
   "Technology", "Manufacturing & Industrial", "Retail & Hospitality",
@@ -134,63 +198,6 @@ function IntakeForm({
     intake.direct_reports !== "" &&
     intake.jurisdiction !== "" &&
     intake.significant_events.length > 0;
-
-  function HeadcountStepper({
-    value,
-    onChange,
-  }: {
-    value: number | "";
-    onChange: (next: number | "") => void;
-  }) {
-    const display = value === "" ? "" : value >= HEADCOUNT_MAX ? "1000+" : String(value);
-
-    function handleTextChange(raw: string) {
-      if (raw.trim() === "") {
-        onChange("");
-        return;
-      }
-      const digitsOnly = raw.replace(/[^\d]/g, "");
-      if (digitsOnly === "") return;
-      const parsed = parseInt(digitsOnly, 10);
-      onChange(Math.max(1, Math.min(HEADCOUNT_MAX, parsed)));
-    }
-
-    return (
-      <div className="mb-5">
-        <label className="block font-ui text-sm font-medium text-charcoal mb-1.5">
-          About how many employees?
-        </label>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => onChange(value === "" ? 1 : stepHeadcount(value, -1))}
-            disabled={value !== "" && value <= 1}
-            className="w-9 h-9 shrink-0 rounded-lg border border-gray-200 text-charcoal font-ui text-lg disabled:opacity-30"
-            aria-label="Decrease"
-          >
-            \u2212
-          </button>
-          <input
-            type="text"
-            inputMode="numeric"
-            value={display}
-            onChange={(e) => handleTextChange(e.target.value)}
-            placeholder="e.g. 60"
-            className="w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-charcoal text-center focus:outline-none focus:border-charcoal"
-          />
-          <button
-            type="button"
-            onClick={() => onChange(value === "" ? 1 : stepHeadcount(value, 1))}
-            disabled={value === HEADCOUNT_MAX}
-            className="w-9 h-9 shrink-0 rounded-lg border border-gray-200 text-charcoal font-ui text-lg disabled:opacity-30"
-            aria-label="Increase"
-          >
-            +
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   function field(
     label: string,
