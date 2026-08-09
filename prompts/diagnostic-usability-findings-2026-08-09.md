@@ -32,6 +32,43 @@
    patterns/symptoms generally, not test a pre-conceived problem. May require a pass
    across multiple questions, not a single fix.
 
+### B-addendum: Numbering resolved, root cause identified (live-verified 2026-08-09)
+
+Pete's Section B numbers (Q05, Q33, Q34, Q35, Q37, Q40, Q43) are on-screen display
+position, not engine question_id -- confirmed via direct browser walkthrough (not
+reconstructed from static file reads). The display position stays stable regardless
+of inserted follow-up/checkpoint screens (those use their own "FOLLOW-UP NX"
+labeling and don't consume a position number), but position-to-engine-question_id
+offset jumps at the point where the excluded Aptitude-addenda range (literal engine
+Q35-39) is skipped from the Phase 1 sequence -- offset is +2 before that gap, +7
+after it.
+
+Confirmed live text for every flagged position:
+- Q33: "How many people have held this exact role before you, and what's the
+  organization's read on why they left?"
+- Q34: "When you've raised the gap between the scope and the resources you actually
+  have, what's happened?"
+- Q35: "When a decision needs that one person's approval and they're unavailable,
+  what happens?"
+- Q37: "Who actually knows about this, and what's happened as a result?"
+- Q40: "Has anything changed for this manager -- additional support, delegated
+  authority, or reduced scope -- since it became clear they were stretched?"
+- Q43: "When someone in this group makes a costly mistake, what happens to them?"
+
+Root cause identified across all six: each is written as a mid-conversation follow-up
+carrying a pronoun with no on-screen antecedent ("this," "that one person," "this
+manager," "this group") but rendered with zero visual distinction from a fresh,
+standalone question -- no "continuing from your last answer" framing, no indent, no
+label. This is very likely one shared root cause, not six unrelated wording problems.
+Q05 not yet re-examined live -- still needs its own look.
+
+Separately (relevant to Section C): the diagnostic can terminate before all 44
+questions once sufficient dimensional signal is reached (confirmed live -- one full
+walkthrough ended at a condition report around position 15; a second walkthrough with
+a different answer path reached Q44/44 cleanly). This is real and path-dependent, not
+guaranteed either way -- relevant to Pete's earlier note about the diagnostic feeling
+like it assumes a pre-conceived problem.
+
 ## C. Report UX and copy
 1. Sequencing: the two-paragraph synthesis description currently appears before the
    observable indicators list -- this ordering reads harsher than intended. Consider
