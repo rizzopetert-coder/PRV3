@@ -69,6 +69,49 @@ a different answer path reached Q44/44 cleanly). This is real and path-dependent
 guaranteed either way -- relevant to Pete's earlier note about the diagnostic feeling
 like it assumes a pre-conceived problem.
 
+### B-addendum-2: Root cause splits into two distinct problems (investigated 2026-08-09)
+
+Investigated whether the six flagged questions (positions 33/34/35/37/40/43 = engine
+Q40/Q41/Q42/Q44/Q47/Q50) share one root cause. They don't -- it splits 5-and-1.
+
+**Structural facts confirmed:**
+- No follow-up relationship is modeled in the data for any of the six --
+  severity_follow_on_id is deliberately None on all of them (per the Q40-51 batch's
+  own authoring comment). Q40/Q41 share state_targets=['built_to_fail'] as a byproduct
+  of authoring order, not a designed link.
+- The "Follow-up NX" splice mechanism is closed and purpose-built -- exactly three
+  hardcoded call sites (severity follow-ons, one Q28-off-Q06 special case, checkpoint
+  distinguishers), no generic "declare a follow-up" pattern exists.
+- Core vs. spliced is a binary, positional property in code (coreQuestionPosition()
+  static membership check; DiagnosticFlow.tsx's "Follow-up" label only renders when
+  label.kind === "spliced"). A core question cannot receive follow-up framing under
+  current code -- there's no third state to add a flag to.
+
+**The five (Q40/Q42/Q44/Q47/Q50): not a labeling problem.**
+Checked each against its true immediate predecessor by state_targets, not just
+position -- none are topical continuations. Each is the first or only Phase-1 question
+for a new state (the_arbitrary_standard, the_overloaded_manager,
+disparate_impact_architecture, motivational_architecture_failure, etc.), most of which
+got only one question instead of the usual two-question pair. The dangling pronoun
+("this manager," "this group," "who actually knows about this") presumes an
+establishing/premise-setting question that was never authored for that state under
+the Q40-51 batch's "minimal new authoring" scope constraint. Relabeling these as
+"Follow-up" would be factually wrong -- there's no real parent. This is a
+content-authoring gap: either rewrite each to be self-contained, or author the missing
+premise question for that state.
+
+**The one (Q41): genuine unlabeled continuation, but not a simple label swap either.**
+Q41 ("the gap between scope and resources") is a real, content-verified continuation
+of Q40. But the existing "Follow-up" mechanism is built exclusively for conditionally-
+spliced questions (only some respondents see them, gated on a trigger) -- Q41 is
+unconditional, static, core content, always asked. Displaying it as a follow-up via
+the current system means either making it conditional (a real behavior change) or
+building a new third label category ("linear but continuing," distinct from both
+"core" and "spliced") that doesn't exist today. Either path is new mechanism work.
+
+**Status:** no fix proposed. Needs a design decision from Pete before any engineering
+-- and the decision differs by which of the six is in question. Not scheduled.
+
 ## C. Report UX and copy
 1. Sequencing: the two-paragraph synthesis description currently appears before the
    observable indicators list -- this ordering reads harsher than intended. Consider
