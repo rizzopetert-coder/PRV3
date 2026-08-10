@@ -120,6 +120,61 @@ calibration suite held at 170/175 (58/58 HC), zero movement. Commit 52e99ac. Pus
 held pending Pete's live browser re-walk to confirm all six render correctly before
 this goes to production.
 
+### B-addendum-3: Gemini architecture review -- Structures 1/2 cleared, Structure 3
+   parked with A5 (2026-08-09)
+
+Gemini reviewed three conditional-follow-up structures for the diagnostic's question
+sequence. Findings:
+
+**Structures 1 (position 34/Q41, 3-deep chain) and 2 (position 36/Q43, 2-deep chain):
+CLEARED.** Neither touches PHASE_1_QUESTION_SEQUENCE's core count -- both add new
+spliced follow-up questions via the existing severity_follow_on_id mechanism, already
+proven safe by every existing SEVER-## follow-on. Implementation in progress
+(see commit reference once written).
+
+**Structure 3 (positions 37/38/39, converting Q44/Q45/Q46 from core to spliced):
+PARKED alongside A5.** Gemini's proposal would remove 2 questions from the core
+sequence (44->42), triggering the identical engine/accumulation.py:539
+scale = N / 44.0 landmine already confirmed this session via A5's Q29-removal attempt
+(170/175->163/175 regression, comparable scope to the original MC_CENTROID_39
+recalibration arc). Gemini's review characterized the fix as a routine "Phase 3: Monte
+Carlo regen + pytest" step -- this contradicts our own direct, empirically-confirmed
+experience this session that a core-count change of this kind requires a genuine
+multi-session recalibration effort, not a routine regen. Worth noting as a
+Gemini-confidence pattern distinct from citation fabrication (memory-tracked
+separately): here it's understating known project-specific difficulty rather than
+inventing a figure, but the same "confident precision that doesn't match ground truth"
+shape.
+
+Separately, Gemini's own review flagged that Q46 (the_arbitrary_standard) doesn't
+share topical continuity with Q44/Q45 (the_tolerated_violation) and recommended NOT
+chaining it under Q45 regardless of the calibration question -- this content issue is
+unresolved and will need addressing whenever Structure 3 is picked back up, separate
+from the N-count problem.
+
+Decision: Structure 3 parked with A5 (Q16/Q29 duplicate removal) -- both hit the same
+recalibration landmine and will be handled together in one dedicated future effort
+rather than as two separate multi-session arcs. Not scheduled. Structures 1 and 2
+proceed independently since they carry zero calibration risk.
+
+**Implementation verification (2026-08-09), before any commit:** Part 0 verification
+found Gemini's proposed ancestry-resolution snippet assumed answers_log entries carry
+spliced_question_id/parent_question_id fields -- confirmed via direct read of
+web/lib/session-store.ts that these fields don't exist. AnswerLogEntry is exactly
+{question_id, option_id}. The real fix lives entirely in spliceLabel() (adding a third
+parameter, the session's existing question_labels map, so a non-core parent's own
+already-resolved label is used instead of falling back to its raw ID string) --
+verified via 2 new automated tests (session-store.test.ts), both passing, plus the
+full existing suite unchanged (same 5 pre-existing baseline failures, unrelated
+hardcoded stale-length assertions). Structures 1 and 2 temporarily applied and tested
+per standing discipline (same as the A5 test): full 172(+3)-profile calibration suite
+held at 170/175 (58/58 HC), zero movement; validate.py 40/41 unchanged; tsc --noEmit
+clean. Reverted after testing, holding for Pete's go-ahead before the real commit --
+several genuine design/content judgment calls were flagged along the way (base-question
+option count, SEVER-30/31/32 naming vs. the 29/29 severity_input_mapping convention,
+placeholder option text for SEVER-30/31/32 beyond Pete's mandatory exact-text options)
+rather than decided unilaterally.
+
 ## C. Report UX and copy
 1. Sequencing: the two-paragraph synthesis description currently appears before the
    observable indicators list -- this ordering reads harsher than intended. Consider
