@@ -108,25 +108,7 @@ export default function PrivateOutput({
       </div>
       <Rule />
 
-      {/* Block 2 — Liability condition */}
-      <div className="py-4">
-        <p className="text-sm leading-[1.65] text-charcoal">
-          {liabilityText || payload.resolution_routing}
-        </p>
-      </div>
-      <Rule />
-
-      {/* Block 2b — Framing text (omit entirely if empty) */}
-      {framingText && (
-        <>
-          <div className="py-4">
-            <p className="text-sm leading-[1.65] text-charcoal">{framingText}</p>
-          </div>
-          <Rule />
-        </>
-      )}
-
-      {/* Block 2c — Observable indicators (omit entirely if empty) */}
+      {/* Block 2 — Observable indicators (omit entirely if empty) */}
       {observableIndicators.length > 0 && (
         <>
           <div className="py-4">
@@ -141,6 +123,24 @@ export default function PrivateOutput({
                 </li>
               ))}
             </ul>
+          </div>
+          <Rule />
+        </>
+      )}
+
+      {/* Block 2b — Liability condition */}
+      <div className="py-4">
+        <p className="text-sm leading-[1.65] text-charcoal">
+          {liabilityText || payload.resolution_routing}
+        </p>
+      </div>
+      <Rule />
+
+      {/* Block 2c — Framing text (omit entirely if empty) */}
+      {framingText && (
+        <>
+          <div className="py-4">
+            <p className="text-sm leading-[1.65] text-charcoal">{framingText}</p>
           </div>
           <Rule />
         </>

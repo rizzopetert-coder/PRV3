@@ -277,6 +277,19 @@ function IntakeForm({
   return (
     <div className="max-w-md mx-auto px-6 py-16">
       <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">
+        Before you begin
+      </p>
+      <h2 className="font-display text-2xl text-charcoal mb-3">
+        This reflects what you see.
+      </h2>
+      <p className="font-ui text-sm text-gray-500 leading-relaxed mb-10">
+        What follows draws entirely on your own perceptions of your organization.
+        That's intentional — this is a starting point, not a full picture.
+        Principal Resolution's services bring more objective data and a solution
+        roadmap next, through a separate process built for exactly that.
+      </p>
+
+      <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">
         Before you start
       </p>
       <h2 className="font-display text-2xl text-charcoal mb-8">

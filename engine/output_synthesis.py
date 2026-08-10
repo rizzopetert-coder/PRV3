@@ -73,8 +73,9 @@ Severity calibration:
 
 asset_resolution_anchor_text (private, principal only):
 What strength exists to build from. 1-3 sentences. Draw from asset_score and intake.
-Not reassurance. An honest account of what is working. If asset_score is low, say so
-plainly. Do not manufacture strength the diagnostic did not find.
+Name what's actually there, including if the picture is thin, but in the same steady,
+descriptive register as the rest of the report, not as a call-out. This is a reading
+of current reality, not a verdict.
 
 framing_text (shareable, professional audience):
 Professional framing for a board member or senior leader. 2-3 sentences.
