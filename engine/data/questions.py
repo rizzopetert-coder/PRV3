@@ -1325,8 +1325,9 @@ _QDATA = [
     ),
     (
         "Q48",
-        "Has this pattern in the data ever been raised internally"
-        " — through HR, legal, or leadership?",
+        "Think of a pattern in your data that could suggest unequal treatment"
+        " (such as pay, promotion, or discipline). Has that pattern ever been"
+        " raised internally, through HR, legal, or leadership?",
         "forced_choice", 48, "late",
         [
             ("A", "No, and there's no indication anyone else has noticed it either.", False, None),
@@ -1339,14 +1340,16 @@ _QDATA = [
     ),
     (
         "Q49",
-        "Has anyone tried to fix or refresh the reward system,"
-        " and what happened?",
+        "Think of your organization's reward or incentive system (such as"
+        " bonuses, raises, or recognition) — whatever actually drives who gets"
+        " rewarded. Has anyone tried to fix or refresh it, and what happened?",
         "forced_choice", 49, "late",
         [
             ("A", "Yes, and it made a real difference.", False, None),
             ("B", "Yes, but it hasn't landed yet — too early to tell.", False, None),
             ("C", "There's been talk about it, but no real change has followed.", False, None),
             ("D", "It's been tried more than once, and nothing has changed — people have stopped believing another attempt will be any different.", True, None),
+            ("E", "No, nothing's been done to address it.", False, None),
         ],
         ["motivational_architecture_failure"],
         True,
@@ -2224,6 +2227,7 @@ def _build_library():
             "B": {**_z, "attitude_liability":  0.25},
             "C": {**_z, "attitude_liability":  0.50},
             "D": {**_z, "attitude_liability":  0.75},
+            "E": dict(_z),
         },
         "Q50": {
             "A": dict(_z),
