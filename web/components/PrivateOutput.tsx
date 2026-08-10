@@ -4,6 +4,20 @@ import type { PrivateOutputPayload, SeverityTier } from "@/lib/types";
 import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
+import { stateIdToSlug } from "@/lib/state-slug";
+
+// First-sentence extraction for a secondary state's short-version summary
+// (Block 4b) -- splits on the first sentence-ending period, not a hard
+// character-count truncation. Falls through to the whole string when no
+// internal ". " boundary exists (confirmed against all 58 real
+// descriptive_prose values this session -- one state, cultural_overtime,
+// is a single sentence with no internal boundary; this is that case
+// resolving correctly, not a bug).
+function firstSentence(text: string): string {
+  const match = text.match(/\.\s/);
+  if (!match || match.index === undefined) return text;
+  return text.slice(0, match.index + 1);
+}
 
 // Tier-based LOCKED copy — mirrors engine/severity.py SEVERITY_TIER_DESCRIPTIONS.
 const SEVERITY_ANCHOR: Record<SeverityTier, string> = {
@@ -77,6 +91,11 @@ export default function PrivateOutput({
             {payload.severity}
           </span>
         </div>
+        {payload.primary_state.descriptive_prose && (
+          <p className="text-[12px] text-gray-400 leading-relaxed mb-2">
+            {payload.primary_state.descriptive_prose}
+          </p>
+        )}
         <p className="text-[12px] text-gray-400 leading-relaxed">
           {SEVERITY_ANCHOR[payload.severity]}
         </p>
@@ -186,11 +205,23 @@ export default function PrivateOutput({
           <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
             Also present
           </p>
-          <p className="text-[13px] text-gray-500">
-            {payload.secondary_states
-              .map((s) => `${s.name} (${(s.weight * 100).toFixed(0)}%)`)
-              .join(", ")}
-          </p>
+          <ul className="space-y-3">
+            {payload.secondary_states.map((s) => (
+              <li key={s.id}>
+                <a
+                  href={`/book/toc#${stateIdToSlug(s.id)}`}
+                  className="text-[13px] font-medium text-charcoal hover:underline"
+                >
+                  {s.name} ({(s.weight * 100).toFixed(0)}%)
+                </a>
+                {s.descriptive_prose && (
+                  <p className="text-[12px] text-gray-500 leading-relaxed mt-0.5">
+                    {firstSentence(s.descriptive_prose)}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
