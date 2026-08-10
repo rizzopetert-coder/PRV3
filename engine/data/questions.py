@@ -461,7 +461,8 @@ _QDATA = [
     ),
     (
         "Q21",
-        "When consequential decisions need to move through your organization, what typically happens?",
+        "As a decision works its way through your organization — from idea to"
+        " final call — what usually happens along the way?",
         "forced_choice", 21, "late",
         [
             ("A", "They move. The right people engage and decisions complete.", False, None),
