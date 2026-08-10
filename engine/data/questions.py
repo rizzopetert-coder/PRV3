@@ -225,8 +225,8 @@ _QDATA = [
     ),
     (
         "Q05",
-        "When someone in your organization isn't performing — really isn't performing"
-        " — what happens?",
+        "When someone in your organization stands out because of their"
+        " underperformance, what happens?",
         "forced_choice", 5, "early",
         [
             ("A", "It gets addressed. There's a process and managers use it.", False, None),
@@ -257,7 +257,7 @@ _QDATA = [
     ),
     (
         "Q07",
-        "When you lose people you didn't want to lose, what's the pattern?",
+        "When it comes to losing people you don't want to lose, is there a pattern?",
         "forced_choice", 7, "early",
         [
             ("A", "It's spread across the organization — no clear concentration by team, manager, or role.", False, None),
@@ -312,7 +312,7 @@ _QDATA = [
     (
         "Q11",
         "How well do your organization's actions reflect what it says it values"
-        " — in who gets ahead, what gets tolerated, and how decisions get made?",
+        " — who gets ahead, what gets tolerated, and how decisions get made?",
         "forced_choice", 11, "early",
         [
             ("A", "Consistently. What we say we value shows up in how we actually operate.", False, None),
@@ -344,8 +344,8 @@ _QDATA = [
     ),
     (
         "Q13",
-        "How well does your organization understand where it's going"
-        " — and believe it will get there?",
+        "How well does your organization understand where it's going, and how"
+        " much belief exists that it will get there?",
         "forced_choice", 13, "mid",
         [
             ("A", "Leadership knows where we're going but I'm not sure the organization does.", False, None),
@@ -359,7 +359,7 @@ _QDATA = [
     ),
     (
         "Q14",
-        "How would you describe your organization's relationship with compensation right now?",
+        "How would you describe your organization's approach to compensation right now?",
         "forced_choice", 14, "mid",
         [
             ("A", "We're confident we're competitive and internally consistent.", False, None),
@@ -402,8 +402,9 @@ _QDATA = [
     ),
     (
         "Q17",
-        "When your organization tries to change something — a new initiative, a cultural shift,"
-        " a structural change — what typically happens?",
+        "When your organization tries to change something (such as a new"
+        " initiative, a cultural shift, or a structural change), what typically"
+        " happens?",
         "forced_choice", 17, "mid",
         [
             ("A", "We execute well. Changes stick and people invest in them.", False, None),
@@ -432,8 +433,8 @@ _QDATA = [
     ),
     (
         "Q19",
-        "How consistent is what your organization says publicly — about its culture, values,"
-        " and commitments — with what's actually happening internally?",
+        "How consistent is what your organization says publicly with what's"
+        " actually happening internally?",
         "forced_choice", 19, "mid",
         [
             ("A", "Consistent. What we say publicly is what we live internally.", False, None),
@@ -475,7 +476,7 @@ _QDATA = [
     (
         "Q22",
         "How current and complete are your organization's people policies"
-        " — employee handbook, HR documentation, compliance obligations?",
+        " (such as employee handbook, HR documentation, compliance obligations)?",
         "forced_choice", 22, "late",
         [
             ("A", "Current — we review them regularly and they reflect how we actually operate.", False, None),
@@ -607,8 +608,9 @@ _QDATA = [
     ),
     (
         "Q30",
-        "How well do people in your organization know what's happening — decisions that have"
-        " been made, where things are headed, what leadership is thinking?",
+        "How well do people in your organization know what's happening (such as"
+        " decisions that have been made, where things are headed, what leadership"
+        " is thinking)?",
         "forced_choice", 30, "late",
         [
             ("A", "Well — we communicate deliberately and people are generally informed.", False, None),
@@ -653,8 +655,8 @@ _QDATA = [
     ),
     (
         "Q32",
-        "As an organization, how well do you learn from experience"
-        " — your own mistakes, prior initiatives, external feedback?",
+        "As an organization, how well do you learn from experience (such as your"
+        " own mistakes, prior initiatives, external feedback)?",
         "forced_choice", 32, "late",
         [
             ("A", "Well — we examine what happened, draw conclusions, and actually change as a result.", False, None),
@@ -668,7 +670,8 @@ _QDATA = [
     (
         "Q33",
         "How current and well-maintained is your operational infrastructure"
-        " — continuity plans, technology governance, organizational network documentation?",
+        " (such as continuity plans, technology governance, organizational"
+        " network documentation)?",
         "forced_choice", 33, "late",
         [
             ("A", "Current — we have plans, we test them, and they reflect how we actually operate.", False, None),
@@ -681,8 +684,8 @@ _QDATA = [
     ),
     (
         "Q34",
-        "Looking at everything you've shared — if you had to name what kind of problem this is,"
-        " what would you say?",
+        "Looking at everything you've shared — if you had to name your"
+        " organization's most pressing people-problem, what would you say?",
         "forced_choice", 34, "late",
         [
             ("A", "It's a people issue — specific individuals or relationships are at the center of it.", False, None),
@@ -1171,7 +1174,7 @@ _QDATA = [
     # tools/gemini_handoff_11_states_package.md.
     (
         "Q40",
-        "Has anyone held your role prior to you — and if so, what's the"
+        "Has anyone held your role prior to you, and if so, what's the"
         " organization's read on why they left?",
         "forced_choice", 40, "late",
         [
@@ -1199,8 +1202,8 @@ _QDATA = [
     ),
     (
         "Q42",
-        "When a decision needs approval from one specific person — and that"
-        " person is unavailable — what happens?",
+        "When a decision needs approval from one specific person and that"
+        " person is unavailable, what happens?",
         "forced_choice", 42, "late",
         [
             ("A", "Someone else is empowered to decide, and it holds.", False, None),
@@ -1270,8 +1273,8 @@ _QDATA = [
     (
         "Q47",
         "Think of a manager you'd describe as stretched thin or overloaded."
-        " Has anything changed for them — additional support, delegated"
-        " authority, or reduced scope — since that became clear?",
+        " Has anything changed for them (such as additional support, delegated"
+        " authority, or reduced scope) since that became clear?",
         "forced_choice", 47, "late",
         [
             ("A", "Yes, and it's made a real difference.", False, None),
@@ -1312,8 +1315,8 @@ _QDATA = [
     ),
     (
         "Q50",
-        "Every organization has a group of people who are especially trusted"
-        " or protected — an inner circle. When someone in that group makes a"
+        "Every organization has an inner circle or group of people who are"
+        " especially trusted or protected. When someone in that group makes a"
         " costly mistake, what happens to them?",
         "forced_choice", 50, "late",
         [
@@ -1328,7 +1331,7 @@ _QDATA = [
     (
         "Q51",
         "How would you describe who gets included in the decisions"
-        " that matter here?",
+        " that matter at your organization?",
         "forced_choice", 51, "late",
         [
             ("A", "It's based on role and relevance — the right people are in the room for the right reasons.", False, None),

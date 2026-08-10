@@ -169,6 +169,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 - If a fix does not work, diagnose before acting again.
 - No semicolons in any string or copy.
 - No em-dashes as default connective tissue. An em-dash is permitted only to mark a genuine interruption or pivot for emphasis, something a comma, colon, or rephrase can't do as well, not a habitual way to link two clauses. Default to a comma, colon, or rephrase first. When used, write a real em-dash, never a "--" placeholder. In LLM system-prompt content specs, avoid entirely.
+- Multi-item appositive lists (e.g. "your policies — handbook, documentation, compliance obligations") convert to "(such as X, Y, and Z)" parenthetical style rather than an em-dash-set-off list. Locked Aug 2026, distinct from the general em-dash-overuse rule above -- this is specifically about the list-appositive construction.
 - No coined terms requiring a glossary in any output string.
 - Pete confirms everything. No recommendation from any AI is a decision until Pete confirms it.
 
