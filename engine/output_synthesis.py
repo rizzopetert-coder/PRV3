@@ -237,6 +237,30 @@ def _parse_synthesis_response(
 
 # ── LLM call ──────────────────────────────────────────────────────────────────
 
+def format_event_for_synthesis(event_id: str, elaboration: str) -> Optional[str]:
+    """
+    Maps a single significant_events entry to its synthesis-prompt label.
+
+    "none" returns None (nothing to render). Any of the 8 real Mechanism-1
+    event types returns PRIOR_ADJUSTER_INDEX's full, untrimmed clinical
+    label. "other" (A1, this session) has no PRIOR_ADJUSTER_INDEX
+    counterpart -- it never existed as a Mechanism-1 event type -- so it
+    is special-cased here using the respondent's own elaboration text
+    instead of a lookup label, falling back to None if elaboration is
+    empty or whitespace-only (a defensive floor; the web UI already
+    requires non-empty elaboration whenever "other" is selected).
+    Any other unrecognized id also returns None, same as an absent
+    PRIOR_ADJUSTER_INDEX entry always has.
+    """
+    if event_id == "none":
+        return None
+    if event_id == "other":
+        stripped = elaboration.strip()
+        return stripped if stripped else None
+    adjuster = PRIOR_ADJUSTER_INDEX.get(event_id)
+    return adjuster.event_label if adjuster else None
+
+
 def _build_synthesis_prompt(
     state_name: str,
     severity_tier: str,
@@ -254,19 +278,22 @@ def _build_synthesis_prompt(
     )
     # significant_events is now real, user-submitted synthesis-only
     # narrative metadata (Mechanism 1 deprecation, this session -- Decision
-    # Register). Mapped through PRIOR_ADJUSTER_INDEX's full, untrimmed
+    # Register). Mapped through format_event_for_synthesis() -- for the 8
+    # real Mechanism-1 event types, PRIOR_ADJUSTER_INDEX's full, untrimmed
     # clinical text (not web/lib/types.ts's SIGNIFICANT_EVENT_OPTIONS
     # checkbox-trimmed copy -- no UI-space constraint here, and the fuller
-    # specificity gives Sonnet more to ground the narrative in). Omitted
-    # entirely when missing, empty, or exactly ["none"] -- a literal
-    # "None" or empty section would read as an unknown value rather than
-    # "nothing significant happened."
+    # specificity gives Sonnet more to ground the narrative in); for
+    # "other" (A1), the respondent's own free-text elaboration instead.
+    # Omitted entirely when missing, empty, or exactly ["none"] -- a
+    # literal "None" or empty section would read as an unknown value
+    # rather than "nothing significant happened."
     significant_events = intake.get("significant_events") or []
-    event_labels = [
-        PRIOR_ADJUSTER_INDEX[e].event_label
-        for e in significant_events
-        if e != "none" and e in PRIOR_ADJUSTER_INDEX
-    ]
+    elaboration = intake.get("significant_event_elaboration") or ""
+    event_labels = []
+    for e in significant_events:
+        label = format_event_for_synthesis(e, elaboration)
+        if label is not None:
+            event_labels.append(label)
     if event_labels:
         intake_lines += "\n  significant_events:\n" + "\n".join(
             f"    - {label}" for label in event_labels

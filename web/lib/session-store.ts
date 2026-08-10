@@ -18,7 +18,7 @@
 
 import { Redis } from "@upstash/redis";
 import { nanoid } from "nanoid";
-import type { IntakeEcho } from "@/lib/types";
+import type { PrivateIntakeEcho } from "@/lib/types";
 import type { SeverityInputPayload } from "@/lib/engine-client";
 
 const redis = Redis.fromEnv();
@@ -134,7 +134,7 @@ export interface CheckpointResult {
 
 export interface DiagnosticSession {
   session_id: string;
-  intake: IntakeEcho;
+  intake: PrivateIntakeEcho;
   next_question_id: string;
   accumulated_vector: AccumulatedVector;
   // Append-only. Not read back in Phase 1 — required now because Phase 3
@@ -325,7 +325,7 @@ export function resolveQuestionLabel(
 // Session CRUD
 // ---------------------------------------------------------------------------
 
-export async function createSession(intake: IntakeEcho): Promise<DiagnosticSession> {
+export async function createSession(intake: PrivateIntakeEcho): Promise<DiagnosticSession> {
   const session: DiagnosticSession = {
     session_id: nanoid(),
     intake,

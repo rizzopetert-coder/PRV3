@@ -148,6 +148,9 @@ interface IntakeFormState {
   direct_reports: string;
   jurisdiction: string;
   significant_events: string[];
+  // A1 -- free-text elaboration, required when "other" is among
+  // significant_events (enforced in isComplete below), ignored otherwise.
+  significant_event_elaboration: string;
 }
 
 const EMPTY_INTAKE: IntakeFormState = {
@@ -158,6 +161,7 @@ const EMPTY_INTAKE: IntakeFormState = {
   direct_reports: "",
   jurisdiction: "",
   significant_events: [],
+  significant_event_elaboration: "",
 };
 
 interface QuestionCopy {
@@ -190,6 +194,13 @@ function IntakeForm({
   // pattern -- that pattern silently broke once significant_events became
   // array-valued ([] !== "" is trivially true, so it would never have
   // blocked submission on its own).
+  // A1: "other" without elaboration text is an incomplete submission,
+  // same treatment as any other unfilled required field -- not a
+  // separate error state.
+  const otherRequiresElaboration =
+    !intake.significant_events.includes("other") ||
+    intake.significant_event_elaboration.trim().length > 0;
+
   const isComplete =
     intake.organization_size !== "" &&
     intake.industry !== "" &&
@@ -197,7 +208,8 @@ function IntakeForm({
     intake.tenure_in_role !== "" &&
     intake.direct_reports !== "" &&
     intake.jurisdiction !== "" &&
-    intake.significant_events.length > 0;
+    intake.significant_events.length > 0 &&
+    otherRequiresElaboration;
 
   function field(
     label: string,
@@ -231,10 +243,14 @@ function IntakeForm({
   // shouldn't allow.
   function SignificantEventsField({
     value,
+    elaboration,
     onChange,
+    onElaborationChange,
   }: {
     value: string[];
+    elaboration: string;
     onChange: (next: string[]) => void;
+    onElaborationChange: (next: string) => void;
   }) {
     function toggle(eventValue: string) {
       if (eventValue === "none") {
@@ -270,6 +286,16 @@ function IntakeForm({
             </label>
           ))}
         </div>
+        {value.includes("other") && (
+          <textarea
+            value={elaboration}
+            onChange={(e) => onElaborationChange(e.target.value)}
+            maxLength={500}
+            placeholder="Briefly describe what happened…"
+            rows={3}
+            className="mt-2.5 w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-charcoal focus:outline-none focus:border-charcoal resize-none"
+          />
+        )}
       </div>
     );
   }
@@ -307,7 +333,11 @@ function IntakeForm({
       {field("Primary jurisdiction", "jurisdiction", JURISDICTION_OPTIONS)}
       <SignificantEventsField
         value={intake.significant_events}
+        elaboration={intake.significant_event_elaboration}
         onChange={(next) => onChange({ ...intake, significant_events: next })}
+        onElaborationChange={(next) =>
+          onChange({ ...intake, significant_event_elaboration: next })
+        }
       />
 
       <button

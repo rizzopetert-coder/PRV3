@@ -4,7 +4,7 @@ import { nanoid } from "nanoid";
 import type {
   ShareableOutputPayload,
   StateRef,
-  IntakeEcho,
+  ShareableIntakeEcho,
   ShareableSynthesisFields,
 } from "@/lib/types";
 import { invokeEngine } from "@/lib/engine-client";
@@ -49,7 +49,7 @@ function computeWeights(
 // Intake mapping
 // ---------------------------------------------------------------------------
 
-function mapIntake(engineIntake: Record<string, unknown>): IntakeEcho {
+function mapIntake(engineIntake: Record<string, unknown>): ShareableIntakeEcho {
   const jurisdictions = Array.isArray(engineIntake.jurisdictions)
     ? (engineIntake.jurisdictions as string[])
     : [];

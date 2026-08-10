@@ -64,13 +64,17 @@ export interface SignificantEventOption {
 
 // Canonical significant-events vocabulary -- mirrors engine/data/intake.py's
 // PRIOR_ADJUSTERS event_id/event_label pairs. Mechanism 1 (prior-probability
-// scoring) was deprecated this session (Decision Register); these 9 values
+// scoring) was deprecated this session (Decision Register); these 10 values
 // now flow through as synthesis-only narrative metadata, never a scoring
 // input. Two labels lightly trimmed for checkbox-length readability
 // (attitude_departure, aptitude_redesign) -- see Decision Register for the
-// approved copy; the other 7 are verbatim. Single source of truth, imported
-// by both the intake UI (web/components/DiagnosticFlow.tsx) and server-side
-// validation (web/app/api/diagnostic/session/start/route.ts).
+// approved copy; the other 7 are verbatim. "other" (A1, this session) has
+// no PRIOR_ADJUSTER_INDEX counterpart -- it never existed as a Mechanism-1
+// event type, so engine/output_synthesis.py's format_event_for_synthesis()
+// special-cases it using the free-text significant_event_elaboration field
+// instead of a lookup label. Single source of truth, imported by both the
+// intake UI (web/components/DiagnosticFlow.tsx) and server-side validation
+// (web/app/api/diagnostic/session/start/route.ts).
 export const SIGNIFICANT_EVENT_OPTIONS: readonly SignificantEventOption[] = [
   { value: "acquisition_or_merger", label: "Acquisition or merger" },
   { value: "external_legal_claim", label: "External legal claim or regulatory inquiry" },
@@ -80,10 +84,11 @@ export const SIGNIFICANT_EVENT_OPTIONS: readonly SignificantEventOption[] = [
   { value: "attitude_conduct", label: "A known performance or conduct issue involving a specific individual remains unresolved." },
   { value: "attitude_departure", label: "A termination or unexpected departure revealed something about how the organization operates that you're still addressing." },
   { value: "aptitude_redesign", label: "A role, team, or function was created, redesigned, or eliminated in the past 18 months." },
+  { value: "other", label: "Other" },
   { value: "none", label: "None" },
 ];
 
-export interface IntakeEcho {
+export interface ShareableIntakeEcho {
   // string | number is TEMPORARY -- see the Priority Queue's dated
   // follow-up to collapse this to number-only once ShareableOutputPayload's
   // 30-day KV TTL has fully cycled past this deployment and no legacy
@@ -95,6 +100,17 @@ export interface IntakeEcho {
   direct_reports: string;
   jurisdiction: string;
   significant_events: string[];
+}
+
+// Private-only superset of ShareableIntakeEcho -- A1 (free-text "Other"
+// elaboration), Gemini-cleared with a structural airgap: this field exists
+// on the private type only, never on ShareableIntakeEcho, so the
+// TypeScript compiler blocks it from ever reaching ShareableOutputPayload
+// rather than relying on a runtime flag or a strip step. Populated only
+// when "other" is among significant_events -- the diagnostic UI
+// (DiagnosticFlow.tsx) requires non-empty elaboration text in that case.
+export interface PrivateIntakeEcho extends ShareableIntakeEcho {
+  significant_event_elaboration?: string;
 }
 
 /**
@@ -261,8 +277,9 @@ export interface PrivateOutputPayload {
     response_window: "Extended" | "Near-Term" | "Immediate" | null;
   };
 
-  // Intake echo — all six fields for recognition framing
-  intake: IntakeEcho;
+  // Intake echo — all six fields for recognition framing, plus
+  // significant_event_elaboration when "other" was selected (private only).
+  intake: PrivateIntakeEcho;
 
   // Per-axis asset ratio for the live-mode ConstellationField visualization.
   dimension_summary: DimensionSummary;
@@ -311,8 +328,11 @@ export interface ShareableOutputPayload {
   // engineResult.private_output.legal_tail_risk_exposure?.band.
   legal_tail_risk_band: LegalTailRiskBand | null;
 
-  // Intake echo — grounds friction_tax_estimate math for external audience
-  intake: IntakeEcho;
+  // Intake echo — grounds friction_tax_estimate math for external audience.
+  // ShareableIntakeEcho specifically -- significant_event_elaboration (if
+  // any) never reaches this payload, enforced at the type level (see
+  // PrivateIntakeEcho above).
+  intake: ShareableIntakeEcho;
 
   // Share metadata
   share_id: string;

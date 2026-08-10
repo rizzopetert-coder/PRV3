@@ -7,7 +7,7 @@ import type {
   ResolutionFamily,
   FrictionTaxEstimate,
   LegalTailRiskExposure,
-  IntakeEcho,
+  PrivateIntakeEcho,
   DimensionSummary,
 } from "@/lib/types";
 
@@ -42,7 +42,7 @@ export interface DevDiagnosticPreviewPayload {
   resolution_routing: string;
   friction_tax_estimate: FrictionTaxEstimate | null;
   legal_tail_risk_exposure: LegalTailRiskExposure | null;
-  intake: IntakeEcho;
+  intake: PrivateIntakeEcho;
   dimension_summary: DimensionSummary;
   primary_asset_domain: string;
 }

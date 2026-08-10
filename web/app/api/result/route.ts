@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type {
   PrivateOutputPayload,
   StateRef,
-  IntakeEcho,
+  PrivateIntakeEcho,
   SynthesisFields,
 } from "@/lib/types";
 import { invokeEngine } from "@/lib/engine-client";
@@ -40,7 +40,7 @@ function computeWeights(
 }
 
 // ---------------------------------------------------------------------------
-// Intake mapping — engine echo fields → IntakeEcho contract
+// Intake mapping — engine echo fields → PrivateIntakeEcho contract
 // ---------------------------------------------------------------------------
 
 // Never throws. Real headcount int passes through unchanged; a numeric
@@ -58,7 +58,7 @@ function parseOrgSize(value: unknown): string | number {
   return "";
 }
 
-function mapIntake(engineIntake: Record<string, unknown>): IntakeEcho {
+function mapIntake(engineIntake: Record<string, unknown>): PrivateIntakeEcho {
   const jurisdictions = Array.isArray(engineIntake.jurisdictions)
     ? (engineIntake.jurisdictions as string[])
     : [];
@@ -75,6 +75,9 @@ function mapIntake(engineIntake: Record<string, unknown>): IntakeEcho {
     direct_reports: "",
     jurisdiction: jurisdictions[0] ?? "",
     significant_events: significantEvents,
+    // A1 -- undefined for Path B (doesn't collect it); Path 1 always
+    // echoes a real string ("" when "other" wasn't selected).
+    significant_event_elaboration: engineIntake.significant_event_elaboration as string | undefined,
   };
 }
 

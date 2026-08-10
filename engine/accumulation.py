@@ -77,7 +77,8 @@ def _coeff(v: Optional[float]) -> float:
 @dataclass
 class IntakeData:
     """
-    Complete intake form result. All six intake fields.
+    Complete intake form result. Six locked intake fields plus one
+    optional field (A1, this session).
     Spec reference: Section I.3
     """
     headcount:          int   # precise headcount (engine/data/intake.py's HEADCOUNT_FIELD_SPEC)
@@ -86,6 +87,13 @@ class IntakeData:
     jurisdictions:      list  # list of state abbreviations, e.g. ["CA", "TX"]
     significant_events: list  # list of event_ids
     principal_role:     str   # from INTAKE_FIELDS["principal_role"]
+    # A1 -- free-text elaboration, populated only when "other" is among
+    # significant_events. Synthesis-only narrative metadata, same as
+    # significant_events itself post-Mechanism-1-deprecation -- never a
+    # scoring input. Defaulted so every pre-existing IntakeData
+    # constructor call (Path B, calibration_runner.py, tests) keeps
+    # working unchanged.
+    significant_event_elaboration: str = ""
 
     @property
     def is_high_hazard(self) -> bool:

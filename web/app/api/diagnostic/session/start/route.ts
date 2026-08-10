@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSession, resolveQuestionLabel } from "@/lib/session-store";
 import { invokeQuestionCopy } from "@/lib/engine-client";
-import { SIGNIFICANT_EVENT_OPTIONS, type IntakeEcho } from "@/lib/types";
+import { SIGNIFICANT_EVENT_OPTIONS, type PrivateIntakeEcho } from "@/lib/types";
 
 const VALID_SIGNIFICANT_EVENTS = new Set(SIGNIFICANT_EVENT_OPTIONS.map((o) => o.value));
 
@@ -14,7 +14,7 @@ const VALID_SIGNIFICANT_EVENTS = new Set(SIGNIFICANT_EVENT_OPTIONS.map((o) => o.
 // engine.main.get_question_copy(), not by omission-in-this-file alone.
 // ---------------------------------------------------------------------------
 
-function validateIntake(body: unknown): body is IntakeEcho {
+function validateIntake(body: unknown): body is PrivateIntakeEcho {
   if (typeof body !== "object" || body === null) return false;
   const b = body as Record<string, unknown>;
   // Soft transition (locked decision) -- accepts a real int from the new
@@ -29,6 +29,18 @@ function validateIntake(body: unknown): body is IntakeEcho {
     b.significant_events.every(
       (v): v is string => typeof v === "string" && VALID_SIGNIFICANT_EVENTS.has(v)
     );
+  // A1 -- elaboration is optional in general, but required non-empty
+  // whenever "other" is among significant_events. This is the real
+  // server-side trust boundary, not the browser -- the client's own
+  // isComplete gate (DiagnosticFlow.tsx) enforces the same rule, but
+  // this is what actually stops a bad submission.
+  const elaboration = b.significant_event_elaboration;
+  const validElaboration =
+    elaboration === undefined || typeof elaboration === "string";
+  const otherSatisfied =
+    !validSignificantEvents ||
+    !(b.significant_events as unknown[]).includes("other") ||
+    (typeof elaboration === "string" && elaboration.trim().length > 0);
   return (
     validOrgSize &&
     typeof b.industry === "string" &&
@@ -36,7 +48,9 @@ function validateIntake(body: unknown): body is IntakeEcho {
     typeof b.tenure_in_role === "string" &&
     typeof b.direct_reports === "string" &&
     typeof b.jurisdiction === "string" &&
-    validSignificantEvents
+    validSignificantEvents &&
+    validElaboration &&
+    otherSatisfied
   );
 }
 

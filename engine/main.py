@@ -67,6 +67,10 @@ def run_engine(
         jurisdictions=intake_dict["jurisdictions"],
         significant_events=intake_dict["significantEvents"],
         principal_role=intake_dict["principalRole"],
+        # A1 -- optional, .get() not bracket access: this camelCase
+        # payload shape predates the field and Path B's UI doesn't
+        # collect it, so no existing caller sends it.
+        significant_event_elaboration=intake_dict.get("significantEventElaboration", ""),
     )
 
     # Path B: selectedStateIds are the declared diagnosis.
@@ -167,6 +171,11 @@ def _locked_intake_to_engine_intake(intake: dict) -> IntakeData:
         jurisdictions=[jurisdiction] if jurisdiction else [],
         significant_events=intake.get("significant_events") or ["none"],
         principal_role=intake.get("role_level", ""),
+        # A1 -- free-text elaboration, present only when "other" was
+        # selected in the checkbox multi-select (validated server-side
+        # in validateIntake(), required non-empty when "other" is
+        # selected).
+        significant_event_elaboration=intake.get("significant_event_elaboration", ""),
     )
 
 

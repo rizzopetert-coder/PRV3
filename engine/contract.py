@@ -543,6 +543,7 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
         "jurisdictions":      list(session.intake.jurisdictions),
         "significant_events": list(session.intake.significant_events),
         "principal_role":     session.intake.principal_role,
+        "significant_event_elaboration": session.intake.significant_event_elaboration,
     }
 
     return {
@@ -631,6 +632,7 @@ _SYNTHESIS_FIELDS = {
 _INTAKE_FIELDS = {
     "headcount", "org_size", "industry", "org_type",
     "jurisdictions", "significant_events", "principal_role",
+    "significant_event_elaboration",
 }
 
 _MONITORING_METADATA_FIELDS = {"flags", "flag_count", "any_high_priority"}

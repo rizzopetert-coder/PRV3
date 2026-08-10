@@ -1,4 +1,4 @@
-import type { IntakeEcho, FrictionTaxEstimate, LegalTailRiskExposure } from "@/lib/types";
+import type { PrivateIntakeEcho, FrictionTaxEstimate, LegalTailRiskExposure } from "@/lib/types";
 import type { AccumulatedVector, AnswerLogEntry } from "@/lib/session-store";
 
 const ENGINE_SECRET = process.env.ENGINE_SECRET ?? "";
@@ -183,7 +183,7 @@ export interface AccumulatePayload {
   accumulated_vector: AccumulatedVector;
   question_id: string;
   option_id: string;
-  intake: IntakeEcho;
+  intake: PrivateIntakeEcho;
 }
 
 // Mirrors engine.severity.SeverityInput's constructor kwargs exactly.
@@ -277,7 +277,7 @@ export interface CheckpointResultsBundle {
 
 export interface CompletePayload {
   accumulated_vector: AccumulatedVector;
-  intake: IntakeEcho;
+  intake: PrivateIntakeEcho;
   answered_question_count: number;
   checkpoint_results: CheckpointResultsBundle;
   // Every SeverityInputPayload collected across the session (one per
