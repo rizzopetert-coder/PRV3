@@ -1088,6 +1088,48 @@ _QDATA = [
         ["the_untouchable"],
         False,
     ),
+    # -- Structure 1/2 conditional follow-up chains (this session) -- Gemini
+    # architecture review, Structures 1 and 2 (Structure 3 parked with A5,
+    # see Decision Register). Content Pete-approved, final.
+    (
+        "SEVER-30",
+        "Have you brought attention to the gap(s), and if so, what's happened?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "It got acknowledged and something changed.", False, None),
+            ("B", "It got acknowledged, but nothing's changed yet.", False, None),
+            ("C", "I was told to figure it out — the responsibility landed on me, not the structure.", False, None),
+            ("D", "I have not brought attention to the gap.", True, "SEVER-31"),
+        ],
+        ["built_to_fail"],
+        True,
+    ),
+    (
+        "SEVER-31",
+        "What's kept you from raising it?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "I've been planning to, but haven't yet — no specific reason it's been delayed.", False, None),
+            ("B", "It didn't seem like it would lead anywhere, based on how similar things have gone before.", False, None),
+            ("C", "I wasn't sure it was my place to raise, or who the right person to raise it with even is.", False, None),
+            ("D", "Raising it has felt genuinely risky — like it could reflect on me rather than get the actual problem addressed.", True, None),
+        ],
+        ["built_to_fail"],
+        True,
+    ),
+    (
+        "SEVER-32",
+        "Why did they depart?",
+        "forced_choice", None, "conditional",
+        [
+            ("A", "For reasons clearly unrelated to this — retirement, relocation, an outside opportunity.", False, None),
+            ("B", "It's unclear whether this played a role.", False, None),
+            ("C", "This was at least part of the reason, alongside other factors.", False, None),
+            ("D", "I don't know.", False, None),
+        ],
+        ["the_founders_grip"],
+        False,
+    ),
     (
         "Q35",
         "When someone in a key role isn't performing,"
@@ -1189,14 +1231,12 @@ _QDATA = [
     ),
     (
         "Q41",
-        "When you've raised the gap between what this role is responsible"
-        " for and the resources you actually have to do it, what's happened?",
+        "Is there a gap between what this role is responsible for and the"
+        " resources you actually have to do it?",
         "forced_choice", 41, "late",
         [
-            ("A", "It got acknowledged and something changed.", False, None),
-            ("B", "It got acknowledged, but nothing's changed yet.", False, None),
-            ("C", "I was told to figure it out — the responsibility landed on me, not the structure.", False, None),
-            ("D", "I've been told that directly — and it's clearly the standard response to this role, not advice specific to my situation.", True, None),
+            ("A", "No.", False, None),
+            ("B", "Yes.", True, "SEVER-30"),
         ],
         ["built_to_fail"],
         True,
@@ -1218,14 +1258,11 @@ _QDATA = [
     ),
     (
         "Q43",
-        "Have senior people left specifically because of how concentrated"
-        " decision-making is here?",
+        "Have more than 1 senior leader left in the last 18 months?",
         "forced_choice", 43, "late",
         [
-            ("A", "Not that I'm aware of.", False, None),
-            ("B", "Maybe — it's come up, but I'm not certain it was the deciding factor.", False, None),
-            ("C", "Yes, at least one departure, and the reason was fairly clear.", False, None),
-            ("D", "Yes, more than one, and it's become something people acknowledge openly as why they left or are thinking about leaving.", True, None),
+            ("A", "No.", False, None),
+            ("B", "Yes.", True, "SEVER-32"),
         ],
         ["the_founders_grip"],
         True,
@@ -2121,6 +2158,16 @@ def _build_library():
         },
         "Q41": {
             "A": dict(_z),
+            "B": dict(_z),
+        },
+        "SEVER-30": {
+            "A": dict(_z),
+            "B": {**_z, "aptitude_liability":  0.25},
+            "C": {**_z, "aptitude_liability":  0.50},
+            "D": {**_z, "aptitude_liability":  0.75},
+        },
+        "SEVER-31": {
+            "A": dict(_z),
             "B": {**_z, "aptitude_liability":  0.25},
             "C": {**_z, "aptitude_liability":  0.50},
             "D": {**_z, "aptitude_liability":  0.75},
@@ -2134,9 +2181,13 @@ def _build_library():
         },
         "Q43": {
             "A": dict(_z),
+            "B": dict(_z),
+        },
+        "SEVER-32": {
+            "A": dict(_z),
             "B": {**_z, "authority_liability":  0.25},
             "C": {**_z, "authority_liability":  0.50},
-            "D": {**_z, "authority_liability":  0.75},
+            "D": dict(_z),
         },
         "Q44": {
             "A": dict(_z),

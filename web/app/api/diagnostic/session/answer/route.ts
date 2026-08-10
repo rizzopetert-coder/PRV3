@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
       currentIndex,
       [severityFollowOnId],
     );
-    session.question_labels[severityFollowOnId] = spliceLabel(question_id, 0);
+    session.question_labels[severityFollowOnId] = spliceLabel(question_id, 0, session.question_labels);
   }
 
   // Q28 conditional splice — the only one of the two live-session-surfaced
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
       currentIndex,
       ["Q28"],
     );
-    session.question_labels["Q28"] = spliceLabel("Q06", 0);
+    session.question_labels["Q28"] = spliceLabel("Q06", 0, session.question_labels);
   }
 
   // Checkpoint evaluation — at most once per canonical position per
@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
         checkpointResult.distinguishers,
       );
       checkpointResult.distinguishers.forEach((distinguisherId, letterIndex) => {
-        session.question_labels[distinguisherId] = spliceLabel(question_id, letterIndex);
+        session.question_labels[distinguisherId] = spliceLabel(question_id, letterIndex, session.question_labels);
       });
     }
   }

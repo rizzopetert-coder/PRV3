@@ -278,14 +278,29 @@ export function coreQuestionPosition(questionId: string): number | null {
 // this question among any siblings spliced from the same parent in the
 // same call (checkpoints can splice up to 2 at once; severity follow-ons
 // and Q28 only ever splice one, so letterIndex is always 0 for those).
-export function spliceLabel(parentQuestionId: string, letterIndex: number): string {
+//
+// existingLabels: the session's current question_labels map. Needed for
+// ancestry-aware labeling -- when the parent is itself a spliced (non-
+// core) question, coreQuestionPosition(parentQuestionId) returns null,
+// and the correct label is the parent's OWN already-resolved label
+// (looked up here) with this splice's letter appended, not the parent's
+// raw ID string. E.g. a follow-up of "34A" becomes "34AA", not
+// "SEVER-30A". Falls back to the raw parent ID only if the parent's own
+// label genuinely isn't in existingLabels yet, which should not happen
+// in practice -- every splice call site sets question_labels for a
+// question before it can ever be answered (and thus become a parent).
+export function spliceLabel(
+  parentQuestionId: string,
+  letterIndex: number,
+  existingLabels: Record<string, string>,
+): string {
   const parentPosition = coreQuestionPosition(parentQuestionId);
   const letter = String.fromCharCode(65 + letterIndex);
-  // parentPosition should never be null in practice -- every current splice
-  // mechanism fires from a real core question. Falls back to the raw
-  // parent ID rather than throwing, so a label always renders instead of
-  // crashing the session on an unexpected edge case.
-  return `${parentPosition ?? parentQuestionId}${letter}`;
+  const parentLabel =
+    parentPosition !== null
+      ? String(parentPosition)
+      : existingLabels[parentQuestionId] ?? parentQuestionId;
+  return `${parentLabel}${letter}`;
 }
 
 // A question's resolved display label -- exactly one of the two shapes.

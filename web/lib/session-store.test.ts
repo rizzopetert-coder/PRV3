@@ -202,13 +202,28 @@ describe("coreQuestionPosition", () => {
 
 describe("spliceLabel", () => {
   it("builds [parent][letter] from a real core parent's position", () => {
-    expect(spliceLabel("Q11", 0)).toBe("11A");
-    expect(spliceLabel("Q11", 1)).toBe("11B");
-    expect(spliceLabel("Q22", 0)).toBe("22A");
+    expect(spliceLabel("Q11", 0, {})).toBe("11A");
+    expect(spliceLabel("Q11", 1, {})).toBe("11B");
+    expect(spliceLabel("Q22", 0, {})).toBe("22A");
   });
 
   it("Q28's conditional splice off Q06 labels as 6A", () => {
-    expect(spliceLabel("Q06", 0)).toBe("6A");
+    expect(spliceLabel("Q06", 0, {})).toBe("6A");
+  });
+
+  // Ancestry-labeling fix (Structures 1/2, this session): when the parent
+  // is itself a spliced (non-core) question, coreQuestionPosition() returns
+  // null for it -- the label must resolve from the parent's OWN already-
+  // computed entry in existingLabels, not fall back to its raw ID string.
+  it("resolves ancestry through a non-core parent instead of falling back to its raw ID", () => {
+    // SEVER-30 is core-less (splice off Q41, position 34) -- its own label
+    // "34A" is already in existingLabels by the time SEVER-31 is spliced.
+    const existingLabels = { "SEVER-30": "34A" };
+    expect(spliceLabel("SEVER-30", 0, existingLabels)).toBe("34AA");
+  });
+
+  it("falls back to the raw parent ID only if the parent truly has no resolved label yet", () => {
+    expect(spliceLabel("SEVER-30", 0, {})).toBe("SEVER-30A");
   });
 });
 
