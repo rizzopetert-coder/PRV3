@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from engine.main import (
     run_engine,
-    accumulate_one_answer,
+    accumulate_answers,
     run_checkpoint,
     run_accumulated_engine,
     get_question_copy,
@@ -72,15 +72,17 @@ async def accumulate(request: Request):
     try:
         accumulated_vector = payload.get("accumulated_vector", {}) if isinstance(payload, dict) else {}
         question_id = payload.get("question_id", "") if isinstance(payload, dict) else ""
-        option_id = payload.get("option_id", "") if isinstance(payload, dict) else ""
+        option_ids = payload.get("option_ids", []) if isinstance(payload, dict) else []
         intake = payload.get("intake", {}) if isinstance(payload, dict) else {}
-        # accumulate_one_answer() returns {"accumulated_vector", "severity_input",
-        # "severity_follow_on_id"} -- passed straight through as the response
-        # body. The Next.js caller unpacks accumulated_vector for the session's
-        # own vector, persists severity_input (when present) into
-        # session.severity_inputs, and splices severity_follow_on_id (when
-        # present) into question_sequence, mirroring checkpoint distinguishers.
-        result = accumulate_one_answer(accumulated_vector, question_id, option_id, intake)
+        # accumulate_answers() (A.2, this session -- wraps
+        # accumulate_one_answer() once per selected option) returns
+        # {"accumulated_vector", "severity_inputs", "severity_follow_on_ids"}
+        # -- passed straight through as the response body. The Next.js
+        # caller unpacks accumulated_vector for the session's own vector,
+        # persists every severity_input into session.severity_inputs, and
+        # splices every severity_follow_on_id into question_sequence,
+        # mirroring checkpoint distinguishers.
+        result = accumulate_answers(accumulated_vector, question_id, option_ids, intake)
         return JSONResponse(content=result)
     except KeyError as e:
         # Unknown question_id or option_id — client fault

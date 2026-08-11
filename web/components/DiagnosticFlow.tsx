@@ -18,7 +18,8 @@ import PrivateOutput from "@/components/PrivateOutput";
 // Mirrors web/lib/session-store.ts's QuestionLabel exactly -- redeclared
 // here rather than imported since that module pulls in server-only Redis
 // code ("use client" can't import it), same reason QuestionCopy below is
-// its own local type rather than imported from engine-client.ts.
+// its own local type rather than imported from engine-client.ts. format
+// added -- A.2, this session (Q06 weighted_multi_select).
 type QuestionLabel =
   | { kind: "core"; position: number; total: number }
   | { kind: "spliced"; label: string };
@@ -167,6 +168,7 @@ const EMPTY_INTAKE: IntakeFormState = {
 interface QuestionCopy {
   question_id: string;
   question_text: string;
+  format: "forced_choice" | "weighted_multi_select";
   options: Array<{ option_id: string; option_text: string }>;
 }
 
@@ -353,6 +355,15 @@ function IntakeForm({
 
 // ── Question view ───────────────────────────────────────────────────────────
 
+// A6-audit-style "none of the above" detection by text, not a hardcoded
+// option_id -- matches the intake form's SignificantEventsField
+// convention in spirit (a known escape-hatch option gets mutual-
+// exclusivity), generalizes to any future weighted_multi_select
+// question without a code change.
+function isNoneOption(optionText: string): boolean {
+  return optionText.trim().toLowerCase().startsWith("none of the above");
+}
+
 function QuestionView({
   question,
   label,
@@ -360,8 +371,37 @@ function QuestionView({
 }: {
   question: QuestionCopy;
   label: QuestionLabel;
-  onAnswer: (optionId: string) => void;
+  onAnswer: (optionIds: string[]) => void;
 }) {
+  const [selected, setSelected] = useState<string[]>([]);
+
+  // New question -- clear any in-progress multi-select state from the
+  // previous one. Keyed on question_id, not label, since spliced
+  // follow-ups reuse label shapes but never question_ids.
+  useEffect(() => {
+    setSelected([]);
+  }, [question.question_id]);
+
+  const isMultiSelect = question.format === "weighted_multi_select";
+
+  // None/other-options mutual exclusivity -- same convention as the
+  // intake form's SignificantEventsField.toggle(): selecting the none-
+  // option clears everything else; selecting anything else clears it.
+  function toggle(optionId: string) {
+    const opt = question.options.find((o) => o.option_id === optionId);
+    if (opt && isNoneOption(opt.option_text)) {
+      setSelected(selected.includes(optionId) ? [] : [optionId]);
+      return;
+    }
+    const noneId = question.options.find((o) => isNoneOption(o.option_text))?.option_id;
+    const withoutNone = selected.filter((id) => id !== noneId);
+    setSelected(
+      withoutNone.includes(optionId)
+        ? withoutNone.filter((id) => id !== optionId)
+        : [...withoutNone, optionId],
+    );
+  }
+
   return (
     <div className="max-w-xl mx-auto px-6 py-16">
       <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-6">
@@ -372,26 +412,98 @@ function QuestionView({
       <h2 className="font-display text-xl md:text-2xl text-charcoal mb-8 leading-snug">
         {question.question_text}
       </h2>
-      <div className="space-y-3">
-        {question.options.map((opt) => (
+      {isMultiSelect ? (
+        <>
+          <div className="space-y-3">
+            {question.options.map((opt) => (
+              <label
+                key={opt.option_id}
+                className="flex items-start gap-3 w-full text-left p-4 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-colors font-ui text-sm text-charcoal cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={selected.includes(opt.option_id)}
+                  onChange={() => toggle(opt.option_id)}
+                  className="mt-0.5 shrink-0"
+                />
+                <span>{opt.option_text}</span>
+              </label>
+            ))}
+          </div>
           <button
-            key={opt.option_id}
-            onClick={() => onAnswer(opt.option_id)}
-            className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-colors font-ui text-sm text-charcoal"
+            onClick={() => onAnswer(selected)}
+            disabled={selected.length === 0}
+            className="w-full bg-charcoal text-white font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-3"
           >
-            {opt.option_text}
+            Continue
           </button>
-        ))}
-      </div>
+        </>
+      ) : (
+        <div className="space-y-3">
+          {question.options.map((opt) => (
+            <button
+              key={opt.option_id}
+              onClick={() => onAnswer([opt.option_id])}
+              className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-colors font-ui text-sm text-charcoal"
+            >
+              {opt.option_text}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 // ── Main export ───────────────────────────────────────────────────────────
 
+// A.3 (reset + look-back), this session -- a purely client-side mirror
+// of what this browser tab has already rendered and submitted. Never
+// reads or touches accumulated_vector/question_sequence/checkpoints/
+// severity_inputs; read-only by construction.
+interface AnsweredEntry {
+  questionText: string;
+  selectedOptionTexts: string[];
+}
+
+function HistoryPanel({ history }: { history: AnsweredEntry[] }) {
+  if (history.length === 0) {
+    return (
+      <div className="max-w-xl mx-auto px-6 pb-4">
+        <p className="font-ui text-xs text-gray-400">No answers yet.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="max-w-xl mx-auto px-6 pb-6 space-y-3 border-b border-gray-200 mb-2">
+      {history.map((entry, i) => (
+        <div key={i}>
+          <p className="font-ui text-xs text-gray-400">{entry.questionText}</p>
+          <p className="font-ui text-sm text-charcoal">{entry.selectedOptionTexts.join(", ")}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function DiagnosticFlow() {
   const [state, setState] = useState<FlowState>({ phase: "intake" });
   const [intake, setIntake] = useState<IntakeFormState>(EMPTY_INTAKE);
+  const [history, setHistory] = useState<AnsweredEntry[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Reset -- same kind of action as the pre-existing error-phase "Start
+  // over" button (client-state discard only, no backend delete/expire
+  // call; an abandoned session already ages out via its existing 6-hour
+  // sliding TTL, same as a closed browser tab today), now also clearing
+  // intake + history and reachable during a normal in-progress session,
+  // not just after an error.
+  function handleReset() {
+    setState({ phase: "intake" });
+    setIntake(EMPTY_INTAKE);
+    setHistory([]);
+    setShowHistory(false);
+  }
 
   // Additive resume capability (not part of the original Session 71 build):
   // a ?session=<id> query param, if present, skips the intake form entirely
@@ -470,7 +582,7 @@ export default function DiagnosticFlow() {
     }
   }
 
-  async function handleAnswer(optionId: string) {
+  async function handleAnswer(optionIds: string[]) {
     if (state.phase !== "question") return;
     const { sessionId, question } = state;
 
@@ -482,13 +594,20 @@ export default function DiagnosticFlow() {
         body: JSON.stringify({
           session_id: sessionId,
           question_id: question.question_id,
-          option_id: optionId,
+          option_ids: optionIds,
         }),
       });
       if (!res.ok) {
         setState({ phase: "error", message: ERROR_COPY });
         return;
       }
+      const selectedTexts = optionIds.map(
+        (id) => question.options.find((o) => o.option_id === id)?.option_text ?? id,
+      );
+      setHistory((prev) => [
+        ...prev,
+        { questionText: question.question_text, selectedOptionTexts: selectedTexts },
+      ]);
       const data = await res.json();
       if (data.status === "complete") {
         setState({ phase: "complete", result: data.result as PrivateOutputPayload });
@@ -540,7 +659,7 @@ export default function DiagnosticFlow() {
       <div className="max-w-2xl mx-auto px-6 py-16 text-center">
         <p className="font-display text-2xl text-charcoal mb-4">{state.message}</p>
         <button
-          onClick={() => setState({ phase: "intake" })}
+          onClick={handleReset}
           className="bg-charcoal text-white font-ui text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
         >
           Start over
@@ -559,11 +678,28 @@ export default function DiagnosticFlow() {
 
   if (state.phase === "question") {
     return (
-      <QuestionView
-        question={state.question}
-        label={state.label}
-        onAnswer={handleAnswer}
-      />
+      <>
+        <div className="max-w-xl mx-auto px-6 pt-6 flex items-center justify-between">
+          <button
+            onClick={() => setShowHistory((s) => !s)}
+            className="font-ui text-xs text-gray-400 hover:text-charcoal transition-colors"
+          >
+            {showHistory ? "Hide" : "Review"} your answers so far
+          </button>
+          <button
+            onClick={handleReset}
+            className="font-ui text-xs text-gray-400 hover:text-charcoal transition-colors"
+          >
+            Start over
+          </button>
+        </div>
+        {showHistory && <HistoryPanel history={history} />}
+        <QuestionView
+          question={state.question}
+          label={state.label}
+          onAnswer={handleAnswer}
+        />
+      </>
     );
   }
 

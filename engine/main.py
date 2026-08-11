@@ -205,6 +205,12 @@ def get_question_copy(question_id: str) -> dict:
     return {
         "question_id": question.question_id,
         "question_text": question.question_text,
+        # format ("forced_choice" | "weighted_multi_select") -- A.2, this
+        # session. Not scoring-sensitive (a UI rendering hint, not
+        # dimensional_contributions/axis_targets/severity_trigger/
+        # severity_follow_on_id), safe to include -- P-03 boundary
+        # unaffected.
+        "format": question.format,
         "options": [
             {"option_id": opt.option_id, "option_text": opt.option_text}
             for opt in question.answer_options
@@ -296,6 +302,62 @@ def accumulate_one_answer(
         "accumulated_vector": session.accumulated_vector,
         "severity_input": severity_input,
         "severity_follow_on_id": severity_follow_on_id,
+    }
+
+
+def accumulate_answers(
+    accumulated_vector: dict,
+    question_id: str,
+    option_ids: list,
+    intake: dict,
+    trigger_question_id: str = "",
+) -> dict:
+    """
+    Multi-option wrapper around accumulate_one_answer() -- A.2 (Q06
+    multi-select), this session. Loops accumulate_one_answer() once per
+    selected option_id, threading accumulated_vector through
+    sequentially (each call's output feeds the next call's input) --
+    exactly the stateless-per-option contract accumulate_one_answer()
+    already guarantees. That function itself is UNCHANGED; this is a
+    second caller, not a modification, per its own docstring's "KNOWN
+    CALLER IMPACT" convention.
+
+    Every existing single-select caller now sends a 1-element list --
+    this function's behavior for len(option_ids) == 1 is byte-for-byte
+    identical to calling accumulate_one_answer() directly once, so it
+    fully replaces the old single-option call path everywhere (one code
+    path, not a dual branch).
+
+    Aggregates severity_input/severity_follow_on_id across every
+    selected option into lists (plural) rather than a single optional
+    value -- confirmed necessary, not hypothetical: Q06's own A option
+    (severity_trigger=True -> SEVER-27) and D option
+    (severity_trigger=True -> SEVER-21) mean a real multi-select answer
+    selecting both can legitimately fire two severity follow-ons from
+    one submission.
+
+    Raises KeyError (same as accumulate_one_answer(), same caller
+    handling in api/engine.py) if option_ids is empty or any entry is
+    invalid for question_id.
+    """
+    if not option_ids:
+        raise KeyError(f"option_ids must be non-empty for question {question_id!r}")
+
+    vector = dict(accumulated_vector)
+    severity_inputs = []
+    severity_follow_on_ids = []
+    for option_id in option_ids:
+        step = accumulate_one_answer(vector, question_id, option_id, intake, trigger_question_id)
+        vector = step["accumulated_vector"]
+        if step["severity_input"] is not None:
+            severity_inputs.append(step["severity_input"])
+        if step["severity_follow_on_id"] is not None:
+            severity_follow_on_ids.append(step["severity_follow_on_id"])
+
+    return {
+        "accumulated_vector": vector,
+        "severity_inputs": severity_inputs,
+        "severity_follow_on_ids": severity_follow_on_ids,
     }
 
 

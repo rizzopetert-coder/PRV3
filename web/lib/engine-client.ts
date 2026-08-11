@@ -182,7 +182,7 @@ export async function invokeEngine(payload: EnginePayload): Promise<EngineResult
 export interface AccumulatePayload {
   accumulated_vector: AccumulatedVector;
   question_id: string;
-  option_id: string;
+  option_ids: string[];
   intake: PrivateIntakeEcho;
 }
 
@@ -202,20 +202,25 @@ export interface SeverityInputPayload {
   named_condition?: boolean;
 }
 
-// Mirrors accumulate_one_answer()'s return shape exactly (engine/main.py).
+// Mirrors accumulate_answers()'s return shape exactly (engine/main.py) --
+// A.2, this session: pluralized from accumulate_one_answer()'s single-
+// option shape, since a weighted_multi_select answer (Q06) can select
+// more than one severity_trigger=true option at once (confirmed real,
+// not hypothetical: Q06's A -> SEVER-27 and D -> SEVER-21 are both
+// severity_trigger=true).
 export interface AccumulateResult {
   accumulated_vector: AccumulatedVector;
-  // Populated only when question_id itself is a SEVER-01..13 follow-on
-  // whose answer maps to a real SeverityInput field -- null for every
-  // other question, including the core question that triggered the
-  // follow-on.
-  severity_input: SeverityInputPayload | null;
-  // Populated only when the just-answered option carries
-  // severity_trigger=true (a core question option) -- the SEVER-##
-  // question_id to splice into the sequence next. Null otherwise,
-  // including on SEVER-01..13 answers themselves (those never trigger a
-  // further follow-on).
-  severity_follow_on_id: string | null;
+  // One entry per selected option whose answer maps to a real
+  // SeverityInput field -- [] when none do, including every core
+  // question that only triggers a follow-on without itself carrying one.
+  severity_inputs: SeverityInputPayload[];
+  // One entry per selected option carrying severity_trigger=true -- the
+  // SEVER-## question_id(s) to splice into the sequence next. [] when
+  // none do, including on SEVER-01..13 answers themselves (those never
+  // trigger a further follow-on... except via an explicit chain, e.g.
+  // SEVER-01 -> SEVER-12, which is exactly this same mechanism firing
+  // again one level deeper).
+  severity_follow_on_ids: string[];
 }
 
 export async function invokeAccumulate(
@@ -306,9 +311,13 @@ export async function invokeComplete(
   return response.json() as Promise<EngineResult>;
 }
 
+// format ("forced_choice" | "weighted_multi_select") -- A.2, this
+// session. Drives QuestionView's rendering branch (checkbox-plus-
+// continue vs. single-click-advance) in web/components/DiagnosticFlow.tsx.
 export interface QuestionCopy {
   question_id: string;
   question_text: string;
+  format: "forced_choice" | "weighted_multi_select";
   options: Array<{ option_id: string; option_text: string }>;
 }
 

@@ -242,7 +242,7 @@ def drive_session(
 
         answer_resp = client.post(
             "/api/diagnostic/session/answer",
-            {"session_id": session_id, "question_id": question_id, "option_id": option_id},
+            {"session_id": session_id, "question_id": question_id, "option_ids": [option_id]},
         )
 
         if answer_resp["status"] == "complete":

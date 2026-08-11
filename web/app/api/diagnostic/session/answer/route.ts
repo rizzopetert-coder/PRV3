@@ -76,10 +76,13 @@ function setCheckpointSlot(
 // purpose: real normalized cosine scores (Path A), not equal weight.
 // ---------------------------------------------------------------------------
 
+// option_ids widened from a single option_id -- A.2, this session (Q06
+// weighted_multi_select). Every single-select submission now sends a
+// 1-element array -- one code path, not a dual-format branch.
 interface AnswerRequest {
   session_id: string;
   question_id: string;
-  option_id: string;
+  option_ids: string[];
 }
 
 function validateRequest(body: unknown): body is AnswerRequest {
@@ -88,7 +91,9 @@ function validateRequest(body: unknown): body is AnswerRequest {
   return (
     typeof b.session_id === "string" &&
     typeof b.question_id === "string" &&
-    typeof b.option_id === "string"
+    Array.isArray(b.option_ids) &&
+    b.option_ids.length > 0 &&
+    b.option_ids.every((v): v is string => typeof v === "string")
   );
 }
 
@@ -104,7 +109,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const { session_id, question_id, option_id } = body;
+  const { session_id, question_id, option_ids } = body;
 
   const session = await getSession(session_id);
   if (!session) {
@@ -127,19 +132,21 @@ export async function POST(request: NextRequest) {
   const accumulateResult = await invokeAccumulate({
     accumulated_vector: session.accumulated_vector,
     question_id,
-    option_id,
+    option_ids,
     intake: session.intake,
   });
 
-  const answerEntry: AnswerLogEntry = { question_id, option_id };
+  const answerEntry: AnswerLogEntry = { question_id, option_ids };
   session.accumulated_vector = accumulateResult.accumulated_vector;
   session.answers_log = [...session.answers_log, answerEntry];
 
   // Severity follow-on wiring (Path 1): question_id itself was a SEVER-##
   // follow-on that maps to a real SeverityInput field -- collect it for
-  // threading into invokeComplete() at Q34.
-  if (accumulateResult.severity_input) {
-    session.severity_inputs = [...session.severity_inputs, accumulateResult.severity_input];
+  // threading into invokeComplete() at Q34. Plural (A.2, this session) --
+  // a weighted_multi_select answer can select more than one option that
+  // independently maps to a SeverityInput field.
+  if (accumulateResult.severity_inputs.length > 0) {
+    session.severity_inputs = [...session.severity_inputs, ...accumulateResult.severity_inputs];
   }
 
   // currentIndex is stable across the splices below — both insert strictly
@@ -147,27 +154,29 @@ export async function POST(request: NextRequest) {
   // shifts as a result of its own follow-on or checkpoint firing.
   const currentIndex = session.question_sequence.indexOf(question_id);
 
-  // Severity follow-on splice — simple per-answer boolean check on the
-  // just-answered option's own severity_trigger flag (already present on
-  // AnswerOption, previously unread), NOT an entropy calculation like
-  // checkpoints use. Mirrors spliceDistinguishers()'s existing pattern
-  // exactly, reusing the same function (a single-element distinguishers
-  // list is exactly what it already handles) rather than a parallel
-  // reimplementation. Guarded against re-firing an already-asked follow-on
-  // (SEVER-11's parked Q31 alternate parent means this only matters for
-  // Q28 today, but the guard is real, general infrastructure -- see
-  // session-store.ts).
-  const severityFollowOnId = accumulateResult.severity_follow_on_id;
-  if (
-    severityFollowOnId &&
-    !severityFollowOnAlreadyAsked(session.answers_log, severityFollowOnId)
-  ) {
+  // Severity follow-on splice — per-answer boolean check on each
+  // selected option's own severity_trigger flag (already present on
+  // AnswerOption), NOT an entropy calculation like checkpoints use.
+  // Plural (A.2, this session): a weighted_multi_select answer can
+  // select more than one severity_trigger option at once (confirmed
+  // real for Q06: A -> SEVER-27, D -> SEVER-21), so this splices every
+  // new one from this submission in a single call, mirroring the
+  // checkpoint-distinguisher path's existing multi-ID + letterIndex
+  // labeling pattern below rather than a parallel reimplementation.
+  // Guarded per-ID against re-firing an already-asked follow-on (same
+  // severityFollowOnAlreadyAsked() infrastructure as before).
+  const newFollowOnIds = accumulateResult.severity_follow_on_ids.filter(
+    (id) => !severityFollowOnAlreadyAsked(session.answers_log, id),
+  );
+  if (newFollowOnIds.length > 0) {
     session.question_sequence = spliceDistinguishers(
       session.question_sequence,
       currentIndex,
-      [severityFollowOnId],
+      newFollowOnIds,
     );
-    session.question_labels[severityFollowOnId] = spliceLabel(question_id, 0, session.question_labels);
+    newFollowOnIds.forEach((followOnId, letterIndex) => {
+      session.question_labels[followOnId] = spliceLabel(question_id, letterIndex, session.question_labels);
+    });
   }
 
   // Q28 conditional splice — the only one of the two live-session-surfaced
@@ -177,7 +186,7 @@ export async function POST(request: NextRequest) {
   // so this is a direct, explicit check rather than reusing the severity
   // mechanism above -- a single hardcoded case, not a generalized
   // framework, since nothing else currently needs this shape.
-  if (question_id === "Q06" && (option_id === "A" || option_id === "B")) {
+  if (question_id === "Q06" && (option_ids.includes("A") || option_ids.includes("B"))) {
     session.question_sequence = spliceDistinguishers(
       session.question_sequence,
       currentIndex,
@@ -193,7 +202,7 @@ export async function POST(request: NextRequest) {
   // been addressed?") not applicable -- so the splice fires on B/C/D
   // only, not unconditionally. Q45 itself carries no severity_trigger
   // of its own.
-  if (question_id === "Q44" && (option_id === "B" || option_id === "C" || option_id === "D")) {
+  if (question_id === "Q44" && (option_ids.includes("B") || option_ids.includes("C") || option_ids.includes("D"))) {
     session.question_sequence = spliceDistinguishers(
       session.question_sequence,
       currentIndex,

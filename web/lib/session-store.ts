@@ -124,9 +124,12 @@ export const ZERO_VECTOR: AccumulatedVector = {
   attitude_asset: 0,
 };
 
+// option_ids widened from a single option_id -- A.2, this session (Q06
+// weighted_multi_select). Every existing single-select entry now stores
+// a 1-element array -- one shape, not a dual-format union.
 export interface AnswerLogEntry {
   question_id: string;
-  option_id: string;
+  option_ids: string[];
 }
 
 // Mirrors engine.checkpoint.CheckpointResult. Three independent optional

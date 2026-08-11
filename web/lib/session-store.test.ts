@@ -144,14 +144,14 @@ describe("severity follow-on splice — reuses spliceDistinguishers() directly",
 
 describe("severityFollowOnAlreadyAsked", () => {
   it("returns false when the follow-on has never been asked", () => {
-    const log: AnswerLogEntry[] = [{ question_id: "Q22", option_id: "D" }];
+    const log: AnswerLogEntry[] = [{ question_id: "Q22", option_ids: ["D"] }];
     expect(severityFollowOnAlreadyAsked(log, "SEVER-04")).toBe(false);
   });
 
   it("returns true once the follow-on itself has been answered", () => {
     const log: AnswerLogEntry[] = [
-      { question_id: "Q22", option_id: "D" },
-      { question_id: "SEVER-04", option_id: "D" },
+      { question_id: "Q22", option_ids: ["D"] },
+      { question_id: "SEVER-04", option_ids: ["D"] },
     ];
     expect(severityFollowOnAlreadyAsked(log, "SEVER-04")).toBe(true);
   });
@@ -164,8 +164,8 @@ describe("severityFollowOnAlreadyAsked", () => {
     // so SEVER-11 can in practice only fire from Q28 today. This test
     // exercises the guard generically, not tied to a live Q28/Q31 case.
     const log: AnswerLogEntry[] = [
-      { question_id: "Q28", option_id: "C" },
-      { question_id: "SEVER-11", option_id: "B" },
+      { question_id: "Q28", option_ids: ["C"] },
+      { question_id: "SEVER-11", option_ids: ["B"] },
     ];
     expect(severityFollowOnAlreadyAsked(log, "SEVER-11")).toBe(true);
   });
