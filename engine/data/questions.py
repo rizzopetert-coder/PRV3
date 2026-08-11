@@ -592,21 +592,13 @@ _QDATA = [
         ["the_unsolved_problem"],
         True,
     ),
-    (
-        "Q29",
-        "How would you describe the relationship between diversity and advancement"
-        " in your organization?",
-        "forced_choice", 29, "late",
-        [
-            ("A", "Consistent — diverse talent advances at the same rate as everyone else.", False, None),
-            ("B", "We're diverse at entry levels but the composition changes as you move up.", True, "SEVER-12"),
-            ("C", "We've invested in diversity but I'm not sure it's translating into advancement.", True, "SEVER-12"),
-            ("D", "We're losing diverse talent before they reach senior levels and I'm not sure why.", True, "SEVER-12"),
-            ("E", "This isn't something we've looked at closely enough to answer with confidence.", False, None),
-        ],
-        ["the_diversity_ceiling"],
-        True,
-    ),
+    # Q29 REMOVED (A5 + Structure 3 combined recalibration, this session,
+    # N: 44 -> 42) -- was a literal duplicate of Q16's question text.
+    # Its severity_follow_on (SEVER-12) now chains off SEVER-01 instead
+    # of firing from its own standalone core slot -- see SEVER-01's
+    # entry below. Zero content loss: SEVER-12 stays reachable,
+    # ATT-DC-01's locked Endemic tier (needs both SEVER-01 and
+    # SEVER-12) is preserved.
     (
         "Q30",
         "How well do people in your organization know what's happening (such as"
@@ -699,20 +691,26 @@ _QDATA = [
         False,
     ),
     # -- Severity follow-ons ---------------------------------------------------
+    # A5 + Structure 3 combined recalibration, this session -- SEVER-01
+    # now chains to SEVER-12 unconditionally (all 5 options), same
+    # mechanism as the already-shipped SEVER-30 -> SEVER-31 chain
+    # (Structure 1). Replaces Q29's removed standalone core slot as
+    # SEVER-12's trigger -- preserves ATT-DC-01's locked Endemic path
+    # (needs both SEVER-01 and SEVER-12 at duration_band=18mo_plus).
     (
         "SEVER-01",
         "Is this something leadership has named and addressed, or is it more of a recognized"
         " pattern that hasn't been tackled directly?",
         "forced_choice", None, "conditional",
         [
-            ("A", "Named and actively addressed — we have a specific plan and owners.", False, None),
-            ("B", "Named but not yet addressed — we know it's there but haven't moved on it.", False, None),
-            ("C", "Recognized informally but not officially named.", False, None),
-            ("D", "I'm not sure leadership has seen it the same way I'm describing it.", False, None),
-            ("E", "It's been recognized in some form for years without real traction.", False, None),
+            ("A", "Named and actively addressed — we have a specific plan and owners.", True, "SEVER-12"),
+            ("B", "Named but not yet addressed — we know it's there but haven't moved on it.", True, "SEVER-12"),
+            ("C", "Recognized informally but not officially named.", True, "SEVER-12"),
+            ("D", "I'm not sure leadership has seen it the same way I'm describing it.", True, "SEVER-12"),
+            ("E", "It's been recognized in some form for years without real traction.", True, "SEVER-12"),
         ],
         ["the_diversity_ceiling"],
-        False,
+        True,
     ),
     (
         "SEVER-02",
@@ -1719,7 +1717,6 @@ def _build_library():
         "Q26":           {"authority_liability": 0.60, "alliance_liability": 0.60},
         "Q27A":          {"alliance_liability": 0.40},
         "Q28":           {"authority_liability": 0.60, "attitude_liability": 0.60},
-        "Q29":           {"attitude_liability": 0.40, "authority_liability": 0.40},
         # Q30: cluster governing (the_suppression_filter) — no seed entry
         "Q31":           {"authority_liability": 0.60, "attitude_liability": 0.60},
         "Q32":           {"authority_liability": 0.40, "alliance_liability": 0.40},
@@ -1969,13 +1966,6 @@ def _build_library():
             "B": {**_z, "authority_liability": -0.15},                  # A — neutral drain v17
             "C": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30},  # P
             "D": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30},  # P
-        },
-        "Q29": {  # Attitude MED (diversity_ceiling). Authority partial drain v15.
-            "A": {**_z, "attitude_asset":     0.40},                    # F
-            "B": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
-            "C": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
-            "D": {**_z, "attitude_liability": 0.50, "authority_liability": 0.10},  # P
-            "E": {**_z, "attitude_liability": 0.25},                    # A
         },
         "Q30": {  # Authority MED + Alliance (dual).
             "A": {**_z, "authority_asset":     0.40},                   # F
@@ -2404,12 +2394,6 @@ def _build_library():
             "C": "Different parts of this organization seem to have genuinely different cultures.",
             "D": "There's real uncertainty here about what the culture actually is right now.",
             "E": "The culture people experience here doesn't match what gets described in recruiting.",
-        },
-        "Q29": {
-            "B": "This organization is diverse at entry levels, but that changes as people move up.",
-            "C": "This organization has invested in diversity, but it's not clear that's translating into advancement.",
-            "D": "This organization is losing diverse talent before it reaches senior levels, and the reason isn't clear.",
-            "E": "This isn't something this organization has looked at closely enough to answer with confidence.",
         },
         "Q30": {
             "B": "There are gaps in what reaches people here, some things land and some don't.",

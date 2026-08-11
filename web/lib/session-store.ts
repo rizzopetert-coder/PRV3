@@ -79,14 +79,22 @@ function sessionKey(sessionId: string): string {
 export const PHASE_1_QUESTION_SEQUENCE: readonly string[] = [
   "Q01", "Q02", "Q03B", "Q04", "Q05", "Q06", "Q07", "Q08", "Q09", "Q10",
   "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17", "Q18", "Q19", "Q20",
-  "Q21", "Q22", "Q23", "Q24", "Q25", "Q26", "Q27B", "Q29", "Q30",
+  "Q21", "Q22", "Q23", "Q24", "Q25", "Q26", "Q27B", "Q30",
   "Q32", "Q33", "Q34",
   // MC_CENTROID_39 recalibration, Step 1 core expansion (this session) --
   // Q40-Q49 close severity-tier reachability for 7 states; Q50-Q51 are
   // the_inner_circle's own two questions (58th state). Full content/
   // rationale: tools/gemini_handoff_11_states_package.md.
-  "Q40", "Q41", "Q42", "Q43", "Q44", "Q45", "Q46", "Q47", "Q48", "Q49",
+  "Q40", "Q41", "Q42", "Q43", "Q44", "Q46", "Q47", "Q48", "Q49",
   "Q50", "Q51",
+  // A5 + Structure 3 combined recalibration (N: 44 -> 42), this session --
+  // Q29 removed (literal duplicate of Q16; its severity_follow_on
+  // (SEVER-12) now chains off SEVER-01 instead, same pattern as
+  // SEVER-30 -> SEVER-31). Q45 converted from core to a Q44-conditional
+  // splice (fires only when Q44's answer is B/C/D, mirroring Q06 -> Q28,
+  // see session/answer/route.ts). Q46 deliberately untouched -- confirmed
+  // no topical continuity with Q44/Q45 (different state target); its own
+  // content redesign is a separate future item.
 ];
 
 // ---------------------------------------------------------------------------

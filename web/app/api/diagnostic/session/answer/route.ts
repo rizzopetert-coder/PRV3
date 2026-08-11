@@ -186,6 +186,22 @@ export async function POST(request: NextRequest) {
     session.question_labels["Q28"] = spliceLabel("Q06", 0, session.question_labels);
   }
 
+  // Q45 conditional splice (A5 + Structure 3 combined recalibration,
+  // this session) -- same shape as Q06 -> Q28 above. Q44's "A" option
+  // means "actively addressed by people with the authority to fix it,"
+  // which makes Q45's question ("what's the honest reason this hasn't
+  // been addressed?") not applicable -- so the splice fires on B/C/D
+  // only, not unconditionally. Q45 itself carries no severity_trigger
+  // of its own.
+  if (question_id === "Q44" && (option_id === "B" || option_id === "C" || option_id === "D")) {
+    session.question_sequence = spliceDistinguishers(
+      session.question_sequence,
+      currentIndex,
+      ["Q45"],
+    );
+    session.question_labels["Q45"] = spliceLabel("Q44", 0, session.question_labels);
+  }
+
   // Checkpoint evaluation — at most once per canonical position per
   // session, guarded by the slot-null check (the index invariant above
   // should already prevent replaying a question_id, but this doesn't rely

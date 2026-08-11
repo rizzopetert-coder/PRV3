@@ -448,6 +448,15 @@ def generate_answers(test_case):
           fallback only if no qualifying option exists even at that tighter threshold.
 
     Handles Q03A/Q03B and Q27A/Q27B conditional pairs from intake.
+
+    A5 + Structure 3 combined recalibration (this session): Q45 is
+    excluded from the unconditional core loop below and answered
+    conditionally right after Q44 instead, mirroring the live app's
+    Q44 -> Q45 splice exactly (session/answer/route.ts). The severity
+    follow-on block is looped rather than a single check, to support
+    SEVER-01 -> SEVER-12 (replacing Q29's removed standalone slot) and
+    any future chain -- bounded by the existing dedup set, so it cannot
+    run away.
     """
     from engine.test_suite import TestAnswer
     events = test_case.intake.get("significant_events", ["none"])
@@ -456,6 +465,24 @@ def generate_answers(test_case):
         "Q03A" if events != ["none"] else "Q03B",
         "Q27A" if has_acq else "Q27B",
     }
+
+    def pick_option(q):
+        strategy = test_case.profile_type
+        if strategy in ("high_confidence", "extreme_high_confidence", "moderate"):
+            return (best_option_for_state(q, test_case.target_state)
+                    if test_case.target_state in (q.state_targets or [])
+                    else _neutral_option(q))
+        # "weak" -- weighted-damping redesign, Session 70/71. Wired
+        # questions get real full-strength signal (same as moderate/
+        # high_confidence); unwired questions keep the damped
+        # dimension-level signal at a further down-weighted threshold,
+        # rather than a zeroed _neutral_option().
+        if test_case.target_state in (q.state_targets or []):
+            return best_option_for_state(q, test_case.target_state)
+        return _damped_weak_option(
+            q, test_case.target_state,
+            threshold=WEAK_DAMPED_THRESHOLD * WEAK_UNWIRED_DAMPING_FACTOR,
+        )
 
     answers = []
     # Dedup guard, mirroring the real live app's severityFollowOnAlreadyAsked()
@@ -476,53 +503,58 @@ def generate_answers(test_case):
         )
         if excluded:
             continue
+        # Q45 (A5 + Structure 3, this session): converted from an
+        # unconditional core question to a Q44-conditional splice.
+        # _CORE_QUESTION_IDS still lists it (derived from the full
+        # QUESTION_LIBRARY, not the live sequence -- same reason it
+        # also still lists Q28/Q31/Q35-39), so it must be explicitly
+        # skipped here or it would be double-answered against the new
+        # N=42 divisor.
+        if qid == "Q45":
+            continue
         q = QUESTION_LIBRARY.get(qid)
         if q is None or not q.answer_options:
             continue
-        strategy = test_case.profile_type
-        if strategy in ("high_confidence", "extreme_high_confidence"):
-            opt = (best_option_for_state(q, test_case.target_state)
-                   if test_case.target_state in (q.state_targets or [])
-                   else _neutral_option(q))
-        elif strategy == "moderate":
-            opt = (best_option_for_state(q, test_case.target_state)
-                   if test_case.target_state in (q.state_targets or [])
-                   else _neutral_option(q))
-        else:
-            # "weak" -- weighted-damping redesign, this session. Wired
-            # questions get real full-strength signal (same as moderate/
-            # high_confidence); unwired questions keep the Session 70 damped
-            # dimension-level signal but at a further down-weighted threshold,
-            # rather than the reverted hard-gate attempt's zeroed _neutral_option().
-            if test_case.target_state in (q.state_targets or []):
-                opt = best_option_for_state(q, test_case.target_state)
-            else:
-                opt = _damped_weak_option(
-                    q, test_case.target_state,
-                    threshold=WEAK_DAMPED_THRESHOLD * WEAK_UNWIRED_DAMPING_FACTOR,
-                )
+        opt = pick_option(q)
         answers.append(TestAnswer(question_id=qid, selected_option_ids=[opt.option_id]))
+
+        # Q45 conditional splice, mirroring the live app's Q44 -> Q45
+        # rule exactly (B/C/D only -- Q44's "A" means "actively
+        # addressed," making Q45's question moot).
+        if qid == "Q44" and opt.option_id in ("B", "C", "D"):
+            q45 = QUESTION_LIBRARY["Q45"]
+            opt45 = pick_option(q45)
+            answers.append(TestAnswer(question_id="Q45", selected_option_ids=[opt45.option_id]))
 
         # Severity follow-on simulation -- opt-in only, via
         # _SEVERITY_FOLLOW_ON_TARGETS. A test_id absent from that table
-        # (168 of 172 profiles) produces byte-for-byte identical answers to
-        # before this build -- no follow-on ever gets spliced in for them.
-        if (
-            opt.severity_trigger
-            and opt.severity_follow_on_id
-            and opt.severity_follow_on_id not in already_spliced_followons
+        # produces byte-for-byte identical answers to before this build --
+        # no follow-on ever gets spliced in for them. Looped (not a
+        # single `if`) since SEVER-01 -> SEVER-12 (A5, this session) is
+        # this harness's first real 2-deep chain requirement --
+        # Structure 1/2's SEVER-30 -> SEVER-31/SEVER-32 chains exist
+        # live but no calibration profile currently exercises them, so
+        # this gap was latent until now.
+        current_opt = opt
+        while (
+            current_opt.severity_trigger
+            and current_opt.severity_follow_on_id
+            and current_opt.severity_follow_on_id not in already_spliced_followons
         ):
+            follow_on_id = current_opt.severity_follow_on_id
             target_value = _SEVERITY_FOLLOW_ON_TARGETS.get(test_case.test_id, {}).get(
-                opt.severity_follow_on_id
+                follow_on_id
             )
-            if target_value is not None:
-                follow_on_q = QUESTION_LIBRARY[opt.severity_follow_on_id]
-                follow_on_opt = select_severity_follow_on_option(follow_on_q, target_value)
-                answers.append(TestAnswer(
-                    question_id=opt.severity_follow_on_id,
-                    selected_option_ids=[follow_on_opt.option_id],
-                ))
-                already_spliced_followons.add(opt.severity_follow_on_id)
+            if target_value is None:
+                break
+            follow_on_q = QUESTION_LIBRARY[follow_on_id]
+            follow_on_opt = select_severity_follow_on_option(follow_on_q, target_value)
+            answers.append(TestAnswer(
+                question_id=follow_on_id,
+                selected_option_ids=[follow_on_opt.option_id],
+            ))
+            already_spliced_followons.add(follow_on_id)
+            current_opt = follow_on_opt
     return answers
 
 
