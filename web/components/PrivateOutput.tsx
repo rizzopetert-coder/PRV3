@@ -1,6 +1,6 @@
 "use client";
 
-import type { PrivateOutputPayload, SeverityTier } from "@/lib/types";
+import type { PrivateOutputPayload, SeverityTier, StateRef } from "@/lib/types";
 import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
@@ -17,6 +17,31 @@ function firstSentence(text: string): string {
   const match = text.match(/\.\s/);
   if (!match || match.index === undefined) return text;
   return text.slice(0, match.index + 1);
+}
+
+// Core cluster bucketing (Direction 3, Category E, this session) --
+// Gemini-reviewed design: delta-weight bucket at 0.08 of the primary
+// state's normalized weight, core cluster capped at 5, everything else
+// folds into a "+N co-occurring conditions" overflow count. Replaces a
+// fixed 2/3-state tier, ruled out by real distribution data (58 real
+// high_confidence profiles: median 7 qualified states, 50% displaying
+// an identical percentage -- see
+// prompts/category-e-direction3-cluster-display.md). secondary_states
+// arrives already sorted descending by weight (both construction sites
+// -- session/answer/route.ts and result/route.ts -- build it straight
+// from the engine's own rank-sorted rankings), so no re-sort here.
+const CORE_CLUSTER_DELTA = 0.08;
+const CORE_CLUSTER_CAP = 5;
+
+function buildCoreCluster(
+  secondaryStates: StateRef[],
+  primaryWeight: number,
+): { core: StateRef[]; overflowCount: number } {
+  const withinDelta = secondaryStates.filter(
+    (s) => primaryWeight - s.weight <= CORE_CLUSTER_DELTA,
+  );
+  const core = withinDelta.slice(0, CORE_CLUSTER_CAP);
+  return { core, overflowCount: secondaryStates.length - core.length };
 }
 
 // Tier-based LOCKED copy — mirrors engine/severity.py SEVERITY_TIER_DESCRIPTIONS.
@@ -72,16 +97,29 @@ export default function PrivateOutput({
   // --oxide/--oxide-text at Emerging/Entrenched.
   const accent = severityAccentTokens(payload.severity);
 
+  // Direction 3, this session -- see buildCoreCluster() above.
+  const { core: coreCluster, overflowCount } = buildCoreCluster(
+    payload.secondary_states,
+    payload.primary_state.weight,
+  );
+
   return (
     <div className="max-w-2xl">
 
-      {/* Block 1 — Condition header */}
+      {/* Block 1 — Condition header. Hero typographic treatment
+          (Direction 3, this session): the primary condition name gets
+          the largest type in the report (font-display/Lora), replacing
+          the prior text-[13px] treatment -- still one verdict named
+          with confidence, per Output Precision. Eyebrow softened from
+          "Condition identified" (implies singularity) to "Most
+          prominent pattern" (signals rank without claiming exclusivity)
+          -- per prompts/category-e-direction3-cluster-display.md. */}
       <div className="pb-4">
         <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
-          Condition identified
+          Most prominent pattern
         </p>
-        <div className="flex items-center gap-2 flex-wrap mb-2">
-          <span className="text-[13px] font-medium text-gray-500">
+        <div className="flex items-center gap-3 flex-wrap mb-2">
+          <span className="font-display text-3xl font-semibold text-charcoal">
             {payload.primary_state.name}
           </span>
           <span
@@ -199,20 +237,34 @@ export default function PrivateOutput({
         )}
       </div>
 
-      {/* Block 4b — Secondary states acknowledgment (omit entirely if none) */}
+      {/* Block 4b — Core cluster of co-occurring conditions (Direction
+          3, this session). Replaces the flat "Also present" bulleted
+          list (with its per-state percentage that a fixed 2/3-state
+          tier and near-uniform real weights made frequently
+          uninformative -- confirmed via real distribution data, see
+          prompts/category-e-direction3-cluster-display.md) with a
+          variable-length cluster: real typographic presence
+          (font-display/Lora, uniform "secondary" weight -- a clear step
+          down from the Block 1 hero, not graduated per member) for
+          every state in the core cluster, plus a "+N co-occurring
+          conditions" overflow affordance for the rest. Section label
+          softened from "Also present" to "Co-occurring conditions" --
+          signals real co-existence, not an afterthought footnote.
+          Percentage intentionally dropped from display -- see this
+          patch script's own docstring for the full rationale. */}
       {payload.secondary_states.length > 0 && (
         <div className="py-4">
-          <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
-            Also present
+          <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-3">
+            Co-occurring conditions
           </p>
-          <ul className="space-y-3">
-            {payload.secondary_states.map((s) => (
+          <ul className="space-y-4">
+            {coreCluster.map((s) => (
               <li key={s.id}>
                 <a
                   href={`/book/toc#${stateIdToSlug(s.id)}`}
-                  className="text-[13px] font-medium text-charcoal hover:underline"
+                  className="font-display text-lg text-charcoal hover:underline"
                 >
-                  {s.name} ({(s.weight * 100).toFixed(0)}%)
+                  {s.name}
                 </a>
                 {s.descriptive_prose && (
                   <p className="text-[12px] text-gray-500 leading-relaxed mt-0.5">
@@ -222,6 +274,11 @@ export default function PrivateOutput({
               </li>
             ))}
           </ul>
+          {overflowCount > 0 && (
+            <p className="font-ui text-[12px] text-gray-400 mt-3">
+              +{overflowCount} co-occurring condition{overflowCount === 1 ? "" : "s"}
+            </p>
+          )}
         </div>
       )}
 
