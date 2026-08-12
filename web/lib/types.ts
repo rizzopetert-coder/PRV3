@@ -171,10 +171,11 @@ export type LegalTailRiskBand = "Minor" | "Moderate" | "Elevated" | "Significant
  * not the raw liability/asset split, per P-03). Always present — computed
  * unconditionally alongside asset_score, never optional.
  *
- * Not yet consumed by any component — the live-mode ConstellationField
- * (web/components/ConstellationField.tsx) that will read this is built
- * and tested against representative mock data but not wired to this real
- * field yet, pending a separate review of that wiring step.
+ * Consumed live by the live-mode ConstellationField (web/components/
+ * ConstellationField.tsx), wired in web/components/PrivateOutput.tsx. This
+ * comment previously said "not yet consumed, pending separate review" --
+ * stale as of the Direction 1 build (Category E, this session), corrected
+ * here.
  */
 export interface DimensionSummary {
   aptitude: number;

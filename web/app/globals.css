@@ -130,19 +130,25 @@
     animation: fade-up 300ms ease-out both;
   }
 
-  [data-emphasis] {
-    transition: opacity 200ms ease, transform 200ms ease;
-  }
+  /* Recede/resolve motion upgrade (Direction 1, Category E, this session).
+     transition is now scoped per target state, not shared -- CSS picks up
+     the transition timing from the value being transitioned TO, so
+     entering "primary" (resolve) genuinely uses a different duration/curve
+     than entering "secondary" or "receded" (recede). No JS, no new
+     dependency (Pete's explicit call: CSS only, not Framer Motion). */
   [data-emphasis="primary"] {
     opacity: 1;
     transform: scale(1);
+    transition: opacity 350ms cubic-bezier(0.16, 1, 0.3, 1), transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
   }
   [data-emphasis="secondary"] {
     opacity: 0.7;
+    transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1), transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
   [data-emphasis="receded"] {
     opacity: 0.55;
     transform: scale(0.98);
+    transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1), transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 

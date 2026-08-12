@@ -31,12 +31,13 @@ import type { SeverityTier } from "@/lib/types";
 // ALWAYS --color-slate, never severity-conditional — only the dominant
 // vertex's rings + center dot + axis label switch color.
 //
-// weights prop is a PLACEHOLDER interface pending a real dimension_summary
-// field in the output contract (confirmed absent from PrivateOutputPayload
-// and EngineResult during Stage 3's investigation — held for separate
-// Gemini clearance before any Python/contract-side implementation, not
-// built here). Callers must supply representative data themselves; no
-// mock data is baked into this component.
+// weights prop is populated from the real dimension_summary field in the
+// output contract (engine/contract.py's assemble_output(), Gemini-cleared,
+// per-axis normalized [0,1] score) — wired live in web/components/
+// PrivateOutput.tsx, confirmed present in this payload at runtime for both
+// Path A and Path B, not just in the type. This comment previously said
+// "not wired yet, pending separate review" — stale as of the Direction 1
+// build (Category E, this session), corrected here.
 
 const VIEW_W = 900;
 const VIEW_H = 640;
@@ -175,6 +176,16 @@ const LIVE_GUIDE_RING_FRACTIONS = [0.25, 0.5, 0.75];
 // never count, radii, or opacity.
 export const LIVE_RING_RADII = [14, 28, 42, 56, 70];
 export const LIVE_RING_OPACITY = [0.9, 0.7, 0.5, 0.35, 0.22];
+
+// Vertex glow (Direction 1, Category E, this session) — data-driven,
+// scaled per axis to the real dimension_summary weight (0.0-1.0), not a
+// fixed effect applied uniformly. Both blur radius (feGaussianBlur
+// stdDeviation) and opacity interpolate between these min/max pairs.
+const GLOW_BASE_R = 10;
+const GLOW_STD_MIN = 2;
+const GLOW_STD_MAX = 9;
+const GLOW_OPACITY_MIN = 0.12;
+const GLOW_OPACITY_MAX = 0.42;
 
 const AXIS_LABELS: Record<AxisKey, string> = {
   apt: "APT",
@@ -357,6 +368,18 @@ function LiveField({ weights, severityTier }: LiveFieldProps) {
   const shapePoints = `${points.apt.x},${points.apt.y} ${points.auth.x},${points.auth.y} ${points.all.x},${points.all.y} ${points.att.x},${points.att.y}`;
   const domPoint = points[domKey];
 
+  // Centroid-tracking radial gradient origin (Direction 1, this session) —
+  // arithmetic mean of the four real weighted vertices, not the fixed
+  // LIVE_CENTER. Shifts with the real shape, same dynamism the flat
+  // color-mix fill it replaces couldn't express.
+  const centroid = {
+    x: (points.apt.x + points.auth.x + points.all.x + points.att.x) / 4,
+    y: (points.apt.y + points.auth.y + points.all.y + points.att.y) / 4,
+  };
+
+  const gradientId = `${filterId}-gradient`;
+  const glowFilterId = (k: AxisKey) => `${filterId}-glow-${k}`;
+
   // Axis label positions — fixed offsets beyond the crosshair ends,
   // matching the reference mockup's exact pixel spacing at this canvas
   // size (top -15, bottom +25, right +20, left -20), not a derived
@@ -392,6 +415,37 @@ function LiveField({ weights, severityTier }: LiveFieldProps) {
             yChannelSelector="G"
           />
         </filter>
+
+        {/* Centroid-tracking radial fill (Direction 1, this session) --
+            slate/charcoal core fading to paper at the shape's edge, origin
+            at the real weighted centroid computed above, not a fixed point. */}
+        <radialGradient
+          id={gradientId}
+          gradientUnits="userSpaceOnUse"
+          cx={centroid.x}
+          cy={centroid.y}
+          r={LIVE_MAX_R * 0.85}
+        >
+          <stop offset="0%" stopColor="var(--color-charcoal)" stopOpacity="0.22" />
+          <stop offset="55%" stopColor="var(--color-slate)" stopOpacity="0.16" />
+          <stop offset="100%" stopColor="var(--color-paper)" stopOpacity="0" />
+        </radialGradient>
+
+        {/* Per-axis vertex glow filters (Direction 1, this session) -- one
+            per axis so each blur radius can scale independently to that
+            axis's own real weight, not one shared, fixed-intensity filter. */}
+        {(Object.keys(AXES) as AxisKey[]).map((k) => (
+          <filter
+            key={`glowfilter-${k}`}
+            id={glowFilterId(k)}
+            x="-200%"
+            y="-200%"
+            width="500%"
+            height="500%"
+          >
+            <feGaussianBlur stdDeviation={GLOW_STD_MIN + weights[k] * (GLOW_STD_MAX - GLOW_STD_MIN)} />
+          </filter>
+        ))}
       </defs>
 
       {/* Reference grid — always #e5e7eb, never severity-conditional. */}
@@ -443,15 +497,48 @@ function LiveField({ weights, severityTier }: LiveFieldProps) {
         </text>
       ))}
 
-      {/* The weighted shape — ALWAYS --color-slate, never severity-conditional.
-          Confirmed from the mockup: only the dominant vertex's rings,
-          center dot, and axis label switch to --color-rust at Endemic. */}
+      {/* Depth stacking (Direction 1, this session) -- a low-alpha charcoal
+          backing stroke immediately behind the real shape, same points,
+          giving the shape a subtle sense of thickness/depth rather than a
+          flat single outline. Never severity-conditional -- depth is a
+          rendering-quality property, not a signal. */}
       <polygon
         points={shapePoints}
-        fill="color-mix(in srgb, var(--color-slate) 14%, transparent)"
+        fill="none"
+        stroke="var(--color-charcoal)"
+        strokeWidth="4"
+        opacity="0.08"
+      />
+
+      {/* The weighted shape — fill is the centroid-tracking radial gradient
+          defined above (Direction 1, this session), replacing the prior flat
+          color-mix. Stroke stays ALWAYS --color-slate, never severity-
+          conditional. Confirmed from the mockup: only the dominant vertex's
+          rings, center dot, and axis label switch to --color-rust at Endemic. */}
+      <polygon
+        points={shapePoints}
+        fill={`url(#${gradientId})`}
         stroke="var(--color-slate)"
         strokeWidth="1.5"
       />
+
+      {/* Vertex glow (Direction 1, this session) -- data-driven, scaled per
+          axis to that axis's real dimension_summary weight (see the
+          per-axis feGaussianBlur filters above). Dominant vertex glows in
+          the tier-gated accent color; all others stay --color-slate --
+          same color rule the crisp dots/rings below already use, not a
+          new one. Rendered beneath those dots/rings, purely additive. */}
+      {(Object.keys(AXES) as AxisKey[]).map((k) => (
+        <circle
+          key={`glow-${k}`}
+          cx={points[k].x}
+          cy={points[k].y}
+          r={GLOW_BASE_R}
+          fill={k === domKey ? accent.stroke : "var(--color-slate)"}
+          opacity={GLOW_OPACITY_MIN + weights[k] * (GLOW_OPACITY_MAX - GLOW_OPACITY_MIN)}
+          filter={`url(#${glowFilterId(k)})`}
+        />
+      ))}
 
       {/* Non-dominant vertex dots — always --color-slate. */}
       {(Object.keys(AXES) as AxisKey[])
