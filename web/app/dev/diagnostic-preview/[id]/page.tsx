@@ -15,6 +15,14 @@ import PrivateOutput from "@/components/PrivateOutput";
 // this page has no other consumer, so a dedicated fetch-from-own-route hop
 // (the pattern /share/[id]/page.tsx uses) would add a file without adding
 // value here.
+//
+// Not the same tool as /dev/diagnostic-fixture (web/app/dev/diagnostic-fixture),
+// intentionally: this page only ever renders a REAL engine-computed result
+// (via tools/diagnostic_fast_forward.py), which is the entire reason it's
+// worth looking at. /dev/diagnostic-fixture renders hand-picked/arbitrary
+// values instead, for fast UI/interaction iteration, with no engine and no
+// Redis involved. Keep both; neither should be merged into or replace the
+// other.
 // ---------------------------------------------------------------------------
 
 interface DevPreviewPageProps {

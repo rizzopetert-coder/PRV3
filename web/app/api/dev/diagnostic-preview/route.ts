@@ -13,6 +13,15 @@ import {
 // through the existing <PrivateOutput> component without a live browser
 // session of his own. Never reachable in Production: returns 404 immediately,
 // before Redis is ever touched, if VERCEL_ENV is "production".
+//
+// Not the same tool as /dev/diagnostic-fixture (web/app/dev/diagnostic-fixture),
+// intentionally: this route's whole purpose is provenance -- the payload it
+// stores was computed by the REAL engine via a real driven session, which is
+// exactly what makes it worth viewing. /dev/diagnostic-fixture is the
+// opposite by design -- hand-picked/arbitrary values for fast rendering/
+// interaction iteration, deliberately decoupled from engine correctness, no
+// Redis involved since producer and consumer are the same browser tab there.
+// Keep both; neither should be merged into or replace the other.
 // ---------------------------------------------------------------------------
 
 function validatePayload(body: unknown): body is DevDiagnosticPreviewPayload {
