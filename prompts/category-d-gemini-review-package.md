@@ -17,7 +17,11 @@ on this feature.
 
 **Final 9, locked, no further changes expected:** Q01, Q05, Q07, Q12, Q14, Q15, Q26, Q47, Q50 —
 all drawn from the live 42-question `PHASE_1_QUESTION_SEQUENCE` (`web/lib/session-store.ts`),
-each individually checked against `checkpointIdMap` (Q11/Q19/Q27B only) and against every
+each individually checked against `checkpointIdMap` — re-verified directly against
+`web/app/api/diagnostic/session/answer/route.ts` for this package: the map's real keys are
+`Q11`, `Q19`, `Q27A`, `Q27B` (both Q27 branches present, both mapping to the same canonical
+`"Q27"` checkpoint position; Phase 1's locked intake adapter always takes the Q27B branch, but
+the map doesn't hardcode that assumption) — and against every
 option's `severity_trigger`/`severity_follow_on_id` in `engine/data/questions.py` — not assumed
 safe from `state_targets` alone. Full table, exclusion reasoning (Q34/Q41/Q46), and the Q11
 drop/Q15 replacement history are in `prompts/category-d-build-scope.md` Section 3 — reproduce
@@ -84,13 +88,14 @@ employee's replacement cost). Likely cross-contamination from the word "attritio
 elsewhere in this project's Friction Tax documentation, not a real proposal grounded in what was
 sent. **Do not build Section 4 of Gemini's first review under any framing.**
 
-**What was actually scoped, restated verbatim from prompts/category-d-build-scope.md Section 2,**
-for Gemini to review this time instead of re-deriving its own version:
+**What was actually scoped, quoted verbatim (one continuous sentence) from
+prompts/category-d-build-scope.md Section 2's own "Recommendation:" line,** for Gemini to review
+this time instead of re-deriving its own version:
 
-> Cost to replace one employee, framed as a percentage-of-salary range... roughly 50%–75% of one
-> estimated departing employee's salary, explicitly framed as a range rather than a single
-> number, and avoid the executive-tier 100%–200% figures entirely for this free,
-> intentionally-simple mechanic.
+> Use the midpoint of the general (non-executive) range, roughly 50%–75% of one estimated
+> departing employee's salary, explicitly framed as a range rather than a single number, and
+> avoid the executive-tier 100%–200% figures entirely for this free, intentionally-simple
+> mechanic — reserve any role-tiered precision for the full paid Dx if ever built there.
 
 Mechanic: `low = industry_wage × 0.50`, `high = industry_wage × 0.75`, where `industry_wage`
 comes from the new `get_industry_wage()` accessor (Section 4 below) keyed on the respondent's
