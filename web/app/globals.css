@@ -122,7 +122,39 @@
   }
 }
 
+/* ConstellationField assembly animation (Direction 1 Refinement, Category E,
+   this session) -- stroke-only "draw-in" on mount for the live-mode weighted
+   shape, via the pathLength={1} normalization trick (no JS perimeter-length
+   computation needed). Deliberately animates stroke-dashoffset only, never
+   opacity/fill -- both polygons this applies to have their own fixed
+   opacity (0.08 for the depth-backing stroke, 1 implicit for the main
+   gradient-filled shape), and an opacity keyframe would fight those SVG
+   presentation attributes. Same cubic-bezier(0.16, 1, 0.3, 1) curve as the
+   shipped Direction 1 "resolve" transition below, per Gemini's cleared
+   review this session -- duration 600ms, longer than that transition's
+   350ms since this is a one-time load moment, not a hover micro-transition. */
+@keyframes cf-shape-assemble {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 @layer utilities {
+  /* Gated inside prefers-reduced-motion: no-preference -- when reduced
+     motion IS preferred, this class does nothing at all (stroke-dasharray
+     never gets set), so the shape renders at its normal, fully-drawn state
+     immediately. No JS matchMedia check needed, unlike AmbientField's
+     continuous animation loop. */
+  @media (prefers-reduced-motion: no-preference) {
+    .cf-shape-entrance {
+      stroke-dasharray: 1;
+      animation: cf-shape-assemble 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+  }
+
   .animate-card-pulse {
     animation: card-pulse 150ms ease-in-out;
   }

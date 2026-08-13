@@ -5,6 +5,7 @@ import {
   RESTING_FRAME,
   LIVE_CENTER,
   LIVE_MAX_R,
+  axisToDimensionKey,
   computeFrame,
   dominantAxis,
   pointFor,
@@ -116,5 +117,19 @@ describe("live-mode vertex geometry", () => {
     expect(polarPoint(0.55, AXES.auth, LIVE_CENTER, LIVE_MAX_R)).toEqual({ x: 421, y: 300 });
     expect(polarPoint(0.1, AXES.all, LIVE_CENTER, LIVE_MAX_R)).toEqual({ x: 300, y: 322 });
     expect(polarPoint(0.2, AXES.att, LIVE_CENTER, LIVE_MAX_R)).toEqual({ x: 256, y: 300 });
+  });
+});
+
+// Direction 1 Refinement (Category E, this session) -- interpretability's
+// reveal copy is sourced from PUBLIC_DIMENSION_LABELS (book-taxonomy-labels.ts),
+// keyed by the full DimensionKey, not the SVG's abbreviated AxisKey. Locks in
+// the mapping so a future rename of either key set surfaces as a real test
+// failure rather than a silent wrong-copy bug at runtime.
+describe("axisToDimensionKey", () => {
+  it("maps each abbreviated AxisKey to its full DimensionKey", () => {
+    expect(axisToDimensionKey("apt")).toBe("aptitude");
+    expect(axisToDimensionKey("auth")).toBe("authority");
+    expect(axisToDimensionKey("all")).toBe("alliance");
+    expect(axisToDimensionKey("att")).toBe("attitude");
   });
 });
