@@ -180,7 +180,15 @@ tools/_mob.txt Decision Register for full detail): `run_condensed_engine()` orig
 entirely; and `resolution_family` was found to come back empty in multi-state mode, confirmed
 pre-existing (`OutputPackage.private` only populated in single-state routing,
 `engine/output.py`) and confirmed to match `PrivateOutput.tsx`'s own identical, already-shipped
-gap byte-for-byte, not a new regression.
+gap byte-for-byte, not a new regression. **CORRECTED, Pete's own live production test:** the
+"informational, out of scope" call on that second finding was too narrow — the same empty value
+also cascaded into `get_fallback_synthesis()`'s lookup (Category D's *only* content source, no
+state-name input unlike the full diagnostic's real synthesis), producing fully generic verdict
+text in essentially every real case, not an edge case, given multi-state is ~100% of real
+profiles. Fixed, commit `6398e11` — `run_condensed_engine()` now reads `resolution_family` from
+the lead `QualifiedState` directly (same confirmed provenance as the old field, just readable in
+both routing modes), fixing both the verdict text and the resolution-pathway badge together.
+`PrivateOutput.tsx`'s own separate copy of this gap is untouched, still real, still out of scope.
 
 **Phase 4 — verification, DONE except live HTTP.** `tsc --noEmit` clean, `tools/test_main.py`
 36/36, full 172(+3)-profile calibration regression 171/175 (exact baseline, zero movement),
@@ -222,8 +230,11 @@ Category D is ready to move toward Phase 3 build on both fronts.
   click-through (industry select → all 9 questions → `CondensedOutput` render) as final
   confirmation, though the specific bug that would have broken it is now fixed and verified via
   real production error logs, not assumed fixed.
-- **New, carried forward, informational (not blocking, shared-engine scope):** `resolution_family`
-  renders empty in multi-state mode — confirmed pre-existing across both the full diagnostic and
-  Category D, not something either build introduced. A real fix (if ever wanted) is
-  shared-engine-level work spanning `engine/output.py`/`engine/contract.py`, out of scope for
-  both features as currently built.
+- **RESOLVED for Category D, commit `6398e11`:** `resolution_family` no longer comes back empty
+  in multi-state mode for the condensed flow — `run_condensed_engine()` now reads it from the
+  lead `QualifiedState` directly instead of `OutputPackage.private` (single-mode only). Both the
+  verdict text (previously fell through to `get_fallback_synthesis()`'s fully generic entry in
+  essentially every real case) and the resolution-pathway badge are fixed by the same change.
+  `PrivateOutput.tsx`'s own separate copy of this gap (`engine/contract.py`'s `assemble_output()`,
+  untouched) remains real and open — shared-engine-level work, out of scope for both features as
+  currently built, but no longer a live problem for Category D specifically.

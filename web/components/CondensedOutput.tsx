@@ -104,20 +104,21 @@ export default function CondensedOutput({ payload }: CondensedOutputProps) {
 
       <div style={{ height: 0, borderTop: "0.5px solid #e5e7eb" }} />
 
-      {/* Block 4 -- resolution family + CTA. resolution_family renders
-          unconditionally, same as PrivateOutput.tsx's own Block 4 --
-          matching existing behavior deliberately, not a Category-D-
-          specific gap. Confirmed via direct trace this session:
-          OutputPackage.private (engine/output.py) is only populated in
-          single-state routing mode; multi-state mode (the common case --
-          Direction 3's own real-data investigation found 100% of real
-          high_confidence profiles land in multi-state) leaves it None,
-          and apply_causation_override()'s own docstring confirms this is
-          already-known, pre-existing behavior ("the override mechanism
-          never turns on a field that is structurally silent for an
-          entire routing mode today"), not something introduced here.
-          A real fix would be shared-engine-level work, out of scope for
-          this build. */}
+      {/* Block 4 -- resolution family + CTA. UPDATE, this session (Pete's own
+          live production test caught this): resolution_family used to be
+          empty in multi-state mode (the common case -- ~100% of real
+          profiles) because run_condensed_engine() read it from
+          OutputPackage.private, only ever populated in single-state mode.
+          FIXED in engine/main.py -- now sourced from the lead
+          QualifiedState directly, which works in both routing modes. This
+          badge renders unconditionally (still no empty-state copy), but
+          the value behind it should now be real in practice, not
+          structurally blank. PrivateOutput.tsx's own separate copy of
+          this same gap (engine/contract.py's assemble_output(), still
+          reading output_package.private the old way) is untouched --
+          that's the full diagnostic's own code path, out of scope here,
+          and remains a real, open, shared-engine-level item if ever
+          wanted there. */}
       <div className="py-4 space-y-3">
         <div className="space-y-1">
           <p className="text-[11px] uppercase tracking-wide text-gray-400">
