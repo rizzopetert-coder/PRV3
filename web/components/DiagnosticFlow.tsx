@@ -116,7 +116,11 @@ function HeadcountStepper({
   );
 }
 
-const INDUSTRY_OPTIONS = [
+// Exported for reuse by CondensedDiagnosticFlow.tsx (Category D, this
+// session) -- the free condensed diagnostic's industry-only intake picker
+// uses the exact same 9 real options a respondent already sees here,
+// rather than a separately hand-maintained list that could drift.
+export const INDUSTRY_OPTIONS = [
   "Professional Services", "Healthcare & Life Sciences", "Financial Services",
   "Technology", "Manufacturing & Industrial", "Retail & Hospitality",
   "Nonprofit & Education", "Government & Public Sector", "Other",
