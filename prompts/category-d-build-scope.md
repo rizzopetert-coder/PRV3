@@ -190,13 +190,16 @@ the lead `QualifiedState` directly (same confirmed provenance as the old field, 
 both routing modes), fixing both the verdict text and the resolution-pathway badge together.
 `PrivateOutput.tsx`'s own separate copy of this gap is untouched, still real, still out of scope.
 
-**Phase 4 — verification, DONE except live HTTP.** `tsc --noEmit` clean, `tools/test_main.py`
-36/36, full 172(+3)-profile calibration regression 171/175 (exact baseline, zero movement),
-vitest unchanged. Real end-to-end Python run (not mocked) confirmed the full 9-question
-accumulate → complete pipeline works. **Not yet done:** live HTTP/browser verification of the
-deployed condensed flow — not verifiable from the coding environment (no Preview deployment,
-`next dev` doesn't serve the Python engine locally, same pre-existing infrastructure gap already
-on record). Needs Pete's own live check post-deploy, same as Category E Directions 1 and 3.
+**Phase 4 — verification, COMPLETE.** `tsc --noEmit` clean, `tools/test_main.py` 36/36, full
+172(+3)-profile calibration regression 171/175 (exact baseline, zero movement), vitest unchanged.
+Real end-to-end Python run (not mocked) confirmed the full 9-question accumulate → complete
+pipeline works. Live HTTP/browser verification, not reproducible from the coding environment (no
+Preview deployment, `next dev` doesn't serve the Python engine locally), was completed by Pete
+directly against production — two independent full runs, different answer paths, different
+resulting states (`the_untouchable`, then `the_fracture`), both completing cleanly with correct
+`resolution_family`, real state-specific `verdict_text`, and a correctly-computed
+`financial_range` (`108110 × 0.50/0.75` against a real BLS wage figure, not just unit-tested in
+isolation). **Category D is genuinely shippable.**
 
 ## Gemini gate — CLEARED (round 3, prompts/category-d-gemini-review-round3-constrained.md)
 
@@ -226,10 +229,10 @@ Category D is ready to move toward Phase 3 build on both fronts.
   `vercel.json`'s explicit routes allowlist never got the entry for that route when it was
   built. `run_condensed_engine()` never ran. Fixed, commit `b7ec5ac`. Logged as its own
   standing-practice Decision Register row — this is a generalizable gap (any new `api/engine.py`
-  route needs its own `vercel.json` entry), not a one-off. Still open: one live end-to-end
-  click-through (industry select → all 9 questions → `CondensedOutput` render) as final
-  confirmation, though the specific bug that would have broken it is now fixed and verified via
-  real production error logs, not assumed fixed.
+  route needs its own `vercel.json` entry), not a one-off. **CLOSED:** the live end-to-end
+  click-through happened — Pete ran two independent full passes against production with
+  different answer paths and different resulting states (the_untouchable, then the_fracture),
+  both completing cleanly.
 - **RESOLVED for Category D, commit `6398e11`:** `resolution_family` no longer comes back empty
   in multi-state mode for the condensed flow — `run_condensed_engine()` now reads it from the
   lead `QualifiedState` directly instead of `OutputPackage.private` (single-mode only). Both the
