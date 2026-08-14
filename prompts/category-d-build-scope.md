@@ -209,8 +209,14 @@ Category D is ready to move toward Phase 3 build on both fronts.
 - **RESOLVED, Phase 3:** `get_industry_wage()` returning `None` (unrecognized industry) now has
   real consuming-side handling — `CondensedOutput.tsx` omits the financial range entirely with
   an explicit "benchmark figure isn't available" note, never a broken or missing figure.
-- **New, carried forward:** live HTTP/browser verification of the deployed condensed flow —
-  not verifiable from the coding environment, needs Pete's own live check post-deploy.
+- **PARTIALLY RESOLVED via Pete's own live check:** confirmed the backend genuinely works
+  (real 200, real question text) — but surfaced a real, fully missing piece: no page anywhere
+  mounted the condensed flow (`/diagnostic/condensed` 404'd). Fixed, commit `106105c` —
+  `web/components/CondensedDiagnosticFlow.tsx` + `web/app/diagnostic/condensed/page.tsx` (both
+  new). Still open: full end-to-end live click-through (industry select → all 9 questions →
+  `CondensedOutput` render) against the deployed environment — the backend, the page, and the
+  result screen have each been independently verified working, but not yet walked end-to-end
+  live in one pass.
 - **New, carried forward, informational (not blocking, shared-engine scope):** `resolution_family`
   renders empty in multi-state mode — confirmed pre-existing across both the full diagnostic and
   Category D, not something either build introduced. A real fix (if ever wanted) is
