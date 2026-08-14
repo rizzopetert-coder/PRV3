@@ -59,8 +59,20 @@ async def invoke_engine(request: Request):
 
 # ── Path 1 (Session 71, Phase 1) — same FastAPI app, same Vercel build ────────
 # Two new routes on the existing api/engine.py serverless function rather
-# than a new Python build target — see vercel.json for the routing entries
+# than a new Vercel build target — see vercel.json for the routing entries
 # that point both paths at this same file.
+#
+# CONFIRMED INCIDENT, not a hypothetical warning (Category D, this session):
+# adding a new @app.post route here is NOT enough on its own. vercel.json's
+# "routes" array is an explicit allowlist, checked before its own catch-all
+# ("/(.*)" -> "/web/$1") -- any path not listed there 404s against the
+# Next.js app before this file's code ever runs, no matter how correct the
+# Python handler is. /api/condensed-complete shipped without its vercel.json
+# entry, produced a clean 404 in production with an empty body and no
+# Python-side stack trace (nothing here ever executed), and was only found
+# via Vercel's runtime error logs, not by reading this file. Add the
+# vercel.json entry FIRST, or in the same commit, every time -- verify it
+# explicitly, don't rely on remembering this comment.
 
 @app.post("/api/accumulate")
 async def accumulate(request: Request):
