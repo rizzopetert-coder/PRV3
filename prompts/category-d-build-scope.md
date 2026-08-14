@@ -143,14 +143,29 @@ untouched, ungated.
 **Phase 4 — verification.** Standard discipline: `tsc --noEmit`, relevant test suite runs, live
 browser verification of the condensed flow end-to-end before treating this as shippable.
 
-## Open items carried forward, unchanged
+## Gemini gate — CLEARED (round 3, prompts/category-d-gemini-review-round3-constrained.md)
+
+Both open architecture questions confirmed sound after a deliberately constrained round 3
+(rounds 1-2 each produced fabricated proposals — see tools/_mob.txt Decision Register,
+"Gemini fails to incorporate explicit, verbatim correction across review rounds"):
+- **Rendering target:** `web/components/CondensedOutput.tsx`, a new, separate component — not
+  `web/lib/output-renderer.ts`'s `renderPrivateOutput()` (confirmed dead code, zero callers).
+- **Financial mechanic:** `low = get_industry_wage(industry) x 0.50`, `high =
+  get_industry_wage(industry) x 0.75` — per-departing-employee, headcount not involved.
+
+Category D is ready to move toward Phase 3 build on both fronts.
+
+## Open items carried forward
+
 - Full-Dx gating mechanism (paywall vs. lead-capture vs. hybrid) — explicitly deferred, separate
   future decision, not blocking this build.
-- Rendering path for the truncated output — Gemini's first review proposed routing through
-  `web/lib/output-renderer.ts`'s `renderPrivateOutput()`, confirmed dead code (zero real callers,
-  same function Category E Direction 3 already found and left untouched). Needs a corrected
-  Gemini re-review with a real target, not this function.
-- Section 4 financial formula from Gemini's first review ("Headcount × BLS Mean Industry Wage ×
-  Attritional Tax% 12%–18%") — confirmed fabricated, does not match what was scoped in Section 2
-  above and doesn't exist anywhere in the real codebase. Do not build. The mechanic to build is
-  exactly Section 2's percentage-of-one-salary range via `get_industry_wage()`.
+- **New, real, non-blocking gap found during round 3 verification:** `get_industry_wage()`
+  returning `None` (unrecognized industry) has no designed consuming-side handling yet.
+  Gemini's round 3 response claimed this "safely triggers Option B null rendering downstream" —
+  verified false as stated: `CondensedOutput.tsx` doesn't exist yet to have any null-handling
+  path at all, and the "Option B" pattern it's referencing belongs to a different field
+  (`friction_tax_estimate`) and is itself unimplemented even there (`PrivateOutput.tsx`'s own
+  Block 6 comment confirms the real behavior is "render nothing," not an Option B placeholder).
+  Needs a real decision at build time: what `CondensedOutput.tsx` shows when the benchmark
+  can't be computed for an unrecognized industry value — not a blocker on starting the build,
+  but must be resolved before this feature ships.
