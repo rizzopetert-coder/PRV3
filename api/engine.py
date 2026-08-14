@@ -11,8 +11,10 @@ from engine.main import (
     accumulate_answers,
     run_checkpoint,
     run_accumulated_engine,
+    run_condensed_engine,
     get_question_copy,
 )
+from engine.friction_tax import get_industry_wage
 
 app = FastAPI()
 
@@ -137,6 +139,46 @@ async def complete(request: Request):
             accumulated_vector, intake, answered_question_count, checkpoint_results,
             severity_inputs, answers_log,
         )
+        return JSONResponse(content=result)
+    except KeyError as e:
+        raise HTTPException(status_code=400, detail=f"Unknown state ID: {e}")
+    except (TypeError, ValueError) as e:
+        raise HTTPException(status_code=400, detail=f"Invalid payload: {e}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Engine error")
+
+
+@app.post("/api/condensed-complete")
+async def condensed_complete(request: Request):
+    # Category D (free condensed diagnostic), this session -- completion
+    # endpoint for the separate condensed session flow. No checkpoint_
+    # results/severity_inputs/answers_log params (run_accumulated_engine()
+    # has them) -- Category D's condensed session never collects any of
+    # them by design. Merges the financial benchmark range into the same
+    # response so the TS caller makes one round trip, not two -- the
+    # get_industry_wage() lookup is a pure function, no reason to split
+    # it into its own endpoint.
+    _check_secret(request)
+
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+    try:
+        accumulated_vector = payload.get("accumulated_vector", {}) if isinstance(payload, dict) else {}
+        intake = payload.get("intake", {}) if isinstance(payload, dict) else {}
+        answered_question_count = payload.get("answered_question_count", 0) if isinstance(payload, dict) else 0
+        result = run_condensed_engine(accumulated_vector, answered_question_count)
+
+        industry = intake.get("industry", "") if isinstance(intake, dict) else ""
+        wage = get_industry_wage(industry)
+        result["condensed_financial_range"] = (
+            {"low": round(wage * 0.50, 2), "high": round(wage * 0.75, 2), "currency": "USD"}
+            if wage is not None
+            else {"low": None, "high": None, "currency": "USD"}
+        )
+
         return JSONResponse(content=result)
     except KeyError as e:
         raise HTTPException(status_code=400, detail=f"Unknown state ID: {e}")

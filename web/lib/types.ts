@@ -297,6 +297,43 @@ export interface PrivateOutputPayload {
 }
 
 // ---------------------------------------------------------------------------
+// CondensedOutputPayload -- Category D (free condensed diagnostic), this
+// session. Deliberately NOT PrivateOutputPayload -- a much smaller, purpose-
+// built contract: no secondary_states/observable_indicators/full synthesis
+// (indicators ship fully locked, zero content to carry -- Decision
+// Register, this session), no dimension_summary (ConstellationField
+// excluded from the condensed report, Pete's resolved decision), no
+// friction_tax_estimate (a different mechanic -- get_industry_wage()-based
+// financial_range instead). Built in web/app/api/diagnostic/condensed/
+// answer/route.ts from CondensedCompleteResult (web/lib/engine-client.ts),
+// same separation of concerns as PrivateOutputPayload's own route-builds-
+// contract, component-renders-contract pattern.
+// ---------------------------------------------------------------------------
+export interface CondensedOutputPayload {
+  primary_state: {
+    id: string;
+    name: string;
+  };
+  // Always "Emerging" in practice -- Category D's condensed session never
+  // collects severity_inputs (Decision Register, this session), so
+  // SeverityEngine always scores with zero inputs. Typed as the full
+  // SeverityTier union for correctness, not narrowed to the literal, in
+  // case that ever changes.
+  severity: SeverityTier;
+  resolution_family: ResolutionFamily;
+  headline: string;
+  // get_fallback_synthesis()'s liability_condition_text -- the condensed
+  // report's one-paragraph verdict. Static, already-approved copy, not a
+  // live synthesis call (Decision Register, this session).
+  verdict_text: string;
+  financial_range: {
+    low: number | null;
+    high: number | null;
+    currency: "USD";
+  };
+}
+
+// ---------------------------------------------------------------------------
 // ShareableOutputPayload
 // ---------------------------------------------------------------------------
 // Professional, credible. Travels without the user present.

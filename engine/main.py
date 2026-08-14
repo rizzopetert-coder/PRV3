@@ -13,6 +13,7 @@ Exceptions propagate. Error handling is the caller's responsibility (api/engine.
 """
 
 from typing import Optional
+from dataclasses import asdict
 
 from engine.accumulation import (
     IntakeData,
@@ -29,8 +30,9 @@ from engine.checkpoint import evaluate_checkpoint, checkpoint_result_from_wire
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.data.questions import QUESTION_LIBRARY
 from engine.data.salience import SALIENCE_PROFILES
-from engine.output_synthesis import OutputSynthesisEngine
+from engine.output_synthesis import OutputSynthesisEngine, SynthesisResult
 from engine.resolution_families import translate_resolution_family
+from engine.data.fallback_synthesis import get_fallback_synthesis
 
 
 def run_engine(
@@ -664,3 +666,95 @@ def run_accumulated_engine(
     )
 
     return assemble_output(session_data, synthesis_result=synthesis_result, trajectory_result=trajectory_result)
+
+
+def run_condensed_engine(
+    accumulated_vector: dict,
+    answered_question_count: int,
+) -> dict:
+    """
+    Category D (free condensed diagnostic) completion orchestrator, this
+    session. Deliberately does NOT call assemble_output() -- that function
+    builds the full VII.1 contract, which has a hard dependency Category
+    D's industry-only intake can't satisfy: compute_friction_tax() requires
+    a numeric session.intake.headcount and crashes on the empty-string
+    default (confirmed via a real end-to-end run during this session's own
+    verification pass, not assumed safe). assemble_output() also computes
+    several other full-diagnostic-only fields (narrative_modulation,
+    jurisdiction_flags, causation_pattern, urgency_window, legal exposure)
+    Category D has no use for. This returns a smaller, self-contained dict
+    with only what CondensedOutputPayload (web/lib/types.ts) actually
+    needs.
+
+    identified_states construction mirrors assemble_output()'s own logic
+    exactly (engine/contract.py, routing.mode == "single"/"multi" branches)
+    so the two stay consistent if that logic ever changes.
+
+    No intake parameter -- unlike run_accumulated_engine(), nothing in
+    this function's own logic (rank_states, SeverityEngine, OutputEngine,
+    get_fallback_synthesis) consumes it; accumulated_vector already
+    reflects every intake-conditioned adjustment made during accumulation
+    (signal reliability, axis modifiers). The industry value is used
+    separately, by the caller (api/engine.py's /api/condensed-complete
+    route), only for get_industry_wage() -- unrelated to this function.
+
+    No checkpoints, no severity follow-ons, no trajectory context --
+    Category D's condensed session never collects any of these inputs by
+    design (web/lib/condensed-session-store.ts never reads
+    severity_follow_on_id/severity_input from /api/accumulate's
+    response). severity_result is therefore always "Emerging" --
+    SeverityEngine with zero inputs, same behavior as Path B, not a bug
+    introduced here.
+
+    asset_score/liability_score/signal_map_context are intentionally not
+    computed here -- they exist solely to feed the real synthesis
+    prompt, which this function never calls.
+    """
+    final_rankings = rank_states(accumulated_vector, answered_question_count, SALIENCE_PROFILES)
+
+    severity_result = SeverityEngine().score()
+
+    output_engine = OutputEngine()
+    output_engine.set_noise_baseline()
+    output_package = output_engine.build(final_rankings, severity_result)
+    routing = output_package.routing
+
+    identified_states = []
+    if routing.mode == "single" and routing.lead_state:
+        identified_states = [{
+            "state_id": routing.lead_state.state_id,
+            "state_name": routing.lead_state.state_name,
+            "score": round(routing.lead_state.score, 6),
+            "descriptive_prose": STATE_PROFILES[routing.lead_state.state_id].descriptive_prose
+                if routing.lead_state.state_id in STATE_PROFILES else "",
+        }]
+    elif routing.mode == "multi":
+        identified_states = [
+            {
+                "state_id": qs.state_id,
+                "state_name": qs.state_name,
+                "score": round(qs.score, 6),
+                "descriptive_prose": STATE_PROFILES[qs.state_id].descriptive_prose
+                    if qs.state_id in STATE_PROFILES else "",
+            }
+            for qs in routing.qualified_states
+        ]
+
+    resolution_routing = output_package.private.resolution_family if output_package.private else ""
+
+    synthesis_result = None
+    if identified_states:
+        commercial_family = translate_resolution_family(resolution_routing)
+        fb = get_fallback_synthesis(commercial_family, severity_result.tier)
+        synthesis_result = SynthesisResult(
+            **fb,
+            synthesis_confidence=0.0,
+            is_fallback=True,
+        )
+
+    return {
+        "identified_states": identified_states,
+        "severity": {"tier": severity_result.tier},
+        "resolution_routing": resolution_routing,
+        "synthesis": asdict(synthesis_result) if synthesis_result else None,
+    }

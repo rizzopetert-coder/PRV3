@@ -340,6 +340,22 @@ _INDUSTRY_WAGE_DATA: dict[str, tuple[float, str, str]] = {
     ),
 }
 
+def get_industry_wage(industry: str) -> Optional[float]:
+    """
+    Public accessor for _INDUSTRY_WAGE_DATA's per-employee mean annual wage
+    (BLS OEWS May 2023), keyed by the same 9 industry categories intake
+    already collects (engine/data/intake.py INTAKE_FIELDS["industry"]).
+    Returns None on an unrecognized industry -- matches this file's
+    existing lookup convention (PAYROLL_BASELINE_GRID.get(),
+    ORG_TYPE_SCALARS.get()), not an exception. Category D (free condensed
+    diagnostic), this session -- the only consumer of this accessor;
+    PAYROLL_BASELINE_GRID's own headcount x industry_wage math is
+    untouched, this is a standalone single-value lookup.
+    """
+    entry = _INDUSTRY_WAGE_DATA.get(industry)
+    return entry[0] if entry is not None else None
+
+
 def resolve_headcount_bucket(headcount: int) -> str:
     """
     Map a precise headcount int (engine/data/intake.py's

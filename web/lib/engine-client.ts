@@ -321,6 +321,67 @@ export interface QuestionCopy {
   options: Array<{ option_id: string; option_text: string }>;
 }
 
+export interface CondensedFinancialRange {
+  low: number | null;
+  high: number | null;
+  currency: "USD";
+}
+
+// Category D (free condensed diagnostic), this session. Deliberately a
+// much smaller payload than CompletePayload above -- no checkpoint_
+// results/severity_inputs/answers_log, since the condensed session never
+// collects any of them by design (web/lib/condensed-session-store.ts).
+// intake is industry-only (CondensedIntake), not the full
+// PrivateIntakeEcho -- nothing else the 9 selected questions' scoring or
+// get_industry_wage() consumes.
+export interface CondensedCompletePayload {
+  accumulated_vector: AccumulatedVector;
+  intake: { industry: string };
+  answered_question_count: number;
+}
+
+// Deliberately NOT EngineResult -- run_condensed_engine() (engine/main.py)
+// does not call assemble_output(), so this does not have the full VII.1
+// contract's other fields (private_output, dimension_summary,
+// narrative_modulation, etc.). Matches exactly what that function
+// actually returns, plus condensed_financial_range merged in by the
+// /api/condensed-complete route.
+export interface CondensedCompleteResult {
+  identified_states: Array<{
+    state_id: string;
+    state_name: string;
+    score: number;
+    descriptive_prose: string;
+  }>;
+  severity: {
+    tier: "Emerging" | "Entrenched" | "Endemic";
+  };
+  resolution_routing: string;
+  synthesis: {
+    liability_condition_text:     string;
+    asset_resolution_anchor_text: string;
+    framing_text:                 string;
+    observable_indicators:        string[];
+    resolution_framing_text:      string;
+    headline:                     string;
+    synthesis_confidence:         number;
+    is_fallback:                  boolean;
+  } | null;
+  condensed_financial_range: CondensedFinancialRange;
+}
+
+export async function invokeCondensedComplete(
+  payload: CondensedCompletePayload,
+): Promise<CondensedCompleteResult> {
+  const response = await engineFetch(resolveEnginePath("/api/condensed-complete"), payload);
+
+  if (!response.ok) {
+    throw new Error(`Condensed complete invocation failed: ${response.status}`);
+  }
+
+  return response.json() as Promise<CondensedCompleteResult>;
+}
+
 export async function invokeQuestionCopy(
   questionId: string,
 ): Promise<QuestionCopy> {
