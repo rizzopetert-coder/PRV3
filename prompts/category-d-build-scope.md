@@ -169,12 +169,26 @@ and zero calibration risk, this phase adds a new report shape (truncated output)
 financial mechanic (the benchmark multiplication) — both are structural additions to the app,
 not content-only changes, so this routes through Gemini per standing protocol before any build.
 
-**Phase 3 — build.** Condensed question subset, truncated result rendering (visible-truncation
-per the recommendation above), the benchmark mechanic, CTA. Full diagnostic stays exactly as-is,
-untouched, ungated.
+**Phase 3 — SHIPPED, commit 5573bd4.** Condensed question subset, engine completion path
+(`run_condensed_engine()`, no live LLM call), the benchmark mechanic (`get_industry_wage()`,
+null-path handled — omits the range with an explicit unavailable note, never a broken figure),
+`CondensedOutput.tsx` with indicators fully locked, CTA. Full diagnostic stays exactly as-is,
+untouched, ungated. Two real bugs found and fixed during verification (not assumed away, see
+tools/_mob.txt Decision Register for full detail): `run_condensed_engine()` originally reused
+`assemble_output()` and crashed on Category D's industry-only intake (Friction Tax's own
+`compute_friction_tax()` requires a numeric headcount) — rewritten to bypass `assemble_output()`
+entirely; and `resolution_family` was found to come back empty in multi-state mode, confirmed
+pre-existing (`OutputPackage.private` only populated in single-state routing,
+`engine/output.py`) and confirmed to match `PrivateOutput.tsx`'s own identical, already-shipped
+gap byte-for-byte, not a new regression.
 
-**Phase 4 — verification.** Standard discipline: `tsc --noEmit`, relevant test suite runs, live
-browser verification of the condensed flow end-to-end before treating this as shippable.
+**Phase 4 — verification, DONE except live HTTP.** `tsc --noEmit` clean, `tools/test_main.py`
+36/36, full 172(+3)-profile calibration regression 171/175 (exact baseline, zero movement),
+vitest unchanged. Real end-to-end Python run (not mocked) confirmed the full 9-question
+accumulate → complete pipeline works. **Not yet done:** live HTTP/browser verification of the
+deployed condensed flow — not verifiable from the coding environment (no Preview deployment,
+`next dev` doesn't serve the Python engine locally, same pre-existing infrastructure gap already
+on record). Needs Pete's own live check post-deploy, same as Category E Directions 1 and 3.
 
 ## Gemini gate — CLEARED (round 3, prompts/category-d-gemini-review-round3-constrained.md)
 
@@ -192,13 +206,13 @@ Category D is ready to move toward Phase 3 build on both fronts.
 
 - Full-Dx gating mechanism (paywall vs. lead-capture vs. hybrid) — explicitly deferred, separate
   future decision, not blocking this build.
-- **New, real, non-blocking gap found during round 3 verification:** `get_industry_wage()`
-  returning `None` (unrecognized industry) has no designed consuming-side handling yet.
-  Gemini's round 3 response claimed this "safely triggers Option B null rendering downstream" —
-  verified false as stated: `CondensedOutput.tsx` doesn't exist yet to have any null-handling
-  path at all, and the "Option B" pattern it's referencing belongs to a different field
-  (`friction_tax_estimate`) and is itself unimplemented even there (`PrivateOutput.tsx`'s own
-  Block 6 comment confirms the real behavior is "render nothing," not an Option B placeholder).
-  Needs a real decision at build time: what `CondensedOutput.tsx` shows when the benchmark
-  can't be computed for an unrecognized industry value — not a blocker on starting the build,
-  but must be resolved before this feature ships.
+- **RESOLVED, Phase 3:** `get_industry_wage()` returning `None` (unrecognized industry) now has
+  real consuming-side handling — `CondensedOutput.tsx` omits the financial range entirely with
+  an explicit "benchmark figure isn't available" note, never a broken or missing figure.
+- **New, carried forward:** live HTTP/browser verification of the deployed condensed flow —
+  not verifiable from the coding environment, needs Pete's own live check post-deploy.
+- **New, carried forward, informational (not blocking, shared-engine scope):** `resolution_family`
+  renders empty in multi-state mode — confirmed pre-existing across both the full diagnostic and
+  Category D, not something either build introduced. A real fix (if ever wanted) is
+  shared-engine-level work spanning `engine/output.py`/`engine/contract.py`, out of scope for
+  both features as currently built.
