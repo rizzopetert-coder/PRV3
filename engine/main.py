@@ -740,7 +740,28 @@ def run_condensed_engine(
             for qs in routing.qualified_states
         ]
 
-    resolution_routing = output_package.private.resolution_family if output_package.private else ""
+    # Deliberately NOT output_package.private.resolution_family -- that field
+    # is only ever populated in single-state routing mode (engine/output.py's
+    # own OutputPackage docstring), which leaves it "" in multi-state mode --
+    # the empirically common case (Direction 3's own real-data investigation
+    # found ~100% of real high_confidence profiles land multi-state). An
+    # empty resolution_family cascades into get_fallback_synthesis() finding
+    # no match and returning the fully generic entry -- confirmed via a real
+    # production reproduction this session, not assumed. Fixed by reading
+    # resolution_family from the lead QualifiedState directly instead --
+    # confirmed same provenance as output_package.private.resolution_family
+    # would have had (engine/output.py: QualifiedState.resolution_family is
+    # populated from STATE_PROFILES[state_id].resolution_family for every
+    # ranked state unconditionally, and build_private_block() does nothing
+    # but copy qualified_state.resolution_family through verbatim) -- not a
+    # separately-maintained field that could drift, the exact same value,
+    # just read through a path that also works in multi-state mode.
+    if routing.mode == "single" and routing.lead_state:
+        resolution_routing = routing.lead_state.resolution_family
+    elif routing.mode == "multi" and routing.qualified_states:
+        resolution_routing = routing.qualified_states[0].resolution_family
+    else:
+        resolution_routing = ""
 
     synthesis_result = None
     if identified_states:
