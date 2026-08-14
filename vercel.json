@@ -31,6 +31,10 @@
       "dest": "/api/engine.py"
     },
     {
+      "src": "/api/condensed-complete",
+      "dest": "/api/engine.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "/web/$1"
     }
