@@ -16,16 +16,49 @@ plus the exact question count/candidates (needs a real data pull only Claude Cod
 Explicitly still out of scope, unchanged from the concept doc: full-Dx gating mechanism
 (paywall/lead-capture/hybrid) — a separate, later decision.
 
-## 1. Visible truncation — recommendation: yes, build it visible
+## 1. Visible truncation — RESOLVED, indicators ship fully locked (not 2-3 shown)
 
 The concept doc flagged this as undecided but already leaned toward visible truncation ("the
-limitation itself is part of the pitch"). Recommending that lean gets formally adopted: greyed/
-locked additional indicators, an explicit count ("3 more indicators identified"), not silent
-omission. Reasoning: silent omission risks reading as a thinner version of the same report,
-which undersells the free tier's honest purpose — visible truncation reads as "there is more
-here," which is the actual CTA. This is also consistent with P-10's brand-voice standard
-(direct, not evasive) — hiding the existence of more findings without saying so would be a soft
-form of the "corporate register" the brand voice explicitly avoids.
+limitation itself is part of the pitch"). That lean is adopted: locked, not silently omitted.
+Reasoning: silent omission risks reading as a thinner version of the same report, which
+undersells the free tier's honest purpose — visible locking reads as "there is more here," which
+is the actual CTA. This is also consistent with P-10's brand-voice standard (direct, not
+evasive) — hiding the existence of more findings without saying so would be a soft form of the
+"corporate register" the brand voice explicitly avoids.
+
+**Result shape, resolved — this table corrects the concept doc's original version, which assumed
+a live synthesis call that was never actually decided on:**
+
+| Full Report | Condensed Report |
+|---|---|
+| Top state + secondary ("Also Present") states | Top state only |
+| Full indicator list (LLM-synthesized, live) | **Fully locked, zero shown** — not "2-3 shown, rest locked." Copy reads along the lines of "All indicators locked — unlock the full diagnostic to see what's driving this result," not a partial reveal. |
+| Two-paragraph synthesis (LLM-synthesized, live) | One paragraph — `get_fallback_synthesis()`'s static copy, keyed on `resolution_family` + `severity_tier`. **No live `synthesize()` call.** |
+| Full Friction Tax estimate | Simple benchmark-based figure (`get_industry_wage()` x 0.50–0.75, Section 3 below) |
+| — | "Partial read" framing + CTA to the full diagnostic |
+
+**Verdict/indicator sourcing decision, resolved this session (Pete's call, product/cost
+decision, not an architecture question — no further Gemini round needed):**
+
+- **Verdict paragraph:** `engine/data/fallback_synthesis.py`'s `get_fallback_synthesis()` —
+  the same static fallback mechanism already live in the full diagnostic's own timeout/failure
+  path, real and already-approved copy, zero marginal cost. **Not** a live call to
+  `engine/output_synthesis.py`'s `synthesize()`.
+- **Why no live synthesis:** a free, anonymous, ungated tool invoking a paid, timeout-exposed
+  LLM endpoint on every submission is a real cost and abuse-surface risk this feature shouldn't
+  carry, and it breaks the "zero new content" framing that has governed every other decision on
+  this feature.
+- **Why indicators ship fully locked rather than partially shown:** `get_fallback_synthesis()`'s
+  `observable_indicators` field is hardcoded to an empty list by design (confirmed by direct
+  read — the fallback path deliberately gives up on indicators rather than inventing generic
+  ones, "coherence over completeness"). There is no real per-respondent indicator content to
+  partially show without a live synthesis call, which was just ruled out. Locking the section
+  entirely, with explicit unlock-framing copy, is honest about what's actually available —
+  matches the feature's own "the limitation is part of the pitch" design rather than fabricating
+  a partial reveal from content that doesn't exist yet.
+- **Option D rejected (state's static `descriptive_prose` as the verdict text):** that content
+  was authored for `/book`'s general state descriptions, not as a response to a specific
+  respondent's answers. Reusing it here repurposes content for a job it wasn't designed for.
 
 ## 2. Financial benchmark mechanic — recommendation, with full Demographic Applicability
    Filter pass
