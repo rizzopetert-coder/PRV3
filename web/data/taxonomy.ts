@@ -471,6 +471,27 @@ export const states: State[] = [
     description:
       "Compensable work produced outside paid hours through cultural pressure rather than explicit instruction. The policy is compliant. The culture creates the liability. Distinct from Structural Overload — this is about expected availability, not volume.",
   },
+  // the_inner_circle -- 58th state (taxonomy expansion, prior session), this
+  // session's own data-availability check confirmed it was missing from
+  // this file entirely (57 states, not 58) while already present and
+  // correct in web/lib/book-state-index.ts. signatureId assigned to
+  // culture_erosion -- Pete's call, on review of the real member list: the
+  // group shares this state's core mechanism (inconsistent application of
+  // standards/accountability based on identity or relationship) with
+  // the_inside_track, the_wrong_reward, the_basement_standard, and
+  // the_burned_credibility, not just a loose thematic echo. Also added to
+  // Culture Erosion's stateIds array below to keep both membership
+  // representations in sync, per the pattern already confirmed to matter
+  // for this file. description reuses book-state-index.ts's real
+  // descriptiveProse verbatim -- already-authored, already-real content,
+  // not invented new copy for this addition.
+  {
+    id: "the_inner_circle",
+    name: "The Inner Circle",
+    signatureId: "culture_erosion",
+    description:
+      "There's a group at the top of this organization who look out for each other first. Decisions get made in rooms you're not in, by people who protect each other's mistakes as readily as their own. It isn't about one person getting away with something — it's a whole layer that answers to itself instead of any standard. The people outside the circle have figured out exactly what that means for them.",
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -517,6 +538,7 @@ export const signatures: Signature[] = [
       "cultural_overtime",
       "distributed_culture_fragmentation",
       "human_displacement_anxiety",
+      "the_inner_circle",
     ],
     description:
       "You remember when this place felt different. The people who've been here long enough know what changed — not the moment it changed, but the accumulation of small decisions that added up to something large. The values are still on the wall. The all-hands still describes an organization that doesn't quite match the one people experience every day. New hires figure out the gap in their first ninety days. Tenured employees stopped expecting it to close. The ones who cared most about what this place stood for are the ones leaving first.",

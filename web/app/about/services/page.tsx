@@ -4,6 +4,18 @@ export const metadata: Metadata = {
   title: "Services | Principal Resolution",
 };
 
+// Section id attributes (added for /book/toc's planned resolution_family
+// badge, this session) -- plain kebab-case slugs of each real commercial
+// name, matching web/lib/resolution-family.ts's ENGINE_TO_COMMERCIAL_NAME
+// output exactly: "People Tactics and Strategy" -> #people-tactics-and-
+// strategy, "Training & Development" -> #training-development,
+// "Intervention" -> #intervention, "Executive Advisory" -> #executive-
+// advisory. No shared slugify utility used -- only 4 fixed values, hand-
+// matched here; whoever builds the badge should link directly to these
+// exact anchors rather than deriving a slug from the commercial name at
+// runtime, since "Training & Development"'s real anchor drops the
+// ampersand rather than encoding it.
+
 export default function ServicesPage() {
   return (
     <main className="bg-paper min-h-screen">
@@ -15,7 +27,7 @@ export default function ServicesPage() {
 
         <div className="divide-y divide-gray-100">
 
-          <section className="pb-12">
+          <section id="people-tactics-and-strategy" className="pb-12">
             <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-3">People Tactics and Strategy</h2>
             <p className="font-ui text-sm text-gray-500 italic mb-6">Org assessment, people strategy, and the tactical HR work required to act on it. Not just structure on paper — the actual decisions about how people are organized, managed, and supported, and the hands-on work to make those decisions real.</p>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
@@ -26,7 +38,7 @@ export default function ServicesPage() {
             </p>
           </section>
 
-          <section className="py-12">
+          <section id="training-development" className="py-12">
             <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-3">Training &amp; Development</h2>
             <p className="font-ui text-sm text-gray-500 italic mb-6">Leadership development, team coaching, and teambuilding, built around what your people actually need rather than a packaged program.</p>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
@@ -37,7 +49,7 @@ export default function ServicesPage() {
             </p>
           </section>
 
-          <section className="py-12">
+          <section id="intervention" className="py-12">
             <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-3">Intervention</h2>
             <p className="font-ui text-sm text-gray-500 italic mb-6">Immediate, in-the-room expertise for a situation that&apos;s live right now.</p>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
@@ -48,7 +60,7 @@ export default function ServicesPage() {
             </p>
           </section>
 
-          <section className="pt-12">
+          <section id="executive-advisory" className="pt-12">
             <h2 className="font-display text-2xl md:text-3xl text-charcoal mb-3">Executive Advisory</h2>
             <p className="font-ui text-sm text-gray-500 italic mb-6">A confidential, ongoing relationship for the decisions that can&apos;t be discussed with anyone inside the organization.</p>
             <p className="font-ui text-base text-gray-600 leading-relaxed mb-5">
