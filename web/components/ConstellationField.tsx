@@ -45,7 +45,15 @@ import { PUBLIC_DIMENSION_LABELS } from "@/lib/book-taxonomy-labels";
 const VIEW_W = 900;
 const VIEW_H = 640;
 const CENTER = { x: 450, y: 320 };
-const MAX_R = 200;
+// Homepage ambient-shape resize (this session) -- was 200, raised to 580
+// (~2.9x, "roughly 3x" per Pete's request). 580, not a literal 600 (3.0x),
+// is the exact largest value with zero clipping across the full 9-keyframe
+// animation cycle: the binding constraint is the apt axis's peak weight
+// (0.55, keyframes 3/4) against CENTER.y's 320px headroom to the top
+// viewBox edge -- 320 / 0.55 = 581.8, so 580 leaves a small margin.
+// Ambient-mode-only -- LiveField (results-page shape) uses its own
+// separate LIVE_MAX_R/LIVE_CENTER, confirmed unaffected by this constant.
+const MAX_R = 580;
 
 export type AxisKey = "apt" | "auth" | "all" | "att";
 

@@ -14,23 +14,26 @@ import {
   severityAccentTokens,
 } from "./ConstellationField";
 
-// Locks in the resting-frame geometry hand-verified during Stage 2 against
-// the actual rendered SVG output (keyframe 0: apt .35, auth .30, all .25,
-// att .30 -> vertices (450,250) (510,320) (450,370) (390,320)). Worth a
-// permanent test specifically because this is math a future refactor
-// could silently break with no visual or type-level signal — same
-// category as the checkpoint splice logic, lower stakes.
+// Locks in the resting-frame geometry, re-verified this session against
+// the actual computed output after the homepage ambient-shape resize
+// (MAX_R 200 -> 580, keyframe 0: apt .35, auth .30, all .25, att .30 ->
+// vertices (450,117) (624,320) (450,465) (276,320)). Re-run directly via
+// vitest before writing these numbers, not hand-derived alone -- confirms
+// the real computed values match the expected r=MAX_R*weight math exactly.
+// Worth a permanent test specifically because this is math a future
+// refactor could silently break with no visual or type-level signal —
+// same category as the checkpoint splice logic, lower stakes.
 
 describe("pointFor", () => {
   it("places each axis at weight * MAX_R along its angle, matching the hand-verified resting frame", () => {
-    // Aptitude (top, -90deg), weight .35 -> r=70 -> (450, 320-70)
-    expect(pointFor(0.35, AXES.apt)).toEqual({ x: 450, y: 250 });
-    // Authority (right, 0deg), weight .30 -> r=60 -> (450+60, 320)
-    expect(pointFor(0.3, AXES.auth)).toEqual({ x: 510, y: 320 });
-    // Alliance (bottom, 90deg), weight .25 -> r=50 -> (450, 320+50)
-    expect(pointFor(0.25, AXES.all)).toEqual({ x: 450, y: 370 });
-    // Attitude (left, 180deg), weight .30 -> r=60 -> (450-60, 320)
-    expect(pointFor(0.3, AXES.att)).toEqual({ x: 390, y: 320 });
+    // Aptitude (top, -90deg), weight .35 -> r=203 -> (450, 320-203)
+    expect(pointFor(0.35, AXES.apt)).toEqual({ x: 450, y: 117 });
+    // Authority (right, 0deg), weight .30 -> r=174 -> (450+174, 320)
+    expect(pointFor(0.3, AXES.auth)).toEqual({ x: 624, y: 320 });
+    // Alliance (bottom, 90deg), weight .25 -> r=145 -> (450, 320+145)
+    expect(pointFor(0.25, AXES.all)).toEqual({ x: 450, y: 465 });
+    // Attitude (left, 180deg), weight .30 -> r=174 -> (450-174, 320)
+    expect(pointFor(0.3, AXES.att)).toEqual({ x: 276, y: 320 });
   });
 });
 
@@ -66,7 +69,7 @@ describe("computeFrame", () => {
 
 describe("pointsAttr", () => {
   it("renders the resting frame as the exact hand-verified SVG points string", () => {
-    expect(pointsAttr(RESTING_FRAME)).toBe("450,250 510,320 450,370 390,320");
+    expect(pointsAttr(RESTING_FRAME)).toBe("450,117 624,320 450,465 276,320");
   });
 });
 

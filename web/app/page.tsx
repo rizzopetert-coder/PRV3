@@ -17,12 +17,12 @@ export default function Home() {
           <ConstellationField mode="ambient" />
           <div className="relative z-10">
             <p className="font-display text-3xl md:text-5xl leading-tight text-charcoal my-8 md:my-12">
-              We don&apos;t arrive with a methodology and fit you into it. We start
-              with you.
+              No fixed methodology. Every read starts from your organization, not
+              a template applied to it.
             </p>
             <p className="font-display text-3xl md:text-5xl leading-tight text-charcoal my-8 md:my-12">
-              We don&apos;t fix people problems. We change the conditions that
-              produce them.
+              People problems are usually structural problems wearing a
+              person&apos;s name.
             </p>
             {/* Muted-text technique ported from the mockup's .lede rule
                 (opacity on the base ink color, not a separate gray
