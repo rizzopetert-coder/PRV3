@@ -197,6 +197,21 @@ const AXIS_LABELS: Record<AxisKey, string> = {
   att: "ATT",
 };
 
+// Gestalt-interpretability addendum (Category E, Direction 1 Refinement,
+// this session) -- locked P-10 copy, Pete's own review
+// (prompts/category-e-direction1-refinement-addendum-gestalt-interpretability.md).
+// Deliberately its own constant, not folded into PUBLIC_DIMENSION_LABELS --
+// this explains the shape as a whole, not one axis, and its content shape
+// (title + a short list) doesn't match that record's title+description pair.
+const GESTALT_INFO = {
+  title: "How to read this",
+  points: [
+    "The further a point sits from the center, the more compromised that dimension is.",
+    "Rust means Endemic. It only appears at the most serious tier — nothing gradual leads into it.",
+    "One point pulled far out names a specific condition. Several pulled out together means more than one thing is compounding at once.",
+  ],
+};
+
 // Direction 1 Refinement (Category E, this session) -- maps the SVG's
 // abbreviated AxisKey to book-taxonomy-labels.ts's full DimensionKey, so
 // the hover/tap reveal can reuse the existing locked, brand-voice-approved
@@ -390,6 +405,20 @@ function LiveField({ weights, severityTier }: LiveFieldProps) {
   const [hoveredDimension, setHoveredDimension] = useState<AxisKey | null>(null);
   const [tappedDimension, setTappedDimension] = useState<AxisKey | null>(null);
 
+  // Gestalt-interpretability addendum (this session) -- fully separate
+  // state, separate from the four-axis pair above by design. Gemini
+  // architecture review confirmed this (option (a)) over a shared/widened
+  // AxisKey | "gestalt" | null type (option (b)) -- see
+  // prompts/category-e-direction1-refinement-addendum-gemini-review.md.
+  // Same hover-vs-tap split and same reasoning as hoveredDimension/
+  // tappedDimension above: gestaltHovered drives the desktop panel (mouse
+  // hover OR keyboard focus), gestaltTapped drives its own Drawer.Root and
+  // is set ONLY by an actual pointer click, never by keyboard, since
+  // Drawer.Root's open prop applies real body-scroll-lock regardless of
+  // the md:hidden CSS hiding its visual output on desktop.
+  const [gestaltHovered, setGestaltHovered] = useState(false);
+  const [gestaltTapped, setGestaltTapped] = useState(false);
+
   const points = (Object.keys(AXES) as AxisKey[]).reduce(
     (acc, k) => {
       acc[k] = polarPoint(weights[k], AXES[k], LIVE_CENTER, LIVE_MAX_R);
@@ -438,6 +467,92 @@ function LiveField({ weights, severityTier }: LiveFieldProps) {
 
   return (
     <div className="relative">
+      {/* Gestalt-interpretability trigger (this session) -- deliberately
+          the first child of this wrapper, before the <svg>, so DOM order
+          alone gives it tab-first placement ahead of the four axis
+          hit-areas (Pete's explicit call), with no tabIndex trick needed.
+          Positioned in the top-right diagonal corner -- confirmed empty of
+          any axis hit-area by direct coordinate check against the real
+          labelPositions below (see the Gemini review package for the
+          full corner math). Real <button>, not the axis pattern's SVG
+          <g role="button"> -- semantic default focus/announce behavior,
+          but that means Enter/Space fire a native synthetic click, which
+          would open gestaltTapped's Drawer.Root (real body-scroll-lock)
+          from a keyboard user just tabbing through. preventDefault() on
+          Enter/Space below suppresses that native click before it fires,
+          restoring the same hover-only-on-keyboard guarantee the axis
+          code already has. */}
+      <button
+        type="button"
+        aria-label={GESTALT_INFO.title}
+        aria-expanded={gestaltHovered || gestaltTapped}
+        className="absolute top-2 right-2 z-10 font-ui text-xs text-gray-400 hover:text-charcoal transition-colors underline decoration-dotted underline-offset-2"
+        onMouseEnter={() => setGestaltHovered(true)}
+        onMouseLeave={() => setGestaltHovered(false)}
+        onFocus={() => setGestaltHovered(true)}
+        onBlur={() => setGestaltHovered(false)}
+        onClick={() => setGestaltTapped((cur) => !cur)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setGestaltHovered((cur) => !cur);
+          }
+        }}
+      >
+        {GESTALT_INFO.title}
+      </button>
+
+      {/* Desktop gestalt panel (this session) -- same visual language as
+          the per-axis panel below, wider (w-72 vs w-56) to fit three short
+          points instead of one title+description pair, per the addendum
+          doc's own sizing note. Fixed position near the trigger, not
+          data-driven -- unlike the axis panels, this affordance has no
+          shape-relative anchor point. */}
+      {gestaltHovered && (
+        <div className="hidden md:block absolute z-10 top-10 right-2 w-72 rounded-md border border-gray-200 bg-white p-3 shadow-lg pointer-events-none">
+          <p className="font-ui text-[12px] font-semibold text-charcoal mb-1.5">
+            {GESTALT_INFO.title}
+          </p>
+          <ul className="space-y-1.5">
+            {GESTALT_INFO.points.map((point) => (
+              <li key={point} className="font-ui text-[11px] text-gray-500 leading-relaxed">
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Mobile gestalt drawer (this session) -- independent Drawer.Root
+          instance, separate from the per-axis Drawer.Root below, per
+          Gemini's confirmed option (a). Opens only from an actual
+          click/tap on the trigger button above, never from hover or
+          keyboard focus alone -- see gestaltTapped's own comment. */}
+      <Drawer.Root
+        open={gestaltTapped}
+        onOpenChange={(open) => setGestaltTapped(open)}
+      >
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/30 z-40 md:hidden" />
+          <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl md:hidden">
+            <Drawer.Title className="sr-only">{GESTALT_INFO.title}</Drawer.Title>
+            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-3 mb-2" />
+            <div className="p-4 pb-8">
+              <p className="font-ui text-sm font-semibold text-charcoal mb-1.5">
+                {GESTALT_INFO.title}
+              </p>
+              <ul className="space-y-2">
+                {GESTALT_INFO.points.map((point) => (
+                  <li key={point} className="font-ui text-[13px] text-gray-500 leading-relaxed">
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+
       <svg
         className="w-full h-auto"
         viewBox={`0 0 ${LIVE_VIEW_W} ${LIVE_VIEW_H}`}
