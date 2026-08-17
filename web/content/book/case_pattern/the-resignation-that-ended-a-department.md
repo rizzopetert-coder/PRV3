@@ -72,4 +72,4 @@ A different organization also has a practice — not a policy, a practice — of
 
 The gap analysis her replacement commissioned eight months later would have been one page. Produced in her third month. Updated annually. The nineteen-page version was not a documentation failure. It was the cost of treating institutional knowledge as a personal attribute rather than an organizational asset.
 
-The window to do that mapping is not the exit interview. It is every year before the exit interview. Most organizations spend it assuming eleven years of knowledge will fit on a fifteen-item checklist.
+The window to do that mapping is not the exit interview. It is every year before the exit interview. Most organizations discover, too late, that eleven years of knowledge doesn't fit on a fifteen-item checklist.

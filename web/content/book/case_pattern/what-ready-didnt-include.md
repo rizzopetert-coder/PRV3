@@ -62,4 +62,4 @@ A different organization has also reckoned with what it asks of the people who a
 
 The coordinator capacity lost in those eleven weeks is not recoverable. The clients who had a worse experience than they should have are not a rounding error in a retrospective. The information existed. The people who had it were present, capable, and paying attention. The organization simply had not built a reason for it to travel.
 
-Every organization has that window. Most spend it redefining ready after the launch instead of before it.
+The window to include regional operations is before the launch, not after. Most organizations only learn what "ready" should have meant once the launch already answered it.

@@ -72,4 +72,4 @@ A different organization has leadership that can receive the answer to those que
 
 A different organization treats the first high-performer departure as a data point requiring investigation, not a loss requiring explanation. The investigation is not punitive or dramatic. It is a genuine attempt to understand what that person saw and whether others are seeing it too. That conversation, conducted early, before the pattern is established, when one honest exchange can still surface what six exit interviews later will not, is the intervention. Not the retreat. Not the survey. Not the communication commitments posted in the break room. The willingness to ask the hard question before the answer becomes expensive.
 
-The window to do this is the first departure. Most organizations spend it writing a job posting.
+The window to do this is the first departure. Most organizations answer it with a job posting.
