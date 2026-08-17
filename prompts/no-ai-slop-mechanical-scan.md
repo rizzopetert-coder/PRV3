@@ -49,6 +49,21 @@ change is a pure punctuation conversion, em-dash to comma or colon, no
 wording or content changed anywhere. No weasel-attribution claims in this
 file, nothing to independently verify. Em-dash-over-cap count: 32 → 31.
 
+**`psychological-safety-walked-into-a-meeting.md` fixed (24 → 8
+em-dashes), its one weasel-attribution hit resolved.** The live text's
+"The research on this is fairly consistent: psychological safety is built
+through demonstrated response, not declared intent" is replaced with an
+attribution to Edmondson's own follow-up work (*The Fearless
+Organization*, 2019), naming her three specific leader behaviors —
+setting the stage, inviting participation, responding productively.
+Independently confirmed via WebSearch before applying: Edmondson's book
+does name exactly these three behaviors, and she's already the piece's
+established named authority (cited earlier in the same file for the
+original definition) — a correct-attribution fix to an already-real
+source, not a new unverified claim. All other diff lines confirmed pure
+em-dash-to-comma/colon conversions. Em-dash-over-cap count: 31 → 30.
+Weasel-attribution file count: 6 → 5.
+
 ---
 
 ## What changed since the first run
