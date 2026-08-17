@@ -64,6 +64,13 @@ source, not a new unverified claim. All other diff lines confirmed pure
 em-dash-to-comma/colon conversions. Em-dash-over-cap count: 31 → 30.
 Weasel-attribution file count: 6 → 5.
 
+**`earned-effectiveness.md` fixed (23 → 8 em-dashes).** Diffed line-by-line
+against live: every change is a pure punctuation conversion (mostly
+em-dash to colon, matching the piece's heavy use of "X is not Y — it is
+Z" definitional constructions; a few to periods/commas), no wording or
+content changed anywhere. No weasel-attribution claims in this file.
+Em-dash-over-cap count: 30 → 29.
+
 ---
 
 ## What changed since the first run
