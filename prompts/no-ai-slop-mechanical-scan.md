@@ -43,6 +43,12 @@ direct read of all 4 matches, not assumed.
 
 Em-dash-over-cap count: 33 → 32.
 
+**`how-to-tell-if-the-organization-will-actually-change.md` fixed (27 → 8
+em-dashes, right at the cap).** Diffed line-by-line against live: every
+change is a pure punctuation conversion, em-dash to comma or colon, no
+wording or content changed anywhere. No weasel-attribution claims in this
+file, nothing to independently verify. Em-dash-over-cap count: 32 → 31.
+
 ---
 
 ## What changed since the first run
