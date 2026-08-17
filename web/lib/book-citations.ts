@@ -228,4 +228,28 @@ export const bookCitations: Record<string, BookCitation> = {
     urlStatus: "verified",
     severity: 1,
   },
+  "HC-MITCHELLWOOD-1980": {
+    id: "HC-MITCHELLWOOD-1980",
+    text: "An empirical test of the leader-attribution model found that supervisors consistently explain a subordinate's poor performance by pointing at the subordinate's own low effort or ability rather than at task design, resourcing, or conflicting priorities -- and respond more punitively the more times the pattern repeats, with the initial attribution driving the intervention chosen rather than the reverse.",
+    source: "Mitchell, T. R., & Wood, R. E. (1980). Supervisor's Responses to Subordinate Poor Performance: A Test of an Attributional Model. Organizational Behavior and Human Performance, 25(1), 123-138.",
+    url: "https://www.sciencedirect.com/science/article/abs/pii/003050738090029X",
+    urlStatus: "verified",
+    severity: 1,
+  },
+  "HC-HEINRICH-1931": {
+    id: "HC-HEINRICH-1931",
+    text: "Heinrich's analysis of over 75,000 industrial accident reports concluded that roughly 88% of workplace accidents were caused by unsafe acts on the part of workers rather than unsafe conditions -- a finding that shaped decades of industrial safety practice, though later researchers have challenged both his methodology and the specific ratio.",
+    source: "Heinrich, H. W. (1931). Industrial Accident Prevention: A Scientific Approach. McGraw-Hill.",
+    url: "https://en.wikipedia.org/wiki/Herbert_William_Heinrich",
+    urlStatus: "verified",
+    severity: 1,
+  },
+  "HC-BLUME-2010": {
+    id: "HC-BLUME-2010",
+    text: "A meta-analytic review of 89 empirical studies on transfer of training found that a supportive post-training work environment is a significant predictor of whether newly learned behavior is sustained on the job, while unsupported training shows steep decay within months.",
+    source: "Blume, B. D., Ford, J. K., Baldwin, T. T., & Huang, J. L. (2010). Transfer of Training: A Meta-Analytic Review. Journal of Management, 36(4), 1065-1105.",
+    url: "https://journals.sagepub.com/doi/10.1177/0149206309352880",
+    urlStatus: "verified",
+    severity: 1,
+  },
 };

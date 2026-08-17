@@ -26,9 +26,9 @@ These are not signs that you have built a great team. They are signs that your t
 
 What makes this pattern genuinely dangerous is that it degrades your information environment at exactly the moment your information environment matters most.
 
-You are making decisions. You are reading situations. You are assessing whether the organization is healthy, whether the strategy is working, whether the people around you are performing. All of that assessment depends on accurate input from the people closest to the work. When that input has been filtered — when everyone around you has learned, through experience, to tell you what you want to hear rather than what is actually true — you are operating on a model of the organization that no longer matches the organization.
+You are making decisions. You are reading situations. You are assessing whether the organization is healthy, whether the strategy is working, whether the people around you are performing. All of that assessment depends on accurate input from the people closest to the work. When that input has been filtered, when everyone around you has learned, through experience, to tell you what you want to hear rather than what is actually true, you are operating on a model of the organization that no longer matches the organization.
 
-The leader who cannot understand why morale is low. The executive who is genuinely surprised when a key person resigns. The manager who describes the team as aligned right up until the moment it isn't. These are not failures of intelligence. They are what happens when the feedback mechanisms that would have prevented the surprise were quietly suppressed — often by the leader's own earlier responses to feedback they didn't want to receive.
+The leader who wonders, months later, why nobody said anything in the room. The executive whose calendar was full of meetings that felt productive and changed nothing. The manager who calls the team "easy to work with" without noticing that easy and honest stopped overlapping months ago. These are not failures of intelligence. They are what happens when the feedback mechanisms that would have prevented the surprise were quietly suppressed — often by the leader's own earlier responses to feedback they didn't want to receive.
 
 ---
 

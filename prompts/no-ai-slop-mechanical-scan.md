@@ -4,6 +4,51 @@ Status: **Investigation only. Grep/regex-based counting, not a rewrite, not a
 subjective close-read.** Tooling: `tools/diag_book_mechanical_scan.py`
 (read-only, reusable). No content edited.
 
+**Addendum (later session): em-dash cap clarified to exclude the signature
+line.** Pete locked a clarification to the `/book` em-dash standard
+(`tools/_mob.txt`, MOB v4.183): the ≤8 cap applies to prose content only — the
+closing `"— [Author Name]"` attribution line (e.g. `"— Principal
+Resolution"`) is exempted, being a fixed typographic convention rather than
+prose density. **This changes how every em-dash count below involving one of
+the 14 files using that closer should be read** — subtract 1 for the
+signature line before comparing against the cap. Re-checked which files
+genuinely use the closer as their literal last line (not just files that
+happen to mention "Principal Resolution" in prose, which the original
+`grep -rl "Principal Resolution"` also matched): **12 files use the real
+closer** (accountability, business-case, exit-pattern, leadership-deafness,
+matrix-organization, no-margin-for-error, silosolation, succession-planning,
+the-basement-standard, the-broken-compass, the-untouchable, toxic-culture).
+**Two do not** — `candor-as-an-organizational-variable.md` and
+`symptoms-states-and-why-the-distinction-matters.md` both end in ordinary
+prose that happens to contain the phrase "Principal Resolution"; no
+exemption applies to either, and their raw counts (28 and 20) are genuine,
+unadjusted prose counts, confirmed via direct file read of each one's actual
+final lines, not assumed from the grep match. Prose-only recount for all 12
+real closer-files, re-measured directly against the live repo (not the
+original scan's raw numbers):
+
+| file | raw | signature line | prose | status |
+|---|---|---|---|---|
+| accountability.md | 13 | 1 | 12 | over cap |
+| business-case.md | 7 | 1 | 6 | ok |
+| exit-pattern.md | 5 | 1 | 4 | ok |
+| leadership-deafness.md | 15 | 1 | 14 | over cap |
+| matrix-organization.md | 17 | 1 | 16 | over cap |
+| no-margin-for-error.md | 11 | 1 | 10 | over cap |
+| silosolation.md | 16 | 1 | 15 | over cap (pre-fix; a revision is in progress this session, not yet landed live — see fix-tracking doc) |
+| succession-planning.md | 12 | 1 | 11 | over cap |
+| the-basement-standard.md | 7 | 1 | 6 | ok |
+| the-broken-compass.md | 7 | 1 | 6 | ok |
+| the-untouchable.md | 13 | 1 | 12 | over cap |
+| toxic-culture.md | 17 | 1 | 16 | over cap (pre-fix; same status as silosolation.md above) |
+
+Net effect on the earlier "45 of 87 files exceed the em-dash cap" finding:
+unchanged in substance — every file that was over cap counting the signature
+line is still over cap after subtracting it (the 1-dash difference doesn't
+flip any file's status either direction), except that `silosolation.md` and
+`toxic-culture.md`'s *pre-fix* prose counts (15, 16) are now confirmed
+independent of whatever their in-progress revisions land at.
+
 **Scope correction, stated up front:** this scans the **full 87-file
 published corpus**, not "the remaining ~79" as originally framed.
 `prompts/no-ai-slop-fix-tracking.md` — which would identify exactly which 8

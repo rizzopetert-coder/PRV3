@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.182
+\\\#\\\# MOB v4.183
 
   
 
@@ -1250,7 +1250,7 @@ Full progression in Section 16 session log.
 | private_output.resolution_routing stale values | engine/data/states.py serializes pre-S32 service names (Development, Roadmap + Intervention, Executive Counsel + Intervention, etc.) in the resolution_routing field. TypeScript layer bypasses this via STATE_RESOLUTION_FAMILY map in /api/result and /api/share/create. Python-side cleanup required in engine/data/states.py and engine/output.py before output layer is fully clean. Deferred to Phase 3. ENGINE DEBT. |
 
 | Copy rule — human register signals | Occasional human register signals are permitted and intentional in client-facing copy. A moment of directness or warmth that breaks from the clinical register can signal human connection when used sparingly. It is not a lapse. Evaluate per instance. |
-| /book editorial standard — em-dash cap | Em-dash density hard-capped at ≤8 per piece, enforced by grep, not judgment call. |
+| /book editorial standard — em-dash cap | Em-dash density hard-capped at ≤8 per piece, enforced by grep, not judgment call. **Clarified this session:** the cap applies to prose content only. The closing "— [Author Name]" attribution/signature line (e.g. "— Principal Resolution", used as a fixed closer across 14 published methodology pieces) is exempted from the count — it is a fixed typographic convention, one occurrence, identical every time, not an instance of the rhetorical-interruption pattern the cap exists to catch. Grep-based counts for any file using this closer must subtract the signature line's own dash before comparing against ≤8. |
 | /book editorial standard — header-4 negation ban | Header slot 4 (“why the obvious response doesn’t work”) may not use a Doesn’t/Isn’t/Can’t/No [X] negation construction as a batch-wide pattern. |
 | /book editorial standard — recognition-header near-duplicate ban | Recognition-section headers must be piece-specific past the exact-duplicate check — near-duplicates differing only by a leading quantifier (e.g. “Three Tells” vs. “The Tells”) are barred. |
 | /book editorial standard — “The Signature” retired | “The Signature” is retired as a section header (reconfirmed Batch 3) — must be checked explicitly in the compliance grep suite, not relied on from drafting memory. |

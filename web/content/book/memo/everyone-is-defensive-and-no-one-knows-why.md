@@ -6,7 +6,7 @@ So people stayed quiet. Then they got good at staying quiet. Then the quiet star
 
 ---
 
-The instinct, when you start noticing defensiveness — in a colleague, in a leader, in yourself — is to locate it in a person. He's sensitive. She can't take criticism. They always do this. That framing is appealing because it makes the problem portable. If it lives in a person, it leaves when they do. Nothing structural has to change.
+The instinct, when you start noticing defensiveness, in a colleague, in a leader, in yourself, is to locate it in a person. He's sensitive. She can't take criticism. They always do this. That framing is appealing because it makes the problem portable. If it lives in a person, it leaves when they do. Nothing structural has to change.
 
 But defensiveness is a learned response, and people learn it from somewhere. They become defensive about things that have bitten them before — or that they have watched bite someone else. The feedback given honestly and received as a personal attack. The concern raised in good faith and interpreted as disloyalty. The performance conversation that somehow became about the person who initiated it. Each of those events teaches the organization something. The lesson accumulates quietly, and after enough of it, people stop needing to learn it consciously. They just know.
 
@@ -26,7 +26,7 @@ Then the organization stops noticing. The absence of conflict starts to read as 
 
 This is where Leadership Deafness takes hold. The pattern produces a specific and durable blind spot: the organization's actual condition becomes invisible to the people with the most power to address it, because the mechanisms that would make it visible have been quietly suppressed. Not by design. Not through any single decision. Through the entirely predictable result of an environment where honesty carries a cost that most people eventually decide not to pay.
 
-The leader who cannot understand why morale is low. The executive who is genuinely surprised by the exit interview. The manager who describes the team as high-functioning right up until three people resign in the same quarter. These are not failures of intelligence or attention. They are what happens when the information environment has been shaped, steadily and invisibly, by the organization's own response to candor.
+The leader who keeps asking why nobody flagged the problem sooner. The executive who learns about the resignation letter before learning why it was written. The manager who calls the team "low-drama" without noticing that drama and candor stopped meaning the same thing a year ago. These are not failures of intelligence or attention. They are what happens when the information environment has been shaped, steadily and invisibly, by the organization's own response to candor.
 
 The mirror is not broken. It has been covered — carefully, over time, by people who learned that showing leadership what it actually looks like was not worth the risk.
 
@@ -34,7 +34,7 @@ The mirror is not broken. It has been covered — carefully, over time, by peopl
 
 What changes this is not a training on giving feedback, a new performance review template, or a team offsite with a commitment wall and a facilitator.
 
-What changes this is a leader who decides — visibly, at some personal cost, more than once — that candor is safe here. Not a leader who announces that candor is safe. A leader who demonstrates it. Who receives hard feedback in front of people and responds in a way that makes the person who gave it glad they did. Who names what is actually happening in a room instead of carefully managing around it. Who is wrong in public and treats it as information rather than threat.
+What changes this is a leader who decides, visibly and at some personal cost, more than once, that candor is safe here. Not a leader who announces that candor is safe. A leader who demonstrates it. Who receives hard feedback in front of people and responds in a way that makes the person who gave it glad they did. Who names what is actually happening in a room instead of carefully managing around it. Who is wrong in public and treats it as information rather than threat.
 
 This is harder than it sounds. It requires tolerating discomfort in front of people who are watching to see what you do with it — which cuts against most of what organizational authority has taught you about how authority is supposed to look.
 

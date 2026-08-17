@@ -1,8 +1,7 @@
 """
 PRV3 -- apply the 8 no-ai-slop content fixes (from Downloads, verified
 against prompts/no-ai-slop-fix-tracking.md and diffed against live repo
-files this session) plus 2 of the 5 new citations from the why-blaming
-fix.
+files this session) plus 3 new citations from the why-blaming fix.
 
 VERIFICATION PERFORMED BEFORE THIS SCRIPT WAS WRITTEN, not assumed:
 - All 8 Downloads files diffed line-by-line against their live
@@ -14,14 +13,12 @@ VERIFICATION PERFORMED BEFORE THIS SCRIPT WAS WRITTEN, not assumed:
       (EXACT match to tracking doc's "12->8" claim)
     the-room-that-never-pushes-back.md: live 10 -> revised 8
       (EXACT match to tracking doc's "10->8" claim)
-    built-for-comfort.md: live 26 -> revised 9
-      (tracking doc claimed "~21->7" -- both figures were undercounts;
-      revised file is 1 OVER the locked <=8 standard, flagged not fixed
-      here)
-    one-exception-at-a-time.md: live 24 -> revised 10
-      (tracking doc claimed "17->4" -- both figures were significant
-      undercounts; revised file is 2 OVER the locked <=8 standard,
-      flagged not fixed here)
+    built-for-comfort.md: live 26 -> revised 7 (RE-REVISED, Pete's own
+      pass -- first revision was 9, over the <=8 cap; this replacement
+      confirmed at 7, under cap; kicker fix confirmed unchanged/intact)
+    one-exception-at-a-time.md: live 24 -> revised 7 (RE-REVISED, same
+      story -- first revision was 10, over cap; this one confirmed at 7,
+      under cap; kicker fix confirmed unchanged/intact)
 - why-blaming-the-person-almost-never-fixes-the-problem.md: all 5 named
   citations (Mitchell & Wood 1980, Swift/Moore/Sharek/Gino 2013,
   Heinrich 1931, Blume/Ford/Baldwin/Huang 2010, Senge 1990) confirmed
@@ -34,14 +31,13 @@ CITATION CHECK (per instruction -- check first, don't duplicate):
 - Senge 1990 -- ALREADY EXISTS as HC-SENGE-1990, exact source-string
   match ("Shifting the Burden" archetype). NOT re-added.
 - Mitchell & Wood 1980 -- confirmed via WebSearch as a real, distinct
-  paper (Organizational Behavior and Human Performance, 25(1), 123-138),
-  NOT a duplicate of the existing HC-GREEN-1979 (Green & Mitchell 1979,
-  a different paper, same lead researcher T.R. Mitchell, closely related
-  but distinct attributional model -- literature recognizes them as two
-  separate models, e.g. Ashkanasy 1989's "Green and Mitchell Model
-  Revisited"). Genuinely a judgment call given the close thematic overlap
-  -- HELD, not added by this script, pending Pete's call on whether to
-  add both or keep just the existing one.
+  paper (Organizational Behavior and Human Performance, 25(1), 123-138).
+  Initially flagged for Pete's call given close thematic overlap with
+  the existing HC-GREEN-1979 (Green & Mitchell 1979). Pete's resolution:
+  add as its own entry -- Green & Mitchell 1979 is the theoretical
+  attribution model, Mitchell & Wood 1980 is the empirical test of that
+  model on supervisor response to subordinate poor performance
+  specifically, which is the actual claim the article makes. Added here.
 - Heinrich 1931 and Blume/Ford/Baldwin/Huang 2010 -- confirmed absent,
   confirmed real via WebSearch (Heinrich: Industrial Accident Prevention,
   1931, the real 88%-unsafe-acts finding, also confirmed methodologically
@@ -63,14 +59,18 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DOWNLOADS = Path(r"C:\Users\rizzo\Downloads")
 
 FILE_PAIRS = [
-    ("toxic-culture.md", "web/content/book/methodology/toxic-culture.md"),
-    ("silosolation.md", "web/content/book/methodology/silosolation.md"),
+    # Only the 4 files with content verified byte-clean via the Downloads file
+    # channel (no mojibake artifact, em-dash counts match exactly what was
+    # claimed). The other 4 (toxic-culture.md, silosolation.md, anchor.md,
+    # why-blaming-the-person-almost-never-fixes-the-problem.md) were only
+    # delivered via chat-paste this round, which showed the same "â"
+    # encoding-corruption artifact both times it was sent -- held until they
+    # arrive via Downloads instead. See prompts/no-ai-slop-fix-tracking.md
+    # for status.
     ("everyone-is-defensive-and-no-one-knows-why.md", "web/content/book/memo/everyone-is-defensive-and-no-one-knows-why.md"),
     ("the-room-that-never-pushes-back.md", "web/content/book/memo/the-room-that-never-pushes-back.md"),
     ("built-for-comfort.md", "web/content/book/case_pattern/built-for-comfort.md"),
     ("one-exception-at-a-time.md", "web/content/book/case_pattern/one-exception-at-a-time.md"),
-    ("why-blaming-the-person-almost-never-fixes-the-problem.md", "web/content/book/methodology/why-blaming-the-person-almost-never-fixes-the-problem.md"),
-    ("anchor.md", "web/content/book/methodology/anchor.md"),
 ]
 
 CITATIONS = "web/lib/book-citations.ts"
@@ -87,6 +87,14 @@ CITATION_ANCHOR = (
 NEW_CITATIONS = (
     '    source: "Murray v. UBS Securities, LLC, 601 U.S. 23 (2024)",\n'
     '    url: "https://www.law.cornell.edu/supremecourt/text/22-660",\n'
+    '    urlStatus: "verified",\n'
+    "    severity: 1,\n"
+    "  },\n"
+    '  "HC-MITCHELLWOOD-1980": {\n'
+    '    id: "HC-MITCHELLWOOD-1980",\n'
+    '    text: "An empirical test of the leader-attribution model found that supervisors consistently explain a subordinate\'s poor performance by pointing at the subordinate\'s own low effort or ability rather than at task design, resourcing, or conflicting priorities -- and respond more punitively the more times the pattern repeats, with the initial attribution driving the intervention chosen rather than the reverse.",\n'
+    '    source: "Mitchell, T. R., & Wood, R. E. (1980). Supervisor\'s Responses to Subordinate Poor Performance: A Test of an Attributional Model. Organizational Behavior and Human Performance, 25(1), 123-138.",\n'
+    '    url: "https://www.sciencedirect.com/science/article/abs/pii/003050738090029X",\n'
     '    urlStatus: "verified",\n'
     "    severity: 1,\n"
     "  },\n"
@@ -129,7 +137,7 @@ def apply(dry_run: bool) -> int:
             live_path.write_text(new_content, encoding="utf-8")
             print(f"WRITTEN: {live_rel}")
 
-    # -- 2 new citations only (Heinrich, Blume) -- Mitchell & Wood held --
+    # -- 3 new citations: Mitchell & Wood, Heinrich, Blume et al. --
     cpath = REPO_ROOT / CITATIONS
     ctext = cpath.read_text(encoding="utf-8")
     count = ctext.count(CITATION_ANCHOR)
@@ -138,14 +146,13 @@ def apply(dry_run: bool) -> int:
         return 1
     new_ctext = ctext.replace(CITATION_ANCHOR, NEW_CITATIONS, 1)
     if dry_run:
-        print(f"OK (dry-run): {CITATIONS} -- would add HC-HEINRICH-1931, HC-BLUME-2010")
+        print(f"OK (dry-run): {CITATIONS} -- would add HC-MITCHELLWOOD-1980, HC-HEINRICH-1931, HC-BLUME-2010")
     else:
         cpath.write_text(new_ctext, encoding="utf-8")
-        print(f"WRITTEN: {CITATIONS} -- HC-HEINRICH-1931, HC-BLUME-2010 added")
+        print(f"WRITTEN: {CITATIONS} -- HC-MITCHELLWOOD-1980, HC-HEINRICH-1931, HC-BLUME-2010 added")
 
     if dry_run:
         print("\nDry run complete. Re-run with --write to apply.")
-        print("NOTE: Mitchell & Wood 1980 NOT included -- held for Pete's call (see docstring).")
     return 0
 
 
