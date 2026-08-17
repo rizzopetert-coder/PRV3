@@ -6,7 +6,7 @@
 
   
 
-\\\#\\\# MOB v4.180
+\\\#\\\# MOB v4.181
 
   
 
@@ -130,6 +130,10 @@ The diagnostic is the primary entry point. Four resolution services sit beneath 
 
   
 
+| \\\*\\\*P-13\\\*\\\* | Structural complexity needs a "how to read this" affordance before or alongside it, not after -- unexplained taxonomy reads as gimmick, not rigor. |
+
+  
+
   
 
   
@@ -151,6 +155,10 @@ The diagnostic is the primary entry point. Four resolution services sit beneath 
   
 
 **Provisional Hold vs. Lock (Session 56):** Before a decision is recorded as Locked in the MOB, confirm whether any open async research threads could invalidate this constraint. If yes, the decision is a Provisional Hold until that thread closes. Provisional Holds are documented in the session log but not listed as Locked Decisions. When the thread closes, the hold converts to a Lock or the decision is revised. Example: displacement-pattern essay count was not locked during the research-refresh automation build because the de Waal verification thread was still open.
+
+  
+
+**P-13, source and first applications (confirmed 2026-08-16):** Pete's own framing this session: "It cannot be overstated how turned off our clients will be if they explore this AI-generated site and only see a gimmicky taxonomy without context. The taxonomy may be the least important detail." First two applications, both shipped before this principle was formally locked, retroactively named as the pattern's own precedent: the ConstellationField gestalt-interpretability addendum (Category E) and the /book/toc Gestalt Pass's Terminology Guide -- both independently built the same shape, a "what do these terms mean" affordance placed before or alongside the complex structural element itself, not after.
 
   
 
