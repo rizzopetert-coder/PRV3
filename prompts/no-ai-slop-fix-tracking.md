@@ -5,6 +5,29 @@ Governing decision (Pete, this session): keep the shared structural skeleton
 template. Locked MOB em-dash standard governs: ≤8 per piece, not the audit
 tool's own ≤3 default.
 
+**Status addendum (later session): all 8 files below are now live, verified,
+committed.** Applied in two rounds
+(`tools/patch_no_ai_slop_fixes_apply.py`,
+`tools/patch_no_ai_slop_fixes_apply_round2.py`) after independent
+verification of every file against the live repo — every diff checked
+line-by-line, every em-dash count re-measured directly (not trusted from
+this doc's own approximate figures, two of which turned out to be
+undercounts requiring a re-revision before they actually cleared the ≤8
+cap: built-for-comfort.md and one-exception-at-a-time.md). Four of the
+eight (toxic-culture.md, silosolation.md, anchor.md,
+why-blaming-the-person-almost-never-fixes-the-problem.md) required two
+delivery attempts before landing clean — the first two chat-paste attempts
+introduced a real "â" mojibake artifact in place of every em-dash
+(confirmed absent from the live repo entirely, not a pre-existing quirk);
+delivery via the Downloads file channel resolved it. All 3 new citations
+from the why-blaming fix (Mitchell & Wood 1980 as its own entry per Pete's
+call — empirically distinct from the existing Green & Mitchell 1979 —
+plus Heinrich 1931 and Blume/Ford/Baldwin/Huang 2010) are live in
+book-citations.ts, each independently verified real via WebSearch, no
+duplicate-ID collisions. The MOB em-dash standard itself was clarified
+mid-fix (v4.183): the ≤8 cap applies to prose only, the fixed "— [Author
+Name]" signature line is exempted.
+
 ## Fixed this session (8 files, committed pending CC pass)
 
 | File | Fix |

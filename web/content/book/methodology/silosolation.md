@@ -14,9 +14,9 @@ It starts with self-protection. Some team needed information from another team a
 
 Each decision made sense at the time. If you can't depend on the other team, build the capability yourself. If the handoff keeps breaking, stop handing off. If the information isn't flowing, create your own source.
 
-But each of those decisions also drew a wall. And once the walls are up, they start to reinforce themselves. The team that built their own capability has no incentive to fix the original handoff problem — they've routed around it. The team that got routed around has no visibility into what broke — they just know they're no longer in the loop. Both sides start to develop their own priorities, their own metrics, their own definitions of success. The definitions don't conflict on paper. They conflict in execution.
+But each of those decisions also drew a wall. And once the walls are up, they start to reinforce themselves. The team that built their own capability has no incentive to fix the original handoff problem: they've routed around it. The team that got routed around has no visibility into what broke: they just know they're no longer in the loop. Both sides start to develop their own priorities, their own metrics, their own definitions of success. The definitions don't conflict on paper. They conflict in execution.
 
-Fast forward a few years. The walls have calcified into culture. The workarounds have become processes. New hires don't even realize the silos are silos — they think this is just how the company works. And somewhere in the middle, the people who have to coordinate across the boundaries are losing their minds.
+Fast forward a few years. The walls have calcified into culture. The workarounds have become processes. New hires don't even realize the silos are silos: they think this is just how the company works. And somewhere in the middle, the people who have to coordinate across the boundaries are losing their minds.
 
 ---
 
@@ -68,13 +68,13 @@ The structural stuff is fixable. The people stuff requires either transformation
 
 The fix starts with mapping the seams.
 
-Not the org chart — the actual points of friction. Where does information stop flowing? Where do decisions stall? Where are the workarounds that have become load-bearing? Where are the people who've become human bridges between teams that should be connected structurally?
+Not the org chart. The actual points of friction. Where does information stop flowing? Where do decisions stall? Where are the workarounds that have become load-bearing? Where are the people who've become human bridges between teams that should be connected structurally?
 
-Once you see the seams clearly, you can start to see what needs to change. Some of it is structural — different reporting lines, different incentive structures, different forums for cross-functional work. Some of it is behavioral — leaders who need to model collaboration instead of territorial defense. Some of it is just permission — making it okay to surface the friction instead of working around it.
+Once you see the seams clearly, you can start to see what needs to change. Some of it is structural: different reporting lines, different incentive structures, different forums for cross-functional work. Some of it is behavioral: leaders who need to model collaboration instead of territorial defense. Some of it is just permission: making it okay to surface the friction instead of working around it.
 
 The organizations that solve Silosolation describe a specific moment when it starts to turn. Usually it's the first time a cross-functional decision gets made cleanly — not through weeks of negotiation, but through a process that actually works. People notice. They start to believe that maybe things could be different.
 
-That belief is where the change actually happens. Everything before that is just planning.
+That belief is where the change actually happens. Everything before that is just another email chain waiting for someone to reply-all.
 
 ---
 
@@ -84,7 +84,7 @@ When an organization describes a collaboration problem or a coordination problem
 
 *Which specific handoff or boundary is causing the most pain right now, and how long has it been broken?*
 
-The answer tells you where to start. Not everywhere at once — that's how improvement initiatives die. Pick the seam that's costing you the most. Fix that one first. Let the organization feel what working coordination actually looks like.
+The answer tells you where to start. Not everywhere at once: that's how improvement initiatives die. Pick the seam that's costing you the most. Fix that one first. Let the organization feel what working coordination actually looks like.
 
 Then move to the next one.
 
