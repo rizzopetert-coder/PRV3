@@ -17,6 +17,32 @@ work that's already done.
 confirmed via direct `book-manifest.ts` parse (87 `status: "published"`
 entries, all 87 loaded successfully).
 
+**Tier 2 progress: `candor-as-an-organizational-variable.md` fixed (28 → 7
+em-dashes).** This one carried a real citation-accuracy problem, not just
+missing names — the live text attributed three genuinely separate Gallup
+studies (65,672 employees/14.9% turnover; 530 work units/12.5%
+productivity; 469 business units/8.9% profitability) to "the same
+research." Independently confirmed via WebSearch before applying: these
+are three distinct studies with different sample sets, and Gallup's "How
+Fast Feedback Fuels Performance" report (also independently confirmed
+real) is the correct named source for the separate 3.6x/80% frequency
+claim. Fixed to attribute each figure to its own source.
+
+**Side effect worth flagging so it isn't misread as regression:** this
+file's own weasel-attribution count in the mechanical scan rose from 2 to
+4 hits after the fix, not down. All 4 are the same class of false positive
+already on record for `when-the-data-points-at-the-person-who-hired-you.md`'s
+"Amy Edmondson" case — the regex only recognizes a named source when a
+parenthetical year sits in the same sentence; prose-style attribution
+("Gallup's research on...", "Separate Gallup studies found...") names the
+real source just as validly but doesn't match that narrow shape. The fix
+made the article's sourcing *more* explicit (more sentences now name
+Gallup by name for their specific claim), which paradoxically trips the
+narrow pattern more often, not because sourcing got worse. Confirmed by
+direct read of all 4 matches, not assumed.
+
+Em-dash-over-cap count: 33 → 32.
+
 ---
 
 ## What changed since the first run
