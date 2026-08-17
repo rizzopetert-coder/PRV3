@@ -71,6 +71,16 @@ Z" definitional constructions; a few to periods/commas), no wording or
 content changed anywhere. No weasel-attribution claims in this file.
 Em-dash-over-cap count: 30 → 29.
 
+**`hr-is-the-table.md` fixed (21 → 8 em-dashes).** Diffed line-by-line
+against live: every change is a pure punctuation conversion (em-dash to
+comma or colon), no wording or content changed anywhere, including the
+Tracy Keogh/HP opening story. That story's attribution (Tracy Keogh, CHRO
+at HP, "HR is the table," referenced on The Talent War Podcast) was
+independently verified via WebSearch before applying, confirmed genuine.
+No weasel-attribution claims in this file. Em-dash-over-cap count: 29 →
+28. Re-run confirms near-duplicate pairs still at 1 and weasel-attribution
+file count still at 5, both unaffected by this fix.
+
 ---
 
 ## What changed since the first run
