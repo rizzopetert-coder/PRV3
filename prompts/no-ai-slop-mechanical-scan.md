@@ -46,44 +46,76 @@ entries, all 87 loaded successfully).
   something to chase — informational only, per the standing "not a required
   fix" framing for this metric.
 
-**Still open, unresolved by this batch:** a **4-file cluster** —
-`what-the-organization-decided-he-was-worth.md`,
+**Update (third run): the 4-file cluster is fixed, but not perfectly clean —
+two real residuals confirmed, one of them new.** All 4 files
+(`what-the-organization-decided-he-was-worth.md`,
 `the-resignation-that-ended-a-department.md`, `what-ready-didnt-include.md`,
-`the-first-one-out-the-door.md` — still shares the "Every organization has
-that window..." closing, 3 of the 4 pairs at 100%/67%/64% match. This is
-exactly the cluster `prompts/no-ai-slop-fix-tracking.md` already flagged as
-"three more likely affected" (plus `what-ready-didnt-include.md`, which
-turns out to already share the exact line too) — not new, but now the
-*only* remaining instance of this specific duplicate, since the other two
-case_pattern files that had it are fixed.
+`the-first-one-out-the-door.md`) now carry distinct, piece-specific
+closings and were verified byte-clean before applying (no mojibake, em-dash
+7/7/7/7 exactly as claimed). Total near-duplicate pairs corpus-wide: **8 →
+3.** But re-running the scan after applying surfaced two the individual
+diff-checks didn't catch:
+
+1. **`what-ready-didnt-include.md` still 62%-matches `one-exception-at-a-time.md`**
+   via the shared literal opening clause "Every organization has that
+   window." — `what-ready-didnt-include.md` kept this clause; the other 3
+   files in this round's fix dropped it entirely. This was flagged
+   *before* applying, not discovered after — a deliberate, known tradeoff,
+   not an oversight.
+2. **New finding, not caught before applying:** `the-first-one-out-the-door.md`
+   and `the-resignation-that-ended-a-department.md` now 65%-match *each
+   other* — not on the "Every organization has that window" clause (both
+   dropped it), but on the residual "...Most organizations spend it
+   [X]-ing..." grammatical template both endings still share. The two
+   were checked individually against live and against each other's
+   *content* (confirmed topically distinct — job posting vs. eleven years
+   of knowledge), but not run through this scan's own LCS check against
+   each other before applying, which is exactly what surfaced this.
+   Genuine miss, logged plainly rather than smoothed over.
+
+`built-for-comfort.md`/`one-exception-at-a-time.md`'s pre-existing 69% match
+(same "Every organization has that window" opening) is unchanged — already
+known, already accepted as-is from the earlier round, not new.
+
+**Net state:** the case_pattern content type's era of exact-duplicate
+closings (39 pairs, then 8) is functionally over — what remains is a
+smaller, shared *grammatical template* ("Every organization has that
+window..." / "...spend it [X]-ing...") across 3 residual pairs, not
+verbatim-identical sentences. Whether that remaining template-level
+similarity is worth a fourth pass is a real question for Pete, not
+something to resolve unilaterally here.
 
 ---
 
-## Current em-dash count > 8 — 37 of 87 files
+## Current em-dash count > 8 — 33 of 87 files
+
+Dropped from 37 to 33 with the Tier 1 cluster fix: `what-the-organization-decided-he-was-worth.md`
+(was 24), `the-resignation-that-ended-a-department.md` (was 19),
+`the-first-one-out-the-door.md` and `what-ready-didnt-include.md` (both
+were 14) all now sit at 7, under the cap.
 
 | file | em-dash count | file | em-dash count |
 |---|---|---|---|
-| candor-as-an-organizational-variable | 28 | accountability | 13 |
-| how-to-tell-if-the-organization-will-actually-change | 27 | groundhog-day | 13 |
-| psychological-safety-walked-into-a-meeting | 24 | the-overloaded-manager | 13 |
-| what-the-organization-decided-he-was-worth | 24 | the-paper-tiger | 13 |
-| earned-effectiveness | 23 | the-untouchable | 13 |
-| hr-is-the-table | 21 | succession-planning | 12 |
-| what-their-resistance-is-actually-telling-you | 21 | velocity-of-truth | 12 |
-| when-the-data-points-at-the-person-who-hired-you | 21 | why-your-team-stopped-disagreeing-with-you | 12 |
-| symptoms-states-and-why-the-distinction-matters | 20 | feedback-nobody-wants-to-say | 11 |
-| earned-effectiveness-conversation-framework | 19 | no-margin-for-error | 11 |
-| the-problem-they-brought-you-is-not-always-the-problem | 19 | the-tolerated-violation | 11 |
-| the-resignation-that-ended-a-department | 19 | dueling-narratives | 10 |
-| matrix-organization | 17 | intellectual-bottleneck | 10 |
-| leadership-deafness | 15 | narrative-lock | 10 |
-| the-policy-lag | 15 | crisis-as-catalyst-for-clarity | 9 |
-| the-unlocked-door | 15 | the-unformed-leader | 9 |
+| candor-as-an-organizational-variable | 28 | the-paper-tiger | 13 |
+| how-to-tell-if-the-organization-will-actually-change | 27 | the-untouchable | 13 |
+| psychological-safety-walked-into-a-meeting | 24 | succession-planning | 12 |
+| earned-effectiveness | 23 | velocity-of-truth | 12 |
+| hr-is-the-table | 21 | why-your-team-stopped-disagreeing-with-you | 12 |
+| what-their-resistance-is-actually-telling-you | 21 | feedback-nobody-wants-to-say | 11 |
+| when-the-data-points-at-the-person-who-hired-you | 21 | no-margin-for-error | 11 |
+| symptoms-states-and-why-the-distinction-matters | 20 | the-tolerated-violation | 11 |
+| earned-effectiveness-conversation-framework | 19 | dueling-narratives | 10 |
+| the-problem-they-brought-you-is-not-always-the-problem | 19 | intellectual-bottleneck | 10 |
+| matrix-organization | 17 | narrative-lock | 10 |
+| leadership-deafness | 15 | crisis-as-catalyst-for-clarity | 9 |
+| the-policy-lag | 15 | the-unformed-leader | 9 |
+| the-unlocked-door | 15 | | |
 | decision-paralysis | 14 | | |
-| the-first-one-out-the-door | 14 | | |
 | the-lost-map | 14 | | |
 | the-unreported-hazard | 14 | | |
-| what-ready-didnt-include | 14 | | |
+| accountability | 13 | | |
+| groundhog-day | 13 | | |
+| the-overloaded-manager | 13 | | |
 
 **Note on the signature-line exemption (MOB v4.183):** none of these 37
 files use the `"— Principal Resolution"` closer, so none of these counts
