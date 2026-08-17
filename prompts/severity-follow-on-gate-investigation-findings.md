@@ -218,6 +218,28 @@ this dimensional space (large numbers of states sharing identical or
 near-identical relevant-dimension profiles against a given accumulated
 vector), not a tuning problem solvable by picking a better number.
 
+**Distinct, worth-its-own-investigation hypothesis — do not flatten this into
+"the scores overlap."** "Close" and "exactly equal" are different findings
+with different causes, and the data here is the second one, not the first.
+5 of 6 sampled states weren't near-ties resolved to 4 decimal places by
+coincidence — they were bit-for-bit identical floating-point values shared
+across 3-7 states with no evident taxonomic relationship to each other
+(`the_suppression_filter`, `the_culture_that_wasnt`, `the_unreported_hazard`,
+and `the_unlocked_door` sharing an exact score with `narrative_lock` is not
+an obviously-related cluster). That specific shape — many states landing on
+the *same* value, not merely close values — is consistent with a structural
+cause in the SCD-WCS computation itself: quantization or rounding somewhere
+in the pipeline, a clamping step collapsing a range of inputs to one output,
+or degenerate cosine geometry once enough states' profile vectors project
+similarly against a given accumulated vector in this dimensional space. It is
+not, on its own, evidence that the taxonomy is simply "noisy" or that these
+states are conceptually close — that would predict *close* scores, not
+*identical* ones. This wasn't investigated further tonight (out of scope for
+a gate-design question), but it's a separate, real, mechanism-level question
+about the scoring math itself, not a restatement of the rank-spread finding
+above, and should be treated as its own line of inquiry rather than folded
+into "the primary-state/target-match distribution is wide."
+
 ---
 
 ## Connection to the existing primary-state/target-match finding
