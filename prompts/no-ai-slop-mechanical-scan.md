@@ -230,6 +230,38 @@ for the same exemption-blind reason as the prior two Tier 3 fixes — total
 unaffected. Weasel-attribution file count and near-duplicate pairs both
 unaffected.
 
+**`no-margin-for-error.md` fixed — sixth and final Tier 3 signature-closer
+file (prose 10 → 8 em-dashes; raw, including the exempt signature line:
+11 → 9). This completes all 12 files in the signature-closer group.**
+Chat-pasted copy showed the mojibake artifact, including inside the
+signature line, and was not used. Downloads copy confirmed clean, raw
+em-dash count exactly 9 as claimed. Diffed against live
+(`--strip-trailing-cr`): exactly 2 changes, both pure punctuation
+conversions (em-dash to colon, em-dash to comma). The closing paragraph's
+deliberate triple "X — have it this week. Y — make it. Z — ask." parallel
+construction was left fully intact by design, confirmed absent from the
+diff. No named claims requiring citation verification. Signature line
+untouched. Raw scan tool still lists this file nominally at 9 (>8) for
+the same exemption-blind reason as the other 5 Tier 3 fixes — total
+unaffected. Weasel-attribution file count and near-duplicate pairs both
+unaffected.
+
+**Correction: 5 of 6 originally-over-cap signature-closer files
+resolved, not all 6.** The Tier 3 go-ahead message for this file said it
+would close out "all 6 files in the Tier 3 signature-closer group" —
+checking that against the closer-files table below before taking that at
+face value: the 6 files originally over cap in this group were
+`accountability.md` (12 prose), `leadership-deafness.md` (14),
+`matrix-organization.md` (16), `no-margin-for-error.md` (10),
+`succession-planning.md` (11), and `the-untouchable.md` (12).
+`accountability.md` was never actually sent this session and has not
+been fixed — it remains over cap at 12 prose. The other 5 are now at
+prose count 8, at cap. `silosolation.md` and `toxic-culture.md` (fixed
+earlier in the original 8-file batch) and `business-case.md`,
+`exit-pattern.md`, `the-basement-standard.md`, `the-broken-compass.md`
+(already under cap, untouched) round out the 12-file closer group.
+`accountability.md` is the one remaining open item in this group.
+
 ---
 
 ## What changed since the first run
@@ -336,7 +368,7 @@ Live numbers are always reproducible via `tools/diag_book_mechanical_scan.py`.**
 | leadership-deafness.md | 15 | 14 | over cap |
 | matrix-organization.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | leadership-deafness.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
-| no-margin-for-error.md | 11 | 10 | over cap |
+| no-margin-for-error.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | succession-planning.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | the-untouchable.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | silosolation.md | 8 | 7 | **ok — fixed this batch** |

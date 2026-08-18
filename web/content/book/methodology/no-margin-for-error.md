@@ -28,7 +28,7 @@ And here's the brutal part: the people who could most help you fix this are ofte
 
 If you're the leader in this situation, you're probably experiencing a specific kind of loneliness.
 
-The board wants answers you don't have. Your team needs direction you're not sure you can give. The decisions in front of you are all bad — you're just trying to figure out which bad is least bad. Every conversation feels heavy. Every email could be the one that tips something over the edge.
+The board wants answers you don't have. Your team needs direction you're not sure you can give. The decisions in front of you are all bad: you're just trying to figure out which bad is least bad. Every conversation feels heavy. Every email could be the one that tips something over the edge.
 
 You might be sleeping okay, actually. Sometimes crisis clarifies things. Or you might be waking up at 3 a.m. running scenarios, wondering how you got here, wondering if there's something you're still not seeing.
 
@@ -72,7 +72,7 @@ When an organization is at Endemic severity, there are a lot of questions compet
 
 But there's one question underneath all of them.
 
-*Is every member of the leadership team aligned on the decision to bring outside involvement in — or is there someone who is privately opposed?*
+*Is every member of the leadership team aligned on the decision to bring outside involvement in, or is there someone who is privately opposed?*
 
 This matters because Endemic severity requires speed. It requires unity. It requires the ability to make hard calls without relitigating them in the hallway afterward. If someone on the team is quietly undermining the effort — protecting themselves, protecting someone who should have been addressed long ago, waiting to see which way things break — you're not going to move fast enough. The window will close while you're still arguing about whether it's open.
 
