@@ -105,6 +105,28 @@ same-sentence parenthetical year), not a new finding. Em-dash-over-cap
 count: 27 → 26. Re-run confirms near-duplicate pairs still at 1 and
 weasel-attribution file count still at 5.
 
+**`symptoms-states-and-why-the-distinction-matters.md` fixed (20 → 8
+em-dashes).** Same mojibake pattern again in the chat-pasted copy, not
+trusted or used. The separately-delivered Downloads copy was confirmed
+clean before writing: zero mojibake, em-dash count exactly 8. The live
+file is CRLF and the Downloads file is LF, which made the raw diff look
+like a full rewrite; re-diffed with `--strip-trailing-cr` to confirm the
+real content changes are all pure punctuation conversions (em-dash to
+colon or comma), no wording changes. CRLF preserved on write (Windows
+Python's `write_text` translates `\n` to the platform line separator by
+default, matching every prior fix in this batch).
+
+**Flagged, not fixed: stale state count.** The piece states "Principal
+Resolution has identified fifty-seven institutional states." Confirmed
+against the live MOB (`tools/_mob.txt`, `the_inner_circle` taxonomy
+expansion row): the locked engine state count is 58, with
+`the_inner_circle` added as the 58th state. "Fifty-seven" is a stale
+pre-expansion figure. Left untouched in this pass per instruction, held
+for Pete's call as a separate, deliberate correction, not folded into
+the em-dash cleanup. Em-dash-over-cap count: 26 → 25. Re-run confirms
+near-duplicate pairs still at 1 and weasel-attribution file count still
+at 5.
+
 ---
 
 ## What changed since the first run
