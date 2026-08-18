@@ -20,7 +20,7 @@ And there's something psychologically weird about succession planning. It requir
 
 So the list gets made once. It goes in a folder. Once a year, maybe, someone asks about it. The names get shuffled around a little. Everyone feels responsible without anyone actually being accountable for whether the plan is real.
 
-Then someone important leaves — gets sick, gets recruited, burns out, retires, dies (it happens) — and suddenly the thing that was never urgent is the only thing that matters.
+Then someone important leaves, gets sick, gets recruited, burns out, retires, dies (it happens), and suddenly the thing that was never urgent is the only thing that matters.
 
 ---
 
@@ -88,7 +88,7 @@ When we work with an organization on succession planning, we don't start with th
 
 *If your most critical person left tomorrow, what specifically would you do on day one?*
 
-The specificity matters. Not "we'd figure it out" — what would you actually do? Who would you call? What decisions would need to be made? What would you tell the team?
+The specificity matters. Not "we'd figure it out": what would you actually do? Who would you call? What decisions would need to be made? What would you tell the team?
 
 If the answer is clear and actionable, you're in better shape than most. If the answer is vague or panicked, that's information about where the work needs to happen.
 

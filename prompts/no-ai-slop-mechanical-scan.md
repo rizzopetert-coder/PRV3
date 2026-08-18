@@ -216,6 +216,20 @@ signature exemption — total unaffected, same reason as
 `matrix-organization.md`. Weasel-attribution file count and near-
 duplicate pairs both unaffected.
 
+**`succession-planning.md` fixed — fourth Tier 3 signature-closer file
+(prose 11 → 8 em-dashes; raw, including the exempt signature line: 12 →
+9).** Chat-pasted copy showed the mojibake artifact, including inside the
+signature line, and was not used. Downloads copy confirmed clean, raw
+em-dash count exactly 9 as claimed. Diffed against live
+(`--strip-trailing-cr`): exactly 2 changes, one paired-dash aside
+converted to commas and one single dash converted to a colon; the other
+4 paired-dash asides in the file were left intact, no wording changes. No
+named claims in this file requiring citation verification. Signature
+line untouched. Raw scan tool still lists this file nominally at 9 (>8)
+for the same exemption-blind reason as the prior two Tier 3 fixes — total
+unaffected. Weasel-attribution file count and near-duplicate pairs both
+unaffected.
+
 ---
 
 ## What changed since the first run
@@ -323,7 +337,7 @@ Live numbers are always reproducible via `tools/diag_book_mechanical_scan.py`.**
 | matrix-organization.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | leadership-deafness.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | no-margin-for-error.md | 11 | 10 | over cap |
-| succession-planning.md | 12 | 11 | over cap |
+| succession-planning.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | the-untouchable.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | silosolation.md | 8 | 7 | **ok — fixed this batch** |
 | toxic-culture.md | 8 | 7 | **ok — fixed this batch** |
