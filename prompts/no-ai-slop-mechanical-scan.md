@@ -177,6 +177,32 @@ this file's actual prose count is 8, at cap, not over — see the updated
 closer-files table below. Near-duplicate pairs and weasel-attribution
 file count both still unaffected.
 
+**`leadership-deafness.md` fixed — second Tier 3 signature-closer file
+(prose 13 → 8 em-dashes; raw, including the exempt signature line: 14 →
+9), plus its one weasel-attribution hit's underlying citation problem
+resolved.** Chat-pasted copy showed the mojibake artifact, including
+inside the signature line, and was not used. Downloads copy confirmed
+clean, raw em-dash count exactly 9 as claimed. The citation fix was
+independently verified before applying, not just taken on claim: the
+live text's "The research on this is brutal ... it literally changes
+your brain" overclaimed Keltner's actual research, which is behavioral
+(facial-expression matching, empathy/perspective-taking tasks) — confirmed
+via WebSearch against *The Power Paradox*'s actual findings. The
+neural/mirror-neuron TMS evidence belongs to a separate study (Obhi,
+McMaster University), also confirmed real via WebSearch and never
+Keltner's own work. Same overclaim pattern already corrected elsewhere in
+the corpus as `HC-103` (confirmed present in `book-citations.ts`, no new
+citation entry needed). Fixed to "is consistent ... makes you worse at
+reading other people," with "spent decades" corrected to "spent over two
+decades," matching Keltner's actual ~20+ year research span. All other
+diff hunks are pure em-dash-to-comma conversions, signature line
+untouched. The mechanical scan's weasel-attribution hit on this file
+persists after the fix ("The research on this is consistent" has no
+same-sentence name) — this is the same established shape-only false
+positive as the other 4 files on this list; Keltner is named in the very
+next sentence. Weasel-attribution file count and near-duplicate pairs
+both unaffected.
+
 ---
 
 ## What changed since the first run
@@ -282,6 +308,7 @@ Live numbers are always reproducible via `tools/diag_book_mechanical_scan.py`.**
 | accountability.md | 13 | 12 | over cap |
 | leadership-deafness.md | 15 | 14 | over cap |
 | matrix-organization.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
+| leadership-deafness.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | no-margin-for-error.md | 11 | 10 | over cap |
 | succession-planning.md | 12 | 11 | over cap |
 | the-untouchable.md | 13 | 12 | over cap |

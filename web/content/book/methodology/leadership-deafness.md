@@ -16,7 +16,7 @@ Usually it's a gradual drift. You get promoted. You get more authority. People s
 
 It's not that people are lying to you. It's that they're editing. They're reading the room before they speak. They're calibrating their feedback to what they think you can hear rather than what you need to hear. And because you're human, you take the edited version as the real version. Why wouldn't you? It's all you're getting.
 
-The research on this is brutal. Dacher Keltner at Berkeley has spent decades studying what power does to people. The short version: it literally changes your brain. You become less accurate at reading emotions. Less likely to take other perspectives. More likely to interrupt, to take credit, to assume your experience is universal. The traits that got you here start working against you — and you're the last person to notice.
+The research on this is consistent. Dacher Keltner at Berkeley has spent over two decades studying what power does to people. The short version: it makes you worse at reading other people. You become less accurate at reading emotions. Less likely to take other perspectives. More likely to interrupt, to take credit, to assume your experience is universal. The traits that got you here start working against you, and you're the last person to notice.
 
 By the time the gap between self-perception and reality is wide enough to matter, it's often too late to close it with normal feedback. The channels are broken. The people who could tell you the truth have either left, checked out, or learned to perform agreement while privately planning their exit.
 
@@ -26,9 +26,9 @@ By the time the gap between self-perception and reality is wide enough to matter
 
 If you work for someone with a cracked mirror, you already know what I'm about to describe.
 
-The meeting where they ask for feedback and then make it subtly clear that disagreement is unwelcome. The look on their face when someone pushes back — that flash of something before the professional mask comes back on. The pattern where every postmortem somehow concludes that the problem was execution, not direction. The way new ideas only gain traction when they can be reframed as the leader's idea.
+The meeting where they ask for feedback and then make it subtly clear that disagreement is unwelcome. The look on their face when someone pushes back, that flash of something before the professional mask comes back on. The pattern where every postmortem somehow concludes that the problem was execution, not direction. The way new ideas only gain traction when they can be reframed as the leader's idea.
 
-You've learned to manage up. You've learned to present information in the specific way that doesn't trigger defensiveness. You've learned the things you can say and the things you can't. You've gotten good at it, actually — so good that sometimes you forget you're doing it.
+You've learned to manage up. You've learned to present information in the specific way that doesn't trigger defensiveness. You've learned the things you can say and the things you can't. You've gotten good at it, actually, so good that sometimes you forget you're doing it.
 
 And there's a cost to that. Not just the time it takes, but the cognitive load. The part of your brain that's always running the "how will this land" calculation. The energy you're spending on navigation that could be going to actual work. The slow, grinding realization that you're becoming someone who manages around the truth instead of telling it.
 
@@ -52,7 +52,7 @@ The problem isn't the tool. The problem is that the conditions for hearing hard 
 
 ## What Actually Gets Through
 
-If you're a leader reading this and feeling that uncomfortable prickle of recognition — first of all, good. That's the right response. Most people who have this problem would never click on something called "Leadership Deafness." The fact that you're here suggests you might actually be ready to look.
+If you're a leader reading this and feeling that uncomfortable prickle of recognition, first of all, good. That's the right response. Most people who have this problem would never click on something called "Leadership Deafness." The fact that you're here suggests you might actually be ready to look.
 
 The thing that closes the gap isn't a feedback process. It's a relationship.
 
@@ -70,11 +70,11 @@ When we're working with an organization where leadership self-perception has bec
 
 *When was the last time someone told this leader something they didn't want to hear, and what happened next?*
 
-The answer tells you everything. If the answer is recent and it went okay, the mirror might not be as cracked as it looks. If the answer is vague, or involves a departure, or comes with a lot of throat-clearing about "it's complicated" — you've found the problem.
+The answer tells you everything. If the answer is recent and it went okay, the mirror might not be as cracked as it looks. If the answer is vague, or involves a departure, or comes with a lot of throat-clearing about "it's complicated," you've found the problem.
 
 From there, the work is about creating the conditions for honest feedback to get through. External reference points. Structured relationships. Information that routes around the broken channels.
 
-It's fixable. It's almost always fixable. But it requires the leader to want to see clearly — and to accept that wanting isn't enough. You need a system. You need someone who can show you what you can't see on your own.
+It's fixable. It's almost always fixable. But it requires the leader to want to see clearly, and to accept that wanting isn't enough. You need a system. You need someone who can show you what you can't see on your own.
 
 If you're ready to build that, we should talk.
 
