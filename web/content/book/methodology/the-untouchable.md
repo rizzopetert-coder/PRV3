@@ -1,6 +1,6 @@
 You know exactly who it is. You knew before you finished reading the title.
 
-Maybe it's the VP who's been here since the Series A and hasn't shipped anything useful in three years but still gets cc'd on everything because nobody wants to be the one to say it out loud. Maybe it's the founder's first hire — the one who was critical when there were twelve people and is now actively slowing down an organization of two hundred, but has so much institutional context that everyone's convinced the place would fall apart without them. Maybe it's just someone who's really, really good at managing up while being a nightmare to manage around.
+Maybe it's the VP who's been here since the Series A and hasn't shipped anything useful in three years but still gets cc'd on everything because nobody wants to be the one to say it out loud. Maybe it's the founder's first hire: the one who was critical when there were twelve people and is now actively slowing down an organization of two hundred, but has so much institutional context that everyone's convinced the place would fall apart without them. Maybe it's just someone who's really, really good at managing up while being a nightmare to manage around.
 
 Whoever it is, you've done the math. You've calculated the hours your team spends routing around this person. You've watched good people leave rather than deal with them for another quarter. You've sat in meetings where everyone dances around the obvious because the obvious is sitting right there, nodding along, utterly unaware that they're the subject of every hallway conversation that happens after.
 
@@ -14,7 +14,7 @@ That calculation is almost always wrong. But it can take years for the cost to b
 
 The Untouchables aren't born. They're made. And they're made by the organization, not by the person.
 
-It usually starts with leverage. Real leverage, at first — they knew the system, they had the relationships, they were there when the company almost died and they helped save it. That history creates a debt. The debt creates deference. The deference creates immunity. And once immunity is established, it's self-reinforcing. The longer someone goes without facing consequences, the harder it becomes to imagine them ever facing consequences.
+It usually starts with leverage. Real leverage, at first: they knew the system, they had the relationships, they were there when the company almost died and they helped save it. That history creates a debt. The debt creates deference. The deference creates immunity. And once immunity is established, it's self-reinforcing. The longer someone goes without facing consequences, the harder it becomes to imagine them ever facing consequences.
 
 Sometimes the leverage is technical. They're the only person who understands the legacy architecture. They wrote the code that runs the billing system. If they leave, nobody knows what breaks. The organization has made itself hostage to a single person's institutional knowledge, and now it's stuck.
 
@@ -34,7 +34,7 @@ Let's talk about what this is actually costing you. Not in theory. In practice.
 
 **The credibility bleed.** Every time leadership says "we have high standards" and then visibly exempts someone from those standards, the words mean less. Your culture isn't what you say it is. It's what you tolerate. And right now, you're tolerating something that everyone can see. The gap between the stated values and the lived reality is the gap where cynicism grows.
 
-**The departure pattern.** You're losing people. Maybe not dramatically — no one's storming out — but steadily. And if you looked closely at who's leaving, you'd notice they're disproportionately the ones who had to work most closely with the protected person. The exit interviews say "better opportunity." The real story is that they got tired of watching nothing change.
+**The departure pattern.** You're losing people. Maybe not dramatically, no one's storming out, but steadily. And if you looked closely at who's leaving, you'd notice they're disproportionately the ones who had to work most closely with the protected person. The exit interviews say "better opportunity." The real story is that they got tired of watching nothing change.
 
 **The drag on everyone else.** The people who stay are adjusting their expectations. They're learning that this is a place where certain things don't get addressed. That realization changes how they show up. It's not that they stop caring. It's that they start conserving their energy for battles they might actually win.
 
