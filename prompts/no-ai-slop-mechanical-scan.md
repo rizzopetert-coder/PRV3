@@ -150,6 +150,16 @@ the single word swap, nothing else touched. Em-dash count unaffected
 (still 8) — no change to the em-dash-over-cap total or any other
 mechanical-scan metric.
 
+**`the-problem-they-brought-you-is-not-always-the-problem.md` fixed
+(19 → 8 em-dashes).** Same mojibake pattern again in the chat-pasted
+copy, not trusted or used. The separately-delivered Downloads copy was
+confirmed clean before writing: zero mojibake, em-dash count exactly 8.
+Diffed against live (`--strip-trailing-cr`): every change is a pure
+punctuation conversion (mostly em-dash to colon, one to a period break),
+no wording or content changes anywhere. Em-dash-over-cap count: 24 → 23.
+Re-run confirms near-duplicate pairs still at 1 and weasel-attribution
+file count still at 5.
+
 ---
 
 ## What changed since the first run
