@@ -92,6 +92,19 @@ weasel-attribution claims in this file. Em-dash-over-cap count: 28 → 27.
 Re-run confirms near-duplicate pairs still at 1 and weasel-attribution
 file count still at 5, both unaffected by this fix.
 
+**`when-the-data-points-at-the-person-who-hired-you.md` fixed (21 → 8
+em-dashes).** Same mojibake pattern again in the chat-pasted copy, again
+not trusted or used. The separately-delivered Downloads copy was
+confirmed clean before writing: zero mojibake, em-dash count exactly 8.
+Diffed line-by-line against live: every change is a pure punctuation
+conversion (em-dash to comma or colon), no wording or content changed
+anywhere. Both Amy Edmondson references are left untouched by the fix;
+this file's one weasel-attribution hit on the first reference remains
+the already-established false positive (real named source, no
+same-sentence parenthetical year), not a new finding. Em-dash-over-cap
+count: 27 → 26. Re-run confirms near-duplicate pairs still at 1 and
+weasel-attribution file count still at 5.
+
 ---
 
 ## What changed since the first run
