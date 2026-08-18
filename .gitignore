@@ -12,3 +12,10 @@ tools/notebooklm_staging/
 .env*
 
 .claude/settings.local.json
+
+# Local MemPalace/MCP tool state -- machine-specific (hardcodes local Python
+# install path and local palace path), not project source. Flagged during
+# 2026-08-18 untracked-file-pile inventory.
+.mcp.json
+entities.json
+mempalace.yaml
