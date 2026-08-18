@@ -2,7 +2,7 @@ There is a leadership profile that appears in high-performing organizations with
 
 And then, at a certain point, the organization stops growing faster than they can think.
 
-The ceiling is not imposed on them. They are the ceiling. Every significant decision routes through a single mind. The leadership team has learned, with varying degrees of resignation, that their primary function is to advise and execute on decisions that have already effectively been made. The good ones find roles adjacent to the real work. The ones who could have grown into genuine leadership leave — because what they were hired to do is not what the environment will allow.
+The ceiling is not imposed on them. They are the ceiling. Every significant decision routes through a single mind. The leadership team has learned, with varying degrees of resignation, that their primary function is to advise and execute on decisions that have already effectively been made. The good ones find roles adjacent to the real work. The ones who could have grown into genuine leadership leave, because what they were hired to do is not what the environment will allow.
 
 ---
 
@@ -30,7 +30,7 @@ Those are different jobs. The first rewards certainty, speed, and confidence to 
 
 The test of whether the transition is happening is not what the leader says about their openness to challenge. It is what they do when challenge arrives.
 
-The room is watching. Not abstractly — they are watching specific moments, specific decisions, specific incidents where someone brought an alternative view and the leader had to decide what to do with it. The evidence from those moments is the curriculum the team is learning from. It tells them whether the organization is one where genuine thinking is welcome, or one where genuine thinking is welcome in theory and processed out of the conversation in practice.
+The room is watching. Not abstractly, they are watching specific moments, specific decisions, specific incidents where someone brought an alternative view and the leader had to decide what to do with it. The evidence from those moments is the curriculum the team is learning from. It tells them whether the organization is one where genuine thinking is welcome, or one where genuine thinking is welcome in theory and processed out of the conversation in practice.
 
 Leaders who have made the transition are easier to read. Their response to challenge is consistent, and the consistency is what makes the environment safe. The team doesn't have to calculate risk every time they bring something difficult. They have watched enough times to know what happens.
 

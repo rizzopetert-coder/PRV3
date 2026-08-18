@@ -274,6 +274,22 @@ count 8, at cap. `business-case.md`, `exit-pattern.md`,
 `the-basement-standard.md`, and `the-broken-compass.md` were already
 under cap and untouched. This closes out the Tier 3 queue in full.
 
+**`intellectual-bottleneck.md` fixed — first Tier 4 file (10 → 8
+em-dashes).** Chat-pasted copy showed the mojibake artifact, not used.
+Downloads copy confirmed clean, em-dash count exactly 8. Before touching
+anything, checked a flagged concern that this file's source might live
+at a stale PRV2 path (`src/content/library/memo/...`) that never
+migrated into the live corpus: that path doesn't exist anywhere in this
+repo, and this file is confirmed present, published, and the only copy
+(`web/content/book/memo/intellectual-bottleneck.md`, `LIB-049` in
+`book-manifest.ts`) — no location ambiguity. The Keltner/power-cognition
+claim already matched the corrected `HC-103` wording, so no citation fix
+was needed here. Diffed against live (`--strip-trailing-cr`): exactly 2
+pure em-dash-to-comma conversions, no wording changes. Em-dash-over-cap
+count: 23 → 22. This file's existing weasel-attribution hit is unchanged
+(the flagged sentence itself wasn't touched) — file count remains 5.
+Near-duplicate pairs unaffected.
+
 ---
 
 ## What changed since the first run
