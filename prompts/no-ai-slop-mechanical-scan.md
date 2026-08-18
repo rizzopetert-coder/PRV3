@@ -127,6 +127,19 @@ the em-dash cleanup. Em-dash-over-cap count: 26 → 25. Re-run confirms
 near-duplicate pairs still at 1 and weasel-attribution file count still
 at 5.
 
+**`earned-effectiveness-conversation-framework.md` fixed (19 → 8
+em-dashes).** Same mojibake pattern again in the chat-pasted copy, not
+trusted or used. The separately-delivered Downloads copy was confirmed
+clean before writing: zero mojibake, em-dash count exactly 8. Diffed
+against live (`--strip-trailing-cr`, live CRLF vs. source LF): one change
+was caught that was not a pure punctuation conversion and not disclosed
+as part of the fix -- the section heading "Why the sequence gets
+shortcut — and what it costs" (sentence case, matching the file's other
+three headings) became "Why the Sequence Gets Shortcut: What It Costs"
+(title case). Flagged to Pete before applying; confirmed apply-as-
+delivered. Em-dash-over-cap count: 25 → 24. Re-run confirms near-
+duplicate pairs still at 1 and weasel-attribution file count still at 5.
+
 ---
 
 ## What changed since the first run
