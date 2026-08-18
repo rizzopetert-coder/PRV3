@@ -1,6 +1,6 @@
 # The Tolerated Violation
 
-There's a practice that people know is wrong. Not unclear or debatable — known, ubiquitous. It's been known long enough that it is now a shoulder shrug. Just another fact about how things operate that everyone's aware of and nobody discusses very long.
+There's a practice that people know is wrong. Not unclear or debatable: known, ubiquitous. It's been known long enough that it is now a shoulder shrug. Just another fact about how things operate that everyone's aware of and nobody discusses very long.
 
 It continues because the person at the center of it is protected or privileged, and because somewhere along the way it was calculated that the risk of letting it continue was smaller than the discomfort of confronting it. That calculation gets harder to defend with every additional day, but nobody revisits it.
 
@@ -8,7 +8,7 @@ The family business version of this is common enough to be almost a category. Th
 
 That pattern isn't unique to family businesses. It shows up wherever a person's removal would cost the decision-maker something personal — a relationship, a narrative about a hire they championed, a revenue line they're not sure can survive the transition. The specific protection varies. The structure is always the same.
 
-What's missing isn't awareness. It's a mechanism that revisits that decision to tolerate. It was made once, under specific circumstances, and then persisted by default — because nobody owns the job of asking whether it still makes sense.
+What's missing isn't awareness. It's a mechanism that revisits that decision to tolerate. It was made once, under specific circumstances, and then persisted by default, because nobody owns the job of asking whether it still makes sense.
 
 ---
 
@@ -30,7 +30,7 @@ The cost that compounds faster is credibility. Every day the violation continues
 
 ## How You'd Recognize One
 
-**Multiple people, independently, can describe the same known issue.** Not a single complaint. Broadly known — which means the toleration is also broadly visible.
+**Multiple people, independently, can describe the same known issue.** Not a single complaint. Broadly known, which means the toleration is also broadly visible.
 
 **The person at the center has a nameable form of protection.** Seniority, a personal relationship with leadership, revenue that makes confrontation feel costly. People can usually say exactly what it is.
 
