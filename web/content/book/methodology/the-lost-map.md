@@ -14,7 +14,7 @@ The Lost Map is the diagnostic equivalent of "it's too early to tell." The signa
 
 That's frustrating. You wanted an answer. You wanted to read a page that said "this is your problem and here's what you do about it." Instead, you're getting "there's probably a problem and we don't know what it is yet."
 
-Stay with that discomfort for a second. Because the fact that you're sensing something while the pattern is still forming — that's actually the most valuable moment to be paying attention.
+Stay with that discomfort for a second. Because the fact that you're sensing something while the pattern is still forming, that's actually the most valuable moment to be paying attention.
 
 Most organizations don't catch friction early. By the time they notice, the problem has compounded enough to be obvious and painful enough to be expensive. The decision-making paralysis has already set in. The talent has already started leaving. The system has already fossilized. Getting in front of that — seeing the shape before it fully forms — is rare.
 
@@ -32,7 +32,7 @@ The Lost Map hasn't declared itself yet. The signals are subtler.
 
 Maybe decision-making is slower than it should be, but not paralyzed. Maybe the org chart has some tension, but people are still working through it. Maybe there's been some turnover, but nothing that looks like a pattern from the outside. Everything is technically functional. Everything is also slightly harder than it should be.
 
-The temptation is to dismiss that. "We're fine. Nothing's broken." And right now, that might be true. But the trajectory matters. The question isn't whether you're in crisis — you're not. The question is whether the subtle friction you're sensing is the early stage of something that will become a crisis if it compounds.
+The temptation is to dismiss that. "We're fine. Nothing's broken." And right now, that might be true. But the trajectory matters. The question isn't whether you're in crisis: you're not. The question is whether the subtle friction you're sensing is the early stage of something that will become a crisis if it compounds.
 
 ---
 
@@ -40,9 +40,9 @@ The temptation is to dismiss that. "We're fine. Nothing's broken." And right now
 
 People don't Google organizational dysfunction when things are great.
 
-Something made you curious enough to look. Maybe someone said something that stuck with you. Maybe you had a moment of pattern recognition — the sense that this specific frustration has happened before, in a different organization, and you remember how that story ended. Maybe you're just the kind of leader who pays attention to ambient signals and something in the ambient signal has shifted.
+Something made you curious enough to look. Maybe someone said something that stuck with you. Maybe you had a moment of pattern recognition: the sense that this specific frustration has happened before, in a different organization, and you remember how that story ended. Maybe you're just the kind of leader who pays attention to ambient signals and something in the ambient signal has shifted.
 
-Trust that instinct. Dismiss the details if you need to — "I'm probably overthinking it" — but don't dismiss the underlying attention. The fact that you're looking is data.
+Trust that instinct. Dismiss the details if you need to, "I'm probably overthinking it," but don't dismiss the underlying attention. The fact that you're looking is data.
 
 The people who catch organizational problems early are usually the ones who don't require the problem to be fully visible before they're willing to see it. They trust the subtle signals. They investigate before the investigation becomes urgent.
 
@@ -56,7 +56,7 @@ The Lost Map is not a failure of diagnosis. It's the honest acknowledgment of di
 
 Some organizational patterns are visible because they've matured. They have symptoms. Evidence. A clear trajectory. You can name them because they've named themselves.
 
-Other situations haven't reached that point. The signals are present but ambiguous. The friction is real but diffuse. The pattern hasn't taken shape yet — or the pattern that's forming isn't one that maps neatly to an existing framework.
+Other situations haven't reached that point. The signals are present but ambiguous. The friction is real but diffuse. The pattern hasn't taken shape yet, or the pattern that's forming isn't one that maps neatly to an existing framework.
 
 That's not the same as "nothing's wrong." And it's not the same as "you're imagining things." It's the space between. Something is there. We can't tell you what it is yet because it hasn't finished becoming itself.
 
