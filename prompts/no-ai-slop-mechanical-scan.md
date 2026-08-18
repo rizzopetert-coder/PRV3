@@ -81,6 +81,17 @@ No weasel-attribution claims in this file. Em-dash-over-cap count: 29 →
 28. Re-run confirms near-duplicate pairs still at 1 and weasel-attribution
 file count still at 5, both unaffected by this fix.
 
+**`what-their-resistance-is-actually-telling-you.md` fixed (21 → 8
+em-dashes).** This file's chat-pasted copy showed the recurring mojibake
+artifact (stray "â" characters in place of em-dashes) and was not trusted
+or used. The separately-delivered Downloads copy was confirmed clean
+before writing: zero mojibake, em-dash count exactly 8. Diffed
+line-by-line against live: every change is a pure punctuation conversion
+(em-dash to comma or colon), no wording or content changed anywhere. No
+weasel-attribution claims in this file. Em-dash-over-cap count: 28 → 27.
+Re-run confirms near-duplicate pairs still at 1 and weasel-attribution
+file count still at 5, both unaffected by this fix.
+
 ---
 
 ## What changed since the first run
