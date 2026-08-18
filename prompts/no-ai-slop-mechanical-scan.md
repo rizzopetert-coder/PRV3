@@ -140,6 +140,16 @@ three headings) became "Why the Sequence Gets Shortcut: What It Costs"
 delivered. Em-dash-over-cap count: 25 → 24. Re-run confirms near-
 duplicate pairs still at 1 and weasel-attribution file count still at 5.
 
+**`symptoms-states-and-why-the-distinction-matters.md` — "fifty-seven" →
+"fifty-eight" correction applied on top of the em-dash fix (73c577e).**
+Supersedes only the state-count figure flagged in that fix, per Pete's
+confirmation against the live MOB. Chat-pasted copy again showed the
+mojibake artifact and was not used; Downloads copy confirmed clean,
+diffed against the currently-live file, and the only change present was
+the single word swap, nothing else touched. Em-dash count unaffected
+(still 8) — no change to the em-dash-over-cap total or any other
+mechanical-scan metric.
+
 ---
 
 ## What changed since the first run

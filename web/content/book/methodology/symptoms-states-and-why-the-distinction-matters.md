@@ -6,7 +6,7 @@ The instrument does not diagnose symptoms. It diagnoses states.
 
 This distinction is not semantic. It is the methodological foundation on which everything else depends. A symptom is what the organization experiences. A state is the pattern that produces it. Treating the symptom without identifying the state is like treating a fever without asking what is causing it: you can reduce the temperature, but you have not addressed the condition, and the temperature will return.
 
-Principal Resolution has identified fifty-seven institutional states: recurring organizational friction patterns with known causes, known cost trajectories, and known resolution requirements. The states are not categories for sorting organizations into buckets. They are diagnostic conclusions about the mechanism generating the friction, which is the only basis on which intervention can be designed that actually resolves rather than merely manages.
+Principal Resolution has identified fifty-eight institutional states: recurring organizational friction patterns with known causes, known cost trajectories, and known resolution requirements. The states are not categories for sorting organizations into buckets. They are diagnostic conclusions about the mechanism generating the friction, which is the only basis on which intervention can be designed that actually resolves rather than merely manages.
 
 ---
 
