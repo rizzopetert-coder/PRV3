@@ -8,7 +8,7 @@ That last detail is the one that matters. Not poor, not strong, fine. A rating t
 
 ## The File Isn't Lying. It's Just Incomplete in One Direction
 
-The instinct is to assume someone is being dishonest — falsifying reviews, covering for a friend, protecting themselves from a difficult conversation. That's sometimes part of it, but the more common mechanism is smaller and more forgivable than outright dishonesty.
+The instinct is to assume someone is being dishonest: falsifying reviews, covering for a friend, protecting themselves from a difficult conversation. That's sometimes part of it, but the more common mechanism is smaller and more forgivable than outright dishonesty.
 
 Each individual review gets written under real pressure to avoid conflict, document fairly, and not torpedo someone's career over what might be a bad stretch. Taken one at a time, every soft rating has a defensible reason. Taken together, across enough cycles, they've built a file that bears no resemblance to the pattern everyone around the situation can describe in detail. Nobody decided to create a fictional record. They each decided, individually and repeatedly, that this particular review wasn't the moment to be the one who said it plainly.
 
@@ -22,9 +22,9 @@ This is one of the few conditions in the diagnostic that doesn't consider a seve
 
 ## What Happens When the Moment to Act Finally Arrives
 
-Eventually something forces the question — a project failure, a complaint, a new manager inheriting the file fresh. Whoever has to act discovers the actual problem isn't the underperformance itself. It's that the documented record provides no support for acting on it.
+Eventually something forces the question: a project failure, a complaint, a new manager inheriting the file fresh. Whoever has to act discovers the actual problem isn't the underperformance itself. It's that the documented record provides no support for acting on it.
 
-A termination or serious intervention built on a file full of fine reviews carries significantly elevated risk of looking unsupported, discriminatory, or retaliatory — regardless of how accurate the private consensus is. The organization is left choosing between two bad options: building a paper trail from scratch under time pressure, which is never smart, or acting without one and either absorbing the legal exposure or paying unnecessary sums in exchange for a release of claims. Either path costs more and moves slower than it would have if any single review — or any document, for that matter — along the way had simply said what everyone already believed.
+A termination or serious intervention built on a file full of fine reviews carries significantly elevated risk of looking unsupported, discriminatory, or retaliatory, regardless of how accurate the private consensus is. The organization is left choosing between two bad options: building a paper trail from scratch under time pressure, which is never smart, or acting without one and either absorbing the legal exposure or paying unnecessary sums in exchange for a release of claims. Either path costs more and moves slower than it would have if any single review — or any document, for that matter — along the way had simply said what everyone already believed.
 
 ---
 
@@ -34,7 +34,7 @@ A termination or serious intervention built on a file full of fine reviews carri
 
 **Soft ratings have accumulated specifically to avoid confrontation, not because performance was genuinely adequate.** The manager writing them can usually tell you this directly, if asked privately and without judgment.
 
-**Nobody can point to when the gap started, only that everyone's known for a while.** Like several conditions in this taxonomy, there's rarely a clean origin point — just an accumulation that became impossible to ignore at some point nobody marked.
+**Nobody can point to when the gap started, only that everyone's known for a while.** Like several conditions in this taxonomy, there's rarely a clean origin point: just an accumulation that became impossible to ignore at some point nobody marked.
 
 ---
 
@@ -48,7 +48,7 @@ What's actually needed is a deliberate reconciliation: an honest accounting of t
 
 ## Where to Start
 
-The conversation with the manager is the starting point — not as blame, but as the accurate source of information the file is missing. From there, the path is three steps.
+The conversation with the manager is the starting point, not as blame, but as the accurate source of information the file is missing. From there, the path is three steps.
 
 **Step one: document what's actually true, now.** The manager writes a contemporaneous account of the specific performance concerns — behaviors observed, patterns noted, conversations that happened informally — with dates attached wherever possible. This isn't a formal performance improvement plan yet. It's an honest written record of what has been true and for how long, signed and dated now, before anything else moves.
 

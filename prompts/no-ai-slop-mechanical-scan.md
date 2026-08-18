@@ -318,6 +318,19 @@ anywhere. No named claims in any of the three requiring citation
 verification. Em-dash-over-cap count: 19 → 16. Near-duplicate pairs and
 weasel-attribution file count both unaffected.
 
+**Three more files fixed in one batch, continuing worst-first:
+`the-overloaded-manager.md` (13 → 8), `the-paper-tiger.md` (13 → 8),
+`velocity-of-truth.md` (12 → 8).** None use the signature closer.
+Chat-pasted copies of all three showed the mojibake artifact and were
+not used; delivered instead as a zip to Downloads
+(`C:\Users\rizzo\Downloads\files111\`), all three confirmed clean,
+em-dash count exactly 8 in each. Diffed against live for all three
+(`--strip-trailing-cr`): 5, 5, and 4 changes respectively, all pure
+punctuation conversions (em-dash to colon or comma), no wording changes
+anywhere. No named claims in any of the three requiring citation
+verification. Em-dash-over-cap count: 16 → 13. Near-duplicate pairs and
+weasel-attribution file count both unaffected.
+
 ---
 
 ## What changed since the first run
