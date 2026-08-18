@@ -160,6 +160,23 @@ no wording or content changes anywhere. Em-dash-over-cap count: 24 → 23.
 Re-run confirms near-duplicate pairs still at 1 and weasel-attribution
 file count still at 5.
 
+**`matrix-organization.md` fixed — first of the Tier 3 signature-closer
+group (prose 16 → 8 em-dashes; raw, including the exempt
+`"— Principal Resolution"` line: 17 → 9).** Chat-pasted copy showed the
+mojibake artifact including inside the signature line itself, not
+trusted or used. Downloads copy confirmed clean: zero mojibake, raw
+em-dash count exactly 9 as claimed (8 prose + 1 exempt signature line,
+per the MOB v4.183 exemption). Diffed against live
+(`--strip-trailing-cr`): every change is a pure punctuation conversion
+(em-dash to colon, comma, or period break), signature line untouched, no
+wording or content changes anywhere. The mechanical scan tool itself
+doesn't apply the signature exemption, so it still nominally lists this
+file at raw count 9 (>8) — the corpus-wide "over cap" total (23) is
+unaffected by this fix for that reason, but per the locked exemption
+this file's actual prose count is 8, at cap, not over — see the updated
+closer-files table below. Near-duplicate pairs and weasel-attribution
+file count both still unaffected.
+
 ---
 
 ## What changed since the first run
@@ -253,11 +270,18 @@ subtracting the signature line; see the dedicated table below).
 
 ### The 12 files using the `"— [Author Name]"` closer — prose-only counts
 
+**Note: the rest of this doc's tables (this one plus "Current em-dash
+count > 8" above) reflect corpus state as of the Tier 1 cluster fix and
+have not been hand-synced against every fix since. The addenda paragraphs
+above this section are the current, authoritative record — the tables
+are being left as a historical snapshot rather than rewritten piecemeal.
+Live numbers are always reproducible via `tools/diag_book_mechanical_scan.py`.**
+
 | file | raw | prose (minus signature) | status |
 |---|---|---|---|
 | accountability.md | 13 | 12 | over cap |
 | leadership-deafness.md | 15 | 14 | over cap |
-| matrix-organization.md | 17 | 16 | over cap |
+| matrix-organization.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | no-margin-for-error.md | 11 | 10 | over cap |
 | succession-planning.md | 12 | 11 | over cap |
 | the-untouchable.md | 13 | 12 | over cap |
