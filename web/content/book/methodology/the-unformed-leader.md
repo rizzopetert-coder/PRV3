@@ -12,7 +12,7 @@ Sit with that for a second. You did try. It didn't work. The reflex from here is
 
 This isn't a story about someone who can't be developed. It's a story about development that didn't target the actual gap.
 
-Generic management training teaches generic management. It covers delegation, feedback, conflict — useful material, delivered in a format that assumes the person already has some baseline instinct for *being* a manager rather than *doing* the work personally. For someone who built their entire professional identity around being the person who solves it himself, that baseline doesn't exist yet. The training adds vocabulary. It doesn't rebuild the reflex underneath it.
+Generic management training teaches generic management. It covers delegation, feedback, conflict: useful material, delivered in a format that assumes the person already has some baseline instinct for *being* a manager rather than *doing* the work personally. For someone who built their entire professional identity around being the person who solves it himself, that baseline doesn't exist yet. The training adds vocabulary. It doesn't rebuild the reflex underneath it.
 
 This is also not a hiring mistake. He was the right call to promote. The technical judgment, the team's respect, the institutional knowledge were all real and all earned. The gap isn't in who he is. It's in what leadership actually requires that individual excellence never asked of him.
 

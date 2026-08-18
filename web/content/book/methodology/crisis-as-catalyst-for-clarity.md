@@ -14,7 +14,7 @@ It is also, in most cases, wrong.
 
 Control is expensive when the organization is functioning well. At crisis severity, it is not just expensive. It adds friction the organization cannot afford while consuming bandwidth the leadership team needs for something else. The attempt to control what can still be controlled rarely addresses what is actually collapsing. It addresses the anxiety of the people attempting to control it.
 
-What the organization actually needs in a structural collapse is clarity. Not clarity as a vague aspirational state — clarity about specific things: who is still aligned to the organization's survival, who is not, and what decisions need to be made about each of those people. The politeness that runs through stable organizational life — the professional courtesy, the careful language, the way difficult truths get managed rather than named — has already been stripped away by the crisis itself. The crisis made it temporarily possible to see things that were invisible before. Using that visibility is the work.
+What the organization actually needs in a structural collapse is clarity. Not clarity as a vague aspirational state, clarity about specific things: who is still aligned to the organization's survival, who is not, and what decisions need to be made about each of those people. The politeness that runs through stable organizational life — the professional courtesy, the careful language, the way difficult truths get managed rather than named — has already been stripped away by the crisis itself. The crisis made it temporarily possible to see things that were invisible before. Using that visibility is the work.
 
 ---
 

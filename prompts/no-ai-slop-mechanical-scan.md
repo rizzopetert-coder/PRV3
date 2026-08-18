@@ -344,6 +344,36 @@ changes anywhere. No named claims in any of the three requiring citation
 verification. Em-dash-over-cap count: 13 → 10. Near-duplicate pairs and
 weasel-attribution file count both unaffected.
 
+**Final four files fixed — closes out the entire em-dash-over-cap
+queue.** `dueling-narratives.md` (10 → 8), `narrative-lock.md` (10 → 8),
+`crisis-as-catalyst-for-clarity.md` (9 → 8), `the-unformed-leader.md`
+(9 → 8). None use the signature closer. Chat-pasted copies of all four
+showed the mojibake artifact and were not used; delivered instead as a
+zip to Downloads (`C:\Users\rizzo\Downloads\files113\`), all four
+confirmed clean, em-dash count exactly 8 in each. Diffed against live for
+all four (`--strip-trailing-cr`): 1, 2, 2, and 1 changes respectively,
+all pure punctuation conversions (em-dash to colon or comma), no wording
+changes anywhere. No named claims in any of the four requiring citation
+verification. Em-dash-over-cap count: 10 → 6.
+
+**The remaining 6 flagged files are all false positives, not open
+items.** The raw scan doesn't apply the MOB v4.183 signature-line
+exemption, so it still lists `accountability.md`, `leadership-deafness.md`,
+`matrix-organization.md`, `no-margin-for-error.md`,
+`succession-planning.md`, and `the-untouchable.md` at raw count 9 — every
+one of these was fixed earlier this session as part of the Tier 3
+signature-closer group and sits at genuine prose count 8, at cap. Zero
+files in the 87-file corpus are actually over the ≤8 standard. This
+closes the em-dash-cap remediation project in full — every file across
+Tier 1 (original 8-file batch), Tier 2, Tier 3, Tier 4, and this
+worst-first continuation is now at or under cap, plus the citation-
+accuracy and factual corrections caught along the way (candor-as-an-
+organizational-variable's Gallup attribution, leadership-deafness's
+Keltner overclaim, symptoms-states's stale state count). Near-duplicate
+pairs remain at 1 (the deliberately-accepted pair) and weasel-attribution
+files remain at 5 (all documented false positives or already-resolved
+citations), both unchanged and settled from earlier in this doc.
+
 ---
 
 ## What changed since the first run

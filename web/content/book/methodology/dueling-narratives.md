@@ -8,7 +8,7 @@ People have heard both. They've done their own quiet math about which one to bel
 
 ## This Isn't a Communication Problem
 
-When two accounts diverge, the instinct is to treat it as a messaging failure — better internal comms would have prevented the confusion. That's usually the wrong diagnosis.
+When two accounts diverge, the instinct is to treat it as a messaging failure: better internal comms would have prevented the confusion. That's usually the wrong diagnosis.
 
 The problem isn't that people received unclear information. It's that they received two different, internally coherent accounts from two sources of real authority, and nothing has reconciled them. Better communication of either single account wouldn't fix this. The accounts themselves are the problem. Until one version is reconciled with the other — or both are reconciled with what actually happened — more communication just means the same two stories reaching more people with more confidence.
 
@@ -32,7 +32,7 @@ People asked to repeat the official version — knowing there's another account 
 
 ## What Tells You This Is What's Happening
 
-**Two distinct accounts of the same significant event are both circulating with real authority.** Not one official story and scattered doubt — two coherent, separately backed versions.
+**Two distinct accounts of the same significant event are both circulating with real authority.** Not one official story and scattered doubt: two coherent, separately backed versions.
 
 **People have made individual judgments about which to believe.** Ask around and you'll get an observable split rather than one version everyone repeats.
 

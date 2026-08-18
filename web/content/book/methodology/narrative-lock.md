@@ -1,6 +1,6 @@
 # Narrative Lock
 
-This organization has an official account of itself, and it defends that account against evidence. Someone brings data that contradicts the official story, and the response isn't curiosity. It's management — of the person, not the discrepancy.
+This organization has an official account of itself, and it defends that account against evidence. Someone brings data that contradicts the official story, and the response isn't curiosity. It's management: of the person, not the discrepancy.
 
 People who contradict the official narrative, even with solid information, don't get heard. They get handled. The people holding the narrative have more organizational power than the people who can see it's wrong. That's exactly why the lock holds as long as it does.
 
@@ -32,7 +32,7 @@ Eventually the organization is operating a meaningful part of its strategy on a 
 
 ## How the Pattern Shows Itself
 
-**Specific, credible evidence has contradicted the official account, more than once.** Real data or real testimony that doesn't fit the story — and it's been raised.
+**Specific, credible evidence has contradicted the official account, more than once.** Real data or real testimony that doesn't fit the story, and it's been raised.
 
 **The people who raised it got managed rather than engaged with.** Reassigned, cooled toward, excluded from the next relevant conversation — some version of consequence for the act of contradicting, separate from what happened to the information itself.
 
