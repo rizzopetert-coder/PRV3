@@ -246,21 +246,33 @@ the same exemption-blind reason as the other 5 Tier 3 fixes — total
 unaffected. Weasel-attribution file count and near-duplicate pairs both
 unaffected.
 
-**Correction: 5 of 6 originally-over-cap signature-closer files
-resolved, not all 6.** The Tier 3 go-ahead message for this file said it
-would close out "all 6 files in the Tier 3 signature-closer group" —
-checking that against the closer-files table below before taking that at
-face value: the 6 files originally over cap in this group were
-`accountability.md` (12 prose), `leadership-deafness.md` (14),
-`matrix-organization.md` (16), `no-margin-for-error.md` (10),
-`succession-planning.md` (11), and `the-untouchable.md` (12).
-`accountability.md` was never actually sent this session and has not
-been fixed — it remains over cap at 12 prose. The other 5 are now at
-prose count 8, at cap. `silosolation.md` and `toxic-culture.md` (fixed
-earlier in the original 8-file batch) and `business-case.md`,
-`exit-pattern.md`, `the-basement-standard.md`, `the-broken-compass.md`
-(already under cap, untouched) round out the 12-file closer group.
-`accountability.md` is the one remaining open item in this group.
+**Correction (superseded below): 5 of 6 originally-over-cap
+signature-closer files resolved, not all 6.** The Tier 3 go-ahead message
+for `no-margin-for-error.md` said it would close out "all 6 files in the
+Tier 3 signature-closer group" — checking that against the closer-files
+table before taking it at face value found `accountability.md` (12
+prose) still outstanding and never actually sent this session.
+
+**`accountability.md` fixed — the sixth and last originally-over-cap
+Tier 3 signature-closer file (prose 12 → 8 em-dashes; raw, including the
+exempt signature line: 13 → 9). This now genuinely completes the group.**
+Chat-pasted copy showed the mojibake artifact, including inside the
+signature line, and was not used. Downloads copy confirmed clean, raw
+em-dash count exactly 9 as claimed. Diffed against live
+(`--strip-trailing-cr`): exactly 4 changes, all pure punctuation
+conversions (em-dash to colon or comma), no wording changes. No named
+claims requiring citation verification. Signature line untouched. Raw
+scan tool still lists this file nominally at 9 (>8) for the same
+exemption-blind reason as the other 5 Tier 3 fixes — total unaffected.
+
+**All 12 signature-closer files now resolved:** `silosolation.md` and
+`toxic-culture.md` (fixed in the original 8-file batch), plus
+`accountability.md`, `matrix-organization.md`, `leadership-deafness.md`,
+`the-untouchable.md`, `succession-planning.md`, and
+`no-margin-for-error.md` (fixed this session as Tier 3) all sit at prose
+count 8, at cap. `business-case.md`, `exit-pattern.md`,
+`the-basement-standard.md`, and `the-broken-compass.md` were already
+under cap and untouched. This closes out the Tier 3 queue in full.
 
 ---
 
@@ -364,10 +376,9 @@ Live numbers are always reproducible via `tools/diag_book_mechanical_scan.py`.**
 
 | file | raw | prose (minus signature) | status |
 |---|---|---|---|
-| accountability.md | 13 | 12 | over cap |
-| leadership-deafness.md | 15 | 14 | over cap |
-| matrix-organization.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
+| accountability.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | leadership-deafness.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
+| matrix-organization.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | no-margin-for-error.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | succession-planning.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |
 | the-untouchable.md | 9 | 8 | **ok — fixed this batch (Tier 3)** |

@@ -14,7 +14,7 @@ The problem is rarely that people don't believe in accountability. The problem i
 
 It usually starts with one pass.
 
-A high performer misses a commitment. They're valuable. They're hard to replace. The organization decides to let it slide — not officially, just practically. The feedback gets softened. The consequence gets skipped. Everyone understands. These things happen.
+A high performer misses a commitment. They're valuable. They're hard to replace. The organization decides to let it slide, not officially, just practically. The feedback gets softened. The consequence gets skipped. Everyone understands. These things happen.
 
 A tenured leader behaves in a way that would get a new hire fired. But they've been here forever. They know where everything is buried. The politics of confronting them feel overwhelming. So the behavior gets managed around. A workaround becomes a pattern. The pattern becomes culture.
 
@@ -52,7 +52,7 @@ And so people don't have them. They delay. They hope the problem resolves itself
 
 The organization rewards this avoidance, in a way. The manager who doesn't have the hard conversation doesn't face any immediate negative consequence. The conflict that was avoided doesn't happen. In the short term, avoidance feels like peace.
 
-It's not peace. It's debt. And the debt comes due eventually — in attrition, in performance gaps, in the quiet corrosion of everything the organization says it values.
+It's not peace. It's debt. And the debt comes due eventually: in attrition, in performance gaps, in the quiet corrosion of everything the organization says it values.
 
 ---
 
@@ -76,7 +76,7 @@ The fix isn't complicated to describe. It's just hard to do.
 
 Someone has to have the conversation. The specific conversation with the specific person who has been exempt. Not a vague performance discussion. Not a feedback sandwich. The actual conversation about what's been observed, what's expected, and what happens next.
 
-And then the consequences have to be real. Not punitive necessarily — accountability isn't about punishment. But real. Connected to the standard. The same standard that applies to everyone else.
+And then the consequences have to be real. Not punitive necessarily: accountability isn't about punishment. But real. Connected to the standard. The same standard that applies to everyone else.
 
 The first time that happens, the organization changes. Not because the conversation was pleasant — it won't be. But because the conversation signals something: the rules are real now. The gap between the stated standard and the lived experience just got smaller.
 
@@ -90,7 +90,7 @@ And if it sticks — if the standard is actually enforced consistently from that
 
 When an organization tells us they have an accountability problem, we don't start with frameworks or processes. We start with a question.
 
-*Who in this organization is currently exempt from the standard that applies to everyone else — and what has made that exemption possible?*
+*Who in this organization is currently exempt from the standard that applies to everyone else, and what has made that exemption possible?*
 
 The answer usually comes quickly. People know. They've always known. They just haven't been willing — or haven't been able — to do anything about it.
 
