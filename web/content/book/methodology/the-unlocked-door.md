@@ -1,8 +1,8 @@
 # The Unlocked Door
 
-A known vulnerability exists in this organization. Not hidden, not undiscovered — known, named, and sitting there unaddressed. Not because nobody's seen it. Because the mechanism for closing it has never been used.
+A known vulnerability exists in this organization. Not hidden, not undiscovered: known, named, and sitting there unaddressed. Not because nobody's seen it. Because the mechanism for closing it has never been used.
 
-The organization has eyes on this one. That's what makes it different from a blind spot, and worse. People who've seen it have stopped expecting it to close. They've built their work around it instead — quietly, individually, without anyone deciding that's the plan.
+The organization has eyes on this one. That's what makes it different from a blind spot, and worse. People who've seen it have stopped expecting it to close. They've built their work around it instead, quietly, individually, without anyone deciding that's the plan.
 
 ---
 
@@ -10,7 +10,7 @@ The organization has eyes on this one. That's what makes it different from a bli
 
 When a vulnerability finally causes a problem, the instinct is to ask how it went unnoticed. The answer here is uncomfortable: it didn't. Someone identified it. Possibly more than one someone, more than once. The fix exists, at least in concept, and has existed the whole time.
 
-What's missing is the use of that fix. The decision to allocate the time, budget, or organizational will to close a known gap rather than manage around it. Not knowing is forgivable. Knowing and not acting requires a harder explanation — and the longer the gap persists, the harder that explanation gets.
+What's missing is the use of that fix. The decision to allocate the time, budget, or organizational will to close a known gap rather than manage around it. Not knowing is forgivable. Knowing and not acting requires a harder explanation, and the longer the gap persists, the harder that explanation gets.
 
 ---
 
@@ -32,7 +32,7 @@ When the vulnerability finally surfaces — usually because something goes wrong
 
 ## How This Shows Up
 
-**The vulnerability has been formally identified.** There's a record somewhere — an audit, a report, a conversation — where this was named specifically, not just sensed.
+**The vulnerability has been formally identified.** There's a record somewhere, an audit, a report, a conversation, where this was named specifically, not just sensed.
 
 **A mechanism for addressing it exists and hasn't been used.** The fix is available. It's sitting unused, usually because of cost, competing priorities, or simple deferral that became habit.
 
@@ -44,7 +44,7 @@ When the vulnerability finally surfaces — usually because something goes wrong
 
 Once a known vulnerability resurfaces — usually after a near-miss or an audit — the instinct is to flag it again and hope re-flagging triggers action. It usually doesn't. The vulnerability was never unflagged. Re-flagging something everyone already knows about doesn't change the conditions that kept it from being addressed the first several times.
 
-What changes the outcome is connecting the known gap to a real cost or a real deadline — making the cost of inaction concrete enough that it competes against whatever has been winning the resource allocation fight up to now.
+What changes the outcome is connecting the known gap to a real cost or a real deadline: making the cost of inaction concrete enough that it competes against whatever has been winning the resource allocation fight up to now.
 
 ---
 
@@ -52,7 +52,7 @@ What changes the outcome is connecting the known gap to a real cost or a real de
 
 Re-flagging it isn't the move. Neither is another audit that produces another report.
 
-The move is a named owner, a specific deadline, and a decision that this gap gets resourced before the next planning cycle — not after something forces it. That decision requires connecting the abstract risk to a concrete cost someone with budget authority actually feels: a regulatory penalty, a breach, an insurer's exclusion, a liability exposure with a dollar figure attached.
+The move is a named owner, a specific deadline, and a decision that this gap gets resourced before the next planning cycle, not after something forces it. That decision requires connecting the abstract risk to a concrete cost someone with budget authority actually feels: a regulatory penalty, a breach, an insurer's exclusion, a liability exposure with a dollar figure attached.
 
 If that connection can't be made in a meeting, make it on paper first. A one-page memo that translates the known vulnerability into its probable cost — if it's exploited, if it surfaces in litigation, if an auditor finds it — changes the conversation from "we're aware of it" to "we can't afford to leave it open."
 

@@ -1,12 +1,12 @@
-You've been in the meeting. The one where everyone agrees, nobody disagrees, and nothing actually gets decided. The agenda moves. The slides advance. People nod at the right moments. And then you walk out and realize — wait, what did we actually resolve? Nothing. Again.
+You've been in the meeting. The one where everyone agrees, nobody disagrees, and nothing actually gets decided. The agenda moves. The slides advance. People nod at the right moments. And then you walk out and realize: wait, what did we actually resolve? Nothing. Again.
 
 The calendar says it was a decision meeting. The outcome says it was theater.
 
-Maybe you've started tracking it. How many times has this initiative come back to the leadership table? Three quarters? Four? Each time with a slightly different framing, a new set of concerns, a request for "more alignment" before moving forward. The alignment never arrives. The decision never lands. And everyone keeps showing up like this is normal — because at this point, it is.
+Maybe you've started tracking it. How many times has this initiative come back to the leadership table? Three quarters? Four? Each time with a slightly different framing, a new set of concerns, a request for "more alignment" before moving forward. The alignment never arrives. The decision never lands. And everyone keeps showing up like this is normal, because at this point, it is.
 
 Decision Paralysis doesn't feel like crisis. That's the thing. It feels like professionalism. Measured. Considered. "We don't want to rush into anything." The language of thoughtfulness deployed in the service of permanent deferral. You can't point to the moment it broke because it didn't break. It just... stopped. Gradually, and then completely.
 
-The people who've been here long enough know the difference between a decision that's being made carefully and a decision that's being avoided indefinitely. They stopped expecting the second kind to resolve. They've learned to work around the paralysis — building their own workarounds, making their own calls, hoping nobody notices that the thing that was supposed to be decided eighteen months ago still hasn't been.
+The people who've been here long enough know the difference between a decision that's being made carefully and a decision that's being avoided indefinitely. They stopped expecting the second kind to resolve. They've learned to work around the paralysis: building their own workarounds, making their own calls, hoping nobody notices that the thing that was supposed to be decided eighteen months ago still hasn't been.
 
 ---
 
@@ -34,7 +34,7 @@ The cost doesn't show up as a line item. It shows up as the gap between where th
 
 And then there's the cost in people. The ones who can't tolerate the paralysis tend to be the ones you can least afford to lose. They're the ones with options. The ones who can go somewhere that actually moves. They don't make a scene about it. They just update their LinkedIn (in a private browser, of course) and start taking calls.
 
-The ones who stay adapt. They stop bringing ideas that would require decisions. They stop pushing back in meetings. They stop expecting things to change. And slowly, the organization's capacity for genuine forward motion atrophies — not because the people are incapable, but because the system has taught them that capability doesn't matter here.
+The ones who stay adapt. They stop bringing ideas that would require decisions. They stop pushing back in meetings. They stop expecting things to change. And slowly, the organization's capacity for genuine forward motion atrophies, not because the people are incapable, but because the system has taught them that capability doesn't matter here.
 
 ---
 
@@ -46,7 +46,7 @@ Decision Paralysis has a specific texture. You can feel it even before you can n
 
 **The same decisions keep coming back.** A healthy organization makes a decision, implements it, and moves on. A paralyzed organization makes a decision, doesn't implement it, forgets it made it, and then has the same conversation six months later as if it's new. If you're experiencing déjà vu in strategic planning, pay attention to that.
 
-**The workarounds are load-bearing.** When decisions don't get made at the top, decisions get made somewhere else — informally, invisibly, by the people who need something to actually happen so they can do their jobs. Those workarounds become the real operating system. The official decision-making process becomes decoration.
+**The workarounds are load-bearing.** When decisions don't get made at the top, decisions get made somewhere else: informally, invisibly, by the people who need something to actually happen so they can do their jobs. Those workarounds become the real operating system. The official decision-making process becomes decoration.
 
 ---
 
@@ -74,6 +74,6 @@ External perspective changes the math. Someone who isn't playing the internal ga
 
 From there, it's about rebuilding the conditions for genuine decision-making. New forums. Clear accountability. The first real decision that gets made and held — that's the moment everything changes. Not because the decision was important, but because it proves the paralysis can break.
 
-If your organization is sitting in Decision Paralysis and you've read this far — that's not an accident. You already knew. The question is what you're going to do about it.
+If your organization is sitting in Decision Paralysis and you've read this far, that's not an accident. You already knew. The question is what you're going to do about it.
 
 We should probably talk.

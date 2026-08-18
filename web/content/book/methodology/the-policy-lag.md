@@ -1,8 +1,8 @@
-The process you're following was designed in 2014. The org chart you're working around was drawn during the second funding round. The reporting structure made perfect sense when there were forty people and three product lines — and nobody has touched it since, even though there are now two hundred people and nine product lines and everyone quietly acknowledges that the structure is mostly decorative.
+The process you're following was designed in 2014. The org chart you're working around was drawn during the second funding round. The reporting structure made perfect sense when there were forty people and three product lines, and nobody has touched it since, even though there are now two hundred people and nine product lines and everyone quietly acknowledges that the structure is mostly decorative.
 
 You're not failing because you're bad at your job. You're failing because you're running 2024 operations on 2014 infrastructure.
 
-Welcome to The Policy Lag. The processes work — if you define "work" as "technically exist and people have learned to tolerate them." They produce outputs. Those outputs get recorded. Reports get generated. Things happen.
+Welcome to The Policy Lag. The processes work: if you define "work" as "technically exist and people have learned to tolerate them." They produce outputs. Those outputs get recorded. Reports get generated. Things happen.
 
 What those things have to do with what the organization actually needs to accomplish? That's less clear. The connection between process and outcome has stretched to the point of abstraction. You're measuring what you can measure, which is not necessarily what matters. You're following workflows that predate the current strategy, the current market, the current team. And everyone involved has decided this is fine because fixing it would require admitting how long it's been broken.
 
@@ -18,7 +18,7 @@ The organization grew. The market shifted. The strategy evolved. New priorities 
 
 At first, people adapted. They built workarounds. They learned which parts of the process to take seriously and which parts to quietly ignore. They figured out the shortcuts, the right person to call, the way to get things done despite the official channels rather than through them.
 
-Those workarounds became the actual operating system. The formal processes became ceremony — things you do because they're documented, not because they accomplish anything. Performance reviews that no one uses to make performance decisions. Approval chains that everyone routes around. Reports that get generated, filed, and never read.
+Those workarounds became the actual operating system. The formal processes became ceremony: things you do because they're documented, not because they accomplish anything. Performance reviews that no one uses to make performance decisions. Approval chains that everyone routes around. Reports that get generated, filed, and never read.
 
 At some point, someone tried to change one of these systems. It went badly. There was resistance, or confusion, or the new thing didn't work any better than the old thing, and everyone concluded — not entirely incorrectly — that changing systems is more trouble than it's worth. Better to leave the lag in place and work around it.
 
@@ -28,7 +28,7 @@ That conclusion hardened into culture. Now you have an organization that believe
 
 ## The Tax
 
-The Policy Lag extracts a tax on everything the organization does. It's not a dramatic tax — no single interaction feels catastrophic. It's cumulative. Attritional. The kind of cost you stop noticing because it's everywhere.
+The Policy Lag extracts a tax on everything the organization does. It's not a dramatic tax: no single interaction feels catastrophic. It's cumulative. Attritional. The kind of cost you stop noticing because it's everywhere.
 
 It's the extra thirty minutes on every decision because the decision rights are defined by a structure that doesn't match the work. It's the meeting to coordinate the teams that shouldn't need to coordinate but do because the org chart says they report to different people with different priorities. It's the three approvals for something that should need one, and the zero approvals for something that should need three.
 
@@ -36,7 +36,7 @@ It's the reporting. God, the reporting. Reports that exist because someone asked
 
 And it's in talent. The people who could modernize the systems — who have the energy and the expertise and the willingness to do the work — tend to be exactly the people who won't tolerate working in systems that are obviously obsolete. They'll try once. Maybe twice. And when they realize the organization would rather preserve the lag than let it evolve, they'll leave. Quietly. For somewhere that takes operational effectiveness seriously.
 
-What remains is a workforce selected for tolerance of dysfunction. That's not an insult — it's an observation. The system filters for people who can make peace with it. But "making peace with it" is not the same as "thriving," and the performance gap between organizations that evolve their systems and organizations that don't is wider than most people realize.
+What remains is a workforce selected for tolerance of dysfunction. That's not an insult: it's an observation. The system filters for people who can make peace with it. But "making peace with it" is not the same as "thriving," and the performance gap between organizations that evolve their systems and organizations that don't is wider than most people realize.
 
 ---
 
@@ -44,7 +44,7 @@ What remains is a workforce selected for tolerance of dysfunction. That's not an
 
 Policy Lag organizations have a distinct feel. Once you recognize it, you see it everywhere.
 
-**The workarounds are institutional knowledge.** The real way to get things done isn't documented. It lives in the heads of people who've been there long enough to learn it. Losing one of those people doesn't just mean losing a contributor — it means losing the map of how the organization actually functions versus how it's supposed to function.
+**The workarounds are institutional knowledge.** The real way to get things done isn't documented. It lives in the heads of people who've been there long enough to learn it. Losing one of those people doesn't just mean losing a contributor: it means losing the map of how the organization actually functions versus how it's supposed to function.
 
 **Process changes are announced but don't stick.** Someone launches a new system. People use it for three weeks. Then they quietly revert to the old way because the new way doesn't fit the surrounding infrastructure. Nobody talks about the failure. The new system becomes a ghost, technically in place, actually unused.
 
@@ -62,7 +62,7 @@ Not outdated. Not "due for an update." Wrong. Built for something this organizat
 
 That admission is uncomfortable. It implicates people. The leader who designed the process. The team that's been running it. The executives who approved it and never revisited it. Saying "this system doesn't work" raises the question of why it's still here, which raises the question of who let it get this bad, which raises questions nobody wants to answer.
 
-So instead, the organization pretends. The system is "being reviewed." There's a "roadmap" for modernization. The current state is "temporary" — it's been temporary for three years. The fiction lets everyone avoid the confrontation, and the system persists.
+So instead, the organization pretends. The system is "being reviewed." There's a "roadmap" for modernization. The current state is "temporary": it's been temporary for three years. The fiction lets everyone avoid the confrontation, and the system persists.
 
 The other reason Policy Lag conditions survive is that they're stable. Bad, but stable. Everyone knows the workarounds. Everyone's adapted. Ripping out a system — even a broken one — creates uncertainty, creates transition costs, creates the possibility that the new thing might be worse than the old thing. "The devil you know" is a powerful argument when the devil you know has become familiar enough to feel like normal.
 

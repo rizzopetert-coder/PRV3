@@ -290,6 +290,21 @@ count: 23 → 22. This file's existing weasel-attribution hit is unchanged
 (the flagged sentence itself wasn't touched) — file count remains 5.
 Near-duplicate pairs unaffected.
 
+**Three files fixed in one batch — the worst-first continuation of the
+open queue past Tier 4: `the-policy-lag.md` (15 → 8),
+`the-unlocked-door.md` (15 → 8), `decision-paralysis.md` (14 → 8).**
+None use the signature closer, so no exemption math applies. Chat-pasted
+copies of all three showed the mojibake artifact and were not used;
+delivered instead as a zip to Downloads
+(`C:\Users\rizzo\Downloads\files00\`), all three confirmed clean, em-dash
+count exactly 8 in each. Diffed against live for all three
+(`--strip-trailing-cr`): 6, 7, and 7 changes respectively, all pure
+punctuation conversions (em-dash to colon or comma), no wording changes
+anywhere, remaining paired-dash asides left intact where not needed to
+hit the cap. No named claims in any of the three requiring citation
+verification. Em-dash-over-cap count: 22 → 19. Near-duplicate pairs and
+weasel-attribution file count both unaffected.
+
 ---
 
 ## What changed since the first run
