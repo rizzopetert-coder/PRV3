@@ -1,12 +1,13 @@
 # SeverityResult Per-State Redesign — Scoping Document
 
 Status: **SCOPING COMPLETE — architecture (Sections 1-3, including the confirmed
-split-by-option prerequisite, Section 2a), content mapping (19/32 locked, Sections 8-9),
-recalibration-scope estimate (Section 5), and recalibration sequencing (Section 6,
-LOCKED: Bundle) all done. Not built, not yet submitted to Gemini.** Unconditionally
-ready for Gemini architecture review — see Section 10 for the full readiness call. No
-engine code touched across any session that produced this document. No commits to
-engine files.
+split-by-option prerequisite, Section 2a, and the now-corrected 14-consumer list),
+content mapping (19/32 locked, Sections 8-9), recalibration-scope estimate (Section 5),
+and recalibration sequencing (Section 6, LOCKED: Bundle) all done. Reviewed once by
+Gemini; that review's 6 specific technical claims independently verified against real
+source (all confirmed real, 3 exposed genuine gaps now folded into Section 3) — see
+Section 10.** Not yet built. No engine code touched across any session that produced
+this document. No commits to engine files.
 
 Origin: Section 13a Decision Register, "Severity follow-on state scoping" row
 (reframed 2026-08-18, commit 362aaaf). Three candidate input-filtering gate designs
@@ -161,23 +162,33 @@ scripts, none of them the production or harness path.
 
 ## 3. Verified consumers and aggregation mechanics (Task 1)
 
-**Every real consumer of `SeverityResult`, repo-wide, engine and web:**
+**Every real consumer of `SeverityResult`, repo-wide, engine and web.** Corrected
+2026-08-19 after Gemini's architecture review of an earlier version of this section
+surfaced 3 real gaps — independently verified before being folded in here (report:
+6 of 6 Gemini claims confirmed real against source, none fabricated), not from a fresh
+investigation pass finding these on its own. Two consumers were missing entirely
+(`_build_synthesis_prompt`, and the real web render layer); one listed consumer was
+confirmed dead code and removed.
 
 | Layer | File | What it does with the single session-wide tier |
 |---|---|---|
 | Engine | `engine/severity.py` | Defines `SeverityResult`; `SeverityEngine.score()` (line 355) produces it |
 | Engine | `engine/main.py` | Computes `severity_result` via `SeverityEngine`, passes to `output_engine.build()` and into `SessionData` |
 | Engine | `engine/output.py` | `build_private_block()`/`build_shareable_block()` (line 658-699) stamp `severity_result.tier` onto each qualified state's block — **output currently unused downstream, see Section 1** |
-| Engine | `engine/contract.py` | `SessionData.severity_result` (line 70, required field). `assemble_output()` (line 316+): top-level `severity` object built directly from `sev.tier`/`sev.score_0_100_with_narrative` (line 387-389); `compute_friction_tax(..., severity_tier=sev.tier, ...)` (line 469-475); Decision Blindness flag's `severity_context.current_severity_reading` (line 292-297) |
-| Web (types) | `web/lib/types.ts` | `PrivateOutputPayload.severity`, `ShareableOutputPayload.severity`, `CondensedOutputPayload.severity` — all three `SeverityTier` (single flat field, lines 229/322/356) |
+| Engine | `engine/output_synthesis.py` | **Added 2026-08-19, confirmed real, a genuine gap in the original pass.** `_build_synthesis_prompt()` (line 264-313) takes `severity_tier: str` as a direct parameter and writes it literally into the LLM-facing prompt text (`f"severity_tier: {severity_tier}"`, line 303). Called via `synthesize()` from `engine/main.py:107` and `:640`, both passing `severity_tier=severity_result.tier` — the same session-global value. **In scope for the redesign:** the narrative text a user actually reads is currently driven by the single broadcast tier too — needs to read per-state severity for whichever state's block is being synthesized, not just the output JSON's numeric fields. |
+| Engine | `engine/contract.py` | `SessionData.severity_result` (line 70, required field). `assemble_output()` (line 316+): top-level `severity` object built directly from `sev.tier`/`sev.score_0_100_with_narrative` (line 387-389); `compute_friction_tax(..., severity_tier=sev.tier, ...)` (line 469-475) — **the actual mechanism, precisely traced 2026-08-19: `engine/friction_tax.py:73-77`, `SEVERITY_SCALAR = {"Emerging": 0.6, "Entrenched": 1.0, "Endemic": 1.4}`, explicitly marked LOCKED, applied at `friction_tax.py:1908` inside `compute_friction_tax()` — this is the real multiplier driving the dollar estimate off session-wide tier**; Decision Blindness flag's `severity_context.current_severity_reading` (line 292-297), inside `_assemble_monitoring_metadata()` (line 242-313, named explicitly here for clarity — same consumer as before, not a new one) |
+| Web (types) | `web/lib/types.ts` | `PrivateOutputPayload.severity`, `ShareableOutputPayload.severity`, `CondensedOutputPayload.severity` — all three `SeverityTier` (single flat field, lines 229/322/356). Also defines `StateRef` (line 47-52, fields `id/name/weight/descriptive_prose`) — not itself a severity consumer, but the real type a web-side `state_severity` lookup should key against via `.id`, confirmed relevant for whoever eventually builds the web-side change. |
 | Web (types) | `web/lib/engine-client.ts` | `EngineResult.severity: {tier, score}` — direct mirror of the Python API's JSON response shape (line 101/356) |
 | Web (routes) | `web/app/api/result/route.ts`, `web/app/api/share/create/route.ts`, `web/app/api/diagnostic/session/answer/route.ts`, `web/app/api/diagnostic/condensed/answer/route.ts` | Each reads `engineResult.severity.tier` and assigns directly to the outgoing payload's flat `severity` field |
-| Web (render) | `web/lib/output-renderer.ts` | Reads `payload.severity` (2 call sites, lines 138-139/196-197) to build the rendered severity block for both Private and Shareable output |
+| ~~Web (render)~~ | ~~`web/lib/output-renderer.ts`~~ | **Removed 2026-08-19, confirmed dead code.** Repo-wide search found zero imports of this file anywhere — its two `payload.severity`-reading functions are never called. Matches an earlier, separate finding on record (Category E Direction 3 session) that this file's `renderPrivateOutput()` has zero callers. Was incorrectly listed here as a live consumer; corrected. |
+| Web (render) | `web/components/PrivateOutput.tsx`, `web/components/ShareableOutput.tsx` | **Added 2026-08-19, the real live web consumers `output-renderer.ts` was mistakenly standing in for.** `PrivateOutput.tsx` reads `payload.severity` directly at lines 98, 129, 138, 163 (no intermediary — receives the raw `PrivateOutputPayload` prop straight from `web/app/diagnostic/page.tsx`'s Phase 5 render). `ShareableOutput.tsx` does the same at line 70. Both need updating to consume per-state severity once the wire contract carries it — these are what actually render to a real user, `output-renderer.ts` never did. |
 | Web (dev) | `web/lib/dev-diagnostic-preview.ts` | Dev-only fixture type, also a flat `severity: SeverityTier` (line 40) |
 
 Every consumer, both layers, is consistent with a single session-wide tier — none
 currently expects or handles a per-state structure. All would need updating in the
-redesign, not just `build_private_block()`.
+redesign, not just `build_private_block()`. **Count: 14 real consumer files** (up from
+12 before this correction — net +2 after removing the one dead-code entry and adding
+the 3 real ones found).
 
 **Aggregation confirmed additive, real code cited:** `engine/severity.py:188-233`,
 `compute_raw_severity()`. Line 212: `for inp in accumulator.inputs: ... raw +=
@@ -510,6 +521,19 @@ redesign's confirmed build scope, not a deferred nice-to-have — a new
 wire-contract plumbing through the web layer (Section 2a's write-site trace) all need to
 ship as part of the same build that adds `state_severity` to `SeverityResult`.
 
+**Section 3's consumer list is now genuinely complete — 14 real consumer files, not 12.**
+Gemini's architecture review of an earlier version of this document returned 6 specific
+technical claims beyond its general confirm-or-reject on Items A-E. Each was independently
+verified against real source before being trusted, per standing protocol — none was
+fabricated, but 3 exposed real gaps this document's own original verification pass had
+missed: `_build_synthesis_prompt()` (a real, previously-uncounted consumer — the narrative
+text a user reads is severity-driven too, not just the numeric fields) and the real web
+render layer, `PrivateOutput.tsx`/`ShareableOutput.tsx` (added in place of
+`output-renderer.ts`, which turned out to be confirmed dead code, incorrectly listed as
+live). This means the count went 12 → 14 net (−1 dead-code removal, +3 real additions),
+and it came from Gemini's own review being checked, not from a fresh, separate
+investigation gap found independently.
+
 **Mapping coverage is 19/32 locked, and full coverage is not required to proceed to a
 build.** The proposed fallback behavior (`state_severity.get(state_id, "Emerging")`,
 Section 2) means any of the 11 genuinely unmapped IDs, or any future new SEVER-##, simply
@@ -523,11 +547,13 @@ affected profiles ships as part of this same build, not a separate follow-on. Ra
 on record: small, fully-characterized scope (14/175, 8%), every affected profile a
 decrease not a new escalation, no unpredictable-blast-radius shape.
 
-**This document is unconditionally ready for Gemini architecture review. Nothing else is
-outstanding.** The mapping is locked (19/32), the data-shape proposal includes the
-confirmed per-option prerequisite (Section 2a), consumer and aggregation verification is
-complete (Section 3), and recalibration sequencing is decided (Section 6). Not yet
-submitted to Gemini — that remains a separate, explicit action.
+**This document has been reviewed once by Gemini, and that review's specific technical
+claims are now fully resolved.** The mapping is locked (19/32), the data-shape proposal
+includes the confirmed per-option prerequisite (Section 2a), consumer and aggregation
+verification is complete and corrected (Section 3, 14 real consumers), and recalibration
+sequencing is decided (Section 6). Whether this corrected version goes back to Gemini for
+a confirming second pass, or moves straight to build authorization, is Pete's call — not
+decided here.
 
 No code changes, no commits to engine files across any session that produced this
 document.
