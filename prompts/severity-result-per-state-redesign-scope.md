@@ -1,13 +1,14 @@
 # SeverityResult Per-State Redesign — Scoping Document
 
 Status: **SCOPING COMPLETE — architecture (Sections 1-3, including the confirmed
-split-by-option prerequisite, Section 2a, and the now-corrected 14-consumer list),
+split-by-option prerequisite, Section 2a, and the now-corrected 16-consumer list),
 content mapping (19/32 locked, Sections 8-9), recalibration-scope estimate (Section 5),
 and recalibration sequencing (Section 6, LOCKED: Bundle) all done. Reviewed once by
 Gemini; that review's 6 specific technical claims independently verified against real
-source (all confirmed real, 3 exposed genuine gaps now folded into Section 3) — see
-Section 10.** Not yet built. No engine code touched across any session that produced
-this document. No commits to engine files.
+source (all confirmed real, 3 exposed genuine gaps now folded into Section 3). A
+follow-up pass the same day found 2 more real consumers via one further repo-wide
+grep — see Section 10.** Not yet built. No engine code touched across any session that
+produced this document. No commits to engine files.
 
 Origin: Section 13a Decision Register, "Severity follow-on state scoping" row
 (reframed 2026-08-18, commit 362aaaf). Three candidate input-filtering gate designs
@@ -168,7 +169,11 @@ surfaced 3 real gaps — independently verified before being folded in here (rep
 6 of 6 Gemini claims confirmed real against source, none fabricated), not from a fresh
 investigation pass finding these on its own. Two consumers were missing entirely
 (`_build_synthesis_prompt`, and the real web render layer); one listed consumer was
-confirmed dead code and removed.
+confirmed dead code and removed. **Further corrected same day, second pass:**
+`engine/data/fallback_synthesis.py` (flagged during the NotebookLM checklist task,
+independently traced) and `web/components/ConstellationField.tsx` (caught by a repeat
+repo-wide grep run specifically to check for anything still hidden) were both confirmed
+real and added — see their rows below for the full trace.
 
 | Layer | File | What it does with the single session-wide tier |
 |---|---|---|
@@ -177,18 +182,30 @@ confirmed dead code and removed.
 | Engine | `engine/output.py` | `build_private_block()`/`build_shareable_block()` (line 658-699) stamp `severity_result.tier` onto each qualified state's block — **output currently unused downstream, see Section 1** |
 | Engine | `engine/output_synthesis.py` | **Added 2026-08-19, confirmed real, a genuine gap in the original pass.** `_build_synthesis_prompt()` (line 264-313) takes `severity_tier: str` as a direct parameter and writes it literally into the LLM-facing prompt text (`f"severity_tier: {severity_tier}"`, line 303). Called via `synthesize()` from `engine/main.py:107` and `:640`, both passing `severity_tier=severity_result.tier` — the same session-global value. **In scope for the redesign:** the narrative text a user actually reads is currently driven by the single broadcast tier too — needs to read per-state severity for whichever state's block is being synthesized, not just the output JSON's numeric fields. |
 | Engine | `engine/contract.py` | `SessionData.severity_result` (line 70, required field). `assemble_output()` (line 316+): top-level `severity` object built directly from `sev.tier`/`sev.score_0_100_with_narrative` (line 387-389); `compute_friction_tax(..., severity_tier=sev.tier, ...)` (line 469-475) — **the actual mechanism, precisely traced 2026-08-19: `engine/friction_tax.py:73-77`, `SEVERITY_SCALAR = {"Emerging": 0.6, "Entrenched": 1.0, "Endemic": 1.4}`, explicitly marked LOCKED, applied at `friction_tax.py:1908` inside `compute_friction_tax()` — this is the real multiplier driving the dollar estimate off session-wide tier**; Decision Blindness flag's `severity_context.current_severity_reading` (line 292-297), inside `_assemble_monitoring_metadata()` (line 242-313, named explicitly here for clarity — same consumer as before, not a new one) |
+| Engine | `engine/data/fallback_synthesis.py` | **Added 2026-08-19, confirmed real via a genuine dict-keying use, not pass-through.** `get_fallback_synthesis(commercial_name, severity_tier)` (line 49-66) keys `FALLBACK_SYNTHESIS.get((commercial_name, severity_tier), ...)` (line 66) — confirmed `RESOLUTION_FALLBACK_COPY` (`engine/resolution_families.py:141+`) genuinely holds distinct copy text per `(commercial_name, tier)` tuple for single-service names, not identical text reused across tiers. **Two real, live caller paths, not theoretical:** (1) `engine/main.py:769`, inside `run_condensed_engine()` (Category D) — called **unconditionally, every single completion**, since Category D never invokes the real LLM at all by locked design ("a free/anonymous/ungated tool must not invoke a paid, timeout-exposed endpoint per submission"); this is the *only* synthesis path Category D ever has. (2) `engine/output_synthesis.py`, 4 call sites inside `synthesize()` (lines 196, 217, 358, 399) — the genuine LLM-failure fallback (JSON parse failure, missing required fields, `anthropic` package missing, any API exception) — confirmed not theoretical: this exact failure class has fired in real production incidents already on record (invalid API key, markdown-fence parsing gap, both from prior sessions). **In scope for the redesign** on both paths — whichever state's synthesis is being built needs that state's own tier, not the session-global one, in both the always-on Category D path and the LLM-failure path. |
 | Web (types) | `web/lib/types.ts` | `PrivateOutputPayload.severity`, `ShareableOutputPayload.severity`, `CondensedOutputPayload.severity` — all three `SeverityTier` (single flat field, lines 229/322/356). Also defines `StateRef` (line 47-52, fields `id/name/weight/descriptive_prose`) — not itself a severity consumer, but the real type a web-side `state_severity` lookup should key against via `.id`, confirmed relevant for whoever eventually builds the web-side change. |
 | Web (types) | `web/lib/engine-client.ts` | `EngineResult.severity: {tier, score}` — direct mirror of the Python API's JSON response shape (line 101/356) |
 | Web (routes) | `web/app/api/result/route.ts`, `web/app/api/share/create/route.ts`, `web/app/api/diagnostic/session/answer/route.ts`, `web/app/api/diagnostic/condensed/answer/route.ts` | Each reads `engineResult.severity.tier` and assigns directly to the outgoing payload's flat `severity` field |
 | ~~Web (render)~~ | ~~`web/lib/output-renderer.ts`~~ | **Removed 2026-08-19, confirmed dead code.** Repo-wide search found zero imports of this file anywhere — its two `payload.severity`-reading functions are never called. Matches an earlier, separate finding on record (Category E Direction 3 session) that this file's `renderPrivateOutput()` has zero callers. Was incorrectly listed here as a live consumer; corrected. |
 | Web (render) | `web/components/PrivateOutput.tsx`, `web/components/ShareableOutput.tsx` | **Added 2026-08-19, the real live web consumers `output-renderer.ts` was mistakenly standing in for.** `PrivateOutput.tsx` reads `payload.severity` directly at lines 98, 129, 138, 163 (no intermediary — receives the raw `PrivateOutputPayload` prop straight from `web/app/diagnostic/page.tsx`'s Phase 5 render). `ShareableOutput.tsx` does the same at line 70. Both need updating to consume per-state severity once the wire contract carries it — these are what actually render to a real user, `output-renderer.ts` never did. |
+| Web (render) | `web/components/ConstellationField.tsx` | **Added 2026-08-19, found by a repeat repo-wide grep (this time including the camelCase `severityTier` variant, not just `severity_tier` — the miss last time).** Exports `severityAccentTokens(tier: SeverityTier)` (line 243) — the rust/slate visual-accent logic ("rust ONLY when severityTier is genuinely 'Endemic'"). `LiveField` (line 395-400) takes `severityTier` as a prop and computes its glow/accent from it. **Two independent consumption points, both from `PrivateOutput.tsx`:** `PrivateOutput.tsx:98` calls `severityAccentTokens(payload.severity)` directly for its own header accent; `PrivateOutput.tsx:155-163` separately passes `severityTier={payload.severity}` as a prop into `<ConstellationField>`, which internally calls the same function again for the shape's own glow. Both driven by the identical session-wide value today. `ShareableOutput.tsx` does not use this component — confirmed, not assumed. **In scope for the redesign:** the shape's glow, not just the text badge, needs a real per-state answer — which state's severity does one shared visualization represent in multi-state mode, not resolved by this document. |
 | Web (dev) | `web/lib/dev-diagnostic-preview.ts` | Dev-only fixture type, also a flat `severity: SeverityTier` (line 40) |
+
+**Adjacent finding, not itself a consumer — flagged so it isn't mistaken for one later:**
+`engine/resolution_families.py`'s `get_fallback_copy(commercial_name, severity_tier)`
+(line 237-248) also keys on `severity_tier` and looks real, but confirmed via repo-wide
+search to have **zero callers anywhere in `engine/` or `api/`** — only its own unit test
+exercises it. Same shape as the `output-renderer.ts` finding: a real function that looks
+like a live consumer and isn't. Not added to the table above; noted here in case a future
+pass is tempted to add it without checking first.
 
 Every consumer, both layers, is consistent with a single session-wide tier — none
 currently expects or handles a per-state structure. All would need updating in the
-redesign, not just `build_private_block()`. **Count: 14 real consumer files** (up from
-12 before this correction — net +2 after removing the one dead-code entry and adding
-the 3 real ones found).
+redesign, not just `build_private_block()`. **Count: 16 real consumer files** (up from
+14 — net +2 this pass: `fallback_synthesis.py`, confirmed real via two live caller
+paths; `ConstellationField.tsx`, caught by extending the grep to camelCase. A third
+candidate, `resolution_families.py`'s `get_fallback_copy()`, was checked and confirmed
+dead — not counted).
 
 **Aggregation confirmed additive, real code cited:** `engine/severity.py:188-233`,
 `compute_raw_severity()`. Line 212: `for inp in accumulator.inputs: ... raw +=
@@ -521,7 +538,7 @@ redesign's confirmed build scope, not a deferred nice-to-have — a new
 wire-contract plumbing through the web layer (Section 2a's write-site trace) all need to
 ship as part of the same build that adds `state_severity` to `SeverityResult`.
 
-**Section 3's consumer list is now genuinely complete — 14 real consumer files, not 12.**
+**Section 3's consumer list is now genuinely complete — 16 real consumer files, not 12.**
 Gemini's architecture review of an earlier version of this document returned 6 specific
 technical claims beyond its general confirm-or-reject on Items A-E. Each was independently
 verified against real source before being trusted, per standing protocol — none was
@@ -530,9 +547,13 @@ missed: `_build_synthesis_prompt()` (a real, previously-uncounted consumer — t
 text a user reads is severity-driven too, not just the numeric fields) and the real web
 render layer, `PrivateOutput.tsx`/`ShareableOutput.tsx` (added in place of
 `output-renderer.ts`, which turned out to be confirmed dead code, incorrectly listed as
-live). This means the count went 12 → 14 net (−1 dead-code removal, +3 real additions),
-and it came from Gemini's own review being checked, not from a fresh, separate
-investigation gap found independently.
+live). That's 12 → 14. **A second pass the same day, prompted by a still-open lead from
+the NotebookLM checklist task plus one more full repo-wide grep, found 2 more real,
+previously-missed consumers** — `engine/data/fallback_synthesis.py` (a genuine
+dict-keying use, two live caller paths) and `web/components/ConstellationField.tsx`
+(caught only once the grep was extended to the camelCase `severityTier` variant) — taking
+the count to 16. Both correction passes came from checking specific leads and re-running
+the search wider, not from a from-scratch investigation each time.
 
 **Mapping coverage is 19/32 locked, and full coverage is not required to proceed to a
 build.** The proposed fallback behavior (`state_severity.get(state_id, "Emerging")`,
@@ -550,7 +571,7 @@ decrease not a new escalation, no unpredictable-blast-radius shape.
 **This document has been reviewed once by Gemini, and that review's specific technical
 claims are now fully resolved.** The mapping is locked (19/32), the data-shape proposal
 includes the confirmed per-option prerequisite (Section 2a), consumer and aggregation
-verification is complete and corrected (Section 3, 14 real consumers), and recalibration
+verification is complete and corrected (Section 3, 16 real consumers), and recalibration
 sequencing is decided (Section 6). Whether this corrected version goes back to Gemini for
 a confirming second pass, or moves straight to build authorization, is Pete's call — not
 decided here.
