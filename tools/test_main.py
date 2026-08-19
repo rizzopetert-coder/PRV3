@@ -391,11 +391,21 @@ with mock.patch.dict("sys.modules", {"anthropic": None}):
 
     # 26. One 18mo_plus duration_band input -> raw=2.0 -> score=33.33 ->
     # Entrenched. First non-"Emerging" tier ever produced in this project.
+    # Checkpoint 3 (SeverityResult per-state redesign): severity_follow_on_id
+    # must map to _CP_VECTOR's real lead state (the_founders_grip, confirmed
+    # via a direct run -- multi_state, identified_states[0] =
+    # the_founders_grip) for the top-level severity to reflect it, now that
+    # severity.tier resolves per-state instead of broadcasting. SEVER-28 is
+    # the_founders_grip's real, locked mapping (Section 9 of the scoping
+    # doc) -- SEVER-04 (used here before this fix) is one of the 11
+    # explicitly unmapped SEVER-IDs and would correctly contribute to no
+    # state under the new architecture, same class of gap as the original
+    # ATT-UT-01 defect this whole redesign exists to fix.
     out_entrenched = run_accumulated_engine(
         _CP_VECTOR, _LOCKED_INTAKE, 27,
         severity_inputs=[{
             "trigger_question_id": "Q22",
-            "severity_follow_on_id": "SEVER-04",
+            "severity_follow_on_id": "SEVER-28",
             "duration_band": "18mo_plus",
         }],
     )
@@ -407,13 +417,16 @@ with mock.patch.dict("sys.modules", {"anthropic": None}):
     )
 
     # 27. Two 18mo_plus duration_band inputs -> raw=4.0 -> score=66.67 ->
-    # Endemic.
+    # Endemic. Both mapped to SEVER-28/the_founders_grip, same reasoning
+    # as test 26 -- a duplicate follow_on_id across two inputs is harmless
+    # for this raw-arithmetic check (compute_state_severity() groups by
+    # intended state, not by follow_on_id uniqueness).
     out_endemic = run_accumulated_engine(
         _CP_VECTOR, _LOCKED_INTAKE, 27,
         severity_inputs=[
-            {"trigger_question_id": "Q22", "severity_follow_on_id": "SEVER-04",
+            {"trigger_question_id": "Q22", "severity_follow_on_id": "SEVER-28",
              "duration_band": "18mo_plus"},
-            {"trigger_question_id": "Q24", "severity_follow_on_id": "SEVER-06",
+            {"trigger_question_id": "Q24", "severity_follow_on_id": "SEVER-28",
              "duration_band": "18mo_plus"},
         ],
     )

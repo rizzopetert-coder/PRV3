@@ -37,7 +37,9 @@ from engine.output import (
     PrivateOutputBlock, ShareableOutputBlock,
 )
 from engine.accumulation import StateRanking
-from engine.severity import SeverityEngine, SeverityInput, SEVERITY_TIER_DESCRIPTIONS
+from engine.severity import (
+    SeverityEngine, SeverityInput, SEVERITY_TIER_DESCRIPTIONS, StateSeverity,
+)
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS, BASELINE_VALUE
 
 PASS = []
@@ -58,11 +60,24 @@ n = len(STATE_PROFILES)
 
 # ── Shared fixtures ────────────────────────────────────────────────────────────
 
-def make_severity_result(tier="Emerging"):
+def make_severity_result(tier="Emerging", state_id=None):
+    """
+    Checkpoint 3 (SeverityResult per-state redesign): state_id is optional
+    -- when given, populates state_severity[state_id] with a matching
+    StateSeverity so build_private_block()/build_shareable_block()'s new
+    per-state lookup resolves to `tier` for that specific state, not the
+    "Emerging" fallback. Callers checking only structural fields
+    (routing.mode, block presence, etc.) rather than a specific tier value
+    can omit state_id -- state_severity stays {} exactly as before this
+    parameter existed.
+    """
     eng = SeverityEngine()
     result = eng.score()
     # Manually override tier for test purposes
     from engine.severity import SeverityResult
+    state_severity = {}
+    if state_id is not None:
+        state_severity[state_id] = StateSeverity(tier=tier, score_0_100=15.0)
     return SeverityResult(
         raw_score=0.0,
         score_0_100=15.0,
@@ -72,6 +87,7 @@ def make_severity_result(tier="Emerging"):
         narrative_contribution_0_100=0.0,
         narrative_ceiling_applied=False,
         input_count=0,
+        state_severity=state_severity,
     )
 
 
@@ -308,7 +324,11 @@ qs_test = QualifiedState(
     cleared_floor=True, score_lift_pct=20.0,
     resolution_family=STATE_PROFILES[first_sid].resolution_family,
 )
-sev = make_severity_result("Entrenched")
+# Checkpoint 3: state_id=first_sid so build_private_block()/
+# build_shareable_block()'s per-state lookup resolves to "Entrenched"
+# for qs_test (state_id=first_sid) specifically, not the "Emerging"
+# fallback.
+sev = make_severity_result("Entrenched", state_id=first_sid)
 
 private = build_private_block(qs_test, sev)
 

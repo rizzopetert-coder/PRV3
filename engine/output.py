@@ -666,12 +666,24 @@ def build_private_block(
     LLM-generated fields (liability_condition_text, asset_resolution_anchor_text)
     are left empty — populated by the application layer using this block as context.
 
+    Checkpoint 3 (SeverityResult per-state redesign): severity_tier now
+    resolves per THIS state (qualified_state.state_id), via
+    state_severity's StateSeverity entry (Checkpoint 1 follow-on -- an
+    object, not a bare string; explicit get-then-unwrap below, not a bare
+    .get(id, "Emerging")) -- this is the fix for the original ATT-UT-01
+    defect (Checkpoint 1's scoping doc, Section 1): this function is
+    already called once per qualified state by OutputEngine.build() below,
+    but was previously fed the same session-global severity_result.tier
+    every time.
+
     Spec reference: Section VI.2 and VI.4
     """
-    anchor = SEVERITY_TIER_DESCRIPTIONS.get(severity_result.tier, "")
+    state_entry = severity_result.state_severity.get(qualified_state.state_id)
+    resolved_tier = state_entry.tier if state_entry is not None else "Emerging"
+    anchor = SEVERITY_TIER_DESCRIPTIONS.get(resolved_tier, "")
     return PrivateOutputBlock(
         state_name=qualified_state.state_name,
-        severity_tier=severity_result.tier,
+        severity_tier=resolved_tier,
         severity_anchor_text=anchor,
         resolution_family=qualified_state.resolution_family,
     )
@@ -690,11 +702,16 @@ def build_shareable_block(
     resolution_framing_text) are left empty — populated by the application
     layer using this block as context.
 
+    Checkpoint 3: severity_tier resolves per THIS state, same fix as
+    build_private_block() above.
+
     Spec reference: Section VI.2 and VI.5
     """
+    state_entry = severity_result.state_severity.get(qualified_state.state_id)
+    resolved_tier = state_entry.tier if state_entry is not None else "Emerging"
     return ShareableOutputBlock(
         state_name=qualified_state.state_name,
-        severity_tier=severity_result.tier,
+        severity_tier=resolved_tier,
         resolution_family=qualified_state.resolution_family,
     )
 

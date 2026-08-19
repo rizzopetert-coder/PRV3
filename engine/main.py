@@ -102,9 +102,22 @@ def run_engine(
             output_package.private.resolution_family
             if output_package.private else ""
         )
+        # Checkpoint 3: lead_id's own attributed tier, not the pooled
+        # session-wide value. Path B never collects real severity inputs
+        # ("Path B bypasses severity Q&A" above) -- state_severity is
+        # always {} here, so this resolves to "Emerging" unconditionally
+        # today, same as before. Changed anyway for consistency with every
+        # other severity_tier consumer in this file, not because it fixes
+        # a live Path B bug. Explicit get-then-unwrap -- state_severity's
+        # values are StateSeverity objects (Checkpoint 1 follow-on), not
+        # bare strings.
+        _lead_severity_entry = severity_result.state_severity.get(lead_id)
+        lead_severity_tier = (
+            _lead_severity_entry.tier if _lead_severity_entry is not None else "Emerging"
+        )
         synthesis_result = OutputSynthesisEngine().synthesize(
             state_name=lead_name,
-            severity_tier=severity_result.tier,
+            severity_tier=lead_severity_tier,
             resolution_family=commercial_family,
             asset_score=0.0,
             liability_score=0.0,
@@ -675,9 +688,18 @@ def run_accumulated_engine(
         signal_map_context = _build_signal_map_context(
             answers_log or [], intake_data, lead_id
         )
+        # Checkpoint 3: lead_id's own attributed tier -- this is the real,
+        # live fix. Path 1's full diagnostic collects real severity
+        # inputs, so state_severity can genuinely differ from the old
+        # pooled sev.tier here, unlike Path B/Category D. Explicit
+        # get-then-unwrap, same reasoning as the Path B site above.
+        _lead_severity_entry = severity_result.state_severity.get(lead_id)
+        lead_severity_tier = (
+            _lead_severity_entry.tier if _lead_severity_entry is not None else "Emerging"
+        )
         synthesis_result = OutputSynthesisEngine().synthesize(
             state_name=lead_name,
-            severity_tier=severity_result.tier,
+            severity_tier=lead_severity_tier,
             resolution_family=commercial_family,
             asset_score=asset_obj["score"],
             liability_score=liability_obj["score"],
@@ -806,7 +828,23 @@ def run_condensed_engine(
     synthesis_result = None
     if identified_states:
         commercial_family = translate_resolution_family(resolution_routing)
-        fb = get_fallback_synthesis(commercial_family, severity_result.tier)
+        # Checkpoint 3: resolve per-state, same identified_states[0]
+        # state_id already used for resolution_routing above (same
+        # single/multi provenance split). Provable no-op today (this
+        # function's own docstring: Category D never collects severity
+        # inputs, severity_result.state_severity is always {} here, so
+        # this already always resolved to "Emerging" either way) --
+        # changed for consistency with every other get_fallback_synthesis()/
+        # synthesize() call site in this file, and to remove a latent
+        # trap if Category D's design ever changes to collect real
+        # severity inputs later. Explicit get-then-unwrap, same reasoning
+        # as every other site in this file.
+        lead_state_id = identified_states[0]["state_id"]
+        _lead_severity_entry = severity_result.state_severity.get(lead_state_id)
+        lead_severity_tier = (
+            _lead_severity_entry.tier if _lead_severity_entry is not None else "Emerging"
+        )
+        fb = get_fallback_synthesis(commercial_family, lead_severity_tier)
         synthesis_result = SynthesisResult(
             **fb,
             synthesis_confidence=0.0,

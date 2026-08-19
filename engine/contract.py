@@ -279,6 +279,19 @@ def _assemble_monitoring_metadata(session: SessionData) -> dict:
     protected_activity_confirmed = len(pa_sources) > 0
     flag_triggered = db_above_baseline and protected_activity_confirmed
 
+    # Checkpoint 3: decision_blindness's OWN attributed StateSeverity, not
+    # the session-wide/lead-state value -- this flag is specifically about
+    # the decision_blindness state (hardcoded state_id just above),
+    # unambiguous, no lead-state reasoning needed here. Explicit
+    # get-then-unwrap, not a bare .get(id, "Emerging") -- state_severity's
+    # values are StateSeverity objects now (Checkpoint 1 follow-on), so a
+    # bare .get() with a string default would return a StateSeverity on
+    # hit and a plain string on miss.
+    _db_severity_entry = session.severity_result.state_severity.get("decision_blindness")
+    db_severity_tier = (
+        _db_severity_entry.tier if _db_severity_entry is not None else "Emerging"
+    )
+
     db_flag = {
         "flag_id":   _DB_FLAG_ID,
         "triggered": flag_triggered,
@@ -291,10 +304,7 @@ def _assemble_monitoring_metadata(session: SessionData) -> dict:
         },
         "severity_context": {
             "decision_blindness_severity_floor": _DB_SEVERITY_FLOOR,
-            "current_severity_reading": (
-                session.severity_result.tier.lower()
-                if session.severity_result.tier else ""
-            ),
+            "current_severity_reading": db_severity_tier.lower(),
         },
         "recommended_routes":           list(_DB_RECOMMENDED_ROUTES),
         "priority":                     "high",
@@ -328,6 +338,36 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
     """
     routing = session.output_package.routing
     sev = session.severity_result
+
+    # Checkpoint 3 (SeverityResult per-state redesign): the top-level
+    # "severity" object, urgency_window.response_window, and
+    # compute_friction_tax()'s severity_tier param are all single
+    # session-scoped scalars in the VII.1 schema (immutable field shape,
+    # not per-state) -- resolved here as the LEAD/primary state's own
+    # attributed StateSeverity rather than the old pooled session-wide
+    # value. Real design decision, not dictated by the scoping doc: for
+    # multi-state output, "the lead state's severity" is the most
+    # defensible single answer a scalar field can give, matching how
+    # asset_score/urgency_window's time_to_consequence already anchor on
+    # lead_id elsewhere in this function.
+    #
+    # Fallback when the lead state has no attributed StateSeverity
+    # (insufficient_signal mode, or a lead state with zero severity
+    # inputs of its own): tier="Emerging", score_0_100=0.0 -- not two
+    # independently invented defaults. classify_severity(normalize_severity
+    # (0.0)) == "Emerging" exactly, so this is the same floor pair a
+    # genuinely zero-input state would produce if run through the real
+    # pipeline, confirmed by the pure functions themselves, not assumed.
+    lead_severity_state_id = routing.lead_state.state_id if routing.lead_state else (
+        routing.qualified_states[0].state_id if routing.qualified_states else None
+    )
+    _lead_severity_entry = sev.state_severity.get(lead_severity_state_id)
+    lead_severity_tier = (
+        _lead_severity_entry.tier if _lead_severity_entry is not None else "Emerging"
+    )
+    lead_severity_score_0_100 = (
+        _lead_severity_entry.score_0_100 if _lead_severity_entry is not None else 0.0
+    )
 
     # ── state_distribution — all states, sorted by score descending ──
     state_distribution = [
@@ -384,10 +424,17 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
     if sev.input_count > 0 and session.output_package.severity_result:
         # Input details are in the SeverityEngine — pulled from first input if present
         pass  # populated when full session pipeline wires SeverityAccumulator
+    # Checkpoint 3 (Checkpoint 1 follow-on landed first, this session):
+    # tier, score, AND anchor_text are now all resolved from the SAME
+    # per-state StateSeverity entry -- the score/tier inconsistency the
+    # original Checkpoint 3 dry-run flagged and left open (score staying
+    # session-wide/pooled while tier/anchor_text became per-state) is
+    # closed. sev.score_0_100_with_narrative (the old session-wide,
+    # post-narrative-ceiling value) is no longer read here at all.
     severity_obj = {
-        "tier":        sev.tier,
-        "score":       round(sev.score_0_100_with_narrative, 2),
-        "anchor_text": sev.tier_description,
+        "tier":        lead_severity_tier,
+        "score":       round(lead_severity_score_0_100, 2),
+        "anchor_text": SEVERITY_TIER_DESCRIPTIONS.get(lead_severity_tier, ""),
         "inputs": {
             "duration_band":               None,  # from SeverityInput
             "population_band":             None,  # from SeverityInput
@@ -410,7 +457,10 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
     lead_profile = STATE_PROFILES.get(lead_id) if lead_id else None
     urgency_window_obj = {
         "time_to_consequence": derive_time_to_consequence(lead_profile) if lead_profile else None,
-        "response_window":     synthesize_response_window(trajectory_result, sev.tier),
+        # Checkpoint 3: lead_severity_tier, not sev.tier -- a 4th real
+        # consumer found via exhaustive trace, not among the 3 sites
+        # originally named for this checkpoint.
+        "response_window":     synthesize_response_window(trajectory_result, lead_severity_tier),
     }
 
     # ── narrative_modulation ──
@@ -468,7 +518,12 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
 
     friction_tax_result = compute_friction_tax(
         state_ids=[s["state_id"] for s in identified_states],
-        severity_tier=sev.tier,
+        # Checkpoint 3: lead_severity_tier, not sev.tier. compute_friction_tax()
+        # itself is unchanged (out of scope, not one of this checkpoint's
+        # named files) -- it takes one severity_tier scalar applied across
+        # the full state_ids list, so the lead state's own tier is the only
+        # per-state value this single-scalar call site can meaningfully use.
+        severity_tier=lead_severity_tier,
         org_size=session.intake.headcount,
         industry=session.intake.industry,
         org_type=session.intake.org_type,
