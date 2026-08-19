@@ -28,6 +28,7 @@ from engine.severity import (
     SeverityInput, SeverityAccumulator, SeverityResult,
     compute_raw_severity, normalize_severity, classify_severity,
     apply_narrative_severity_ceiling, SeverityEngine,
+    compute_state_severity, SEVERITY_ID_INTENDED_STATES, SEVERITY_ID_OPTION_STATES,
     _NORMALIZATION_DEFAULT, _EMERGING_MAX_DEFAULT, _ENTRENCHED_MAX_DEFAULT,
 )
 
@@ -354,6 +355,82 @@ check("NARRATIVE_SEVERITY_CEILING_POINTS = 25.0 (LOCKED)",
 check("Population weights all CALIBRATION_TARGET (None)",
       all(v is None for v in POPULATION_WEIGHTS.values()))
 check("Duration weights dict has exactly 3 entries", len(DURATION_WEIGHTS) == 3)
+
+
+# ── 15. compute_state_severity — per-state attribution (Checkpoint 1) ────────
+print("\n15. compute_state_severity — per-state attribution")
+
+check("Locked flat mapping covers exactly 17 SEVER-IDs",
+      len(SEVERITY_ID_INTENDED_STATES) == 17,
+      f"got {len(SEVERITY_ID_INTENDED_STATES)}")
+check("Split-by-option mapping covers exactly 2 IDs x 3 options = 6 entries",
+      len(SEVERITY_ID_OPTION_STATES) == 6,
+      f"got {len(SEVERITY_ID_OPTION_STATES)}")
+check("Combined locked SEVER-ID count = 19 (17 flat + 2 split), matches Section 9",
+      len(SEVERITY_ID_INTENDED_STATES) + 2 == 19)
+
+# Single input, single-state mapping (SEVER-15 -> the_exposed only)
+single_state_acc = SeverityAccumulator(inputs=[
+    SeverityInput("Q02", "SEVER-15", duration_band="0_6mo")
+])
+single_state_result = compute_state_severity(single_state_acc)
+check("Single-state mapping: state_severity has exactly the_exposed",
+      set(single_state_result.keys()) == {"the_exposed"},
+      f"got {single_state_result}")
+
+# One input mapped to multiple states (SEVER-02 -> built_to_fail, the_undefined_role)
+# -- both should carry the identical tier, since the same input feeds both groups.
+multi_state_acc = SeverityAccumulator(inputs=[
+    SeverityInput("Q05", "SEVER-02", duration_band="18mo_plus")
+])
+multi_state_result = compute_state_severity(multi_state_acc)
+check("Multi-state mapping: both built_to_fail and the_undefined_role present",
+      set(multi_state_result.keys()) == {"built_to_fail", "the_undefined_role"},
+      f"got {multi_state_result}")
+check("Multi-state mapping: both states carry the same tier",
+      multi_state_result.get("built_to_fail") == multi_state_result.get("the_undefined_role"),
+      f"got {multi_state_result}")
+
+# Split-by-option: SEVER-03 option C -> decision_paralysis, option E -> the_lost_map
+split_acc = SeverityAccumulator(inputs=[
+    SeverityInput("Q21", "SEVER-03", triggering_option_id="C", duration_band="0_6mo"),
+    SeverityInput("Q21", "SEVER-03", triggering_option_id="E", duration_band="0_6mo"),
+])
+split_result = compute_state_severity(split_acc)
+check("Split-by-option: option C and option E route to different states",
+      set(split_result.keys()) == {"decision_paralysis", "the_lost_map"},
+      f"got {split_result}")
+
+# Unmapped ID: still contributes to the pooled score (backward compat) but
+# attributes to no state -- absent from state_severity entirely, not defaulted
+# to Emerging here (that fallback is a downstream caller's responsibility).
+unmapped_acc = SeverityAccumulator(inputs=[
+    SeverityInput("Q99", "SEVER-99", duration_band="18mo_plus")
+])
+check("Unmapped SEVER-ID still contributes to pooled raw score",
+      isclose(compute_raw_severity(unmapped_acc), 2.0),
+      f"got {compute_raw_severity(unmapped_acc)}")
+check("Unmapped SEVER-ID: state_severity is empty (no attribution, no state key)",
+      compute_state_severity(unmapped_acc) == {},
+      f"got {compute_state_severity(unmapped_acc)}")
+
+# SeverityEngine.score() populates state_severity alongside unchanged session fields
+eng_state = SeverityEngine()
+eng_state.add_input(SeverityInput("Q02", "SEVER-15", duration_band="18mo_plus"))
+result_state = eng_state.score()
+check("SeverityResult.state_severity populated end-to-end via SeverityEngine",
+      result_state.state_severity == {"the_exposed": result_state.tier},
+      f"got {result_state.state_severity}, session tier={result_state.tier}")
+check("SeverityResult still exposes all session-wide fields unchanged (backward compat)",
+      hasattr(result_state, "raw_score") and hasattr(result_state, "tier"),
+      "session-wide fields missing")
+
+# Zero inputs: state_severity is empty, session-wide fields unaffected
+eng_state_zero = SeverityEngine()
+result_state_zero = eng_state_zero.score()
+check("Zero inputs: state_severity is empty dict",
+      result_state_zero.state_severity == {},
+      f"got {result_state_zero.state_severity}")
 
 
 # ── Summary ────────────────────────────────────────────────────────────────────

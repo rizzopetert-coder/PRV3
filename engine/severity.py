@@ -131,6 +131,10 @@ class SeverityInput:
     """
     trigger_question_id:     str            # core question that fired the trigger
     severity_follow_on_id:   str            # SEVER-## question that collected this
+    triggering_option_id:    Optional[str]  = None
+    # which option (e.g. "C") of the SEVER-## follow-on was selected --
+    # required only for follow-ons whose intended state depends on which
+    # option fired (SEVER-03, SEVER-07 today); unused/None otherwise.
 
     duration_band:           Optional[str]  = None
     # "0_6mo" | "6_18mo" | "18mo_plus"
@@ -272,6 +276,99 @@ def classify_severity(score_0_100: float) -> str:
     return "Emerging"
 
 
+# ── Per-state severity attribution — locked mapping ────────────────────────────
+# Spec reference: prompts/severity-result-per-state-redesign-scope.md, Section 9
+# 19 of 32 live SEVER-## IDs locked to their intended state(s). Two IDs
+# (SEVER-03, SEVER-07) require per-option attribution — different options of
+# the same follow-on question map to different intended states — and are keyed
+# by (severity_follow_on_id, triggering_option_id) in SEVERITY_ID_OPTION_STATES
+# instead. Every other locked ID fires into every state listed for it (not
+# split/divided across them). IDs absent from both tables (the 11 unmapped IDs,
+# SEVER-05/SEVER-13 explicitly excluded, and any future new SEVER-##) attribute
+# to no state — the qualifying state falls back to "Emerging" downstream
+# rather than inheriting an unrelated broadcast tier.
+
+SEVERITY_ID_INTENDED_STATES: dict[str, tuple[str, ...]] = {
+    "SEVER-02": ("built_to_fail", "the_undefined_role"),
+    "SEVER-08": ("silosolation",),
+    "SEVER-10": ("culture_drift", "identity_erosion", "wellbeing_theater"),
+    "SEVER-15": ("the_exposed",),
+    "SEVER-17": ("compression_crisis", "pay_exposure"),
+    "SEVER-18": ("dueling_narratives",),
+    "SEVER-19": ("invisible_influence_architecture",),
+    "SEVER-20": (
+        "cultural_overtime", "motivational_architecture_failure",
+        "the_basement_standard", "the_inside_track", "the_wrong_reward",
+    ),
+    "SEVER-21": ("the_paper_tiger",),
+    "SEVER-22": ("heard_and_ignored", "hr_capture", "leadership_deafness", "what_nobody_says"),
+    "SEVER-23": ("groundhog_day", "the_burned_credibility"),
+    "SEVER-24": ("narrative_lock", "the_burned_credibility"),
+    "SEVER-25": ("the_basement_standard", "the_inside_track", "the_untouchable"),
+    "SEVER-26": ("the_suppression_filter",),
+    "SEVER-27": ("disparate_impact_architecture", "heard_and_ignored", "the_tolerated_violation"),
+    "SEVER-28": ("the_founders_grip",),
+    "SEVER-29": ("the_untouchable",),
+}
+
+# Split-by-option: (severity_follow_on_id, triggering_option_id) -> single state.
+SEVERITY_ID_OPTION_STATES: dict[tuple[str, str], str] = {
+    ("SEVER-03", "C"): "decision_paralysis",
+    ("SEVER-03", "D"): "decision_paralysis",
+    ("SEVER-03", "E"): "the_lost_map",
+    ("SEVER-07", "C"): "leadership_continuity_risk",
+    ("SEVER-07", "D"): "the_dormant_talent",
+    ("SEVER-07", "E"): "the_unformed_leader",
+}
+
+
+def _intended_states(inp: SeverityInput) -> tuple[str, ...]:
+    """
+    Return the intended state(s) a single SeverityInput attributes to, per the
+    locked mapping. Empty tuple if this input's severity_follow_on_id is not
+    yet mapped (unmapped IDs, explicitly-excluded IDs, or an unrecognized ID).
+    """
+    key = (inp.severity_follow_on_id, inp.triggering_option_id)
+    if key in SEVERITY_ID_OPTION_STATES:
+        return (SEVERITY_ID_OPTION_STATES[key],)
+    return SEVERITY_ID_INTENDED_STATES.get(inp.severity_follow_on_id, ())
+
+
+def compute_state_severity(accumulator: SeverityAccumulator) -> dict[str, str]:
+    """
+    Group accumulator.inputs by intended state (via the locked mapping above)
+    and classify each state's own tier independently, using the same
+    unmodified normalize_severity()/classify_severity() pipeline as the
+    pooled session-wide score. An input mapped to multiple states (e.g.
+    SEVER-02 -> built_to_fail, the_undefined_role) contributes to every one
+    of them, not divided across them.
+
+    Deliberately excludes narrative_severity_addition — narrative
+    modulation's per-state distribution is an open design question (Section
+    2 of the redesign scoping doc), not resolved here, and its real
+    contribution is confirmed zero in production today regardless.
+
+    States with zero attributed inputs are simply absent from the returned
+    dict — callers apply the "Emerging" fallback for any qualifying state
+    with no key present, not this function.
+
+    Spec reference: prompts/severity-result-per-state-redesign-scope.md,
+    Sections 2/3/9.
+    """
+    by_state: dict[str, list[SeverityInput]] = {}
+    for inp in accumulator.inputs:
+        for state_id in _intended_states(inp):
+            by_state.setdefault(state_id, []).append(inp)
+
+    state_severity: dict[str, str] = {}
+    for state_id, state_inputs in by_state.items():
+        raw = compute_raw_severity(SeverityAccumulator(inputs=state_inputs))
+        score = normalize_severity(raw)
+        state_severity[state_id] = classify_severity(score)
+
+    return state_severity
+
+
 # ── Narrative severity ceiling enforcement ─────────────────────────────────────
 
 def apply_narrative_severity_ceiling(
@@ -312,8 +409,15 @@ class SeverityResult:
     tier_description:          LOCKED behavioral anchor copy from V.3.
     narrative_contribution_0_100: Narrative addition on 0–100 scale.
     narrative_ceiling_applied: True if narrative addition was capped.
+    state_severity:            Per-state tier, keyed by state_id. Only states
+                                with at least one attributed input are present;
+                                callers apply the "Emerging" fallback for any
+                                qualifying state with no key present. Kept
+                                alongside the session-wide fields above, not a
+                                replacement for them (backward-compat).
 
-    Spec reference: Section V
+    Spec reference: Section V. Per-state field added per
+    prompts/severity-result-per-state-redesign-scope.md, Checkpoint 1.
     """
     raw_score:                    float
     score_0_100:                  float
@@ -323,6 +427,7 @@ class SeverityResult:
     narrative_contribution_0_100: float
     narrative_ceiling_applied:    bool
     input_count:                  int
+    state_severity:               dict[str, str] = field(default_factory=dict)
 
 
 class SeverityEngine:
@@ -382,6 +487,7 @@ class SeverityEngine:
         narrative_ceiling_applied = narrative_0_100 > NARRATIVE_SEVERITY_CEILING_POINTS
 
         tier = classify_severity(final_score)
+        state_severity = compute_state_severity(self.accumulator)
 
         return SeverityResult(
             raw_score=raw_without_narrative + raw_narrative,
@@ -392,4 +498,5 @@ class SeverityEngine:
             narrative_contribution_0_100=narrative_0_100,
             narrative_ceiling_applied=narrative_ceiling_applied,
             input_count=len(self.accumulator.inputs),
+            state_severity=state_severity,
         )
