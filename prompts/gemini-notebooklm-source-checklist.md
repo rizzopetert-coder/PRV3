@@ -24,16 +24,15 @@ Google Slides, PDF, plain text (`.txt`), Markdown (`.md`), pasted text, and web 
 It does not recognize source-code extensions as a category, regardless of the file's
 actual content being plain text underneath.
 
-**Practical workaround for every `.py`/`.ts`/`.tsx` file in Sections 1-5 below:**
-- Save or export a copy with a `.txt` extension (identical content, extension only) and
-  upload that copy, or
-- Use NotebookLM's "paste text" source option and paste the file's content directly, or
-- If a batch of files needs to go in at once, concatenate them into one `.txt` file with
-  clear `--- filename ---` separators between each, rather than uploading one at a time.
-
-**Sections 6 (`CLAUDE.md`, `.md`) and `tools/_mob.txt` (`.txt`) are already in accepted
-formats and can be uploaded as-is, no conversion needed.** This is why those two didn't
-surface the problem — the code files are where it bites.
+**Automated as of 2026-08-19 — `tools/export_gemini_sources.py`.** Run it and it
+produces a single `gemini_export/` staging folder (repo root, gitignored) containing
+every file from Sections 1-6 below, already in an accepted format: code files
+(`.py`/`.ts`/`.tsx`) get a `.txt` extension appended with content otherwise byte-
+identical to source; `CLAUDE.md` and `tools/_mob.txt` are copied as-is. A
+`manifest.txt` lands in the same folder recording the git commit hash and timestamp
+the export was taken at, plus every source-path → export-filename mapping. This
+replaces the manual per-file conversion described in earlier versions of this doc —
+see "How to use this" below for the actual workflow now.
 
 ---
 
@@ -155,6 +154,22 @@ checklist exists to catch — remove them, don't just skip re-adding them.
 
 ## How to use this at the next Quarterly Step-Back
 
+**Checking whether a re-export is even needed:** if a `gemini_export/manifest.txt`
+from a prior run still exists, compare its `commit:` line against `git rev-parse
+HEAD`. Identical means the last export already reflects current `main` — no need to
+re-run or re-upload anything.
+
+**Refreshing the notebook (the normal case, once this list itself is still accurate):**
+1. Run `python tools/export_gemini_sources.py` from the repo root.
+2. Open `gemini_export/` and upload its entire contents to NotebookLM, replacing the
+   notebook's existing sources rather than adding alongside them (stale sources
+   sitting next to fresh ones is its own drift risk).
+3. Done — `manifest.txt` itself is also uploadable if you want the commit hash/
+   timestamp visible to Gemini as context, though it's mainly for your own
+   staleness-checking, not required reading.
+
+**Re-deriving the list itself (only needed when the file set may have changed —
+Quarterly Step-Back, or a Gemini review citing an unrecognized file):**
 1. Re-run the directory listings this checklist is built from (`engine/`, `engine/data/`,
    `web/lib/`, `web/app/api/`, `web/components/`, `web/data/`) — don't assume the file
    set hasn't changed since this version was written.
@@ -166,6 +181,10 @@ checklist exists to catch — remove them, don't just skip re-adding them.
 4. Spot-check a small number of "is this dead code" claims the way `output-renderer.ts`
    was checked this session (repo-wide import search) — dead files silently accumulate
    and this is the cheapest point to catch them.
-5. Before uploading anything: remember Section 0's format constraint. Every `.py`/`.ts`/
-   `.tsx` file needs converting to `.txt` (or pasting as text) first — NotebookLM does
-   not accept the raw extension.
+5. **If the file list changes, update both this doc's Sections 1-6 and
+   `EXPORT_FILES` in `tools/export_gemini_sources.py` — they're deliberately not
+   auto-synced (the script hardcodes the list rather than parsing this doc, since
+   parsing prose-plus-tables reliably is more fragile than keeping two short lists
+   aligned by hand). The script prints a warning on run if it finds a path in this
+   doc's Sections 1-6 that's missing from `EXPORT_FILES`, but that check is best-
+   effort, not a substitute for updating both.**
