@@ -184,6 +184,14 @@ export interface AccumulatePayload {
   question_id: string;
   option_ids: string[];
   intake: PrivateIntakeEcho;
+  // Checkpoint 2 (SeverityResult per-state redesign) -- both optional,
+  // populated by the caller only when question_id is itself a SEVER-##
+  // follow-on with a recorded origin (DiagnosticSession.
+  // severity_follow_on_origins). Absent/undefined for every other
+  // question, matching today's payload shape exactly -- pure addition,
+  // not a breaking change to any existing call.
+  trigger_question_id?: string;
+  triggering_option_id?: string;
 }
 
 // Mirrors engine.severity.SeverityInput's constructor kwargs exactly.
@@ -195,6 +203,10 @@ export interface AccumulatePayload {
 export interface SeverityInputPayload {
   trigger_question_id: string;
   severity_follow_on_id: string;
+  // Checkpoint 2 -- optional, mirrors SeverityInput.triggering_option_id
+  // (engine/severity.py). Required only for SEVER-03/SEVER-07's
+  // per-option attribution; undefined for every other follow-on.
+  triggering_option_id?: string;
   duration_band?: "0_6mo" | "6_18mo" | "18mo_plus";
   population_band?: "under_10pct" | "10_30pct" | "30pct_plus";
   prior_failed_resolution?: boolean;
@@ -221,6 +233,14 @@ export interface AccumulateResult {
   // SEVER-01 -> SEVER-12, which is exactly this same mechanism firing
   // again one level deeper).
   severity_follow_on_ids: string[];
+  // Checkpoint 2 -- maps each entry in severity_follow_on_ids to the
+  // option_id (within THIS call's option_ids) that produced it. Mirrors
+  // accumulate_answers()'s new return key (engine/main.py). {} when
+  // severity_follow_on_ids is empty. Exists so the caller never has to
+  // guess origin from option_ids' length/position -- correct even if a
+  // single weighted_multi_select answer (Q06-style) fires more than one
+  // follow-on from different options in the same request.
+  severity_follow_on_origins: Record<string, string>;
 }
 
 export async function invokeAccumulate(

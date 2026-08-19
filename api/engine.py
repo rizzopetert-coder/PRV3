@@ -88,15 +88,27 @@ async def accumulate(request: Request):
         question_id = payload.get("question_id", "") if isinstance(payload, dict) else ""
         option_ids = payload.get("option_ids", []) if isinstance(payload, dict) else []
         intake = payload.get("intake", {}) if isinstance(payload, dict) else {}
+        # Checkpoint 2 (SeverityResult per-state redesign) -- both optional,
+        # absent from the payload for any question_id that isn't a SEVER-##
+        # follow-on with a recorded origin. No Pydantic model exists on this
+        # route to "mirror" -- confirmed via direct read, every field here
+        # is manually parsed via payload.get(), not a typed BaseModel.
+        trigger_question_id = payload.get("trigger_question_id", "") if isinstance(payload, dict) else ""
+        triggering_option_id = payload.get("triggering_option_id", "") if isinstance(payload, dict) else ""
         # accumulate_answers() (A.2, this session -- wraps
         # accumulate_one_answer() once per selected option) returns
-        # {"accumulated_vector", "severity_inputs", "severity_follow_on_ids"}
-        # -- passed straight through as the response body. The Next.js
-        # caller unpacks accumulated_vector for the session's own vector,
-        # persists every severity_input into session.severity_inputs, and
-        # splices every severity_follow_on_id into question_sequence,
-        # mirroring checkpoint distinguishers.
-        result = accumulate_answers(accumulated_vector, question_id, option_ids, intake)
+        # {"accumulated_vector", "severity_inputs", "severity_follow_on_ids",
+        # "severity_follow_on_origins"} -- passed straight through as the
+        # response body. The Next.js caller unpacks accumulated_vector for
+        # the session's own vector, persists every severity_input into
+        # session.severity_inputs, splices every severity_follow_on_id into
+        # question_sequence (mirroring checkpoint distinguishers), and
+        # records severity_follow_on_origins for later per-option
+        # attribution (Checkpoint 2).
+        result = accumulate_answers(
+            accumulated_vector, question_id, option_ids, intake,
+            trigger_question_id, triggering_option_id,
+        )
         return JSONResponse(content=result)
     except KeyError as e:
         # Unknown question_id or option_id — client fault

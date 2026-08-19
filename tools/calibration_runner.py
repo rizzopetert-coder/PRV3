@@ -603,6 +603,20 @@ def run_profile(test_case) -> dict:
     sev_engine = SeverityEngine()
 
     answers_to_use = test_case.answers or generate_answers(test_case)
+    # Checkpoint 2 (SeverityResult per-state redesign): maps
+    # severity_follow_on_id -> the option_id of its real trigger question,
+    # built forward as answers_to_use is walked. Mirrors engine/main.py's
+    # accumulate_answers() severity_follow_on_origins return value, kept
+    # local here rather than widening generate_answers()'s own return
+    # shape -- ~8 other diagnostic scripts call generate_answers()
+    # directly and would break on a return-shape change. Correct by
+    # construction: a trigger's answer always precedes its follow-on's
+    # answer in answers_to_use, both for generated profiles
+    # (generate_answers() appends the follow-on immediately after its
+    # trigger) and for any manually authored test_case.answers (a
+    # follow-on cannot be answered before the question that spliced it
+    # in).
+    severity_follow_on_origins = {}
     for ans in answers_to_use:
         q = QUESTION_LIBRARY.get(ans.question_id)
         if q is None:
@@ -616,6 +630,9 @@ def run_profile(test_case) -> dict:
                 continue
             acc_engine.apply_answer(opt, ans.question_id)
 
+            if opt.severity_trigger and opt.severity_follow_on_id:
+                severity_follow_on_origins[opt.severity_follow_on_id] = opt_id
+
             # Severity follow-on collection -- mirrors engine/main.py's
             # accumulate_one_answer() exactly, including its own documented
             # trigger_question_id simplification (defaults to the follow-on's
@@ -626,6 +643,7 @@ def run_profile(test_case) -> dict:
                 severity_input = SeverityInput(
                     trigger_question_id=ans.question_id,
                     severity_follow_on_id=ans.question_id,
+                    triggering_option_id=severity_follow_on_origins.get(ans.question_id),
                     **opt.severity_input_mapping,
                 )
                 sev_engine.add_input(severity_input)

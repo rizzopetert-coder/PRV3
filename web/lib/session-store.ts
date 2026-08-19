@@ -132,6 +132,17 @@ export interface AnswerLogEntry {
   option_ids: string[];
 }
 
+// Checkpoint 2 (SeverityResult per-state redesign) -- recorded at splice
+// time (session/answer/route.ts, alongside question_labels) for every
+// severity follow-on question, so its own eventual answer can still
+// attribute triggering_option_id correctly even though the trigger's
+// answer and the follow-on's answer arrive in two separate HTTP
+// requests, with the session round-tripping through Redis in between.
+export interface SeverityFollowOnOrigin {
+  trigger_question_id: string;
+  triggering_option_id: string;
+}
+
 // Mirrors engine.checkpoint.CheckpointResult. Three independent optional
 // slots on DiagnosticSession below — not a nested dict — matching Python's
 // SessionData pattern (confirmed against engine/contract.py lines 47-62).
@@ -171,6 +182,18 @@ export interface DiagnosticSession {
   // "Emerging" constant. [] (no follow-ons fired) preserves that constant
   // exactly, same as before this wiring existed.
   severity_inputs: SeverityInputPayload[];
+  // Checkpoint 2 (SeverityResult per-state redesign) -- one entry per
+  // severity follow-on spliced this session, keyed by the follow-on's
+  // own question_id (e.g. "SEVER-03"). Populated at the same splice site
+  // as question_labels below, from accumulateResult.
+  // severity_follow_on_origins (engine/main.py's accumulate_answers()).
+  // Consumed once, at the moment that follow-on question is itself
+  // answered -- looked up and threaded into that answer's own
+  // invokeAccumulate() payload. Never cleaned up after consumption, same
+  // append-only convention as question_labels/answers_log below --
+  // bounded by the ~19-entry real SEVER-## count, no meaningful growth
+  // concern.
+  severity_follow_on_origins: Record<string, SeverityFollowOnOrigin>;
   // Display labels for spliced questions only (question_id -> "[parent]
   // [letter]", e.g. "6A", "11A", "11B"). Core questions never get an
   // entry here -- their label is always derivable via
@@ -349,6 +372,7 @@ export async function createSession(intake: PrivateIntakeEcho): Promise<Diagnost
     checkpoint_q27: null,
     question_sequence: [...PHASE_1_QUESTION_SEQUENCE],
     severity_inputs: [],
+    severity_follow_on_origins: {},
     question_labels: {},
   };
 

@@ -226,6 +226,7 @@ def accumulate_one_answer(
     option_id: str,
     intake: dict,
     trigger_question_id: str = "",
+    triggering_option_id: str = "",
 ) -> dict:
     """
     Stateless per-answer accumulation step. Pure vector math -- no ranking,
@@ -253,6 +254,15 @@ def accumulate_one_answer(
     not true provenance, when the real trigger context isn't threaded
     through. Ignored entirely when this question has no
     severity_input_mapping.
+
+    triggering_option_id (Checkpoint 2, SeverityResult per-state
+    redesign): which option of trigger_question_id was selected --
+    required only for follow-ons whose intended state depends on which
+    option fired (SEVER-03, SEVER-07 today, per SEVERITY_ID_OPTION_STATES
+    in engine/severity.py). Threaded into the constructed severity_input
+    dict as "triggering_option_id" (None when not supplied). Same
+    "known only by the caller" caveat as trigger_question_id above --
+    this function has no way to derive it independently.
 
     severity_follow_on_id (return value): the OPPOSITE direction from
     severity_input above -- when the just-answered option itself carries
@@ -297,6 +307,13 @@ def accumulate_one_answer(
             "severity_follow_on_id": question_id,
             **option.severity_input_mapping,
         }
+        # Omitted (not set to None) when absent -- preserves the old dict
+        # shape byte-for-byte for every non-split-option mapping, matches
+        # SeverityInputPayload's optional-field convention on the wire,
+        # and SeverityInput(**severity_input) fills its own
+        # Optional[str] = None default either way.
+        if triggering_option_id:
+            severity_input["triggering_option_id"] = triggering_option_id
 
     severity_follow_on_id = option.severity_follow_on_id if option.severity_trigger else None
 
@@ -313,6 +330,7 @@ def accumulate_answers(
     option_ids: list,
     intake: dict,
     trigger_question_id: str = "",
+    triggering_option_id: str = "",
 ) -> dict:
     """
     Multi-option wrapper around accumulate_one_answer() -- A.2 (Q06
@@ -338,6 +356,22 @@ def accumulate_answers(
     selecting both can legitimately fire two severity follow-ons from
     one submission.
 
+    triggering_option_id (Checkpoint 2): threaded uniformly into every
+    accumulate_one_answer() call in the loop below, same as
+    trigger_question_id already is -- both describe the ORIGIN question/
+    option of whichever follow-on is currently being answered, not a
+    per-selected-option value, so one value applies to the whole call.
+
+    severity_follow_on_origins (return value, Checkpoint 2): maps each
+    entry in severity_follow_on_ids to the option_id (within THIS call's
+    option_ids) that produced it. Not strictly required for any
+    currently-locked mapping (SEVER-03/07's real parents, Q21/Q25, are
+    both format="forced_choice" -- option_ids is always 1 element for
+    them), but removes a latent correctness trap for any future
+    multi-select trigger question whose fired follow-ons need
+    split-by-option attribution -- Q06 already proves multi-select
+    triggers exist live (A -> SEVER-27, D -> SEVER-21).
+
     Raises KeyError (same as accumulate_one_answer(), same caller
     handling in api/engine.py) if option_ids is empty or any entry is
     invalid for question_id.
@@ -348,18 +382,24 @@ def accumulate_answers(
     vector = dict(accumulated_vector)
     severity_inputs = []
     severity_follow_on_ids = []
+    severity_follow_on_origins = {}
     for option_id in option_ids:
-        step = accumulate_one_answer(vector, question_id, option_id, intake, trigger_question_id)
+        step = accumulate_one_answer(
+            vector, question_id, option_id, intake,
+            trigger_question_id, triggering_option_id,
+        )
         vector = step["accumulated_vector"]
         if step["severity_input"] is not None:
             severity_inputs.append(step["severity_input"])
         if step["severity_follow_on_id"] is not None:
             severity_follow_on_ids.append(step["severity_follow_on_id"])
+            severity_follow_on_origins[step["severity_follow_on_id"]] = option_id
 
     return {
         "accumulated_vector": vector,
         "severity_inputs": severity_inputs,
         "severity_follow_on_ids": severity_follow_on_ids,
+        "severity_follow_on_origins": severity_follow_on_origins,
     }
 
 

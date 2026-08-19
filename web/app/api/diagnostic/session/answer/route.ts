@@ -129,11 +129,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Checkpoint 2 (SeverityResult per-state redesign) -- if question_id is
+  // itself a previously-spliced severity follow-on, its origin (which
+  // core question, which option) was recorded at splice time below.
+  // undefined for every other question -- both new AccumulatePayload
+  // fields stay absent from the request body exactly as before this
+  // checkpoint.
+  const followOnOrigin = session.severity_follow_on_origins[question_id];
+
   const accumulateResult = await invokeAccumulate({
     accumulated_vector: session.accumulated_vector,
     question_id,
     option_ids,
     intake: session.intake,
+    trigger_question_id: followOnOrigin?.trigger_question_id,
+    triggering_option_id: followOnOrigin?.triggering_option_id,
   });
 
   const answerEntry: AnswerLogEntry = { question_id, option_ids };
@@ -176,6 +186,15 @@ export async function POST(request: NextRequest) {
     );
     newFollowOnIds.forEach((followOnId, letterIndex) => {
       session.question_labels[followOnId] = spliceLabel(question_id, letterIndex, session.question_labels);
+      // Checkpoint 2 -- record which option of question_id triggered this
+      // follow-on, keyed off accumulateResult.severity_follow_on_origins
+      // (engine-computed, correct even for a multi-select answer firing
+      // more than one follow-on from different options at once) rather
+      // than assuming option_ids[0].
+      session.severity_follow_on_origins[followOnId] = {
+        trigger_question_id: question_id,
+        triggering_option_id: accumulateResult.severity_follow_on_origins[followOnId],
+      };
     });
   }
 
