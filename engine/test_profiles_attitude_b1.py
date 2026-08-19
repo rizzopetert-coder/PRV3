@@ -553,7 +553,7 @@ ATT_NL_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["narrative_lock"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 
@@ -581,7 +581,7 @@ ATT_NL_02 = TestCase(
     expected=ExpectedOutput(
         output_type="multi_state",
         identified_states=["narrative_lock", "the_burned_credibility"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -606,7 +606,7 @@ ATT_NL_03 = TestCase(
     expected=ExpectedOutput(
         output_type="multi_state",
         identified_states=["narrative_lock", "the_burned_credibility"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
         pass_criterion="top_3",
     ),
 )
@@ -640,7 +640,7 @@ ATT_GD_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["groundhog_day"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 
@@ -667,7 +667,7 @@ ATT_GD_02 = TestCase(
     expected=ExpectedOutput(
         output_type="multi_state",
         identified_states=["groundhog_day", "the_burned_credibility"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -692,7 +692,7 @@ ATT_GD_03 = TestCase(
     expected=ExpectedOutput(
         output_type="multi_state",
         identified_states=["groundhog_day", "the_lost_map"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
         pass_criterion="top_3",
     ),
 )
@@ -814,7 +814,7 @@ ATT_BCP_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_broken_compass"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -842,7 +842,7 @@ ATT_BCP_02 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_broken_compass"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -867,7 +867,7 @@ ATT_BCP_03 = TestCase(
     expected=ExpectedOutput(
         output_type="multi_state",
         identified_states=["the_broken_compass", "groundhog_day"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
         pass_criterion="top_3",
     ),
 )

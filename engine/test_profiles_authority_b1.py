@@ -45,7 +45,7 @@ AUT_FG_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_founders_grip"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 
@@ -212,7 +212,7 @@ AUT_HC_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["hr_capture"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 
@@ -239,7 +239,7 @@ AUT_HC_02 = TestCase(
     expected=ExpectedOutput(
         output_type="multi_state",
         identified_states=["hr_capture", "the_exposed"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -379,7 +379,7 @@ AUT_TV_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_tolerated_violation"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 

@@ -43,7 +43,7 @@ ATT_WNS_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["what_nobody_says"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 
@@ -222,7 +222,7 @@ ATT_UD_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_unlocked_door"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -309,7 +309,7 @@ ATT_LD_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["leadership_deafness"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 

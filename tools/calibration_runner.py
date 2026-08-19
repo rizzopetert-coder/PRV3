@@ -36,7 +36,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
 from engine.accumulation import IntakeData, AccumulationEngine, rank_states
-from engine.severity import SeverityEngine, SeverityInput
+from engine.severity import SeverityEngine, SeverityInput, SEVERITY_ID_OPTION_STATES
 from engine.output import OutputEngine, compute_noise_baseline, SCD_WCS_ALIGNMENT_THRESHOLD
 from engine.contract import SessionData, assemble_output
 from engine.test_suite import run_test_case, run_suite, PROFILE_TYPES
@@ -132,6 +132,25 @@ def best_option_for_state(question, target_state_id: str):
     sequential_decision_blindness). Two other trigger-involved ties exist
     (Q03A/the_second_close, Q20/decision_paralysis) but differ on other
     fields and are deliberately excluded by the full-identity check.
+
+    Checkpoint 4 investigation, this session: a SECOND tiebreak added,
+    scoped to the split-by-option severity mapping (SEVERITY_ID_OPTION_STATES,
+    engine/severity.py, Checkpoint 1). Q21's C/D/E and Q25's C/D/E each
+    carry byte-for-byte identical dimensional_contributions -- a real,
+    deliberate data fact (one shared dimensional-signal group spanning
+    multiple states, differentiated only by qualitative option text) --
+    so the max() above always silently returns C (first in list order),
+    with zero awareness that C/D/E now carry a real, distinct
+    severity-option-to-state association this function predates. When
+    the tied `best` carries severity_trigger=True but its own
+    (severity_follow_on_id, option_id) doesn't resolve to target_state_id,
+    search the other dimensionally-identical, same-follow-on options for
+    one whose own key does. SEVERITY_ID_OPTION_STATES.get() returns None
+    for any non-split-option key -- so this only ever changes behavior
+    when a genuine split-option tie exists and the naive pick doesn't
+    already match; confirmed via direct trace this doesn't touch the
+    three tie precedents named above (none of their trigger IDs appear
+    in SEVERITY_ID_OPTION_STATES).
     """
     profile = STATE_PROFILES.get(target_state_id)
     if not profile:
@@ -147,6 +166,20 @@ def best_option_for_state(question, target_state_id: str):
                 opt is not best
                 and opt.severity_trigger
                 and opt.dimensional_contributions == best.dimensional_contributions
+            ):
+                return opt
+        return best
+
+    if SEVERITY_ID_OPTION_STATES.get((best.severity_follow_on_id, best.option_id)) != target_state_id:
+        for opt in question.answer_options:
+            if (
+                opt is not best
+                and opt.severity_trigger
+                and opt.severity_follow_on_id == best.severity_follow_on_id
+                and opt.dimensional_contributions == best.dimensional_contributions
+                and SEVERITY_ID_OPTION_STATES.get(
+                    (opt.severity_follow_on_id, opt.option_id)
+                ) == target_state_id
             ):
                 return opt
     return best

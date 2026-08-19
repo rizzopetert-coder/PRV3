@@ -278,21 +278,34 @@ def classify_severity(score_0_100: float) -> str:
 
 # ── Per-state severity attribution — locked mapping ────────────────────────────
 # Spec reference: prompts/severity-result-per-state-redesign-scope.md, Section 9
-# 19 of 32 live SEVER-## IDs locked to their intended state(s). Two IDs
-# (SEVER-03, SEVER-07) require per-option attribution — different options of
-# the same follow-on question map to different intended states — and are keyed
-# by (severity_follow_on_id, triggering_option_id) in SEVERITY_ID_OPTION_STATES
-# instead. Every other locked ID fires into every state listed for it (not
-# split/divided across them). IDs absent from both tables (the 11 unmapped IDs,
-# SEVER-05/SEVER-13 explicitly excluded, and any future new SEVER-##) attribute
-# to no state — the qualifying state falls back to "Emerging" downstream
-# rather than inheriting an unrelated broadcast tier.
+# 31 of 32 live SEVER-## IDs locked to their intended state(s), Checkpoint 4
+# (this session -- promoted from 19/32, Gemini-confirmed: SEVER-05 added as a
+# real split-by-option entry, 11 previously-unmapped flat IDs promoted from
+# Section 4's own "Clear" investigation, never formally locked until now).
+# Three IDs (SEVER-03, SEVER-05, SEVER-07) require per-option attribution —
+# different options of the same follow-on question map to different intended
+# states — and are keyed by (severity_follow_on_id, triggering_option_id) in
+# SEVERITY_ID_OPTION_STATES instead. Every other locked ID fires into every
+# state listed for it (not split/divided across them). SEVER-13 is the sole
+# remaining exclusion — "found clean," no state-scoping leak, per the
+# original SEVER-19 leak investigation. IDs absent from both tables (SEVER-13
+# and any future new SEVER-##) attribute to no state — the qualifying state
+# falls back to "Emerging" downstream rather than inheriting an unrelated
+# broadcast tier.
 
 SEVERITY_ID_INTENDED_STATES: dict[str, tuple[str, ...]] = {
+    "SEVER-01": ("the_diversity_ceiling",),
     "SEVER-02": ("built_to_fail", "the_undefined_role"),
+    "SEVER-04": ("the_policy_lag",),
+    "SEVER-06": ("invisible_burnout",),
     "SEVER-08": ("silosolation",),
+    "SEVER-09": ("the_second_close",),
     "SEVER-10": ("culture_drift", "identity_erosion", "wellbeing_theater"),
+    "SEVER-11": ("the_unsolved_problem",),
+    "SEVER-12": ("the_diversity_ceiling",),
+    "SEVER-14": ("the_fracture",),
     "SEVER-15": ("the_exposed",),
+    "SEVER-16": ("the_unreported_hazard",),
     "SEVER-17": ("compression_crisis", "pay_exposure"),
     "SEVER-18": ("dueling_narratives",),
     "SEVER-19": ("invisible_influence_architecture",),
@@ -309,6 +322,9 @@ SEVERITY_ID_INTENDED_STATES: dict[str, tuple[str, ...]] = {
     "SEVER-27": ("disparate_impact_architecture", "heard_and_ignored", "the_tolerated_violation"),
     "SEVER-28": ("the_founders_grip",),
     "SEVER-29": ("the_untouchable",),
+    "SEVER-30": ("built_to_fail",),
+    "SEVER-31": ("built_to_fail",),
+    "SEVER-32": ("the_founders_grip",),
 }
 
 # Split-by-option: (severity_follow_on_id, triggering_option_id) -> single state.
@@ -316,6 +332,16 @@ SEVERITY_ID_OPTION_STATES: dict[tuple[str, str], str] = {
     ("SEVER-03", "C"): "decision_paralysis",
     ("SEVER-03", "D"): "decision_paralysis",
     ("SEVER-03", "E"): "the_lost_map",
+    # SEVER-05 (Checkpoint 4, this session): Q23 fires SEVER-05 from two
+    # different options with genuinely distinct content -- option A ("no
+    # single departure would be unmanageable") is a confident, untested
+    # claim matching paper_shield's exact definition; option D ("people
+    # right now whose loss would be genuinely destabilizing") is an
+    # acknowledged, current fragility matching leadership_continuity_risk's
+    # definition. Verified against real question/option text and state
+    # descriptive_prose, Gemini-confirmed.
+    ("SEVER-05", "A"): "paper_shield",
+    ("SEVER-05", "D"): "leadership_continuity_risk",
     ("SEVER-07", "C"): "leadership_continuity_risk",
     ("SEVER-07", "D"): "the_dormant_talent",
     ("SEVER-07", "E"): "the_unformed_leader",

@@ -364,14 +364,15 @@ check("Duration weights dict has exactly 3 entries", len(DURATION_WEIGHTS) == 3)
 # is present, a real float, and matches the real normalize_severity(raw) math.
 print("\n15. compute_state_severity — per-state attribution")
 
-check("Locked flat mapping covers exactly 17 SEVER-IDs",
-      len(SEVERITY_ID_INTENDED_STATES) == 17,
+check("Locked flat mapping covers exactly 28 SEVER-IDs",
+      len(SEVERITY_ID_INTENDED_STATES) == 28,
       f"got {len(SEVERITY_ID_INTENDED_STATES)}")
-check("Split-by-option mapping covers exactly 2 IDs x 3 options = 6 entries",
-      len(SEVERITY_ID_OPTION_STATES) == 6,
+check("Split-by-option mapping covers exactly 3 IDs x up to 3 options = 8 entries",
+      len(SEVERITY_ID_OPTION_STATES) == 8,
       f"got {len(SEVERITY_ID_OPTION_STATES)}")
-check("Combined locked SEVER-ID count = 19 (17 flat + 2 split), matches Section 9",
-      len(SEVERITY_ID_INTENDED_STATES) + 2 == 19)
+check("Combined locked SEVER-ID count = 31 of 32 (28 flat + 3 split), "
+      "matches Checkpoint 4's promotion -- only SEVER-13 remains excluded",
+      len(SEVERITY_ID_INTENDED_STATES) + len({k[0] for k in SEVERITY_ID_OPTION_STATES}) == 31)
 
 # Single input, single-state mapping (SEVER-15 -> the_exposed only)
 single_state_acc = SeverityAccumulator(inputs=[
@@ -423,6 +424,21 @@ check("Split-by-option: each state's own StateSeverity carries a real tier",
       split_result["decision_paralysis"].tier in SEVERITY_TIERS
       and split_result["the_lost_map"].tier in SEVERITY_TIERS,
       f"got {split_result}")
+
+# Split-by-option, Checkpoint 4 addition: SEVER-05 option A -> paper_shield,
+# option D -> leadership_continuity_risk.
+sever05_split_acc = SeverityAccumulator(inputs=[
+    SeverityInput("Q23", "SEVER-05", triggering_option_id="A", duration_band="0_6mo"),
+    SeverityInput("Q23", "SEVER-05", triggering_option_id="D", duration_band="0_6mo"),
+])
+sever05_split_result = compute_state_severity(sever05_split_acc)
+check("SEVER-05 split-by-option: option A and option D route to different states",
+      set(sever05_split_result.keys()) == {"paper_shield", "leadership_continuity_risk"},
+      f"got {sever05_split_result}")
+check("SEVER-05 split-by-option: each state's own StateSeverity carries a real tier",
+      sever05_split_result["paper_shield"].tier in SEVERITY_TIERS
+      and sever05_split_result["leadership_continuity_risk"].tier in SEVERITY_TIERS,
+      f"got {sever05_split_result}")
 
 # Unmapped ID: still contributes to the pooled score (backward compat) but
 # attributes to no state -- absent from state_severity entirely, not defaulted

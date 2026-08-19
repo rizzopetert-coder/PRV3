@@ -45,7 +45,7 @@ ALL_FR_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_fracture"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 
@@ -73,7 +73,7 @@ ALL_FR_02 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_fracture"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -131,7 +131,7 @@ ALL_SC_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_second_close"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -216,7 +216,7 @@ ALL_SI_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["silosolation"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 
@@ -302,7 +302,7 @@ ALL_SF_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_suppression_filter"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 
@@ -330,7 +330,7 @@ ALL_SF_02 = TestCase(
     expected=ExpectedOutput(
         output_type="multi_state",
         identified_states=["the_suppression_filter", "leadership_deafness"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -355,7 +355,7 @@ ALL_SF_03 = TestCase(
     expected=ExpectedOutput(
         output_type="multi_state",
         identified_states=["the_suppression_filter", "leadership_deafness"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
         pass_criterion="top_3",
     ),
 )
@@ -388,7 +388,7 @@ ALL_AS_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_arbitrary_standard"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -474,7 +474,7 @@ ALL_DB_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["decision_blindness"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 

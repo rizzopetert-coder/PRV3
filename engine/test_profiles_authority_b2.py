@@ -380,7 +380,7 @@ AUT_TP_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["transition_paralysis"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -634,7 +634,7 @@ AUT_PF_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_pay_fog"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 

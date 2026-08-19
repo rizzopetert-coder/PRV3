@@ -43,7 +43,7 @@ AUT_UA_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_unexamined_algorithm"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -131,7 +131,7 @@ AUT_PS_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["paper_shield"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 

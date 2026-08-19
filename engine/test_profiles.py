@@ -121,7 +121,7 @@ APT_OM_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_overloaded_manager"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -280,7 +280,7 @@ APT_BF_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["built_to_fail"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 

@@ -127,7 +127,7 @@ EXP_SDB_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["sequential_decision_blindness"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -209,7 +209,7 @@ EXP_DIA_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["disparate_impact_architecture"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 
@@ -289,7 +289,7 @@ EXP_PAG_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["planning_authority_gap"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -449,7 +449,7 @@ EXP_HDA_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["human_displacement_anxiety"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -529,7 +529,7 @@ EXP_MAF_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["motivational_architecture_failure"],
-        severity_tier="Endemic",
+        severity_tier="Entrenched",
     ),
 )
 
@@ -687,7 +687,7 @@ EXP_IPM_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["invisible_performance_management"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -766,7 +766,7 @@ EXP_DCF_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["distributed_culture_fragmentation"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
@@ -847,7 +847,7 @@ EXP_IC_01 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_inner_circle"],
-        severity_tier="Endemic",
+        severity_tier="Emerging",
     ),
 )
 
@@ -873,7 +873,7 @@ EXP_IC_02 = TestCase(
     expected=ExpectedOutput(
         output_type="single_state",
         identified_states=["the_inner_circle"],
-        severity_tier="Entrenched",
+        severity_tier="Emerging",
     ),
 )
 
