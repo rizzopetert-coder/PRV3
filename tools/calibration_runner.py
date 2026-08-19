@@ -591,13 +591,15 @@ def generate_answers(test_case):
     return answers
 
 
-def run_profile_synthetic(test_case) -> dict:
+def _run_profile_synthetic_core(test_case) -> tuple:
     """
-    Run one test profile using synthetic dimensional injection (Option A).
-    Bypasses the question routing layer — directly injects a vector before
-    rank_states(). Used for Phase 1 calibration before answer population.
-
-    Returns the assemble_output() dict.
+    Shared core for run_profile_synthetic() -- returns
+    (assembled_output_dict, SeverityResult). Extracted this session
+    (Checkpoint 5) so the calibration harness's severity check can
+    access state_severity directly, mirroring _run_profile_core() below.
+    Synthetic mode never calls SeverityEngine.add_input() at all
+    (bypasses the question layer entirely), so state_severity is always
+    {} here, deterministically -- documented, not a bug.
     """
     intake = IntakeData(**test_case.intake)
     synthetic_vector = _build_synthetic_vector(test_case.target_state, test_case.profile_type)
@@ -618,13 +620,31 @@ def run_profile_synthetic(test_case) -> dict:
         output_package=out_pkg,
         severity_result=sev_result,
     )
-    return assemble_output(session)
+    return assemble_output(session), sev_result
 
 
-def run_profile(test_case) -> dict:
+def run_profile_synthetic(test_case) -> dict:
     """
-    Run one test profile through the full engine pipeline.
+    Run one test profile using synthetic dimensional injection (Option A).
+    Bypasses the question routing layer — directly injects a vector before
+    rank_states(). Used for Phase 1 calibration before answer population.
+
     Returns the assemble_output() dict.
+    """
+    return _run_profile_synthetic_core(test_case)[0]
+
+
+def _run_profile_core(test_case) -> tuple:
+    """
+    Shared core for run_profile() -- returns (assembled_output_dict,
+    SeverityResult). Extracted this session (Checkpoint 5) so the
+    calibration harness's severity pass/fail check can access
+    state_severity directly without a second, duplicate engine run or a
+    hand-copied reimplementation of this exact severity-collection loop
+    -- the pattern this session's earlier investigation scripts
+    (tools/verify_checkpoint3_recalibration_scope.py,
+    tools/categorize_checkpoint4_mismatches.py) had to resort to, now
+    superseded by this single, real source of truth.
 
     With test_case.answers=[], generates answers via generate_answers() based
     on profile_type and target_state (Phase 2 mode).
@@ -696,7 +716,18 @@ def run_profile(test_case) -> dict:
         output_package=out_pkg,
         severity_result=sev_result,
     )
-    return assemble_output(session)
+    return assemble_output(session), sev_result
+
+
+def run_profile(test_case) -> dict:
+    """
+    Run one test profile through the full engine pipeline.
+    Returns the assemble_output() dict.
+
+    With test_case.answers=[], generates answers via generate_answers() based
+    on profile_type and target_state (Phase 2 mode).
+    """
+    return _run_profile_core(test_case)[0]
 
 
 # -- v23 Calibration Suite Builder -------------------------------------------
@@ -746,12 +777,56 @@ def _passes_prominence_criterion(result: dict, profile_type: str) -> bool:
     return target_score >= (rank_1_score - delta)
 
 
+# Checkpoint 5 (SeverityResult per-state redesign) -- mirrors, does not
+# import, engine/test_suite.py's own module-private _TIER_ORDER. Reused
+# for the same +/-1 Emerging/Entrenched boundary tolerance already
+# locked in that module's evaluate_pass_criteria() (Section VII.2).
+_SEVERITY_TIER_ORDER = {"Emerging": 0, "Entrenched": 1, "Endemic": 2}
+
+
+def _severity_check(test_case, state_severity: dict):
+    """
+    Checkpoint 5: compares test_case.target_state's own real per-state
+    tier (state_severity, from _run_profile_core()) against
+    test_case.expected.severity_tier. Returns None (not applicable) when
+    expected.severity_tier is unset -- matches
+    evaluate_pass_criteria()'s own "if expected.severity_tier is not
+    None" convention. Absent state_severity entries fall back to
+    "Emerging", matching state_severity.get(state_id, "Emerging")'s
+    established convention everywhere else in this redesign.
+    """
+    expected_tier = test_case.expected.severity_tier
+    if expected_tier is None:
+        return None
+    entry = state_severity.get(test_case.target_state)
+    actual_tier = entry.tier if entry is not None else "Emerging"
+    if actual_tier == expected_tier:
+        return {"test_id": test_case.test_id, "target_state": test_case.target_state,
+                "expected_tier": expected_tier, "actual_tier": actual_tier, "passed": True}
+    exp_ord = _SEVERITY_TIER_ORDER.get(expected_tier, -1)
+    act_ord = _SEVERITY_TIER_ORDER.get(actual_tier, -1)
+    boundary_case = abs(exp_ord - act_ord) == 1 and {exp_ord, act_ord} <= {0, 1}
+    return {"test_id": test_case.test_id, "target_state": test_case.target_state,
+            "expected_tier": expected_tier, "actual_tier": actual_tier, "passed": boundary_case}
+
+
 def _build_suite_v23(
     test_cases: list,
     engine_outputs: dict,
+    state_severity_map: dict = None,
 ) -> dict:
     # HC/extreme: pass iff _passes_cluster_criterion().
     # Moderate/weak: pass iff _passes_prominence_criterion() -- Session 28.
+    #
+    # Checkpoint 5: state_severity_map (optional, test_id ->
+    # dict[state_id, StateSeverity]) adds a SEPARATE severity_checks/
+    # severity_summary dimension to the returned dict -- deliberately
+    # NOT folded into `passed`/the existing pass/fail count. That
+    # headline has been a stable, trusted reference throughout this
+    # whole project's history, entirely about state ranking; silently
+    # redefining its meaning here would break historical continuity.
+    # Omitting state_severity_map preserves this function's exact prior
+    # behavior and return shape -- purely additive, backward compatible.
     import types as _types
     from engine.test_suite import TestResult
     results = []
@@ -829,7 +904,7 @@ def _build_suite_v23(
 
     total = len(results)
     passed_count = sum(1 for r in results if r.passed)
-    return {
+    suite_result = {
         'total':           total,
         'passed':          passed_count,
         'failed':          total - passed_count,
@@ -837,6 +912,21 @@ def _build_suite_v23(
         'by_profile_type': by_type,
         'by_state':        by_state,
     }
+
+    if state_severity_map is not None:
+        severity_checks = [
+            c for c in (
+                _severity_check(tc, state_severity_map.get(tc.test_id, {}))
+                for tc in test_cases
+            ) if c is not None
+        ]
+        suite_result['severity_checks'] = severity_checks
+        suite_result['severity_summary'] = {
+            'applicable': len(severity_checks),
+            'passed':     sum(1 for c in severity_checks if c['passed']),
+        }
+
+    return suite_result
 
 
 # ── Confusion Matrix ───────────────────────────────────────────────────────────
@@ -955,6 +1045,20 @@ def print_report(
     print(f"\nRESULT: {suite['passed']}/{suite['total']} passed "
           f"({suite['failed']} failed)")
 
+    # Checkpoint 5: severity_summary is a SEPARATE dimension from the
+    # state-ranking RESULT line above -- absent unless the caller passed
+    # state_severity_map to _build_suite_v23().
+    if 'severity_summary' in suite:
+        ssum = suite['severity_summary']
+        print(f"\nSEVERITY: {ssum['passed']}/{ssum['applicable']} "
+              f"applicable profiles match expected per-state tier "
+              f"(+/-1 Emerging/Entrenched boundary tolerance)")
+        if verbose:
+            for c in suite['severity_checks']:
+                if not c['passed']:
+                    print(f"  [{c['test_id']}] target={c['target_state']} "
+                          f"expected={c['expected_tier']} actual={c['actual_tier']}")
+
     print("\nBy profile type:")
     for pt in PROFILE_TYPES:
         data = suite["by_profile_type"].get(pt, {})
@@ -1036,18 +1140,24 @@ def main() -> None:
             print(f"No profiles found for state: {args.state!r}")
             sys.exit(1)
 
+    # Checkpoint 5: runner_core always returns (output, SeverityResult) --
+    # runner (the plain-dict-returning public function) is kept for the
+    # --output-json path below, which only ever needed the dict.
     runner = run_profile_synthetic if args.synthetic else run_profile
+    runner_core = _run_profile_synthetic_core if args.synthetic else _run_profile_core
 
     # Run all profiles
     run_results = []
     engine_outputs = {}
+    state_severity_map = {}
 
     for tc in profiles:
-        output = runner(tc)
+        output, sev_result = runner_core(tc)
         run_results.append((tc, output))
         engine_outputs[tc.test_id] = output
+        state_severity_map[tc.test_id] = sev_result.state_severity
 
-    suite = _build_suite_v23(profiles, engine_outputs)
+    suite = _build_suite_v23(profiles, engine_outputs, state_severity_map)
     matrix = build_confusion_matrix(run_results)
     dim_table = build_dimensional_error_table(run_results)
 
@@ -1110,7 +1220,15 @@ def main() -> None:
         synthetic=args.synthetic,
     )
 
-    sys.exit(0 if suite["failed"] == 0 else 1)
+    # Checkpoint 5: severity failures also fail the exit code (a real
+    # regression is worth CI catching), OR'd against the existing
+    # ranking-failure condition rather than merged into suite["failed"]
+    # itself -- that counter's meaning stays state-ranking-only.
+    severity_ok = True
+    if "severity_summary" in suite:
+        ssum = suite["severity_summary"]
+        severity_ok = ssum["passed"] == ssum["applicable"]
+    sys.exit(0 if suite["failed"] == 0 and severity_ok else 1)
 
 
 if __name__ == "__main__":
