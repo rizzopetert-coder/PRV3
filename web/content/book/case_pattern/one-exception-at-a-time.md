@@ -68,4 +68,4 @@ The direction was real. The exceptions were reasonable. The drift was the produc
 
 The COO told him what she saw because she was walking out the door. A different organization is built so that someone can say it while they're staying — and so the leader has already built the structures that make hearing it survivable, and acting on it possible, before the resignation letter arrives.
 
-Every organization has that window. Most spend it approving one more reasonable exception.
+That window closes one exception at a time. Most spend it approving one more reasonable exception.
