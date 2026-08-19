@@ -358,6 +358,10 @@ check("Duration weights dict has exactly 3 entries", len(DURATION_WEIGHTS) == 3)
 
 
 # ── 15. compute_state_severity — per-state attribution (Checkpoint 1) ────────
+# Updated this session (Checkpoint 1 follow-on): state_severity's values are
+# now StateSeverity objects (tier + score_0_100), not bare tier strings --
+# every check below reads .tier explicitly and new checks verify score_0_100
+# is present, a real float, and matches the real normalize_severity(raw) math.
 print("\n15. compute_state_severity — per-state attribution")
 
 check("Locked flat mapping covers exactly 17 SEVER-IDs",
@@ -377,9 +381,20 @@ single_state_result = compute_state_severity(single_state_acc)
 check("Single-state mapping: state_severity has exactly the_exposed",
       set(single_state_result.keys()) == {"the_exposed"},
       f"got {single_state_result}")
+check("Single-state mapping: value is a StateSeverity with a real tier and score",
+      single_state_result["the_exposed"].tier in SEVERITY_TIERS
+      and isinstance(single_state_result["the_exposed"].score_0_100, float),
+      f"got {single_state_result['the_exposed']}")
+# duration_band="0_6mo" alone -> raw=1.0 (dur_w=1.0, pop_w=1.0 fallback) --
+# same math as compute_raw_severity()'s own Section 2 checks above.
+expected_single_score = normalize_severity(1.0)
+check("Single-state mapping: score_0_100 matches the real normalize_severity(raw) math",
+      isclose(single_state_result["the_exposed"].score_0_100, expected_single_score),
+      f"got {single_state_result['the_exposed'].score_0_100}, expected {expected_single_score}")
 
 # One input mapped to multiple states (SEVER-02 -> built_to_fail, the_undefined_role)
-# -- both should carry the identical tier, since the same input feeds both groups.
+# -- both should carry the identical tier AND score, since the same input feeds
+# both groups (StateSeverity's dataclass equality checks both fields at once).
 multi_state_acc = SeverityAccumulator(inputs=[
     SeverityInput("Q05", "SEVER-02", duration_band="18mo_plus")
 ])
@@ -387,9 +402,13 @@ multi_state_result = compute_state_severity(multi_state_acc)
 check("Multi-state mapping: both built_to_fail and the_undefined_role present",
       set(multi_state_result.keys()) == {"built_to_fail", "the_undefined_role"},
       f"got {multi_state_result}")
-check("Multi-state mapping: both states carry the same tier",
-      multi_state_result.get("built_to_fail") == multi_state_result.get("the_undefined_role"),
+check("Multi-state mapping: both states carry the same tier and score_0_100",
+      multi_state_result["built_to_fail"] == multi_state_result["the_undefined_role"],
       f"got {multi_state_result}")
+check("Multi-state mapping: score_0_100 is a real float, not a placeholder",
+      isinstance(multi_state_result["built_to_fail"].score_0_100, float)
+      and multi_state_result["built_to_fail"].score_0_100 > 0.0,
+      f"got {multi_state_result['built_to_fail'].score_0_100}")
 
 # Split-by-option: SEVER-03 option C -> decision_paralysis, option E -> the_lost_map
 split_acc = SeverityAccumulator(inputs=[
@@ -399,6 +418,10 @@ split_acc = SeverityAccumulator(inputs=[
 split_result = compute_state_severity(split_acc)
 check("Split-by-option: option C and option E route to different states",
       set(split_result.keys()) == {"decision_paralysis", "the_lost_map"},
+      f"got {split_result}")
+check("Split-by-option: each state's own StateSeverity carries a real tier",
+      split_result["decision_paralysis"].tier in SEVERITY_TIERS
+      and split_result["the_lost_map"].tier in SEVERITY_TIERS,
       f"got {split_result}")
 
 # Unmapped ID: still contributes to the pooled score (backward compat) but
@@ -418,9 +441,15 @@ check("Unmapped SEVER-ID: state_severity is empty (no attribution, no state key)
 eng_state = SeverityEngine()
 eng_state.add_input(SeverityInput("Q02", "SEVER-15", duration_band="18mo_plus"))
 result_state = eng_state.score()
-check("SeverityResult.state_severity populated end-to-end via SeverityEngine",
-      result_state.state_severity == {"the_exposed": result_state.tier},
-      f"got {result_state.state_severity}, session tier={result_state.tier}")
+check("SeverityResult.state_severity[id].tier matches the session tier "
+      "(single input, no divergence possible)",
+      result_state.state_severity["the_exposed"].tier == result_state.tier,
+      f"got {result_state.state_severity['the_exposed'].tier}, session tier={result_state.tier}")
+check("SeverityResult.state_severity[id].score_0_100 matches the session's own "
+      "score_0_100 (single input, no divergence possible)",
+      isclose(result_state.state_severity["the_exposed"].score_0_100, result_state.score_0_100),
+      f"got {result_state.state_severity['the_exposed'].score_0_100}, "
+      f"session score_0_100={result_state.score_0_100}")
 check("SeverityResult still exposes all session-wide fields unchanged (backward compat)",
       hasattr(result_state, "raw_score") and hasattr(result_state, "tier"),
       "session-wide fields missing")

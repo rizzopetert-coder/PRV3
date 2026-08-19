@@ -334,11 +334,40 @@ def _intended_states(inp: SeverityInput) -> tuple[str, ...]:
     return SEVERITY_ID_INTENDED_STATES.get(inp.severity_follow_on_id, ())
 
 
-def compute_state_severity(accumulator: SeverityAccumulator) -> dict[str, str]:
+@dataclass
+class StateSeverity:
+    """
+    One state's own severity result, computed from only the SeverityInputs
+    attributed to it (compute_state_severity()) -- the per-state analog of
+    SeverityResult's session-wide tier/score_0_100 pair.
+
+    tier:        Emerging | Entrenched | Endemic -- classify_severity(score_0_100).
+    score_0_100: normalize_severity() output for this state's own raw score.
+                 NOT the same value as SeverityResult.score_0_100 (the
+                 session-wide pooled score) -- this is the per-state figure.
+
+    Checkpoint 1 follow-on (this session, revises already-shipped/Gemini-
+    confirmed code): state_severity originally mapped state_id -> a bare
+    tier string. Extended to this small object once Checkpoint 3's dry-run
+    surfaced a real consistency gap -- the top-level severity.score field
+    had no per-state numeric equivalent to resolve against, only tier did.
+    Deliberately minimal: no tier_description/raw_score/narrative fields.
+    Callers wanting the LOCKED behavioral-anchor copy for a resolved tier
+    use SEVERITY_TIER_DESCRIPTIONS[state_severity[id].tier] directly, same
+    as SeverityResult.tier_description already does at the session level.
+
+    Spec reference: prompts/severity-result-per-state-redesign-scope.md,
+    Section 2 (Checkpoint 1), revised per Checkpoint 3's dry-run finding.
+    """
+    tier:        str
+    score_0_100: float
+
+
+def compute_state_severity(accumulator: SeverityAccumulator) -> dict[str, StateSeverity]:
     """
     Group accumulator.inputs by intended state (via the locked mapping above)
-    and classify each state's own tier independently, using the same
-    unmodified normalize_severity()/classify_severity() pipeline as the
+    and classify each state's own tier AND score independently, using the
+    same unmodified normalize_severity()/classify_severity() pipeline as the
     pooled session-wide score. An input mapped to multiple states (e.g.
     SEVER-02 -> built_to_fail, the_undefined_role) contributes to every one
     of them, not divided across them.
@@ -360,11 +389,14 @@ def compute_state_severity(accumulator: SeverityAccumulator) -> dict[str, str]:
         for state_id in _intended_states(inp):
             by_state.setdefault(state_id, []).append(inp)
 
-    state_severity: dict[str, str] = {}
+    state_severity: dict[str, StateSeverity] = {}
     for state_id, state_inputs in by_state.items():
         raw = compute_raw_severity(SeverityAccumulator(inputs=state_inputs))
         score = normalize_severity(raw)
-        state_severity[state_id] = classify_severity(score)
+        state_severity[state_id] = StateSeverity(
+            tier=classify_severity(score),
+            score_0_100=score,
+        )
 
     return state_severity
 
@@ -409,15 +441,21 @@ class SeverityResult:
     tier_description:          LOCKED behavioral anchor copy from V.3.
     narrative_contribution_0_100: Narrative addition on 0–100 scale.
     narrative_ceiling_applied: True if narrative addition was capped.
-    state_severity:            Per-state tier, keyed by state_id. Only states
-                                with at least one attributed input are present;
-                                callers apply the "Emerging" fallback for any
-                                qualifying state with no key present. Kept
-                                alongside the session-wide fields above, not a
-                                replacement for them (backward-compat).
+    state_severity:            Per-state StateSeverity (tier + score_0_100),
+                                keyed by state_id. Only states with at least
+                                one attributed input are present; callers
+                                apply the "Emerging" tier fallback for any
+                                qualifying state with no key present (no
+                                score fallback defined -- callers needing a
+                                per-state score for an unmapped state have
+                                no real value to fall back to). Kept
+                                alongside the session-wide fields above, not
+                                a replacement for them (backward-compat).
 
     Spec reference: Section V. Per-state field added per
-    prompts/severity-result-per-state-redesign-scope.md, Checkpoint 1.
+    prompts/severity-result-per-state-redesign-scope.md, Checkpoint 1;
+    widened from dict[str, str] to dict[str, StateSeverity] this session
+    (Checkpoint 1 follow-on, revises already-shipped/Gemini-confirmed code).
     """
     raw_score:                    float
     score_0_100:                  float
@@ -427,7 +465,7 @@ class SeverityResult:
     narrative_contribution_0_100: float
     narrative_ceiling_applied:    bool
     input_count:                  int
-    state_severity:               dict[str, str] = field(default_factory=dict)
+    state_severity:               dict[str, StateSeverity] = field(default_factory=dict)
 
 
 class SeverityEngine:
