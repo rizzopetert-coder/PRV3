@@ -15,6 +15,28 @@ this is not carried forward from a prior screenshot or an earlier assumption.
 
 ---
 
+## 0. Format constraint — confirmed real, applies to every code file below
+
+**NotebookLM rejects raw source-code files by extension.** Confirmed directly (Pete,
+2026-08-19): `.py` files are not accepted as uploads. The same restriction applies to
+`.ts`/`.tsx` for the same reason — NotebookLM's accepted source types are Google Docs,
+Google Slides, PDF, plain text (`.txt`), Markdown (`.md`), pasted text, and web links.
+It does not recognize source-code extensions as a category, regardless of the file's
+actual content being plain text underneath.
+
+**Practical workaround for every `.py`/`.ts`/`.tsx` file in Sections 1-5 below:**
+- Save or export a copy with a `.txt` extension (identical content, extension only) and
+  upload that copy, or
+- Use NotebookLM's "paste text" source option and paste the file's content directly, or
+- If a batch of files needs to go in at once, concatenate them into one `.txt` file with
+  clear `--- filename ---` separators between each, rather than uploading one at a time.
+
+**Sections 6 (`CLAUDE.md`, `.md`) and `tools/_mob.txt` (`.txt`) are already in accepted
+formats and can be uploaded as-is, no conversion needed.** This is why those two didn't
+surface the problem — the code files are where it bites.
+
+---
+
 ## 1. Core engine files (`engine/`)
 
 Confirmed against the real `engine/` directory listing, not assumed from a prior list.
@@ -144,3 +166,6 @@ checklist exists to catch — remove them, don't just skip re-adding them.
 4. Spot-check a small number of "is this dead code" claims the way `output-renderer.ts`
    was checked this session (repo-wide import search) — dead files silently accumulate
    and this is the cheapest point to catch them.
+5. Before uploading anything: remember Section 0's format constraint. Every `.py`/`.ts`/
+   `.tsx` file needs converting to `.txt` (or pasting as text) first — NotebookLM does
+   not accept the raw extension.
