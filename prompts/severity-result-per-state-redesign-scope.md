@@ -2,11 +2,11 @@
 
 Status: **SCOPING COMPLETE — architecture (Sections 1-3, including the confirmed
 split-by-option prerequisite, Section 2a), content mapping (19/32 locked, Sections 8-9),
-and recalibration-scope estimate (Section 5) all done. Not built, not submitted to
-Gemini yet.** Ready for Gemini architecture review pending one open item, not resolved
-in this document: Pete's bundle-vs-separate recalibration sequencing call (Section 6) —
-see Section 10 for the full readiness call. No engine code touched across any session
-that produced this document. No commits to engine files.
+recalibration-scope estimate (Section 5), and recalibration sequencing (Section 6,
+LOCKED: Bundle) all done. Not built, not yet submitted to Gemini.** Unconditionally
+ready for Gemini architecture review — see Section 10 for the full readiness call. No
+engine code touched across any session that produced this document. No commits to
+engine files.
 
 Origin: Section 13a Decision Register, "Severity follow-on state scoping" row
 (reframed 2026-08-18, commit 362aaaf). Three candidate input-filtering gate designs
@@ -281,26 +281,34 @@ to the underlying issue even where the specific tier happens not to flip.
 
 ---
 
-## 6. Open sequencing question for Pete
+## 6. Recalibration sequencing — LOCKED: Bundle
 
-Two paths, not decided here:
+**Decided (2026-08-19): recalibration is bundled into this same build, not shipped as a
+separate follow-on.** Two paths were on the table:
 
-**A — Bundle:** scope and build the `SeverityResult` per-state redesign and the
-recalibration (re-authoring the ~14+ affected profiles' `expected.severity_tier`, plus
-deciding the harness's new per-state comparison mechanism) as one piece of work. Single
-Gemini review covering both the architecture change and its calibration-data
-consequences together.
+**A — Bundle (locked):** scope and build the `SeverityResult` per-state redesign and the
+recalibration (re-authoring the 14 affected profiles' `expected.severity_tier`, plus the
+harness's new per-state comparison mechanism) as one piece of work. Single Gemini review
+covering both the architecture change and its calibration-data consequences together.
 
-**B — Separate:** ship the redesign first (engine + web consumers + harness mechanism
-change), verify it against the *existing* locked tiers where they still apply, then run
-recalibration as its own dedicated follow-on once the new mechanism is live and stable.
+**B — Separate (not taken):** ship the redesign first, verify against existing locked
+tiers where they still apply, run recalibration as its own dedicated follow-on later.
 
-Neither is recommended here — this document reports what's now known (verified
-consumers, mechanical compatibility, the 16-ID mapping proposal, and the real 8%/47%
-scope numbers) so the sequencing call can be made with that information rather than a
-guess. Both paths route through a Gemini architecture review before any code, per Tier 3
-— `SeverityResult` is a core engine data contract consumed by every downstream output
-path (Section 3 above).
+**Rationale for Bundle, recorded plainly:** the real scope is small and fully
+characterized, not open-ended. Section 5's estimate found exactly **14 of 175 profiles
+(8%)** affected, and **every one of the 14 is a decrease** — over-escalation being
+corrected to what the target state's own attributed signal actually supports, never a
+new escalation appearing where none exists today. This is the opposite shape of the
+MC_CENTROID_39 precedent (a normalization-constant change with unpredictable, session-
+count-coupled blast radius across the whole suite, discovered only after real regression
+runs) — here the affected set, direction, and magnitude are all already known from a
+real run against the actual 175-profile suite, not estimated after the fact. Splitting
+into two Gemini reviews and two build passes would cost more coordination than it saves,
+given the recalibration side is this well-bounded going in.
+
+Both were going to route through the same Gemini architecture review regardless
+(`SeverityResult` is a core engine data contract, Tier 3) — bundling means one review
+covers the full, real scope rather than a partial one that gets revisited later.
 
 ---
 
@@ -510,11 +518,16 @@ today's broadcast behavior (an unmapped trigger inflating every qualifying state
 not a blocker. Coverage can grow incrementally after the redesign ships. SEVER-05 and
 SEVER-13 are excluded by design, not gaps.
 
-**Recommendation: this document is ready for Gemini architecture review, contingent on
-one thing, not resolved here:** Pete's confirmation on the bundle-vs-separate
-recalibration sequencing call (Section 6). Nothing else is outstanding — the mapping is
-locked, the data-shape proposal includes the confirmed per-option prerequisite, and the
-consumer/aggregation verification is complete.
+**Recalibration sequencing is locked: Bundle** (Section 6) — recalibrating the 14
+affected profiles ships as part of this same build, not a separate follow-on. Rationale
+on record: small, fully-characterized scope (14/175, 8%), every affected profile a
+decrease not a new escalation, no unpredictable-blast-radius shape.
+
+**This document is unconditionally ready for Gemini architecture review. Nothing else is
+outstanding.** The mapping is locked (19/32), the data-shape proposal includes the
+confirmed per-option prerequisite (Section 2a), consumer and aggregation verification is
+complete (Section 3), and recalibration sequencing is decided (Section 6). Not yet
+submitted to Gemini — that remains a separate, explicit action.
 
 No code changes, no commits to engine files across any session that produced this
 document.
