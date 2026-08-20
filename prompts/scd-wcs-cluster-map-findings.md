@@ -546,6 +546,70 @@ own unscoped investigation, and whether Track 1 continues at all given
 rank-1/rank-2's scale (see "Full cluster characterization" above) are
 all Pete's call.
 
+## A fourth dominance pattern — cross-cluster asymmetry (`the_uninitiated`)
+
+**Characterization only, 2026-08-20. No code changed, no differentiation
+candidate proposed.** `the_uninitiated` (rank-2, 12.6% false rank-1, the
+session's second-largest dominance signal) was initially assigned to
+Track 1 on the strength of its "narrow, same-dimension" theft shape.
+Pulling the actual 22 stolen profiles and checking each one directly —
+not assuming a clean pairing exists — shows something structurally
+different from both tracks.
+
+**The 22 decompose into three distinct groups, not one:**
+
+1. **6 are pure tie-break artifacts, not new dominance at all.**
+   `decision_paralysis` (×3) and `the_lost_map` (×3) are
+   `the_uninitiated`'s own rank-2 cluster-mates. Checked directly: scores
+   are byte-identical in all 6 cases (e.g. `AUT-DP-01`: both
+   `0.985507`). This is rank-2's already-logged 10-way uniform tie —
+   `the_uninitiated` only wins the insertion-order tie-break, nothing
+   new is happening here.
+2. **14 of the remaining 16 (87.5%) are genuine wins concentrated on one
+   other cluster: rank-3.** `the_uninitiated` genuinely outscores 7 of
+   rank-3's 8 states (`the_founders_grip` ×3, `disparate_impact_architecture`
+   ×3, `sequential_decision_blindness` ×3, `heard_and_ignored` ×2,
+   `hr_capture` ×1, `the_tolerated_violation` ×1, `the_unsolved_problem`
+   ×1 — real score gaps, 0.023–0.065, not ties).
+3. **2 are a smaller, separate, cross-dimensional side note** — genuine
+   wins against `decision_blindness` (rank-9, alliance-dominant, not
+   authority-dominant), the largest single gap of the set (0.250), but
+   rank-9 is already characterized and declined.
+
+**The real finding is #2 — a cluster-vs-cluster asymmetry, not a
+1-to-1 pairing and not a same-cluster tie.** `the_uninitiated`
+(rank-2) and rank-3 both key off the same dimension (authority) and
+share the identical salience *shape* (authority=2.5/2.5, rest 0.4/0.4)
+— but their vectors differ in concentration: `the_uninitiated`'s
+authority_liability sits at 0.45 with a 0.15 floor elsewhere; rank-3's
+sits at 0.6 with a 0.1 floor elsewhere — objectively the *sharper,
+more concentrated* vector of the two. Despite that, the *less*
+concentrated `the_uninitiated` systematically beats rank-3 across 7 of
+its 8 states. This directly contradicts the simple "sharper vector
+wins" intuition, and sharpens (not just confirms) the
+dominance-mechanism investigation's earlier finding that vector
+concentration doesn't predict dominance magnitude — here it's not just
+non-predictive, it points the wrong way.
+
+**Why this doesn't belong in either existing track:** fixing it would
+mean reweighting `the_uninitiated` against an entire separate 8-state
+cluster simultaneously, not a 1-to-1 pairing (Track 1's shape) and not
+a single broad attractor with no clean opponent (Track 2's shape) —
+structurally closer to a two-cluster remediation project than a pilot.
+rank-3 itself remains fully uniform and has only had the earlier
+stakes/narrative pass (see "Full cluster characterization" above) —
+it needs its own dedicated look before any fix here makes sense.
+
+**Logged as a fourth, distinct dominance pattern — "cross-cluster
+asymmetry"** — separate from Track 1 (narrow same-cluster
+neighbor-stealing) and Track 2 (broad cross-dimensional attraction).
+Flagged as needing further diagnosis, specifically: what property
+actually predicts which of two competing clusters wins, since peak
+concentration was just ruled out (and ruled out in the wrong
+direction, not just as a non-predictor). Not assigned to either track
+until that's understood. No differentiation candidate proposed, no
+code touched.
+
 ## Cross-references
 
 - `prompts/primary-state-target-match-finding.md` — original 1/58
