@@ -22,11 +22,41 @@ SALIENCE_PROFILES = {
         "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
+    # SCD-WCS remediation pilot (2026-08-20, rank-8): previously shared
+    # this exact tuple with built_to_fail -- combined with an identical
+    # dimensional_vector, a guaranteed exact-tie score for any session
+    # vector (confirmed: 175/175 calibration profiles tied before this
+    # change). built_to_fail's own read stays unchanged (approved as-is,
+    # aptitude-dominant, clean). the_paper_tiger differentiated per the
+    # real descriptive_prose: aptitude reduced (not a skill/resourcing
+    # story), authority raised (structural gap -- no one held
+    # responsible for keeping documentation current, precedent for this
+    # exact magnitude class in the_suppression_filter's own Authority
+    # secondary), attitude raised (operational avoidance behavior --
+    # managed verbally, record doesn't match reality). alliance
+    # untouched -- no textual basis to move it. dimensional_vector
+    # deliberately untouched -- salience-only, by design.
+    #
+    # Magnitude: 4 candidates searched against the real calibration
+    # pipeline (tools/_salience_pilot_search_rank8.py), all passed
+    # identically clean -- landed on the best worst-case gap floor
+    # (min gap 0.0195 across all 175 profiles) among candidates tested.
+    #
+    # SIGNIFICANT FINDING, not fixed by this change: built_to_fail wins
+    # a false rank-1 in 49/175 calibration profiles (28%) -- confirmed
+    # structurally incapable of improving via this differentiation at
+    # ANY tested magnitude, because built_to_fail and the_paper_tiger
+    # share an identical dimensional_vector and built_to_fail's own
+    # aptitude weight stays fixed at 2.5 (its only real vector signal).
+    # Only 4 of the 49 are the_paper_tiger's own profiles; the other 45
+    # are unrelated states entirely -- a taxonomy-wide dominance
+    # pattern, not a tie artifact. See
+    # prompts/scd-wcs-cluster-map-findings.md for the full writeup.
     "the_paper_tiger": {
-        "aptitude_liability": 2.5, "aptitude_asset": 2.5,
-        "authority_liability": 0.4, "authority_asset": 0.4,
+        "aptitude_liability": 1.0, "aptitude_asset": 1.0,
+        "authority_liability": 1.0, "authority_asset": 1.0,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
-        "attitude_liability": 0.4, "attitude_asset": 0.4,
+        "attitude_liability": 1.5, "attitude_asset": 1.5,
     },
 
     # ── APTITUDE — MEDIUM tier (primary only) ─────────────────────────────────
