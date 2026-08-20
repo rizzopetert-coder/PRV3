@@ -38,17 +38,46 @@ SALIENCE_PROFILES = {
     },
 
     # ── APTITUDE — LOW/CLUSTER (primary=Aptitude, secondary=Attitude) ─────────
+    # SCD-WCS remediation pilot (2026-08-20, revised magnitude --
+    # second pass): the_unformed_leader and the_dormant_talent
+    # previously shared this exact tuple (Tier 2 v18 comment above,
+    # kept for history, superseded by this revision) -- combined with
+    # an identical dimensional_vector, this produced a guaranteed
+    # exact-tie score for any session vector (confirmed: 175/175
+    # calibration profiles tied before this change). Differentiated
+    # per the real descriptive_prose (engine/data/states.py), not the
+    # TS-facing description copy: the_unformed_leader is a capability
+    # gap ("without having been equipped for it") -- aptitude stays
+    # dominant, unchanged. the_dormant_talent is retained capability
+    # plus a willingness failure ("can name precisely... consistently
+    # doesn't act on it"). A larger swing (aptitude 1.5, attitude 2.0,
+    # making attitude fully dominant) broke the tie but regressed
+    # APT-DT-02 below its moderate-tier prominence threshold --
+    # searched smaller deltas against the real calibration pipeline
+    # (tools/_salience_pilot_search.py) rather than re-tuning by hand.
+    # Every candidate preserving full attitude dominance failed
+    # APT-DT-02 (its session vector carries strong aptitude signal);
+    # every candidate keeping aptitude dominant passed with real
+    # margin. Landed on aptitude=2.0/attitude=1.3 -- best margin
+    # (+0.064) and best worst-case gap floor (0.000633) among
+    # candidates tested. Aptitude remains the larger weight on both
+    # states -- this does NOT make attitude dominant for
+    # the_dormant_talent, a real deviation from the original
+    # narrative-driven direction, flagged not silently adapted around.
+    # authority/alliance untouched on both -- the text gives no basis
+    # to move them. dimensional_vector deliberately untouched this
+    # pilot -- salience-only, by design.
     "the_unformed_leader": {  # Tier 2 v18: attitude secondary 2.5->1.0
         "aptitude_liability": 2.5, "aptitude_asset": 2.5,
         "authority_liability": 0.4, "authority_asset": 0.4,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
-        "attitude_liability": 1.0, "attitude_asset": 1.0,
+        "attitude_liability": 0.6, "attitude_asset": 0.6,
     },
     "the_dormant_talent": {  # Tier 2 v18: attitude secondary 2.5->1.0
-        "aptitude_liability": 2.5, "aptitude_asset": 2.5,
+        "aptitude_liability": 2.0, "aptitude_asset": 2.0,
         "authority_liability": 0.4, "authority_asset": 0.4,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
-        "attitude_liability": 1.0, "attitude_asset": 1.0,
+        "attitude_liability": 1.3, "attitude_asset": 1.3,
     },
 
     # ── APTITUDE — LOW/CLUSTER (primary=Aptitude, secondary=Authority) ────────
