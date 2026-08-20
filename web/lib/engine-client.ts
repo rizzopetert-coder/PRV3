@@ -103,6 +103,11 @@ export interface EngineResult {
     score: number;
     anchor_text: string;
     inputs: Record<string, unknown>;
+    by_state: Array<{
+      state_id: string;
+      tier: "Emerging" | "Entrenched" | "Endemic";
+      score_0_100: number;
+    }>;
   };
   asset_score: {
     score: number;

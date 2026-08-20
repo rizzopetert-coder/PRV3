@@ -174,6 +174,7 @@ export async function POST(request: NextRequest) {
     secondary_states: stateRefs.slice(1),
 
     severity: engineResult.severity.tier,
+    severity_by_state: engineResult.severity.by_state,
 
     resolution_family: translateResolutionFamily(engineResult.private_output.resolution_routing),
     // resolution_routing: legacy service-name string from states.py profile (old naming, pre-S32)

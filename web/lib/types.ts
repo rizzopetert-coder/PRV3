@@ -17,6 +17,15 @@
 
 export type SeverityTier = "Emerging" | "Entrenched" | "Endemic";
 
+// Visualize Your Data (Layer 1, engine/contract.py's severity_obj.
+// by_state). One entry per state in identified_states -- pure
+// exposure of the engine's per-state severity, not derived here.
+export interface StateSeverityEntry {
+  state_id: string;
+  tier: SeverityTier;
+  score_0_100: number;
+}
+
 // Commercial service names. Matches ENGINE_TO_COMMERCIAL_NAME in engine/resolution_families.py.
 // Widened beyond the 4 single names -- translateResolutionFamily()
 // (web/lib/resolution-family.ts) can also produce a compound string
@@ -227,6 +236,21 @@ export interface PrivateOutputPayload {
   secondary_states: StateRef[];
 
   severity: SeverityTier;
+
+  // Visualize Your Data (Layer 2). NEW SIBLING field, deliberately not
+  // nested inside severity above -- severity is a bare string read by
+  // 9 real call sites (PrivateOutput.tsx, output-renderer.ts,
+  // ShareableOutput.tsx, CondensedOutput.tsx); changing its type would
+  // break all of them. Both real PrivateOutputPayload builders
+  // (answer/route.ts, result/route.ts) populate it unconditionally --
+  // optional only because DevDiagnosticPreviewPayload (a deliberate
+  // structural near-mirror of this interface, dev-diagnostic-preview.ts)
+  // omits it like every other field this interface added after that
+  // type was written, and is passed into <PrivateOutput> by structural
+  // typing (confirmed: tsc caught this exact mismatch when the field was
+  // first made required, same reason cascade_risk/causation_pattern/
+  // trajectory/urgency_window are optional here too).
+  severity_by_state?: StateSeverityEntry[];
 
   // Layer 3 — resolution direction
   resolution_family: ResolutionFamily;
