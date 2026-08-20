@@ -237,6 +237,41 @@ deliberately one cluster — its result is the signal to bring back for
 a sequencing conversation, not a green light to mechanically repeat
 the search across the rest.
 
+## Cluster check — rank-9 (`the_fracture` / `decision_blindness`)
+
+Verification pass only, 2026-08-20 — no code changed. `SALIENCE_PROFILES`
+confirmed byte-identical for both (`engine/data/salience.py`, ALLIANCE —
+HIGH tier), `dimensional_vector` confirmed identical (`alliance_liability`
+dominant at 0.6, matches the cluster map's rank-9 row).
+
+**Not a schema limitation — the real finding is narrower.** An initial
+working hypothesis (Alliance-liability for `the_fracture`,
+Authority-liability/exclusion-from-decision-rights for
+`decision_blindness`) was checked against the live `descriptive_prose`
+and against precedent elsewhere in the taxonomy. The mechanism itself is
+real: `the_suppression_filter` (also Alliance-primary) already carries an
+Authority-secondary weight (`authority_liability/asset = 1.0`, above the
+0.4 floor) — an Alliance/Authority split is an authored pattern in this
+schema, not an invented one. What doesn't hold up is applying it to this
+pair: `decision_blindness`'s own prose explicitly rules out an
+authority/exclusion framing — *"The decision-maker wasn't negligent. The
+information simply never reached them, because nobody's job was making
+sure it did"* — an information-routing gap, not a decision-rights
+exclusion. No confident secondary-dimension read was found for either
+state in this pair.
+
+**Low downstream impact, independent of the above.** Both states route to
+the same `resolution_family` — `"Intervention + Executive Counsel"` —
+confirmed via direct read of `engine/data/states.py`. Whichever state wins
+an unresolved tie here, a real respondent gets the same resolution
+recommendation either way.
+
+**Logged as:** a real tie, accurately authored given the available
+textual grounding, low practical/product stakes — not prioritized for
+further pursuit. Not a candidate for a salience or vector remediation
+pass unless the underlying descriptive_prose for one of these two states
+changes.
+
 ## Cross-references
 
 - `prompts/primary-state-target-match-finding.md` — original 1/58
