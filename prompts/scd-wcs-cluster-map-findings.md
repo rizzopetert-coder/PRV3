@@ -1,7 +1,9 @@
 # SCD-WCS / Primary-State Ranking Investigation — Findings
 
-Status: **OPEN, fully scoped, not yet remediated.** Investigation only —
-no engine code touched, no vectors or salience weights changed. This
+Status: **OPEN, fully scoped, PILOT COMPLETE (1 of 11 clusters).**
+First remediation result landed 2026-08-20 (commit 043b8ad) — see
+"Pilot result" below. Remaining 10 clusters not attempted; general
+remediation sequencing still undecided, Pete's call. This
 document is the durable record consolidating the original findings
 (`prompts/primary-state-target-match-finding.md`,
 `prompts/severity-follow-on-gate-investigation-findings.md` lines
@@ -164,7 +166,11 @@ quick fix.
   layer — could resolve several smaller clusters (e.g. rank 7, 9, 11
   above, each 2-state) without touching any dimensional_vector at all,
   the same kind of fix that already differentiates `the_untouchable`
-  from `the_inner_circle`.
+  from `the_inner_circle`. Rank 7 now piloted (see "Pilot result"
+  below) — mechanically validated, but narrative-correct
+  differentiation was not achievable within calibration-safe bounds
+  for that cluster. One data point, not a confirmed pattern for 9/11
+  or the remaining clusters.
 - **Full dimensional-vector re-authoring**, for up to 51 states, is
   real clinical/taxonomic judgment — comparable in nature (though
   likely larger in scope) to the still-undated
@@ -175,6 +181,62 @@ No remediation approach is being recommended here. Pete's call on
 sequencing — salience-first, full vector re-authoring, or staged by
 cluster size — whenever this gets picked up.
 
+## Pilot result — rank-7 cluster (`the_unformed_leader` / `the_dormant_talent`)
+
+First-ever remediation result for this investigation. Commit `043b8ad`,
+2026-08-20. Salience-only differentiation — `dimensional_vector`
+deliberately untouched, by design, to test whether salience alone can
+move ranking outcomes before committing to the larger 51-state
+remediation project.
+
+**Two passes.** First (`the_dormant_talent` aptitude 2.5→1.5, attitude
+1.0→2.0 — making attitude fully dominant, per the real
+`descriptive_prose`) broke the tie but regressed calibration profile
+`APT-DT-02` below its moderate-tier prominence threshold — caught by a
+full-suite regression, not assumed clean. Second pass searched smaller
+deltas against the real calibration pipeline (not hand-derived
+extrapolation — the underlying formula is weighted cosine, nonlinear).
+Landed on `the_dormant_talent` aptitude=2.0/attitude=1.3
+(`the_unformed_leader`'s originally proposed attitude=0.6 unchanged,
+its own 3 profiles held 3/3 throughout both passes).
+
+**Mechanically validated:**
+- Tie fully broken: 175/175 calibration profiles tied before this
+  change → 0/175 tied after, score gap range 0.000633–0.139833.
+- Zero cross-contamination: full 58-state × 175-profile comparison
+  (10,150 pairs), not spot-checked — every other state's score
+  byte-identical before/after in every single profile. Traced to the
+  formula itself (`rank_states()`, `engine/accumulation.py:572-588`):
+  each state's score depends only on the session vector and that
+  state's own profile vector and salience weights, no cross-state term.
+- Full regression exactly at the 171/175 baseline — same 4
+  pre-existing failures (`identity_erosion`, `invisible_burnout`,
+  `leadership_deafness`, `the_untouchable`), nothing new.
+- `APT-DT-02` passes with real margin: +0.064 above its threshold,
+  not a bare clear.
+
+**Real, load-bearing tension found, not routed around.** Every
+candidate tested that preserved attitude as the dominant dimension for
+`the_dormant_talent` (matching the actual `descriptive_prose` —
+retained capability plus a willingness failure) failed `APT-DT-02`,
+whose underlying session vector carries strong aptitude signal. Every
+candidate that kept aptitude dominant passed with real margin. The
+landed value keeps aptitude dominant on both states — **this is not a
+finished clinical differentiation**, only the largest safe tie-break
+found by search.
+
+**Open question this raises, Pete's call, not resolved here:** when
+salience-only can't achieve narrative-correct differentiation within
+calibration-safe bounds, does that cluster get left as a
+mechanical-only fix, get combined with a targeted vector nudge, or get
+deferred to the larger vector re-authoring pass? No general answer
+yet — this is one confirmed data point, not assumed to generalize to
+the other 8 salience-uniform clusters. Needs testing against a few
+more before any pattern can be claimed. This pilot's scope was
+deliberately one cluster — its result is the signal to bring back for
+a sequencing conversation, not a green light to mechanically repeat
+the search across the rest.
+
 ## Cross-references
 
 - `prompts/primary-state-target-match-finding.md` — original 1/58
@@ -184,4 +246,7 @@ cluster size — whenever this gets picked up.
 - `engine/accumulation.py`'s `rank_states()` — the traced mechanism.
 - `engine/data/states.py` — `dimensional_vector` authoring, per-state.
 - `engine/data/salience.py` — `SALIENCE_PROFILES`, per-state weighting.
+- `tools/_salience_pilot_search.py` (untracked, scratch) — the delta
+  search used to find the pilot's final magnitude against the real
+  calibration pipeline.
 - Section 13a Decision Register — consolidated investigation row.
