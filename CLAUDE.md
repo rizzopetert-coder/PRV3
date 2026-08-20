@@ -158,6 +158,14 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 - `engine/data/states.py` is the authoritative state registry — 57 states
 - `engine/data/questions.py` registry is intentionally empty — question population is a separate deliverable
 - Do not adjust calibration target values speculatively — data-first calibration principle applies
+- No new state may be added to the taxonomy with a `dimensional_vector` or
+  `salience_weights` identical to an existing state's — confirmed uniqueness
+  required before a new state is considered authored, not just named/described.
+  (Locked 2026-08-19, following the SCD-WCS/primary-state ranking
+  investigation's finding that past taxonomy expansions assigned pre-existing
+  template vectors to new states — e.g. `disparate_impact_architecture`
+  inheriting the `heard_and_ignored` cluster's vector during the 47→58
+  expansion. See `prompts/scd-wcs-cluster-map-findings.md`.)
 
 ---
 
@@ -180,7 +188,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.202 |
+| MOB version | v4.203 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 58 (locked) |
