@@ -1,7 +1,8 @@
 # Visual Identity Philosophy — Open Question, Flagged for Real Discussion
 
-Status: RAW FINDING, just captured. Not a build task. This is a governing-philosophy question,
-not a styling tweak — treat it as its own decision, not folded into any in-flight task.
+Status: RAW FINDING, still not a final decision. This session (Claude.ai) adds a new connecting
+finding and a proposed reframe/direction below — still flagged for the Quarterly Step-Back, not
+resolved here. Treat it as its own decision, not folded into any in-flight task.
 
 ## Origin, Pete's own words
 "I want the rust glow. I want more color in general. The site does not look professionally
@@ -68,3 +69,48 @@ premature to lock in. If the philosophy question resolves toward "more color, mo
 the whole visual approach to that shape may change again regardless of how the collision
 question gets answered today. Recommend holding that decision loosely rather than finalizing it
 before the bigger question is resolved — not urgent, no work is blocked by leaving it open.
+
+---
+
+## This session's (Claude.ai) proposed direction for the Step-Back — NOT a final decision
+
+**New finding, connecting two facts from this session's own work:** `--urgency` (the v2 token
+carrying rust's Endemic-only meaning) is confirmed dormant in production — defined in
+`web/app/globals.css`, zero live utility-class usage, same as the original `--color-rust` before
+it. Separately, the SeverityResult per-state redesign shipped this session corrects a defect
+where severity was being over-escalated — broadcast to unrelated states rather than attributed
+per-state — meaning Endemic readings are now rarer and more accurate than before this session's
+own fix.
+
+The design philosophy's entire payoff ("when full color finally appears, it should land as a
+diagnosis, not a UI state change") depends on that moment actually occurring for users with
+meaningful frequency. This session's own correct, necessary severity fix makes that moment fire
+even less often than it already did. Worth stating plainly at the Step-Back: **the central
+visual-philosophy mechanism may be effectively unobserved by real users** — which would explain
+"lands amateur" independent of any craft-execution quality. A restraint mechanism nobody ever
+sees pay off reads as an absence, not a discipline.
+
+**Proposed reframe of the craft-vs-philosophy fork:** not a clean either/or. The Core Reframe's
+philosophical case (the differentiator is delivery style — magnanimous but unflinching — not the
+taxonomy) doesn't require a colorless palette. Restraint and warmth aren't opposites. The likely
+real problem: the original 3-color lock conflated "restrained" with "monochrome except one rare
+severity event" — a stricter reading of the Saint-Exupéry principle than the philosophy itself
+actually requires.
+
+**Proposed direction:** the already-partially-built v2/OD-07 token system may already be the
+correct answer. It already separates two genuinely different jobs that the original 3-color lock
+collapsed into one color (rust): `--oxide` as a general-use accent (warmth, presence, everyday
+use) and `--urgency` (rust's exact meaning, Endemic-only, still fully exclusive) as the reserved
+diagnostic-moment color. A two-tier system, not an abandonment of restraint — general color gets
+real presence; the reserved color keeps its exclusivity and its payoff, whenever it fires.
+
+Currently `--oxide`/v2 is live only on the homepage (Stage 4 proof point); every other route
+still runs the original Session 58 tokens (`--color-paper/-charcoal/-slate/-rust`) unchanged.
+
+**Proposed Step-Back question:** should the v2 token system become the site-wide standard, not
+just a homepage proof point?
+
+**Explicitly not a final decision.** This is this session's (Claude.ai) proposed framing for Pete
+to bring into the Step-Back conversation, alongside the doc's own existing recommendation above
+(specific "amateur"-reading pages/components, comparison sites/brands, an honest read on whether
+shipped craft fixes moved the needle).
