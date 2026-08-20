@@ -610,6 +610,64 @@ direction, not just as a non-predictor). Not assigned to either track
 until that's understood. No differentiation candidate proposed, no
 code touched.
 
+## Track 1 membership verification — 0 of 3 remaining candidates confirmed clean
+
+**Characterization only, 2026-08-20 — the last characterization pass
+for this session. No code changes, no direction proposed, no further
+investigation initiated regardless of result.** `the_uninitiated`
+turned out to hide a cross-cluster asymmetry rather than a simple
+same-cluster neighbor-steal (above). Before treating the remaining 3
+provisional Track 1 members as confirmed, the same tie-vs-genuine
+decomposition check — for every stolen profile, confirm it's a real
+score win rather than an insertion-order tie-break against a
+cluster-mate, then check whether the genuine wins concentrate on one
+identifiable cluster/state or spread across a separate one — was run
+on all 3. **None came back clean.**
+
+**`the_unexamined_algorithm` — SURPRISE.** Has no cluster of its own
+(genuinely unique vector), so same-cluster tie-break can't apply at
+all — confirmed 0 of 11 stolen profiles are tie-artifacts, all 11 are
+genuine wins. But they spread across three different clusters, not
+one: rank-3 (6, 54.5%), rank-2 (4, 36.4%), rank-9 (1, 9%). Structurally
+can't be a same-cluster neighbor-steal (no cluster to be narrow
+about), and isn't a clean single cross-cluster pairing either — a
+smaller-scale version of Track 2's broad-attractor shape (multiple
+clusters), far less extreme than `built_to_fail`/`invisible_performance_management` but not Track 1's shape.
+
+**`the_second_close` — SURPRISE.** 3 of 5 stolen profiles are
+tie-artifacts against `silosolation`, its own rank-6 cluster-mate
+(scores confirmed byte-identical) — already covered by rank-6's known
+uniform tie, not new dominance. The only 2 genuine wins are both
+against `the_fracture` (rank-9, already characterized and declined as
+low-stakes). Once the tie-artifact noise is stripped, there's almost
+no real signal left, and what remains points at an unrelated,
+already-closed cluster rather than confirming a clean pairing within
+rank-6.
+
+**`culture_drift` — SURPRISE.** 1 of 5 stolen profiles is a
+tie-artifact against `wellbeing_theater`, its own rank-11 cluster-mate.
+The 4 genuine wins split across two different clusters:
+`the_broken_compass` ×3 (rank-1, 75%) and `the_inner_circle` ×1
+(rank-10, 25% — notable that this is a genuine win, not a tie, despite
+`the_inner_circle`'s already-resolved differentiation). Not a single
+clean pairing.
+
+**Net: 0 of the 4 original "narrow neighbor-stealer" candidates
+(`the_uninitiated` plus these 3) survive verification as a clean
+same-cluster Track 1 pairing.** Worth stating plainly as its own
+finding: the "narrow, same-dimension theft" heuristic from the
+dominance-mechanism investigation does not reliably predict a clean
+same-cluster pairing once actually checked — 0-for-4 as a screening
+criterion in this session's data, not a pattern to keep trusting at
+face value. Track 1, as originally scoped (a set of clean,
+structurally-similar-to-rank-7 pairings ready for pilot-style
+remediation), currently has no confirmed members. Each of the 4 is
+its own more complex case — three additional cross-cluster-flavored
+patterns alongside `the_uninitiated`'s, none yet diagnosed further,
+none assigned anywhere. Not scoped or actioned here — this is the
+last characterization pass for the session, per explicit instruction,
+regardless of what it found.
+
 ## Cross-references
 
 - `prompts/primary-state-target-match-finding.md` — original 1/58
