@@ -75,8 +75,13 @@ Update:
 
 Use `pathlib.Path('tools/_mob.txt').write_text(content, encoding='utf-8')` to overwrite the file.
 
+### Step 3a — Session Handoff File
+After Section 16's closeout entry is written, write `prompts/session-handoff-v[MOB version].md` — a direct extract/reformatting of that same Section 16 entry, not independently authored. Cover: the files-to-attach list for the next session (Section 13b), the full shipped/open/parked status breakdown, and any time-anchored items. Additive only — one file per session close, never overwritten, named by the MOB version at close so it's unambiguous which project state it reflects. Tracked in git, not gitignored — these are durable records, not scratch output.
+
+This file must never contain information that contradicts or drifts from Section 16's own entry for that session — it is a derived, more portable copy for quick reference, not a second independent record. If the two ever need reconciling, Section 16 is authoritative.
+
 ### Step 3b — Commit MOB file
-After writing `tools/_mob.txt`, include it in the session commit. This step fires every session without exception.
+After writing `tools/_mob.txt` and `prompts/session-handoff-v[MOB version].md`, include both in the session commit. This step fires every session without exception.
 
 ### Step 4 — Commit
 Run `git status`. Present Pete with `[filename] — [why]` for each touched file. Flag anything CC did not touch — Pete decides.
@@ -188,7 +193,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.204 |
+| MOB version | v4.205 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 58 (locked) |
