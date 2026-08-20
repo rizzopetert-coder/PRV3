@@ -428,6 +428,124 @@ no shared-vector confusion to resolve. This needs its own future
 investigation, independent of the cluster/tie remediation track this
 whole document has been about. Not scoped or actioned here.
 
+## Dominance-mechanism investigation — cross-cutting, not per-state
+
+**Diagnostic only, 2026-08-20. No code touched, no weight numbers
+proposed.** Seven states flagged this session with meaningful
+false-rank-1 dominance, spanning both tied clusters and
+genuinely-unique vectors, examined together rather than one at a time:
+`built_to_fail` (28%), `invisible_performance_management` (33.7%),
+`the_uninitiated` (12.6%), `the_unexamined_algorithm` (6.3%),
+`the_second_close` (2.9%), `culture_drift` (2.9%),
+`the_overloaded_manager` (2.3%). For each: `dimensional_vector`
+magnitude/concentration on its dominant field, `SALIENCE_PROFILES`
+entry (presence and magnitude), and — pulled directly, not
+inferred — every profile ID it steals rank-1 from and that profile's
+true target's own dominant vector field.
+
+| State | Dominance | Vector dominant field (magnitude) | Vector concentration (dom/total) | Salience | Theft pattern |
+|---|---|---|---|---|---|
+| `invisible_performance_management` | **33.7%** | aptitude, 0.45 | 0.290 | Custom, sharp: aptitude=2.5, rest 0.4 | **Broad, cross-dimensional** — steals from Alliance-, Aptitude-, Attitude-, and Authority-dominant targets alike |
+| `built_to_fail` | **28.0%** | aptitude, 0.60 (highest raw magnitude of the 7) | 0.462 (sharpest/most peaked) | Custom, sharp: aptitude=2.5, rest 0.4 | **Broad, cross-dimensional** — all 4 target dimensions represented among its 49 stolen profiles |
+| `the_uninitiated` | 12.6% | authority, 0.45 | 0.300 | Custom, sharp: authority=2.5, rest 0.4 | **Narrow, same-dimension** — 20 of 22 stolen targets are authority-dominant |
+| `the_unexamined_algorithm` | 6.3% | authority, 0.50 | 0.345 | Custom: authority=2.5, aptitude=1.0 secondary, rest 0.4 | **Narrow, same-dimension** — 10 of 11 stolen targets are authority-dominant |
+| `the_second_close` | 2.9% | alliance, 0.45 | 0.300 | Custom, sharp: alliance=2.5, rest 0.4 | **Narrow, same-dimension** — all 5 stolen targets are alliance-dominant |
+| `culture_drift` | 2.9% | attitude, 0.35 | 0.233 | Custom: attitude=2.5, authority=1.0 secondary, rest 0.4 | **Narrow, same-dimension** — all 5 stolen targets are attitude-dominant |
+| `the_overloaded_manager` | 2.3% | aptitude, 0.35 | 0.233 | Custom: aptitude=2.5, authority=1.0 secondary, rest 0.4 | **Anomalous** — all 4 stolen targets are attitude-dominant, not aptitude (its own dimension) or authority (its secondary) |
+
+### Three direct findings
+
+**(a) Salience presence/magnitude does not correlate with dominance —
+it's a constant across all 7, not a variable.** Every one of the 7 has a
+custom, sharply-weighted salience entry (2.5 on its dominant field),
+from the biggest dominator (33.7%) to the smallest (2.3%). This falsifies
+the "lacking a custom entry = generalist attractor" hypothesis outright
+— nothing in this set lacks an entry.
+
+**(b) Vector magnitude/concentration on the dominant field does not
+correlate with dominance magnitude, and not even in a consistent
+direction.** `invisible_performance_management` has the *lowest*
+concentration (0.290) of the top two dominators yet wins the most
+(33.7%); `built_to_fail` has the *highest* concentration of all 7
+(0.462, a sharp single-spike vector) and wins second-most.
+`the_unexamined_algorithm` has higher raw magnitude (0.50) than
+`the_uninitiated` (0.45) but roughly half its dominance (6.3% vs.
+12.6%). No single metric here predicts dominance magnitude
+monotonically.
+
+**(c) The aptitude-signal-correlation hypothesis specifically checked
+against `built_to_fail` does NOT hold — confirmed directly, not
+assumed.** `built_to_fail`'s 49 stolen profiles span all four
+dimensions in roughly even measure (Alliance, Aptitude, Attitude, and
+Authority targets all represented), not concentrated on
+aptitude-flavored targets. What the theft data actually shows instead
+is a **magnitude-of-dominance split**: the two biggest dominators
+(`invisible_performance_management`, `built_to_fail`, both >25%) steal
+broadly across all four dimensions; four of the remaining five
+(`the_uninitiated`, `the_unexamined_algorithm`, `the_second_close`,
+`culture_drift`) steal almost exclusively from targets sharing their
+*own* dominant dimension — a narrow same-dimension "neighbor" effect,
+structurally different from a broad attractor effect.
+
+### Genuine anomaly, logged as open rather than forced into a pattern
+
+`the_overloaded_manager` fits neither pattern. It's aptitude-dominant
+with an authority secondary, but all 4 profiles it steals are
+attitude-dominant — a dimension where it has no elevated presence in
+either vector or salience. Checked one case directly (`ATT-IT-02`'s
+`dimension_summary`: authority 0.44, attitude 0.40, alliance 0.25,
+aptitude 0.15 — aptitude is actually the *lowest* of the four, not
+elevated); it doesn't explain the win either. Small sample (n=4) —
+flagged for more data before any theory is trusted, not resolved here.
+
+## Sequencing synthesis — two-track recommendation (Pete's call, not decided here)
+
+**A proposal for Pete's decision, drawn directly from the theft-pattern
+split above — not a decision already made, and nothing here has been
+built.** The broad-vs-narrow theft distinction maps onto two
+structurally different remediation problems that likely need different
+handling.
+
+**Track 1 — narrow neighbor-stealers.** `the_uninitiated`,
+`the_unexamined_algorithm`, `the_second_close`, `culture_drift`, and by
+extension any other state found later with the same narrow,
+same-dimension theft signature. Salience-only differentiation is a
+*plausible* fix for this shape of problem — structurally similar to
+rank-7's confirmed success (`the_unformed_leader`/`the_dormant_talent`,
+also a narrow within-cluster tie, resolved via salience alone without
+touching `dimensional_vector`). Candidate for continued pilot-style
+remediation, cluster by cluster, same process as rank-7/8/9 — dry-run,
+search against the real calibration suite, full verification, Pete
+confirms before commit.
+
+**Track 2 — broad cross-dimensional attractors.**
+`invisible_performance_management` and `built_to_fail`. Confirmed NOT
+fixable via salience alone — direct evidence from rank-8's actual pilot
+(searched 4 magnitudes spanning a wide range, `built_to_fail`'s false
+rank-1 rate never moved), now reinforced by this session's broader
+theft-pattern data showing the dominance isn't concentrated on any one
+paired opponent or dimension to reweight against. These need
+`dimensional_vector`-level attention — likely reducing peak
+concentration or reshaping the vector itself, not just reweighting a
+paired opponent, since there often isn't a single clean opponent to
+pair against (the theft is spread across many unrelated states). This
+is real clinical/taxonomic authoring work, comparable in kind to the
+still-undated `STATE_CAUSATION_OVERRIDES` item — the harder of the two
+tracks, and should be sequenced with that in mind rather than attempted
+piecemeal alongside Track 1's lighter-weight pilots.
+
+**`the_overloaded_manager`** sits outside both tracks — logged as an
+open, small-sample anomaly, not assigned to either track until more
+data (more theft profiles, or a deeper trace of the actual
+centroid-displaced accumulated_vector rather than the derived
+`dimension_summary`) clarifies what's actually happening.
+
+Not scoped or actioned here. Both tracks, their relative priority
+against each other and against `invisible_performance_management`'s
+own unscoped investigation, and whether Track 1 continues at all given
+rank-1/rank-2's scale (see "Full cluster characterization" above) are
+all Pete's call.
+
 ## Cross-references
 
 - `prompts/primary-state-target-match-finding.md` — original 1/58
