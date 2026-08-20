@@ -47,7 +47,7 @@ from engine.output import (
 
 # ── Engine version ─────────────────────────────────────────────────────────────
 
-ENGINE_VERSION: str = "0.2.0"  # Incremented at each build milestone
+ENGINE_VERSION: str = "0.2.1"  # Incremented at each build milestone
 
 
 # ── VII.1  Session data container ──────────────────────────────────────────────
@@ -431,6 +431,20 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
     # session-wide/pooled while tier/anchor_text became per-state) is
     # closed. sev.score_0_100_with_narrative (the old session-wide,
     # post-narrative-ceiling value) is no longer read here at all.
+    # by_state (Visualize Your Data, Layer 1 -- VII.1 additive field,
+    # commit pending): pure exposure of sev.state_severity filtered to
+    # identified_states, no new computation. Mirrors the
+    # lead_severity_tier/score fallback pattern above (get() -> is not
+    # None check -> "Emerging"/0.0 default) rather than a new idiom.
+    by_state = []
+    for s in identified_states:
+        _state_entry = sev.state_severity.get(s["state_id"])
+        by_state.append({
+            "state_id":    s["state_id"],
+            "tier":        _state_entry.tier if _state_entry is not None else "Emerging",
+            "score_0_100": _state_entry.score_0_100 if _state_entry is not None else 0.0,
+        })
+
     severity_obj = {
         "tier":        lead_severity_tier,
         "score":       round(lead_severity_score_0_100, 2),
@@ -442,6 +456,7 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
             "financial_indicators_present": None,  # from SeverityInput
             "named_condition":             None,  # from SeverityInput
         },
+        "by_state": by_state,
     }
 
     # ── asset_score ──
