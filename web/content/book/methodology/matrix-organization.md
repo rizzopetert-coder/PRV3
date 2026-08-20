@@ -1,10 +1,6 @@
-You report to two people. They both think they're your real boss.
+An engineer reports to both a functional manager and a project manager. When their priorities align, the arrangement is invisible. When they conflict, the engineer becomes the shock absorber — negotiating whose meeting to prioritize, absorbing friction two managers created and never resolved between themselves.
 
-When their priorities align, everything's fine. When they conflict — and they will conflict — you become the shock absorber. The one who has to figure out whose meeting to prioritize. The one who gets the passive-aggressive Slack message from the manager you didn't choose. The one who spends half your time navigating relationships and the other half doing your actual job.
-
-Welcome to the matrix. On paper, it's supposed to give you the best of both worlds: functional expertise and project agility. In practice, it often gives you two bosses, unclear accountability, and a lot of meetings where everyone's trying to figure out who actually decides things.
-
-The matrix isn't inherently broken. Some organizations make it work beautifully. But most organizations implement the structure without building the decision-making infrastructure that makes it functional. The reporting lines change. The conflict resolution doesn't. And the people in the middle get crushed.
+Matrix structures promise the best of both worlds: functional expertise and project agility. In practice, most organizations implement the reporting lines without building the decision-making infrastructure that makes the structure functional. The lines change. The conflict resolution doesn't. The people in the middle get crushed.
 
 ---
 
@@ -94,6 +90,6 @@ If the answer is vague, or different depending on who you ask, or involves a lot
 
 Fixing a matrix isn't about flattening it or going back to traditional hierarchy. It's about building the decision-making architecture that makes the structure functional. That's doable. It just requires admitting that the structure alone isn't enough.
 
-If your matrix is creating more friction than flexibility, we should talk.
+If your matrix is creating more friction than flexibility, the missing piece is usually the infrastructure, not the structure itself.
 
 — Principal Resolution

@@ -1,10 +1,6 @@
-You were twenty people eighteen months ago. Now you're eighty. The Slack is a firehose. The "quick syncs" have syncs of their own. Someone just asked you who owns the thing you're pretty sure three different people think they own, and honestly, you're not certain anymore either.
+A company that was twenty people eighteen months ago is eighty now. Someone asks who owns a particular function and gets three different answers from three different people, each one reasonably confident.
 
-The pitch deck talks about "hypergrowth." The reality feels more like hyperspeed without a seatbelt.
-
-Here's what nobody told you: the org chart you drew at twenty doesn't work at eighty. The processes you built when everyone fit in one room don't work when you've got people who've never met each other making decisions that affect each other's work. The "culture" that was just... vibes... doesn't transmit when half the company joined in the last six months and learned the norms from other people who joined four months before them.
-
-You're not imagining that everything feels harder than it should. It is harder than it should be. The infrastructure is running a version behind the organization. And the gap is widening every week.
+The org chart drawn at twenty doesn't work at eighty. The processes built for a team that fit in one room don't hold when half the company joined in the last six months and learned the norms from people who'd only been there four months longer. The infrastructure is running a version behind the organization, and the gap widens every week.
 
 ---
 
@@ -84,6 +80,4 @@ The work itself is usually straightforward once the space is carved out. Map the
 
 What's hard is creating the permission to do that work. Because it means slowing down. It means admitting the machine isn't as well-built as the pitch deck suggests. It means the people who've been saying "this is fine" have to acknowledge that it isn't.
 
-If you're on the treadmill right now — if the pace has been getting faster and the infrastructure has been falling further behind and you're starting to wonder how much longer this can hold — you're not wrong to wonder.
-
-It's worth a conversation.
+If the pace has been getting faster while the infrastructure falls further behind, that gap doesn't close on its own — it has to become as much of a priority as the product it's supporting.

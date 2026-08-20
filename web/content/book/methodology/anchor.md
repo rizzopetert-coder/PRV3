@@ -1,10 +1,6 @@
-You're reading this and you're not quite sure why.
+Why would an organization with coordinated decision-making, low structural friction, and engaged leadership go looking for a diagnostic tool at all?
 
-Nothing is on fire. The team is functioning. Decisions are getting made at reasonable velocity. The people you want to keep are staying. The culture isn't performative — people actually seem to mean it when they say they like working here.
-
-You Googled something anyway. Maybe "signs of organizational health" or "protecting company culture during growth" or something like that. Maybe you took a diagnostic that was designed for organizations in crisis and it told you... you're fine. Which feels right. But also incomplete.
-
-You're not wrong to be paying attention.
+Most Anchor organizations wouldn't, which is part of why this is the rarest finding in the diagnostic system — not because healthy organizations are rare, but because they rarely go looking. You did anyway, maybe after Googling "signs of organizational health" or running a diagnostic built for crisis and getting told, correctly, that you're fine. Which felt right. But also incomplete.
 
 ---
 
@@ -80,6 +76,4 @@ It's a different kind of conversation than the one most organizations have with 
 
 That's worth doing. The organizations that treat their health as an asset worth protecting — that stay intentional about the conditions that created it — are the ones that hold it through the transitions that break everyone else.
 
-If that sounds like you, if you're here because you want to protect something rather than fix something, that's a conversation worth having.
-
-Let's talk about what that looks like.
+If that's you, what's worth having isn't a diagnosis. It's a conversation about what you're protecting and how.

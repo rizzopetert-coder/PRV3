@@ -6,7 +6,7 @@ That last detail is the one that matters. Not poor, not strong, fine. A rating t
 
 ---
 
-## The File Isn't Lying. It's Just Incomplete in One Direction
+## How the Fine Reviews Add Up
 
 The instinct is to assume someone is being dishonest: falsifying reviews, covering for a friend, protecting themselves from a difficult conversation. That's sometimes part of it, but the more common mechanism is smaller and more forgivable than outright dishonesty.
 

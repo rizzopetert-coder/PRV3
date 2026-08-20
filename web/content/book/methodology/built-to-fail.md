@@ -1,8 +1,8 @@
 # Built to Fail
 
-You took the job because it looked like the right next step. Bigger scope, more visibility, a real shot at proving what you could do. Six months in, you understand exactly why the last person left.
+Some roles are designed with a scope that no reasonable allocation of time, authority, or resources could support. The person in the seat changes. The outcome doesn't. Each one arrives confident they'll be the exception, and each one eventually raises the gap and gets the same answer: figure it out, said kindly, as if effort alone should be able to close a gap that was never about effort.
 
-The scope was never realistic. The resources that were promised in the interview never fully materialized. When you raised it, the answer was some version of "figure it out" — said kindly, with real confidence in your ability, as if the gap between what the role requires and what it's been given is something a sufficiently talented person should be able to close through effort alone. The person before you got the same answer. So, probably, did the person before them.
+The person in the role now got that answer too. So, probably, did the person before them, and the person before that.
 
 ---
 
@@ -52,8 +52,4 @@ The role doesn't need a better person. It needs a better design. Less scope, mor
 
 The fix requires the organization to do the thing it's been avoiding: look directly at what this role actually requires versus what it's actually been given, and close that gap through redesign rather than through the next round of hope. That might mean splitting the role, adding a layer, removing responsibilities that never should have landed in one seat, or genuinely increasing the resources behind it.
 
-What it can't be is another search for someone tougher. The pattern across multiple departures is the data. Trust your gut if you already know what you're looking at. Until then, trust the data. It requires someone willing to say, out loud, that the last several people who struggled here weren't the problem.
-
-If a role has churned through several genuinely capable people in a short window, the role is the variable worth examining before the next hire becomes the next casualty.
-
-Trusting that pattern, instead of running the same search again and calling it a fresh start, is the harder and more honest move.
+What it requires is someone willing to say, out loud, that the people who struggled here weren't the problem, and to treat the role itself as the thing that needs to change.

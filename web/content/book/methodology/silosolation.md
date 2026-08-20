@@ -1,8 +1,6 @@
-You've seen the email chain. The one that starts with a simple question and somehow loops in fourteen people across three departments, none of whom can actually answer it because they're all waiting for someone else to own it.
+Silosolation is what happens when self-contained teams learn to function well individually while producing less than the sum of their parts collectively. Each team is fine on its own. The organization, taken as a whole, isn't — and the gap between those two things is where the best people quietly burn out.
 
-Three days later, you're still cc'd on the thread. The original question has been lost somewhere around reply number twenty-seven. Two VPs have weighed in with opinions that contradict each other. Someone suggested scheduling a meeting. Someone else replied-all to say they can't make the proposed time. And somewhere, buried in a Slack DM, the actual answer exists — but the person who has it doesn't know anyone's looking for it because they're not on the email chain.
-
-This is Silosolation. The organization has fractured into self-contained units that have learned to function without each other. Each team is doing fine on their own. The whole is producing less than the sum of its parts. And the gap between "each team" and "the whole" is where your best people are slowly burning out.
+A routine question gets forwarded across departments, loops in more people than it needs, and by the time it reaches reply twenty, the original question is buried and the person who actually has the answer isn't even on the thread.
 
 ---
 
@@ -92,6 +90,6 @@ It's not glamorous work. There's no single intervention that makes all the silos
 
 That's available to you. But it starts with naming the specific seams that are currently broken.
 
-If you're ready to stop working around the walls and start taking them down, we should talk.
+If you're ready to stop working around the walls, the first move is mapping the seams.
 
 — Principal Resolution

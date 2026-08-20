@@ -1,13 +1,17 @@
 # No-AI-Slop Remediation Plan — /book Corpus
 
-Status: **Phase 1 and Phase 2 CLOSED (this session).** Pete-confirmed
-3-phase structure (Claude.ai), scope for each phase pulled from
-`prompts/no-ai-slop-book-audit-findings.md` (~438 findings, 87 files
-audited, zero clean) and then re-verified against live file content before
-any edit — several scope items turned out to already be resolved by an
-earlier, unrelated project (see Phase 2 below) or to be intentional device
-reuse rather than defects (see Phase 1, items 1/2/4/5). Phase 3 remains
-explicitly gated on the ~August 23 Quarterly Step-Back.
+Status: **ALL THREE PHASES CLOSED (this session). No-AI-slop remediation
+project complete.** Pete-confirmed 3-phase structure (Claude.ai), scope
+for each phase pulled from `prompts/no-ai-slop-book-audit-findings.md`
+(~438 findings, 87 files audited, zero clean) and then re-verified
+against live file content before any edit — several scope items turned
+out to already be resolved by an earlier, unrelated project (see Phase 2
+below) or to be intentional device reuse rather than defects (see Phase
+1, items 1/2/4/5). Phase 3 was originally gated on the ~August 23
+Quarterly Step-Back's visual-identity-philosophy resolution but was
+pulled forward per Pete's explicit instruction and closed ahead of that
+gate — see Phase 3 below for the full closure record, and the
+Step-Back note at the end of that section.
 
 ---
 
@@ -183,38 +187,249 @@ this session).
 
 ---
 
-## Phase 3 — Structural template variation (EXPLICITLY GATED)
+## Phase 3 — Structural template variation — CLOSED
 
-**Gate: the ~August 23 Quarterly Step-Back's visual-identity-philosophy
-resolution.** Do not begin design or remediation work on this phase before
-that conversation resolves — it's the same underlying "does this read as
-professionally crafted or as AI-generated template" question the findings
-doc already connects to the visual-identity-philosophy open question
-(`prompts/visual-identity-philosophy-open-question.md`), now confirmed at
-the copy layer with objective textual evidence rather than only a
-subjective visual read. Resolving the visual question first avoids
-building copy-layer remediation on an unsettled premise.
+**Originally gated on the ~August 23 Quarterly Step-Back's visual-identity-
+philosophy resolution.** Pulled forward per Pete's explicit instruction,
+ahead of that conversation, and closed this session — ahead of the gate
+it was originally waiting on. See the Step-Back note at the end of this
+section. Direction confirmed: **CONSERVATIVE** — fewer rhetorical
+flourishes, quieter confidence, not bolder or more expressive.
 
-**Scope when unblocked:**
+**Real scope, re-verified against live content this session (findings
+doc's numbers didn't hold up under direct file inspection, same pattern
+as several Phase 1 items):**
 
-- The shared skeleton across roughly 58 of the 87 methodology-type files:
-  hook paragraph → horizontal rule → a "diagnostic signs" section using
-  exactly three bolded lead-sentence pseudo-bullets → (in about half the
-  files) a "First/Second/Third" bolded fix-list using the same device →
-  closing aphoristic "kicker" line → (in a subset, batch 2's pieces) an
-  identical closing block (`## The Question We Ask` header, italicized
-  question, "If you're ready to ___, we should talk." CTA, "— Principal
-  Resolution" signature).
-- The "X isn't Y. It's Z." binary-contrast construction's overuse —
-  present in essentially every one of the 87 files, 2-6 times per piece,
-  used as a section heading in a dozen-plus files.
+- **43 of 64 methodology files** share the skeleton (horizontal rule +
+  3+ bolded diagnostic-signs pseudo-bullets), not "roughly 58 of 87."
+  Full file list on record in this session's scoping report.
+- **First/Second/Third fix-list device: 7 files**, not "roughly half."
+- **CTA closing block: 8 files** (`accountability`, `business-case`,
+  `matrix-organization`, `silosolation`, `succession-planning`,
+  `the-broken-compass`, `the-untouchable`, `toxic-culture`) — "a subset"
+  held up.
+- **"X isn't Y. It's Z." as a genuine two-clause heading pivot: 8
+  instances**, not "a dozen-plus" — `groundhog-day`,
+  `invisible-influence-architecture`, `the-founders-grip`,
+  `paper-shield`, `the-paper-tiger`, `the-pay-fog`, `the-second-close`,
+  `the-suppression-filter`. A broader, related family of single-clause
+  negation headings (~9-10 more files, e.g. "This Isn't a Communication
+  Problem") exists but is a different, less repetitive construction —
+  not part of this remediation.
 
-**Governing constraint, already locked:** vary execution, keep the
-skeleton. This is not a rebuild of the methodology-piece format — the
-underlying structure (hook, diagnostic signs, fix-list, kicker) stays;
-what needs to change is that ~58 files stop reading as one template
-filled in 58 times, through genuine variation in how each piece executes
-that structure.
+**Governing constraint, still locked:** vary execution, keep the
+skeleton. The diagnostic-signs bullets and the CTA block's *structure*
+are functional navigation aids, not stylistic tics — left untouched.
+Restraint applies to sentence-level prose (headings, hooks, kickers, and
+the CTA block's closing invitation line specifically), not to the
+scaffolding.
+
+### Heading construction — CLOSED
+
+Of the 8 true two-clause headings, 2 shared the identical construction
+with another file despite different wording:
+- `the-founders-grip.md` / `the-suppression-filter.md`: both
+  "[X] Isn't a Person. It's a [abstract noun]." `the-suppression-
+  filter.md` kept as-is (fuller, more specific). `the-founders-grip.md`
+  rewritten to "The Structure Behind the Bottleneck" — matches its own
+  sibling headings' plain declarative style rather than reaching for a
+  different device.
+- `paper-shield.md` / `the-paper-tiger.md`: both "[X] Isn't Lying. It's
+  [Y]." `paper-shield.md` kept as-is (more vivid — "stopped describing
+  this place"). `the-paper-tiger.md` rewritten to "How the Fine Reviews
+  Add Up" — tied to the piece's own central image, avoids echoing its
+  own later "The Gap You'd Actually See" heading.
+
+The other 6 headings earn their construction (each correcting a real,
+piece-specific misconception) and were left untouched.
+
+### Hook/kicker menu — piloted, tightened, ready to scale
+
+**Opener shapes:** (1) plain definitional statement, no anecdote
+framing; (2) brief concrete ordinary-moment scene; (3) direct diagnostic
+question; (4) name the underlying mechanism in sentence one.
+
+**Closer shapes:** (1) plain statement of practical stakes; (2) quiet
+one-sentence "what this requires"; (3) direct callback to the opener's
+named pattern; (4) aphoristic kicker — the exception, not the default.
+
+**Rule added after the pilot:** if a file's current hook/kicker already
+reads restrained, leave it. The goal is reducing flourish where it
+exists, not rewriting every file for variety's own sake.
+
+**Shape 3 (diagnostic question), tightened after the pilot:** the
+question must have a genuine, variable answer the reader doesn't already
+know going in, and must not stack multiple loaded claims into one
+"gotcha" sentence. A plain diagnostic question invites real
+self-assessment ("Does your organization have X, and when did Y last
+happen?"); a rhetorical question presupposes its own answer and
+functions as a dramatic accusation dressed as inquiry ("How many of your
+people already know X, have already done Y, and are simply waiting for
+Z?"). If a shape-3 draft reads as the second kind, use a plainer
+question or a different shape entirely.
+
+**Pilot (5 files, deliberately varied subject matter) — findings and
+resolution:**
+- `built-to-fail.md` (opener 1, closer 2) and `decision-paralysis.md`
+  (opener 1, closer 4) — clean results, no issues.
+- `pay-exposure.md` (opener 3) — first draft violated the tightened
+  shape-3 rule above (a stacked, loaded rhetorical question). Rewritten
+  to a genuine diagnostic question with a real, variable answer.
+- `the-untouchable.md` (opener 4) — surfaced a real tonal seam between a
+  newly-quiet opener and its still-salesy CTA close ("we should talk").
+  Resolved by Task 2's CTA-prose pass (below), not by softening the
+  opener.
+- `hr-capture.md` (opener 2, closer 3) — the file was already restrained
+  before the pilot touched it; applying the "concrete scene" shape
+  *added* flourish that wasn't there, the wrong direction. Fully
+  reverted to its original hook and kicker (not just the closer — the
+  closer's "next employee" callback only made sense against the
+  opener's invented scene, so both had to revert together for the file
+  to make sense again). This is the finding behind the new rule above.
+
+### CTA-block prose — piloted on the-untouchable.md, ready to extend to the other 7
+
+**Finding:** direct read of all 8 CTA-block files found "we should talk"
+used as the literal closing invitation line in **7 of 8** — the same
+kind of near-verbatim cross-file reuse Phase 1 targeted, not just a tone
+problem specific to one file. (`toxic-culture.md` is the one exception,
+using "that's the work we do.")
+
+**Approach, applied to `the-untouchable.md` as the highest-flourish test
+case:** keep the block's real job intact — header, framing paragraph,
+the italicized diagnostic question (the block's genuine functional
+hook), and the "— Principal Resolution" signature all untouched. Only
+the final closing-invitation line changes, and it changes to something
+piece-specific, not a second repeated template phrase substituted for
+the first. `the-untouchable.md`'s new close — "If you're ready to stop
+managing around it, that's where we'd start." — ties back to the
+block's own already-established "That's where..." language two
+sentences earlier in the same section, rather than borrowing new
+phrasing. **The other 7 CTA-block files each need their own
+piece-specific closing line when touched, not a copy of this one** —
+scoped for Phase 3's file-by-file rollout, not decided in advance here.
+
+### Rollout — all 38 remaining files resolved, batches 1-4
+
+Applied the finalized menu and CTA-prose approach across the remaining
+38 skeleton files (5 had already been resolved via the pilot), assessed
+restraint-first per file in batches of 8-10, dry-run before each write.
+
+**Final result: 14 of 43 skeleton files (33%) needed a real hook/kicker
+change.** 2 more got heading-only fixes with hook/kicker left untouched
+(`the-founders-grip.md`, `the-paper-tiger.md`). 27 files needed nothing.
+
+**The CTA-block correlation, confirmed and quantified across the full
+rollout:** all **8 of 8** CTA-block files needed changes (100%). Of the
+other 35 non-CTA files, only **6** needed changes (17%) — CTA-block
+pieces were touched at roughly 6x the rate of everything else. Working
+theory, not confirmed further: CTA-block pieces were likely authored
+with more "hook the reader" intent from the start, which is exactly the
+register this phase targeted.
+
+**Final shape distribution, openers (14 touched files):** shape 1
+(plain definitional) 4, shape 2 (concrete scene) 2, shape 3 (diagnostic
+question) 3, shape 4 (name the mechanism) 5. Shape 4 was the plurality
+pick but not from repeated phrasing — the 5 instances (`the-untouchable`,
+`accountability`, `business-case`, `the-policy-lag`, `toxic-culture`)
+each name a different mechanism in different words.
+
+**Final shape distribution, closers (6 non-CTA files touched — CTA
+files get their own piece-specific line, tracked separately below):**
+shape 1 (plain stakes) 2, shape 2 (quiet "what this requires") 3, shape
+3 (callback) 0, shape 4 (aphoristic) 1.
+
+**Batch-by-batch:** Batch 1 (9 files, alphabetical) — 3 touched
+(`accountability.md`, `anchor.md`, `business-case.md`), 6 left alone.
+Batch 2 (10 files) — 4 touched, all 4 of that batch's CTA-block files
+(`matrix-organization.md`, `silosolation.md`, `succession-planning.md`,
+`the-broken-compass.md`), 6 left alone; self-corrected mid-batch when 3
+of 4 first drafts converged on the same underlying construction (a
+plain claim followed by a condensed illustrative example) — revised
+`succession-planning.md` to a genuinely different construction (a real
+diagnostic question, no definitional lead-in) before finalizing. Batch 3
+(10 files) — 2 touched (`the-policy-lag.md`, `the-undefined-role.md`), 8
+left alone (0 of this batch's files were CTA-block). Batch 4 (9 files,
+the last batch) — 1 touched (`toxic-culture.md`, the 8th and final
+CTA-block file, also the single most heavily flourished hook in the
+entire 87-file corpus — condensed from 9 paragraphs to 2), 8 left alone.
+
+### A recurring blind spot, caught twice — worth flagging for any future remediation work
+
+**The lesson:** checking new text for distinct *wording* against other
+files is not the same as checking it for distinct *construction*, and
+this session missed the second check twice, in two different
+categories, before finally catching it.
+
+1. **Batch 2, mid-batch (openers):** 3 of 4 first-draft openers for that
+   batch converged on the same underlying move (plain claim + condensed
+   illustrative example) despite using different words and, on the
+   original shape log, different shape labels. Caught and corrected
+   before writing (`succession-planning.md` revised) — see above.
+2. **Final DETECT-style re-check, after all 4 batches were already
+   applied (CTA closes):** 6 of the 8 CTA closing lines had converged on
+   the same idea — "where this begins/starts" — with 4 using the
+   literal phrase "starts with" (`accountability.md`,
+   `succession-planning.md`, `the-broken-compass.md`, `toxic-culture.md`)
+   and 2 more using close cousins (`silosolation.md`: "is where that
+   begins"; `the-untouchable.md`: "that's where we'd start"). This one
+   was NOT caught mid-batch, because CTA lines were tracked across
+   batches for uniqueness against each other's exact wording, which they
+   had — the shared construction underneath the different wording was
+   the part that went unchecked until a dedicated final pass looked for
+   it specifically. All 6 rewritten to genuinely distinct constructions
+   before this closure was recorded.
+
+**Why this is worth logging as its own lesson, not just folding into the
+batch notes above:** the failure mode is the same shape both times —
+distinct-wording checks passed, distinct-construction checks weren't
+run until something forced them (a self-review mid-batch the first
+time, a dedicated final re-scan the second) — and it happened *after*
+the first catch had already been logged as a "watch for this" item.
+Knowing about the failure mode didn't prevent a second instance of it in
+a different category. For any future content remediation work at this
+scale: build the construction-level check into the process from the
+start (e.g., a running list of each file's closing/opening *shape*, not
+just its final sentence, checked against the list before each write),
+rather than relying on catching it via review after the fact a second
+time.
+
+### CTA-block prose — CLOSED, all 8 files
+
+Extended from the pilot's `the-untouchable.md` test case to all 7
+remaining CTA-block files. Each got its own piece-specific closing line,
+confirmed distinct in both wording and construction from the other 7
+(see the blind-spot note above for how that got verified properly).
+Final 8 closing lines on record in Section 13a.
+
+### Step-Back note
+
+This closes Phase 3 — and the full 3-phase remediation project — ahead
+of the ~August 23 Quarterly Step-Back that Phase 3 was originally gated
+on. It is no longer blocking on that conversation. The Step-Back's own
+visual-identity-philosophy discussion may still want to reference this
+work's outcome (the real skeleton/heading/CTA-line numbers, the
+conservative-direction execution, the construction-level blind spot) as
+input, since it's the same underlying "professionally crafted vs.
+AI-generated" question at the copy layer that the original findings doc
+connected to the visual question — just no longer a dependency either
+direction.
+
+---
+
+## Out-of-scope finding, not part of this remediation
+
+**"We should talk" also appears, unscoped, in 4 files outside the
+43-file skeleton set:** `exit-pattern.md`, `leadership-deafness.md`,
+`no-margin-for-error.md`, `the-basement-standard.md` — found during
+Phase 3's final DETECT-style re-check. All 4 were correctly excluded
+from Phase 3 (confirmed against the original scoping pass: none have the
+bolded diagnostic-signs skeleton this remediation was scoped around),
+so this isn't a rollout gap. It means the "we should talk" duplication
+problem extends beyond what any phase of this project covered. **Not
+touched. Not actioned.** Flagged here for a future decision on whether
+it's worth its own pass — a much smaller scope than Phase 3 (4 files,
+one line each), if and when Pete wants to open it.
 
 ---
 

@@ -1,12 +1,6 @@
-You already know you're in one. You knew within the first month. Probably the first week, if you're being honest — but you talked yourself out of it because the comp was good and you'd already told everyone you were excited about the role.
+Toxic cultures rarely announce themselves with an incident. They teach the rules by example — who gets protected, who gets pushed out, what happens to the person who said the thing everyone else was already thinking — until everyone in the building has learned which parts of themselves to leave in the car before walking in.
 
-Maybe it was the all-hands where the CEO talked about "radical candor" and then someone got quietly managed out for giving honest feedback. Maybe it was the skip-level where your boss's boss asked how things were going and you watched yourself lie in real time, smiled, nodded, said "really excited about the direction," because you'd already seen what happened to the last person who told the truth. Maybe it was just the Slack channel going dead silent after someone got cc'd who shouldn't have been. That split-second collective flinch. The way everyone suddenly got very interested in their own keyboards. You don't need a memo to explain that. Your nervous system figured it out before your brain caught up.
-
-The careers page has a photo of people laughing around a laptop. (Have you ever actually laughed while looking at a laptop with coworkers?) The engagement survey comes around quarterly, and you fill it out just positive enough to stay off anyone's radar but just honest enough that you can tell yourself you tried. The values are on the wall. Literally on the wall, in that startup font, probably something about "ownership" and "bringing your whole self to work." Which is funny, because your whole self would have quit six months ago. The version that shows up every day is the one that learned which parts to leave in the car.
-
-Toxic cultures don't announce themselves. They teach you the rules the old-fashioned way: by making examples. You learn by watching who gets protected, who gets pushed out, and what happens to the people who couldn't help but say the thing everyone else was thinking.
-
-And look, maybe you've been that person. The one who said it. The one who sent the email you shouldn't have sent, or asked the question in the meeting that made everyone's face do that thing. If so — welcome, we should talk. If not — you watched it happen. And you learned something about where you work that day. Something the careers page definitely didn't mention.
+The values are usually on the wall somewhere, printed in the right font. The gap between what's written there and what actually gets rewarded is where the culture actually lives, and most people working inside it can describe that gap in specific, granular detail well before anyone with the authority to close it admits it exists.
 
 ---
 
@@ -82,6 +76,6 @@ Either way, that's where the work starts. Not with the values poster. Not with t
 
 We've been in that room before. We know what it takes to have that conversation and what happens after you have it.
 
-If you're ready to stop managing around the thing and start addressing it directly, that's the work we do.
+Naming the specific, human-shaped problem everyone already knows about is the only part of this that actually works.
 
 — Principal Resolution

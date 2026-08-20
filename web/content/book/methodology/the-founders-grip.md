@@ -6,7 +6,7 @@ That person isn't malicious, and they're usually not even wrong when they finall
 
 ---
 
-### The Bottleneck Isn't a Person. It's a Design.
+### The Structure Behind the Bottleneck
 
 It's tempting to read this as a personality issue — this person just needs to let go, needs to trust the team more. That's rarely the whole story, and treating it as one usually leads to interventions that don't stick. The approval chain that runs through one person wasn't built on purpose, most of the time. It's just how the organization worked at a smaller size, when one person having full context on everything was a genuine advantage rather than a constraint. Nobody sat down and decided that every contract, every hire, every meaningful decision would route through a single desk. It simply never got redesigned once the organization outgrew the size where that structure made sense.
 

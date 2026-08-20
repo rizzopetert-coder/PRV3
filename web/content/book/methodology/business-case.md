@@ -1,10 +1,6 @@
-You know the spreadsheet. The one with the projections that go up and to the right, a hockey stick trajectory that somehow always arrives at a number just above the threshold for approval. The assumptions are listed on a tab nobody opens. The risk section exists but reads like a formality — three bullet points acknowledging that things could theoretically go wrong, without any real engagement with what happens if they do.
+Most business cases aren't predictions. They're arguments optimized for approval, not accuracy — a hockey-stick projection, an assumptions tab nobody opens, a risk section that acknowledges things could go wrong without engaging with what happens if they do.
 
-You've built this spreadsheet. You've presented this spreadsheet. You've sat in the meeting where everyone looked at this spreadsheet and nodded along, even though half the room quietly suspected the numbers were optimistic.
-
-And then, six months or eighteen months later, you've been on the project that delivered something quite different from what the spreadsheet promised. The timeline slipped. The costs were higher. The benefits materialized more slowly than projected, or didn't materialize at all. The thing that was supposed to be a layup turned into a postmortem.
-
-This is how most business cases work. They're not predictions. They're arguments. And the argument is optimized for approval, not accuracy.
+Six months or eighteen months later, the project that looked like a layup on paper turns into a postmortem. The timeline slipped. The costs were higher. The benefits materialized slower than projected, if they materialized at all.
 
 ---
 
@@ -78,6 +74,6 @@ The gap between those two things is diagnostic. If the business case said one th
 
 Nobody sets out to build a fantasy. But if the system rewards optimism and punishes honesty, fantasies are what you'll get. Changing the system is hard. It requires leadership that's willing to fund uncertainty honestly and a culture that treats conservative estimates as rigorous rather than weak.
 
-That's the work. If you're ready to do it, we should talk.
+That's the work — and it's worth doing now, before the next business case gets built the same way.
 
 — Principal Resolution

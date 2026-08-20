@@ -1,8 +1,8 @@
 # Pay Exposure
 
-She knows she's underpaid. She's done the research, talked to people in comparable roles elsewhere, looked at the published ranges for her position in this market. The number she should be making and the number on her paycheck have a real gap between them, and she's not guessing about it.
+Does your organization have real, current market data on whether specific roles are underpaid, and if so, when did that data last actually change a number on someone's paycheck?
 
-Her manager almost certainly knows it too. The organization has the market data — it ran the analysis, or could run it in an afternoon if it wanted to. The conversation about closing the gap has come up, in some form, and gotten deferred, because fixing it costs real money across more than one role, and that's a harder number to approve than the cost of waiting. When she eventually leaves, the exit interview will say something about a new opportunity, a better fit, a natural next step. That will be technically true and substantively incomplete. The real reason isn't going to appear in any document the organization keeps.
+Most organizations carrying this condition have the market data too, or could pull it in an afternoon. The conversation about closing the gap has come up before and gotten deferred, because fixing it costs real money across more than one role, and that's a harder number to approve than the cost of waiting. When the departures come, the exit interviews will say something about a new opportunity, a better fit, a natural next step. Technically true. Substantively incomplete.
 
 ---
 
@@ -54,6 +54,4 @@ The fix isn't complicated to describe, even though it's expensive to execute: cl
 
 Part of what makes this defensible to leadership, when the budget conversation is difficult, is connecting the actual cost of inaction — replacement recruiting, onboarding time, the compounding signal to everyone still watching — against the cost of correction, instead of comparing correction against a baseline of zero. The organization is already paying for this gap. It's just paying in a currency that doesn't show up on the line item where the fix would.
 
-If your best people are leaving for reasons that sound plausible and don't quite add up, and you already have pay data that shows a gap you haven't closed, that's usually not a coincidence worth explaining away again.
-
-The data's already sitting there. The only open question is whether this is the cycle you act on it.
+If people are leaving for reasons that sound plausible and don't quite add up, and the pay data already shows a gap that hasn't been closed, the two are very likely connected. The data is already there. Acting on it is the only remaining variable.

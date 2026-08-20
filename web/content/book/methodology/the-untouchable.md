@@ -1,12 +1,6 @@
-You know exactly who it is. You knew before you finished reading the title.
+Some people become impossible to hold accountable, not because of what they did once, but because of what the organization decided, repeatedly and mostly without saying so out loud, that tolerating them was easier than addressing them.
 
-Maybe it's the VP who's been here since the Series A and hasn't shipped anything useful in three years but still gets cc'd on everything because nobody wants to be the one to say it out loud. Maybe it's the founder's first hire: the one who was critical when there were twelve people and is now actively slowing down an organization of two hundred, but has so much institutional context that everyone's convinced the place would fall apart without them. Maybe it's just someone who's really, really good at managing up while being a nightmare to manage around.
-
-Whoever it is, you've done the math. You've calculated the hours your team spends routing around this person. You've watched good people leave rather than deal with them for another quarter. You've sat in meetings where everyone dances around the obvious because the obvious is sitting right there, nodding along, utterly unaware that they're the subject of every hallway conversation that happens after.
-
-And here's the thing that really gets you: leadership knows. They've always known. They just decided — somewhere along the way, probably without ever saying it explicitly — that tolerating the problem was easier than solving it.
-
-That calculation is almost always wrong. But it can take years for the cost to become undeniable. By then, the damage is baked in.
+The specific leverage varies — institutional history, technical dependency, a personal relationship with someone powerful — but the mechanism is the same: real deference, earned once, that never got revisited as the person or the organization changed. Leadership usually knows. The cost compounds quietly for years before it becomes undeniable, and by then it's already expensive to fix.
 
 ---
 
@@ -82,6 +76,6 @@ And then the real question becomes: what has made the organization unwilling to 
 
 That's where the conversation gets interesting. That's where we find out whether this is a problem the organization is ready to solve or one it's still committed to managing around.
 
-If you're ready to stop managing around it, we should talk.
+If you're ready to stop managing around it, ask what actually breaks if this person left tomorrow. The honest answer is usually smaller than the fear.
 
 — Principal Resolution

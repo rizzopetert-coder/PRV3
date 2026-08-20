@@ -1,12 +1,6 @@
-You've been in the meeting. The one where everyone agrees, nobody disagrees, and nothing actually gets decided. The agenda moves. The slides advance. People nod at the right moments. And then you walk out and realize: wait, what did we actually resolve? Nothing. Again.
+Decision Paralysis is what happens when a leadership team keeps holding decision meetings without making decisions. The agenda moves, people nod, and everyone leaves having agreed to revisit the same question next quarter — sometimes for the third or fourth time, each round with a slightly different framing and a request for more alignment that never quite arrives.
 
-The calendar says it was a decision meeting. The outcome says it was theater.
-
-Maybe you've started tracking it. How many times has this initiative come back to the leadership table? Three quarters? Four? Each time with a slightly different framing, a new set of concerns, a request for "more alignment" before moving forward. The alignment never arrives. The decision never lands. And everyone keeps showing up like this is normal, because at this point, it is.
-
-Decision Paralysis doesn't feel like crisis. That's the thing. It feels like professionalism. Measured. Considered. "We don't want to rush into anything." The language of thoughtfulness deployed in the service of permanent deferral. You can't point to the moment it broke because it didn't break. It just... stopped. Gradually, and then completely.
-
-The people who've been here long enough know the difference between a decision that's being made carefully and a decision that's being avoided indefinitely. They stopped expecting the second kind to resolve. They've learned to work around the paralysis: building their own workarounds, making their own calls, hoping nobody notices that the thing that was supposed to be decided eighteen months ago still hasn't been.
+It doesn't feel like crisis. It feels like professionalism: measured, considered, unwilling to rush. That's what makes it durable. Nobody can point to the moment it broke, because it didn't break. It just stopped, gradually, and then completely — and the people who've been there long enough have already learned to work around it rather than expect it to resolve.
 
 ---
 
@@ -72,8 +66,4 @@ That naming almost never happens internally. The people who could name it have t
 
 External perspective changes the math. Someone who isn't playing the internal game, who doesn't need anything from anyone in the room, who can say the uncomfortable thing because they don't have to live with the politics of having said it — that's usually what creates the first crack.
 
-From there, it's about rebuilding the conditions for genuine decision-making. New forums. Clear accountability. The first real decision that gets made and held — that's the moment everything changes. Not because the decision was important, but because it proves the paralysis can break.
-
-If your organization is sitting in Decision Paralysis and you've read this far, that's not an accident. You already knew. The question is what you're going to do about it.
-
-We should probably talk.
+The first decision that actually gets made and held is the one that matters — not because the decision itself is significant, but because it's the proof that the paralysis can break.

@@ -1,12 +1,6 @@
-You have a list. Somewhere — maybe in a shared drive, maybe in an HR system, maybe in a doc that gets dusted off once a year for the board meeting — there's a list of names that are supposed to be your succession plan.
+If your most critical leader left tomorrow, with no warning, could you say specifically who steps in, whether they're ready, and what the first ninety days look like?
 
-The CEO has two names next to her role. The CFO has one. The VP of Engineering has a question mark because the obvious internal candidate left eight months ago and you haven't updated it. A few critical roles have "external hire" written next to them, which is another way of saying "we don't have anyone."
-
-That's not a succession plan. That's a wish.
-
-A plan would answer the question: if this person left tomorrow — not "announced a transition" but left, tomorrow, no warning — what specifically happens next? Who steps in? Are they ready? What support do they need? What does the first ninety days look like?
-
-If you can't answer those questions with specifics, you don't have a plan. You have hope. And hope is not a strategy for organizational continuity.
+Most organizations can't. What exists instead is a list of names in a shared drive, dusted off once a year for the board meeting — a CEO with two names next to her role, a CFO with one, a VP of Engineering with a question mark because the internal candidate left eight months ago and nobody updated it. That's not a plan. It's a wish.
 
 ---
 
@@ -94,6 +88,6 @@ If the answer is clear and actionable, you're in better shape than most. If the 
 
 Succession planning isn't about predicting the future. It's about being prepared for transitions that are guaranteed to happen eventually. The only question is whether they happen on your terms or someone else's.
 
-If you'd rather be prepared than surprised, we should talk.
+Being prepared instead of surprised means answering that question now, on your own timeline, not someone else's.
 
 — Principal Resolution

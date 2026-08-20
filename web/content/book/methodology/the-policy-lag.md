@@ -1,10 +1,6 @@
-The process you're following was designed in 2014. The org chart you're working around was drawn during the second funding round. The reporting structure made perfect sense when there were forty people and three product lines, and nobody has touched it since, even though there are now two hundred people and nine product lines and everyone quietly acknowledges that the structure is mostly decorative.
+Most organizational dysfunction gets blamed on people or culture. The Policy Lag is different: the processes, org chart, and reporting structure were designed for an organization that no longer exists — built for forty people and three product lines, still in place at two hundred people and nine — and nobody has touched them since, even though everyone quietly knows the structure is mostly decorative.
 
-You're not failing because you're bad at your job. You're failing because you're running 2024 operations on 2014 infrastructure.
-
-Welcome to The Policy Lag. The processes work: if you define "work" as "technically exist and people have learned to tolerate them." They produce outputs. Those outputs get recorded. Reports get generated. Things happen.
-
-What those things have to do with what the organization actually needs to accomplish? That's less clear. The connection between process and outcome has stretched to the point of abstraction. You're measuring what you can measure, which is not necessarily what matters. You're following workflows that predate the current strategy, the current market, the current team. And everyone involved has decided this is fine because fixing it would require admitting how long it's been broken.
+The processes still work, in the sense that they technically exist and produce outputs. What those outputs have to do with what the organization actually needs to accomplish is a separate question, and the connection has stretched thin enough that nobody's really tracking it anymore.
 
 ---
 
@@ -78,6 +74,4 @@ The work, once the decision is made, is actually not that complicated. Audit the
 
 What makes it hard is the honesty. Someone has to say out loud that the operating model is running on infrastructure designed for a different organization. That the workarounds have become the system. That the people who've been adapting to the dysfunction deserve better than being asked to adapt forever.
 
-If that sounds like where you are — if you're running operations on systems you know are obsolete, working around processes that should have been replaced years ago, watching good people leave because they can't tolerate the gap between what's possible and what's permitted — you're not imagining things.
-
-We should talk about what a real update would look like.
+If that's where you are — running operations on systems you know are obsolete, watching good people leave because they can't tolerate the gap between what's possible and what's permitted — the honest starting point is saying out loud that the systems were built for an organization that no longer exists.

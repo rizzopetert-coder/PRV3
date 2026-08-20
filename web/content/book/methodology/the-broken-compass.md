@@ -1,10 +1,6 @@
-The offsite was great. Everyone agreed on the strategy. You left feeling aligned. Optimistic, even.
+The Broken Compass names a specific failure: leadership agrees to language vague enough for everyone to nod along with, then discovers months later the agreement never actually resolved anything. Six teams interpret the same "locked-in" strategy six different ways. Priorities that were supposedly settled get quietly reprioritized. Two VPs present contradicting plans in the same meeting, and nobody names the contradiction because naming it would require a conversation nobody wants to have.
 
-That was three months ago. Since then, you've watched the same "agreed" strategy get interpreted six different ways by six different teams. You've seen priorities that were supposedly locked in get quietly reprioritized. You've sat in meetings where two VPs presented plans that directly contradict each other, and nobody acknowledged the contradiction because acknowledging it would require having a conversation that nobody wants to have.
-
-The strategy deck still exists. It's in a folder somewhere. Occasionally someone references it in a presentation, and everyone nods like they're on the same page. They're not on the same page. They're not even reading the same book.
-
-This is The Broken Compass. The organization is moving — that's not the problem. The problem is that leadership isn't moving toward the same destination. And everyone below them is executing against assumptions that have never been tested, building on alignment that doesn't actually exist.
+The strategy deck still exists, in a folder somewhere. People reference it occasionally and nod like they're aligned. They're not reading the same book.
 
 ---
 
@@ -96,6 +92,6 @@ That's where it has to happen. Not in the hallway. Not in the DM. In the room, w
 
 We've facilitated that conversation before. We know what it takes to set it up, hold it together, and help the team land on something real. Something that sticks.
 
-If you're ready to stop managing around the disagreement and start resolving it, we should talk.
+The leadership team already knows which conversation they've been avoiding. Stopping the management-around means finally having it.
 
 — Principal Resolution
