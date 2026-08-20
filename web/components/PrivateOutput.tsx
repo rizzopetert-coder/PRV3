@@ -54,6 +54,23 @@ const SEVERITY_ANCHOR: Record<SeverityTier, string> = {
     "This is how the organization works now. The condition isn't something that happens inside the organization anymore. It is part of the operating environment itself. People make decisions inside it without questioning it. Resolution means changing the environment, not just addressing the condition.",
 };
 
+// Visualize Your Data (Layer 3). Mirrors engine/severity.py's
+// classify_severity() CALIBRATION TARGET default boundaries (0-100
+// scale; EMERGING_MAX/ENTRENCHED_MAX confirmed None/live-on-default
+// at HEAD) -- same accepted mirror-drift risk SEVERITY_ANCHOR above
+// already carries for SEVERITY_TIER_DESCRIPTIONS, not a new pattern.
+const SEVERITY_TIER_BAND: Record<SeverityTier, { min: number; max: number }> = {
+  Emerging:   { min: 0,  max: 33 },
+  Entrenched: { min: 33, max: 66 },
+  Endemic:    { min: 66, max: 100 },
+};
+
+function tierFillPercent(tier: SeverityTier, score: number): number {
+  const { min, max } = SEVERITY_TIER_BAND[tier];
+  const fraction = (score - min) / (max - min);
+  return Math.max(0, Math.min(1, fraction)) * 100;
+}
+
 function Rule() {
   return (
     <div style={{ height: 0, borderTop: "0.5px solid #e5e7eb" }} />
@@ -102,6 +119,15 @@ export default function PrivateOutput({
     payload.secondary_states,
     payload.primary_state.weight,
   );
+
+  // Visualize Your Data (Layer 3). severity_by_state entries carry
+  // state_id only -- both real builders derive primary_state/
+  // secondary_states from the exact same identified_states array
+  // severity_by_state comes from, so this lookup always resolves.
+  const stateNameById = new Map<string, string>([
+    [payload.primary_state.id, payload.primary_state.name],
+    ...payload.secondary_states.map((s): [string, string] => [s.id, s.name]),
+  ]);
 
   return (
     <div className="max-w-2xl">
@@ -279,6 +305,61 @@ export default function PrivateOutput({
               +{overflowCount} co-occurring condition{overflowCount === 1 ? "" : "s"}
             </p>
           )}
+        </div>
+      )}
+
+      {/* Block 4c — Visualize Your Data (Layer 3): per-state severity
+          comparison, one row per state in severity_by_state.
+          Deliberately NOT lead-state-anchored -- a departure from
+          Block 1's hero treatment, by design
+          (prompts/visualize-your-data-build-scope.md). Omitted
+          entirely when severity_by_state is absent or empty, same
+          idiom as every other optional block in this component --
+          never a partial/broken render. Row order is
+          severity_by_state's own array order (primary state first,
+          secondary_states rank-sorted); no re-sort here, matching
+          "no sorting/ranking implied by row position." Renders for
+          single-state results too (one row) -- the literal settled
+          design, not gated to multi-state only. */}
+      {payload.severity_by_state && payload.severity_by_state.length > 0 && (
+        <div className="py-4">
+          <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-3">
+            Severity across conditions
+          </p>
+          <ul className="space-y-3">
+            {payload.severity_by_state.map((entry) => {
+              const rowAccent = severityAccentTokens(entry.tier);
+              return (
+                <li key={entry.state_id}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[13px] text-charcoal">
+                      {stateNameById.get(entry.state_id) ?? entry.state_id}
+                    </span>
+                    <span
+                      className="text-[10px] rounded-md px-1.5 py-0.5 border"
+                      style={{ borderColor: rowAccent.stroke, color: rowAccent.text }}
+                    >
+                      {entry.tier}
+                    </span>
+                  </div>
+                  <div className="h-1 rounded-full bg-gray-100">
+                    <div
+                      className="h-1 rounded-full"
+                      style={{
+                        width: `${tierFillPercent(entry.tier, entry.score_0_100)}%`,
+                        backgroundColor: rowAccent.stroke,
+                      }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="text-[11px] text-gray-400 mt-3 leading-relaxed">
+            A short bar at Emerging reflects a real finding, not a
+            partial or uncertain one — Emerging is the floor of the
+            severity scale.
+          </p>
         </div>
       )}
 
