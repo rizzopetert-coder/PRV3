@@ -221,10 +221,18 @@ SALIENCE_PROFILES = {
     },
 
     # ── AUTHORITY — LOW/CLUSTER (primary=Authority, secondary=Alliance) ───────
-    "paper_shield": {  # Tier 2 v18: alliance secondary 2.5->1.0
-        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
-        "authority_liability": 2.5, "authority_asset": 2.5,
-        "alliance_liability": 1.0, "alliance_asset": 1.0,
+    # SCD-WCS re-clustering (this session): paper_shield moved from
+    # the rank-5 Authority-dominant template (Tier 2 v18 comment, kept
+    # for history) to a standard flat-aptitude-primary template,
+    # matching invisible_performance_management's own entry ("medium
+    # tier, primary only"). Vector-only change was sufficient --
+    # confirmed by the search holding this exact salience constant
+    # across all 12 tested vector candidates. See
+    # prompts/scd-wcs-remediation-tracker.md for full detail.
+    "paper_shield": {
+        "aptitude_liability": 2.5, "aptitude_asset": 2.5,
+        "authority_liability": 0.4, "authority_asset": 0.4,
+        "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
     # SCD-WCS remediation pilot (rank-5 cluster): previously shared

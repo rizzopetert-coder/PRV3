@@ -176,7 +176,7 @@ export const BOOK_STATE_INDEX: BookStateEntry[] = [
     id: "paper_shield",
     resolutionFamily: "Roadmap",
     name: "Paper Shield",
-    dimension: "authority",
+    dimension: "aptitude",
     descriptiveProse: "Contingency and continuity plans exist in writing and have never been tested against anything real. The organization believes it is prepared because the documentation says so. The gap between documented readiness and actual readiness surfaces exactly once, at the worst time to discover it.",
   },
   {

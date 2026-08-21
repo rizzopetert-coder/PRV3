@@ -736,7 +736,15 @@ STATE_PROFILES["transition_paralysis"].descriptive_prose = "An organizational tr
 _reg(_profile(
     state_id="paper_shield",
     state_name="Paper Shield",
-    primary_dimension="Authority",
+    # SCD-WCS re-clustering (this session): was "Authority" --
+    # confirmed mis-clustered. Full descriptive_prose carries zero
+    # decision-rights/accountability content anywhere -- a pure
+    # capability-verification story ("never been tested against
+    # anything real... the gap between documented readiness and
+    # actual readiness"). See
+    # prompts/scd-wcs-remediation-tracker.md for the full text
+    # analysis, precedent comparison, and 12-candidate vector search.
+    primary_dimension="Aptitude",
     signal_weight="low",
     cluster_id=None,
     liability_axes=["Governance & Authority", "Operational & Structural", "Financial & Economic"],
@@ -746,11 +754,23 @@ _reg(_profile(
     resolution_family="Roadmap",
 ))
 STATE_PROFILES["paper_shield"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.15,
+    # Re-vectored (this session): aptitude=0.45/0.15 asymmetric,
+    # matching every other Aptitude-dominant state's liability>asset
+    # pattern (the_unformed_leader 0.35/0.15, built_to_fail 0.60/0.10,
+    # invisible_performance_management 0.45/0.15). Authority/alliance/
+    # attitude all dropped to flat 0.15 -- the real text carries zero
+    # secondary-axis content on any of the three. 0.45 is the smallest
+    # magnitude confirmed safe by a 12-candidate search against the
+    # real calibration pipeline: below it, paper_shield newly
+    # out-competes the_untouchable on one of its own already-marginal
+    # profiles; at 0.45 and above, the full 171/175 baseline holds
+    # with zero new failures anywhere. Confirmed not byte-identical
+    # to any existing state's vector.
+    aptitude_liability=0.45,
     aptitude_asset=0.15,
-    authority_liability=0.35,
+    authority_liability=0.15,
     authority_asset=0.15,
-    alliance_liability=0.25,
+    alliance_liability=0.15,
     alliance_asset=0.15,
     attitude_liability=0.15,
     attitude_asset=0.15,
