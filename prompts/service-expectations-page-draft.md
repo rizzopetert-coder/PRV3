@@ -15,8 +15,8 @@ corporate register, no hedging into vagueness.
 We guarantee the work itself, not the outcome. Every engagement gets our full attention, our
 honest read of what we find, and a written record of what we did and why. If the diagnostic or
 the engagement that follows doesn't hold up to that standard, tell us and we'll make it right —
-[specific remedy: refund, extended engagement, revised deliverable — pick one or state the
-actual policy].
+we redo the work. Not a refund, not a credit toward something else: we go back in and deliver
+what we said we would.
 
 What we won't do is promise a result we don't control. No consultant can guarantee a culture
 changes, a leader listens, or a board approves a recommendation. We can guarantee the work that
@@ -68,8 +68,7 @@ four sections already live on this page.
   outcome.
 - Stay engaged for as long as the situation requires, not for a fixed number of sessions.
 - Hand off to legal counsel when a situation crosses from organizational into legal exposure,
-  rather than working past that line ourselves. [Confirm this is accurate to how you actually
-  operate — I don't want to overstate or understate the legal handoff without your read.]
+  rather than working past that line ourselves.
 
 **Executive Advisory**
 - Hold a standing, confidential relationship with a leader for the decisions they can't discuss
@@ -85,9 +84,9 @@ than one specifically.
 **Across every service**
 - We don't sell the service that's easiest to pitch over the one that actually fits the
   diagnosed condition.
-- We don't soften a finding to protect anyone's feelings in the moment. [Cross-reference: this
-  echoes /about/story's existing "mistaken kindness" line — consider linking or reusing that
-  language directly rather than restating it here.]
+- We don't soften a finding to protect anyone's feelings in the moment. As we put it on
+  /about/story: "An assessment that's been softened to protect somebody's feelings in the moment
+  isn't an assessment — it's a case of mistaken kindness the organization pays for later."
 - We don't guarantee outcomes that depend on someone else's decisions.
 - We don't disappear once the diagnostic is delivered. If the finding doesn't lead anywhere,
   we'll tell you that too.
@@ -125,12 +124,18 @@ there rather than complementing it.]
 
 ## Who Is Responsible
 
-[This section needs your own input — I don't have enough to draft it honestly. Likely questions
-it should answer: Who at Principal Resolution owns the engagement start to finish? What happens
-if something goes wrong, who does the client actually call? Is there a distinction between what
-you're responsible for and what depends on the client's own follow-through? If PTS/Training &
-Development/Intervention/Executive Advisory each have different delivery models, does
-responsibility work differently across them?]
+Principal Resolution is a sole practice. There's no team to route you through and no escalation
+layer above the person who ran your engagement — the same person is your one point of contact
+from the first conversation to the last, across all four services.
+
+What we're responsible for is the work itself: the diagnostic's accuracy, how the engagement is
+run, and staying engaged through implementation where the service calls for it. What you're
+responsible for is what happens with the finding — whether your organization acts on it, how it's
+received internally, the follow-through on your end. We can hand you a finding that's accurate,
+specific, and honest. We can't make anyone else in your organization act on it.
+
+If something goes wrong or you have a concern, you call the same person who did the work. Not a
+support line, not a different department — the person who was in the room.
 
 ## How We Resolve Disagreement
 
@@ -139,9 +144,10 @@ win the argument but to make sure the read is actually right. If we got it wrong
 and fix it. If we still think we're right after that conversation, we'll tell you that plainly
 too — that's the same standard the diagnostic itself holds you to.
 
-[Needs a real mechanism, not just a sentiment: who do they escalate to, is there a timeframe, does
-this connect to anything in the signed engagement agreement? This is the section most likely to
-need actual attorney input before it's more than good intentions in writing.]
+There's no committee and no formal escalation process to route through. You raise it with the same
+person who ran your engagement, because that's the only person there is. We don't have a fixed
+response-time commitment to point you to today — we'll tell you honestly that this hasn't been
+formalized yet rather than invent a number that sounds more solid than it is.
 
 ---
 
