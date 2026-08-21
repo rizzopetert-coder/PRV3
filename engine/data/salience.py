@@ -227,10 +227,25 @@ SALIENCE_PROFILES = {
         "alliance_liability": 1.0, "alliance_asset": 1.0,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
+    # SCD-WCS remediation pilot (rank-5 cluster): previously shared
+    # this exact tuple with paper_shield and planning_authority_gap
+    # (Tier 2 v18 comment above, kept for history) -- combined with an
+    # identical dimensional_vector, all three states tied exactly on
+    # every calibration profile (confirmed 175/175 via
+    # tools/_salience_pilot_search_rank5.py before this change).
+    # Differentiated per the real descriptive_prose
+    # (engine/data/states.py): informal, relationship-based influence
+    # ("channels that don't match the org chart... who actually has
+    # to say yes") is the substance of the narrative -- alliance
+    # secondary raised. Authority stays dominant, unchanged --
+    # confirmed Authority-correct against the real text. paper_shield
+    # deliberately left untouched -- flagged possible mis-clustering,
+    # a separate open question, not a same-cluster question.
+    # dimensional_vector untouched -- salience-only, by design.
     "invisible_influence_architecture": {  # Tier 2 v18: alliance secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 2.5, "authority_asset": 2.5,
-        "alliance_liability": 1.0, "alliance_asset": 1.0,
+        "alliance_liability": 1.8, "alliance_asset": 1.8,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
 
@@ -414,10 +429,22 @@ SALIENCE_PROFILES = {
         "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
+    # SCD-WCS remediation pilot (rank-5 cluster): previously shared
+    # this exact tuple with paper_shield and
+    # invisible_influence_architecture (Tier 2 v18 comment above, kept
+    # for history) -- see invisible_influence_architecture's comment
+    # above for the full tie finding. Differentiated per the real
+    # descriptive_prose (engine/data/states.py): a pure structural/
+    # procedural authority-execution gap ("plans get built and then
+    # wait for approval from someone who wasn't part of building
+    # them") -- zero relational content in the text, alliance
+    # secondary lowered. Authority stays dominant, unchanged --
+    # confirmed Authority-correct against the real text.
+    # dimensional_vector untouched -- salience-only, by design.
     "planning_authority_gap": {  # low tier, alliance secondary 2.5->1.0
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
         "authority_liability": 2.5, "authority_asset": 2.5,
-        "alliance_liability": 1.0, "alliance_asset": 1.0,
+        "alliance_liability": 0.5, "alliance_asset": 0.5,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
     "distributed_culture_fragmentation": {  # medium tier, attitude secondary 2.5->1.0
