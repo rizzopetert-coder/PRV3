@@ -162,7 +162,7 @@ export const BOOK_STATE_INDEX: BookStateEntry[] = [
     id: "the_unsolved_problem",
     resolutionFamily: "Intervention + Roadmap",
     name: "The Unsolved Problem",
-    dimension: "authority",
+    dimension: "aptitude",
     descriptiveProse: "A specific problem has been addressed before, more than once, and keeps returning in close to the same form. Each fix treats the most recent symptom rather than whatever keeps regenerating it. The organization is paying repeatedly for a resolution that has never actually resolved anything.",
   },
   {

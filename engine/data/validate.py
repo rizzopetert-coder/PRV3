@@ -116,8 +116,9 @@ for p in STATE_PROFILES.values():
     dim_counts[d] = dim_counts.get(d, 0) + 1
 print(f"\n  States per dimension: {dim_counts}")
 # SCD-WCS re-clustering (this session): paper_shield moved Authority -> Aptitude.
-check("Aptitude count = 8",  dim_counts.get("Aptitude",  0) == 8,  f"got {dim_counts.get('Aptitude',0)}")
-check("Authority count = 21", dim_counts.get("Authority", 0) == 21, f"got {dim_counts.get('Authority',0)}")
+# SCD-WCS re-clustering (this session): the_unsolved_problem moved Authority -> Aptitude.
+check("Aptitude count = 9",  dim_counts.get("Aptitude",  0) == 9,  f"got {dim_counts.get('Aptitude',0)}")
+check("Authority count = 20", dim_counts.get("Authority", 0) == 20, f"got {dim_counts.get('Authority',0)}")
 check("Alliance count = 7",  dim_counts.get("Alliance",  0) == 7,  f"got {dim_counts.get('Alliance',0)}")
 check("Attitude count = 22", dim_counts.get("Attitude",  0) == 22, f"got {dim_counts.get('Attitude',0)}")
 

@@ -689,7 +689,19 @@ STATE_PROFILES["dueling_narratives"].descriptive_prose = "Different parts of the
 _reg(_profile(
     state_id="the_unsolved_problem",
     state_name="The Unsolved Problem",
-    primary_dimension="Authority",
+    # SCD-WCS re-clustering (this session, Program Phase 4): was
+    # "Authority" -- confirmed mis-clustered. Full descriptive_prose
+    # carries zero decision-rights/accountability content anywhere --
+    # a pure root-cause-solving-capability story ("each fix treats
+    # the most recent symptom rather than whatever keeps
+    # regenerating it"). resolution_family "Roadmap" was already
+    # this cluster's only outlier (its 7 siblings share "Intervention
+    # + Executive Counsel" uniformly) -- independent corroborating
+    # evidence, "Roadmap"/"Development" correlate with 6 of 7
+    # existing Aptitude-dominant states. See
+    # prompts/scd-wcs-remediation-tracker.md for the full text
+    # analysis, precedent check, and 9-candidate vector search.
+    primary_dimension="Aptitude",
     signal_weight="high",
     cluster_id=None,
     liability_axes=["Legal & Compliance", "Financial & Economic", "Cultural & Behavioral"],
@@ -699,14 +711,26 @@ _reg(_profile(
     resolution_family="Intervention + Roadmap",
 ))
 STATE_PROFILES["the_unsolved_problem"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.10,
-    aptitude_asset=0.10,
-    authority_liability=0.60,
-    authority_asset=0.10,
-    alliance_liability=0.10,
-    alliance_asset=0.10,
-    attitude_liability=0.10,
-    attitude_asset=0.10,
+    # Re-vectored (this session): aptitude=0.50/0.15 asymmetric,
+    # matching every other Aptitude-dominant state's liability>asset
+    # pattern. Authority/alliance/attitude all dropped to flat 0.15
+    # -- the real text carries zero secondary-axis content on any of
+    # the three. 0.50 is the smallest magnitude confirmed safe by a
+    # 9-candidate search against the real calibration pipeline:
+    # below it (0.35/0.40), the_unsolved_problem newly threatens
+    # the_untouchable's already-marginal profile; at 0.45 it
+    # collides exactly with paper_shield's vector; at 0.50 and above
+    # the full 171/175 baseline holds with zero new failures
+    # anywhere. Confirmed not byte-identical to any existing state's
+    # vector.
+    aptitude_liability=0.50,
+    aptitude_asset=0.15,
+    authority_liability=0.15,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
 )
 STATE_PROFILES["the_unsolved_problem"].descriptive_prose = "A specific problem has been addressed before, more than once, and keeps returning in close to the same form. Each fix treats the most recent symptom rather than whatever keeps regenerating it. The organization is paying repeatedly for a resolution that has never actually resolved anything."
 

@@ -149,9 +149,17 @@ SALIENCE_PROFILES = {
         "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
+    # SCD-WCS re-clustering (this session, Program Phase 4):
+    # the_unsolved_problem moved from the rank-3 Authority-dominant
+    # template to a standard flat-aptitude-primary template,
+    # matching invisible_performance_management's own entry. Vector-
+    # only change was sufficient -- confirmed by the search holding
+    # this exact salience constant across all 9 tested vector
+    # candidates. See prompts/scd-wcs-remediation-tracker.md for
+    # full detail.
     "the_unsolved_problem": {
-        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
-        "authority_liability": 2.5, "authority_asset": 2.5,
+        "aptitude_liability": 2.5, "aptitude_asset": 2.5,
+        "authority_liability": 0.4, "authority_asset": 0.4,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
