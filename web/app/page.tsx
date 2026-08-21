@@ -17,12 +17,12 @@ export default function Home() {
           <ConstellationField mode="ambient" />
           <div className="relative z-10">
             <p className="font-display text-3xl md:text-5xl leading-tight text-charcoal my-8 md:my-12">
-              No fixed methodology. Every read starts from your organization, not
-              a template applied to it.
-            </p>
-            <p className="font-display text-3xl md:text-5xl leading-tight text-charcoal my-8 md:my-12">
               People problems are usually structural problems wearing a
               person&apos;s name.
+            </p>
+            <p className="font-display text-3xl md:text-5xl leading-tight text-charcoal my-8 md:my-12">
+              No fixed methodology. Every read starts from your organization, not
+              a template applied to it.
             </p>
             {/* Muted-text technique ported from the mockup's .lede rule
                 (opacity on the base ink color, not a separate gray
@@ -39,6 +39,34 @@ export default function Home() {
 
         {/* Section 2 — Three paths */}
         <section className="mb-16 space-y-10">
+
+          {/* Orientation copy — closes the site-wide orientation gap
+              (Section 13, item 5) alongside the diagnostic-to-services
+              funnel clarification, per Pete's direction to handle both
+              together. Sits directly above the three entry points below,
+              sharing this section's own space-y-10 rhythm rather than a
+              separate margin, so it reads as one continuous run into the
+              buttons rather than a fourth separated block. Second
+              paragraph echoes the three button labels below verbatim --
+              keep in sync if those labels ever change. */}
+          <div className="space-y-4">
+            <p className="font-ui text-base text-charcoal">
+              The diagnostic names the specific condition producing the
+              friction inside an organization, whatever&apos;s driving it,
+              however it&apos;s showing up. From there,{" "}
+              <Link href="/about/services" className="underline hover:text-charcoal">
+                what we do
+              </Link>{" "}
+              depends on what it finds.
+            </p>
+            <p className="font-ui text-base text-charcoal">
+              Not sure where to start? Begin the diagnostic if something
+              specific is already on your mind. Explore the conditions if
+              you want to see whether this is a known pattern first. Just
+              ask if you&apos;d rather talk it through before doing
+              either.
+            </p>
+          </div>
 
           {/* Path 1 — primary */}
           <div className="space-y-2" data-emphasis="primary">
