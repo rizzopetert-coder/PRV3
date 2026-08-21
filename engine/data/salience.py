@@ -321,9 +321,26 @@ SALIENCE_PROFILES = {
         "alliance_liability": 2.5, "alliance_asset": 2.5,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
+    # SCD-WCS remediation pilot (Phase 7, leftover from rank-6):
+    # previously shared this exact tuple with the_second_close --
+    # tied exactly on every calibration profile (confirmed 175/175,
+    # rank-6). Differentiated per the real descriptive_prose
+    # (engine/data/states.py): rule-application/documentation
+    # language runs through all three dedicated profiles ("documented
+    # criteria", "documentation" x2, "rules apply differently") --
+    # Authority secondary raised. Alliance (2.5/2.5) unchanged, still
+    # dominant. dimensional_vector UNCHANGED -- salience-only
+    # confirmed sufficient (tools/_scdwcs_phase7_arbitrary_standard.py).
+    # Magnitude 2.0 landed via proper margin search across 1.0-3.0
+    # (tools/_salience_pilot_search_arbitrary_standard.py): smallest
+    # candidate clearing the thin-margin zone on ALL-AS-02/03
+    # (+0.0115, vs. a razor-thin +0.0039 at 1.0), matches
+    # silosolation's own shipped score exactly on ALL-AS-01
+    # (0.710304). Zero regression, zero reverse-direction ripple onto
+    # the_second_close's own profiles, at every magnitude tested.
     "the_arbitrary_standard": {
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
-        "authority_liability": 0.4, "authority_asset": 0.4,
+        "authority_liability": 2.0, "authority_asset": 2.0,
         "alliance_liability": 2.5, "alliance_asset": 2.5,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
