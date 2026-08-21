@@ -270,9 +270,38 @@ SALIENCE_PROFILES = {
         "alliance_liability": 2.5, "alliance_asset": 2.5,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
+    # SCD-WCS remediation pilot (rank-6 cluster, silosolation-only
+    # partial fix): previously shared this exact tuple with
+    # the_second_close and the_arbitrary_standard -- all three tied
+    # exactly on every calibration profile (confirmed 175/175 via
+    # tools/_scdwcs_decomposition_rank6.py and
+    # tools/_salience_pilot_search_rank6.py before this change).
+    # Differentiated per the real descriptive_prose
+    # (engine/data/states.py): cross-team structural/decision-
+    # visibility gap ("not hostile... structural") -- Authority
+    # secondary raised. Alliance (2.5/2.5) unchanged, still
+    # dominant -- confirmed Alliance-correct against the real text.
+    # HONEST PARTIAL FIX, not a full fix: breaks the exact
+    # mathematical tie against both the_second_close and
+    # the_arbitrary_standard (0/175 tied on both pairings, verified),
+    # but does NOT make silosolation win its own dedicated profiles
+    # outright -- the_second_close (left untouched) still outranks
+    # it there, confirmed unmovable even at extreme magnitude (tested
+    # to 12.0). Vector-shape ceiling: silosolation's authored
+    # authority_liability/authority_asset are only 0.15 each
+    # (dimensional_vector deliberately untouched, salience-only by
+    # design), too small for a salience weight alone to efficiently
+    # overcome the_second_close's larger, untouched Alliance anchor.
+    # Accepted as-is, same category as built_to_fail's residual after
+    # rank-8. the_second_close and the_arbitrary_standard
+    # deliberately left untouched -- the_arbitrary_standard's
+    # originally-proposed Attitude secondary failed scrutiny (not
+    # text-grounded, and mechanically counterproductive -- see
+    # prompts/scd-wcs-remediation-tracker.md), no replacement axis
+    # identified yet.
     "silosolation": {
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
-        "authority_liability": 0.4, "authority_asset": 0.4,
+        "authority_liability": 2.0, "authority_asset": 2.0,
         "alliance_liability": 2.5, "alliance_asset": 2.5,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
