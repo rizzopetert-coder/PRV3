@@ -145,9 +145,7 @@ and fix it. If we still think we're right after that conversation, we'll tell yo
 too — that's the same standard the diagnostic itself holds you to.
 
 There's no committee and no formal escalation process to route through. You raise it with the same
-person who ran your engagement, because that's the only person there is. We don't have a fixed
-response-time commitment to point you to today — we'll tell you honestly that this hasn't been
-formalized yet rather than invent a number that sounds more solid than it is.
+person who ran your engagement, because that's the only person there is.
 
 ---
 
