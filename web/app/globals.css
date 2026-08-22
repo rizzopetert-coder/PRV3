@@ -38,6 +38,23 @@
   --cta-text: #E9E7E2;
   --urgency: #8C4A2F;
   --urgency-text: #8C4A2F;
+  /* Visual identity v3 palette expansion (Pete-approved, 2026-08-22 --
+     prompts/visual-identity-v3-palette-expansion.md). Warm theme only --
+     Dark/Neutral's own 6-color sets are approved but not yet wired, do
+     not add them here without their own pass. Usage tiers are locked in
+     that file: TEXT-SAFE (oxide/oxide-text, moss, umber, berry -- body
+     copy, links, small UI, no restriction), LARGE/DECORATIVE-ONLY
+     (taupe, dusk-blue -- headings 24px+, icons, borders, fills, never
+     body text or small links), BACKGROUND-FILL-ONLY (ochre -- solid
+     fill with dark charcoal/ink text on top only, never foreground).
+     berry is additionally CTA-exclusive: exactly once per page, primary
+     CTA only, no fallback role -- see the tracker file's pop-color rule. */
+  --moss: #5C6B4A;
+  --umber: #5A3A28;
+  --taupe: #857C6E;
+  --dusk-blue: #6B8299;
+  --ochre: #B8863D;
+  --berry: #A62C6B;
 }
 
 [data-theme="dark"] {
@@ -83,6 +100,14 @@
   --color-field-raise: var(--field-raise);
   --color-oxide: var(--oxide);
   --color-oxide-text: var(--oxide-text);
+  /* v3 palette expansion (Warm only, see the :root token block comment
+     above for the full tier discipline). */
+  --color-moss: var(--moss);
+  --color-umber: var(--umber);
+  --color-taupe: var(--taupe);
+  --color-dusk-blue: var(--dusk-blue);
+  --color-ochre: var(--ochre);
+  --color-berry: var(--berry);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
   --color-cta-text: var(--cta-text);
