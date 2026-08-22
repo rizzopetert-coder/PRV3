@@ -723,8 +723,24 @@ STATE_PROFILES["the_unsolved_problem"].dimensional_vector = DimensionalVector(
     # the full 171/175 baseline holds with zero new failures
     # anywhere. Confirmed not byte-identical to any existing state's
     # vector.
+    #
+    # SCD-WCS Phase 8 mitigation (later same session): this
+    # re-clustering manufactured a 19/175 false-rank-1 footprint
+    # that measured 0/175 before it (see
+    # prompts/scd-wcs-remediation-tracker.md). No secondary axis
+    # exists in the text -- fresh re-read confirmed genuinely
+    # single-axis-pure. aptitude_asset raised 0.15 -> 0.20
+    # (liability held at 0.50, reducing the skew from 3.33:1 to
+    # 2.5:1) instead. Lowering it further was tested and
+    # backfires catastrophically (0.10 -> 100/175, 0.05 -> 123/175
+    # plus a new regression failure) -- raising it is the correct
+    # direction. Margin-searched (0.16-0.25, full 175-profile
+    # suite): 0.20 is the smallest value where the binding
+    # near-miss constraint stabilizes on one profile with a
+    # margin ~7x the razor-thin low end, zero regression cost,
+    # zero vector collision with any other state.
     aptitude_liability=0.50,
-    aptitude_asset=0.15,
+    aptitude_asset=0.20,
     authority_liability=0.15,
     authority_asset=0.15,
     alliance_liability=0.15,

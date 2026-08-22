@@ -237,11 +237,28 @@ SALIENCE_PROFILES = {
     # confirmed by the search holding this exact salience constant
     # across all 12 tested vector candidates. See
     # prompts/scd-wcs-remediation-tracker.md for full detail.
+    # SCD-WCS Phase 8 mitigation: previously the bare standard
+    # template (aptitude=2.5/2.5, else flat 0.4/0.4), which
+    # manufactured a 9/175 false-rank-1 footprint that measured
+    # 0/175 before this session's Aptitude re-clustering (see
+    # prompts/scd-wcs-remediation-tracker.md). Attitude secondary
+    # raised per the real text -- "the organization believes it
+    # is prepared because the documentation says so" -- a real
+    # false-confidence/complacency mechanism, never tested in the
+    # original re-clustering search. Aptitude (2.5/2.5) unchanged,
+    # still dominant, dimensional_vector untouched. Margin-searched
+    # (0.7-2.0, full 175-profile suite): false-rank-1 reaches
+    # 0/175 at every tested magnitude; landed on 2.0, the best
+    # available margin in the tested range (0.0100 vs. 0.7's
+    # razor-thin 0.0034), zero regression cost, zero collision.
+    # Still loses all 3 of its own dedicated profiles to
+    # built_to_fail -- separate, already-known Track 2 problem,
+    # unaffected by and not solved by this fix.
     "paper_shield": {
         "aptitude_liability": 2.5, "aptitude_asset": 2.5,
         "authority_liability": 0.4, "authority_asset": 0.4,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
-        "attitude_liability": 0.4, "attitude_asset": 0.4,
+        "attitude_liability": 2.0, "attitude_asset": 2.0,
     },
     # SCD-WCS remediation pilot (rank-5 cluster): previously shared
     # this exact tuple with paper_shield and planning_authority_gap
