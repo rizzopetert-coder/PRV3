@@ -5,6 +5,7 @@
 // ShareableOutputPayload — excluded at /api/share/create before KV write.
 
 import type { ShareableOutputPayload } from "@/lib/types";
+import { severityAccentTokens } from "@/components/ConstellationField";
 
 function Rule() {
   return (
@@ -45,6 +46,12 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
 
   const observableIndicators = payload.synthesis.observable_indicators ?? [];
 
+  // Severity-conditional accent -- reuses the same tested function
+  // PrivateOutput.tsx/CondensedOutput.tsx already use, rather than a
+  // parallel implementation. --color-rust only at genuine Endemic;
+  // --color-slate at Emerging/Entrenched.
+  const accent = severityAccentTokens(payload.severity);
+
   return (
     <div className="max-w-2xl">
 
@@ -66,7 +73,10 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
           <span className="text-[13px] font-medium text-gray-500">
             {payload.primary_state.name}
           </span>
-          <span className="text-[11px] bg-gray-100 border border-gray-200 text-gray-500 rounded-md px-2 py-0.5 align-middle">
+          <span
+            className="text-[11px] rounded-md px-2 py-0.5 border"
+            style={{ borderColor: accent.stroke, color: accent.text }}
+          >
             {payload.severity}
           </span>
         </div>
