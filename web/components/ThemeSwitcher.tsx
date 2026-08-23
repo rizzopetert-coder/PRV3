@@ -18,10 +18,13 @@ import { useSyncExternalStore } from "react";
 // not useEffect+setState (avoids both the SSR/hydration mismatch and the
 // react-hooks/set-state-in-effect lint rule this repo enforces).
 //
-// Not mounted on any page yet — infrastructure only until Stage 4 places
-// it on the homepage proof point.
+// Mounted /about/*-scoped only (web/app/about/layout.tsx), per Gemini's
+// cleared architecture review — see prompts/gemini-themeswitcher-review-
+// verification.md (commit 1ffb3e7). Not mounted in NavBar.tsx or the
+// root layout, and not on the homepage — that original Stage 1 plan was
+// superseded by the review before it was ever built.
 
-type ThemeName = "warm" | "dark" | "neutral";
+export type ThemeName = "warm" | "dark" | "neutral";
 
 const THEME_STORAGE_KEY = "prv3-theme";
 
@@ -75,8 +78,19 @@ function selectTheme(next: ThemeName): void {
   listeners.forEach((listener) => listener());
 }
 
+// Reusable reactive theme read, exported so other components can render
+// theme-conditional content without duplicating the useSyncExternalStore
+// wiring above -- first consumer: /about/services (Dark/Neutral pilot,
+// this session), since role-specific token names (e.g. Warm's dusk-blue,
+// Dark's amber) don't share a cross-theme CSS variable name the way
+// oxide/oxide-text do, so picking the right Tailwind class per role
+// requires knowing the live theme, not just a CSS cascade.
+export function useTheme(): ThemeName {
+  return useSyncExternalStore(subscribe, readTheme, getServerSnapshot);
+}
+
 export function ThemeSwitcher() {
-  const theme = useSyncExternalStore(subscribe, readTheme, getServerSnapshot);
+  const theme = useTheme();
 
   return (
     <div role="radiogroup" aria-label="Theme" className="flex w-full">
