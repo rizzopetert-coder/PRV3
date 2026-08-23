@@ -127,8 +127,10 @@ If three consecutive sessions are pure Tier 1 work, the next session opens with 
 ### Quarterly Step-Back
 A full project assessment (workstream status, goal progress, process feedback) should be run on a calendar cadence: every 3 weeks. Originally defined as "roughly every 15 sessions" (locked at Session 71) — changed because the session-number counter this depended on was discontinued after Session 72 (Section 16 switched to date-based headers with no session numbers), making the original trigger uncheckable. This calendar-based cadence replaces the session-count trigger entirely going forward, not just for this one instance — future step-backs are checked against calendar time from the last logged date below, not a session counter.
 
-- Last step-back: August 2, 2026 (this session — triggered deliberately given scope: all 3 Friction Tax calibration sets closed, multi-state compounding design locked, not waiting for a session-count trigger that no longer functions)
-- Next due: on or near August 23, 2026
+**Required format, locked 2026-08-23 (tools/_mob.txt Section 14, MOB v4.225) — supersedes the single-question-resolution style used before this date.** A Quarterly Step-Back is a dual-sourced, source-verified process, not an open-ended single-question session: (1) Claude.ai produces an initial project evaluation — status, business viability, SWOT, recommendations — from whatever context it has; (2) Claude Code independently re-verifies it cold, from direct source only, without reading Claude.ai's version first, producing its own full five-part assessment; (3) discrepancies are resolved against live source, not by deferring to whichever assessment sounds more confident, and the root cause of any error is named; (4) the reconciled, verified picture — not either assessment alone — drives the next work plan. This exists because a conversation-history-based assessment gave Pete at least two materially wrong claims on 2026-08-23 (friction-tax engine status, resolution-family copy status) before an independent, source-verified CC pass caught and corrected both. Full process definition and this run's own trace: `prompts/prv3-quarterly-step-back-2026-08-23.md`. First assessment run to this format: `prompts/prv3-comprehensive-assessment-cc.md`.
+
+- Last step-back: August 23, 2026 (this session — first run under the new dual-sourced format, triggered by Pete's request for a full evaluation after a long execution stretch: Visual Identity v3 rollout, Candidate C shipped, MemPalace fix)
+- Next due: on or near September 13, 2026
 
 ### Outside Human Gap (documented, not yet actioned)
 The entire verification/decision loop currently runs inside Pete + the AI stack. This is strong for factual rigor, structurally weak for judgment about public reception. Before the first truly public, hard-to-reverse Tier 4 action, a second human read — a trusted colleague — is recommended over another internal review pass.
@@ -193,7 +195,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.220 |
+| MOB version | v4.225 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 58 (locked) |
