@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme, type ThemeName } from "@/components/ThemeSwitcher";
-import { ABOUT_HEADING_CLASS } from "@/lib/about-theme-tokens";
+import { HEADING_ACCENT_CLASS } from "@/lib/theme-role-tokens";
 
 // Dark/Neutral pilot (this session), same tier discipline as Warm's
 // original pilot (commit 76815a7) -- see prompts/visual-identity-v3-
@@ -28,7 +28,7 @@ import { ABOUT_HEADING_CLASS } from "@/lib/about-theme-tokens";
 //     for tags once oxide-text is spoken for by body copy (plum is
 //     CTA-exclusive, excluded the same way Warm left berry unused).
 //
-// Heading color now lives in web/lib/about-theme-tokens.ts, shared with
+// Heading color now lives in web/lib/theme-role-tokens.ts, shared with
 // /about/story and /about/method -- this was the first page to define
 // it, not the only owner of the decision.
 const TAG_CLASS: Record<ThemeName, string> = {
@@ -39,7 +39,7 @@ const TAG_CLASS: Record<ThemeName, string> = {
 
 export default function ServicesPageContent() {
   const theme = useTheme();
-  const heading = `font-display text-2xl md:text-3xl ${ABOUT_HEADING_CLASS[theme]} mb-3`;
+  const heading = `font-display text-2xl md:text-3xl ${HEADING_ACCENT_CLASS[theme]} mb-3`;
   const tag = `font-ui text-sm ${TAG_CLASS[theme]} italic mb-6`;
 
   return (

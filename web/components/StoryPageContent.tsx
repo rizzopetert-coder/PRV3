@@ -1,11 +1,11 @@
 "use client";
 
 import { useTheme } from "@/components/ThemeSwitcher";
-import { ABOUT_HEADING_CLASS } from "@/lib/about-theme-tokens";
+import { HEADING_ACCENT_CLASS } from "@/lib/theme-role-tokens";
 
 // Dark/Neutral rollout (this session), extending /about/services'
 // existing role assignments (commit bfc137b) rather than re-deriving
-// them -- see web/lib/about-theme-tokens.ts. Body copy -> oxide-text
+// them -- see web/lib/theme-role-tokens.ts. Body copy -> oxide-text
 // (TEXT-SAFE, shared name across all three themes, no conditional
 // needed). Eyebrow labels (text-xs uppercase tracking-widest text-gray-
 // 400) intentionally left on neutral gray -- structural/low-emphasis,
@@ -13,7 +13,7 @@ import { ABOUT_HEADING_CLASS } from "@/lib/about-theme-tokens";
 // explicit instruction not to force them into the accent system.
 export default function StoryPageContent() {
   const theme = useTheme();
-  const heading = `font-display text-2xl md:text-3xl ${ABOUT_HEADING_CLASS[theme]} mb-8`;
+  const heading = `font-display text-2xl md:text-3xl ${HEADING_ACCENT_CLASS[theme]} mb-8`;
 
   return (
     <main className="bg-paper min-h-screen">

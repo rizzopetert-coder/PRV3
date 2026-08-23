@@ -1,14 +1,14 @@
 "use client";
 
 import { useTheme } from "@/components/ThemeSwitcher";
-import { ABOUT_HEADING_CLASS } from "@/lib/about-theme-tokens";
+import { HEADING_ACCENT_CLASS } from "@/lib/theme-role-tokens";
 
 // Dark/Neutral rollout (this session), same pattern as
 // StoryPageContent.tsx -- see that file's header comment and
-// web/lib/about-theme-tokens.ts for the shared heading-color decision.
+// web/lib/theme-role-tokens.ts for the shared heading-color decision.
 export default function MethodPageContent() {
   const theme = useTheme();
-  const heading = `font-display text-2xl md:text-3xl ${ABOUT_HEADING_CLASS[theme]} mb-8`;
+  const heading = `font-display text-2xl md:text-3xl ${HEADING_ACCENT_CLASS[theme]} mb-8`;
 
   return (
     <main className="bg-paper min-h-screen">
