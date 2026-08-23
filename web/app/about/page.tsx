@@ -15,13 +15,13 @@ export default function AboutPage() {
         </p>
         <div className="space-y-4">
           <p className="font-ui text-base text-oxide-text leading-relaxed">
-            <Link href="/about/story" className="underline hover:text-charcoal">The Story</Link> covers who built this practice and the twenty-five years behind it.
+            <Link href="/about/story" className="underline hover:text-hover-ink">The Story</Link> covers who built this practice and the twenty-five years behind it.
           </p>
           <p className="font-ui text-base text-oxide-text leading-relaxed">
-            <Link href="/about/method" className="underline hover:text-charcoal">The Method</Link> explains where the underlying pattern came from, confirmed against sources that had no reason to agree with each other.
+            <Link href="/about/method" className="underline hover:text-hover-ink">The Method</Link> explains where the underlying pattern came from, confirmed against sources that had no reason to agree with each other.
           </p>
           <p className="font-ui text-base text-oxide-text leading-relaxed">
-            <Link href="/about/services" className="underline hover:text-charcoal">The Services</Link> lays out what actually happens once a diagnostic finds something real.
+            <Link href="/about/services" className="underline hover:text-hover-ink">The Services</Link> lays out what actually happens once a diagnostic finds something real.
           </p>
         </div>
       </div>

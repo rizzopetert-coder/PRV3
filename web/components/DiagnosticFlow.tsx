@@ -686,13 +686,13 @@ export default function DiagnosticFlow() {
         <div className="max-w-xl mx-auto px-6 pt-6 flex items-center justify-between">
           <button
             onClick={() => setShowHistory((s) => !s)}
-            className="font-ui text-xs text-gray-400 hover:text-charcoal transition-colors"
+            className="font-ui text-xs text-gray-400 hover:text-hover-ink transition-colors"
           >
             {showHistory ? "Hide" : "Review"} your answers so far
           </button>
           <button
             onClick={handleReset}
-            className="font-ui text-xs text-gray-400 hover:text-charcoal transition-colors"
+            className="font-ui text-xs text-gray-400 hover:text-hover-ink transition-colors"
           >
             Start over
           </button>

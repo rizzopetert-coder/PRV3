@@ -494,7 +494,7 @@ function LiveField({ weights, severityTier }: LiveFieldProps) {
         type="button"
         aria-label={GESTALT_INFO.title}
         aria-expanded={gestaltHovered || gestaltTapped}
-        className="absolute top-2 right-2 z-10 font-ui text-xs text-gray-400 hover:text-charcoal transition-colors underline decoration-dotted underline-offset-2"
+        className="absolute top-2 right-2 z-10 font-ui text-xs text-gray-400 hover:text-hover-ink transition-colors underline decoration-dotted underline-offset-2"
         onMouseEnter={() => setGestaltHovered(true)}
         onMouseLeave={() => setGestaltHovered(false)}
         onFocus={() => setGestaltHovered(true)}

@@ -163,7 +163,7 @@ function ResolutionFamilyBadge({ resolutionFamily }: { resolutionFamily: string 
           <span key={part}>
             {i > 0 && " + "}
             {anchor ? (
-              <Link href={`/about/services#${anchor}`} className="underline hover:text-charcoal">
+              <Link href={`/about/services#${anchor}`} className="underline hover:text-hover-ink">
                 {label}
               </Link>
             ) : (
@@ -289,7 +289,7 @@ export default function StatesTocPage() {
           type="button"
           aria-label={TERMS_GUIDE_TRIGGER_TEXT}
           aria-expanded={termsHovered || termsTapped}
-          className="font-ui text-sm text-gray-500 hover:text-charcoal transition-colors underline decoration-dotted underline-offset-2"
+          className="font-ui text-sm text-gray-500 hover:text-hover-ink transition-colors underline decoration-dotted underline-offset-2"
           onMouseEnter={() => setTermsHovered(true)}
           onFocus={() => setTermsHovered(true)}
           onBlur={() => setTermsHovered(false)}
@@ -383,7 +383,7 @@ export default function StatesTocPage() {
               setDimensionFilters(new Set());
               setSignatureFilters(new Set());
             }}
-            className="font-ui text-xs text-gray-500 hover:text-charcoal underline"
+            className="font-ui text-xs text-gray-500 hover:text-hover-ink underline"
           >
             Clear filters
           </button>

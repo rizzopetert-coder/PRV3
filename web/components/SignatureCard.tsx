@@ -49,7 +49,7 @@ export default function SignatureCard({ signature }: SignatureCardProps) {
         </h3>
         <button
           onClick={handleClusterToggle}
-          className="font-ui text-xs text-gray-500 hover:text-charcoal transition-colors shrink-0 mt-1"
+          className="font-ui text-xs text-gray-500 hover:text-hover-ink transition-colors shrink-0 mt-1"
           aria-label={
             isClusterSelected
               ? `Deselect all conditions in ${signature.name}`
@@ -69,7 +69,7 @@ export default function SignatureCard({ signature }: SignatureCardProps) {
       <div className="px-5 pb-5">
         <button
           onClick={() => setActiveSheet(signature.id)}
-          className="font-ui text-sm text-gray-500 hover:text-charcoal transition-colors text-left"
+          className="font-ui text-sm text-gray-500 hover:text-hover-ink transition-colors text-left"
         >
           See the conditions inside →
         </button>

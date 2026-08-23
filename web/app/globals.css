@@ -28,6 +28,26 @@
  * --------------------------------------------------------------------- */
 :root {
   --ink: #14171A;
+  /* --hover-ink: named replacement for hardcoded hover:text-charcoal (20
+     sites across 8 files, 2026-08-23 audit -- prompts/visual-identity-v3-
+     route-inventory.md). Confirmed via direct grep that every one of
+     those 20 sites currently sits on a fixed bg-white/bg-paper container,
+     never a theme-reactive --field background -- no live contrast bug
+     exists today. Deliberately a SINGLE value, identical in all three
+     [data-theme] scopes, not branched per theme -- a first attempt at
+     branching this per theme (reusing each theme's own --ink) was tried
+     and reverted after live verification showed it breaking: Dark's
+     --ink (#EDEAE3) is a light color designed for Dark's own near-black
+     --field, and applying it to hover text that actually renders against
+     these sites' permanent white/paper background made it nearly
+     invisible -- worse than the original hardcoded charcoal, not better.
+     Named and centralized here so a real per-theme value can be
+     introduced later IF/when any of these 20 sites' own background is
+     migrated onto --field -- until then, one value everywhere is the
+     only value that's actually correct against what they really render
+     on. Matches --color-charcoal (#26241F) exactly -- zero visual change
+     from before this fix. */
+  --hover-ink: #26241F;
   --field: #E9E7E2;
   --field-raise: #DFDCD5;
   --oxide: #8C4A2F;
@@ -60,6 +80,8 @@
 
 [data-theme="dark"] {
   --ink: #EDEAE3;
+  /* --hover-ink deliberately NOT overridden here -- see the :root block's
+     comment. Stays #26241F in every theme. */
   --field: #171512;
   --field-raise: #201E1A;
   --oxide: #B8663D;
@@ -85,6 +107,8 @@
 
 [data-theme="neutral"] {
   --ink: #34383C;
+  /* --hover-ink deliberately NOT overridden here -- see the :root block's
+     comment. Stays #26241F in every theme. */
   --field: #FFFFFF;
   --field-raise: #EFE6D0;
   --oxide: #4A6B85;
@@ -116,6 +140,7 @@
   --color-foreground: var(--foreground);
   --color-paper: #F6F3ED;
   --color-charcoal: #26241F;
+  --color-hover-ink: var(--hover-ink);
   --color-slate: #4A6B85;
   --color-rust: #C2492E;
   /* Visual identity v2 (OD-07) — new names only, no collisions with the

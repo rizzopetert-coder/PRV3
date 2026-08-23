@@ -29,7 +29,7 @@ export function StateDrawer({ signature }: StateDrawerProps) {
           </span>
           <button
             onClick={() => setActiveSheet(null)}
-            className="text-gray-400 hover:text-charcoal transition-colors"
+            className="text-gray-400 hover:text-hover-ink transition-colors"
             aria-label="Close"
           >
             ✕

@@ -54,7 +54,7 @@ export default function Home() {
               The diagnostic names the specific condition producing the
               friction inside an organization, whatever&apos;s driving it,
               however it&apos;s showing up. From there,{" "}
-              <Link href="/about/services" className="underline hover:text-charcoal">
+              <Link href="/about/services" className="underline hover:text-hover-ink">
                 what we do
               </Link>{" "}
               depends on what it finds.
@@ -129,7 +129,7 @@ export default function Home() {
           <div className="pt-2">
             <Link
               href="/book"
-              className="font-ui text-sm text-gray-500 hover:text-charcoal transition-colors"
+              className="font-ui text-sm text-gray-500 hover:text-hover-ink transition-colors"
             >
               Explore the research and thinking behind the work. →
             </Link>
