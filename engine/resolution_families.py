@@ -10,7 +10,8 @@ CONSTRAINT (locked S34): No service names appear in this file or in
 any output derived from it. The family description is the only
 user-facing text associated with resolution routing.
 
-All family description copy is flagged COPY PENDING.
+All four family description values are final, Pete-supplied copy (shipped
+commit 95fc404, 2026-07-31).
 
 Spec reference: PRV3 Output Layer Brief — Step 3
 """
@@ -21,25 +22,25 @@ from typing import Optional
 
 
 # ── Resolution family definitions ──────────────────────────────────────────────
-# Four families. Descriptions are COPY PENDING — placeholders below.
+# Four families. Descriptions are final, shipped copy (commit 95fc404).
 # family_id is an internal routing key, not user-facing.
 
 RESOLUTION_FAMILY_DESCRIPTIONS: dict[str, dict] = {
     "structural": {
         "family_id":   "structural",
-        "description": "Something in how decisions get made, who holds authority, or how the organization is built is producing this condition. Not a person carrying it. The structure itself. It will keep producing the same outcome until that structure changes. Fixing it means no longer managing around it.",  # COPY PENDING — structural design resolution copy
+        "description": "Something in how decisions get made, who holds authority, or how the organization is built is producing this condition. Not a person carrying it. The structure itself. It will keep producing the same outcome until that structure changes. Fixing it means no longer managing around it.",  # structural design resolution copy
     },
     "developmental": {
         "family_id":   "developmental",
-        "description": "Somebody in this organization needs to be able to do something they can't do yet, and no amount of good intention closes that gap on its own. This is capability work. It's specific, it's learnable, and it requires deliberate practice aimed at exactly what the diagnostic found, not a general program hoping to cover it.",  # COPY PENDING — capability development resolution copy
+        "description": "Somebody in this organization needs to be able to do something they can't do yet, and no amount of good intention closes that gap on its own. This is capability work. It's specific, it's learnable, and it requires deliberate practice aimed at exactly what the diagnostic found, not a general program hoping to cover it.",  # capability development resolution copy
     },
     "investigative": {
         "family_id":   "investigative",
-        "description": "Something here needs a direct, unbiased look from someone with no stake in what they find. Not coaching. Not a communication fix. A fact-finding problem, and the resolution starts with an honest, unflinching read on what's actually happening before anyone decides what to do about it.",  # COPY PENDING — investigative / compliance resolution copy
+        "description": "Something here needs a direct, unbiased look from someone with no stake in what they find. Not coaching. Not a communication fix. A fact-finding problem, and the resolution starts with an honest, unflinching read on what's actually happening before anyone decides what to do about it.",  # investigative / compliance resolution copy
     },
     "directional": {
         "family_id":   "directional",
-        "description": "The organization is drifting, and drift doesn't correct itself. This is about realigning what the organization says it values with what it actually rewards and tolerates day to day. Resolution here means naming the gap plainly and doing the harder work of closing it, not writing a new mission statement.",  # COPY PENDING — strategic direction / culture resolution copy
+        "description": "The organization is drifting, and drift doesn't correct itself. This is about realigning what the organization says it values with what it actually rewards and tolerates day to day. Resolution here means naming the gap plainly and doing the harder work of closing it, not writing a new mission statement.",  # strategic direction / culture resolution copy
     },
 }
 
