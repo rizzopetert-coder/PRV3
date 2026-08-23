@@ -2,6 +2,16 @@
 
 Status: **DIRECTION APPROVED, NOT A FINALIZED BUILDABLE PALETTE.** The `--oxide` decoupling question (below) is now formally resolved by Pete. Draft hex values remain otherwise unfinalized — Warm theme's contrast is now real-checked (see below, 3 of 7 colors fail body-text contrast), Dark/Neutral remain unchecked, no full Gemini sign-off yet, nothing committed to `globals.css`. This file is the record of the decision itself; implementation is separate, future, unscoped work.
 
+## STANDING GOTCHA — three unrelated, visually similar green/blue tokens
+
+Confirmed via `prompts/gemini-themeswitcher-review-verification.md` (commit 1ffb3e7): this codebase currently carries three genuinely different tokens that are easily confused by name and by eye — all muted blue-green, from three different token generations, serving different roles:
+
+- **v1 `--color-slate` = `#4A6B85`** — the original Session 58 palette's general accent, live today via bare `border-slate`/`text-slate`/`bg-slate` Tailwind utilities (e.g. `SignatureCard.tsx`, `book/toc/page.tsx`'s signature-tag pills).
+- **v2 `--slate` = `#5C6B66`** — the OD-07 general-accent layer, deliberately NOT mapped to a bare Tailwind utility (would collide with the v1 name above), only reachable via arbitrary-value syntax (`text-[color:var(--slate)]`) or inline style.
+- **v3 `--moss` = `#5C6B4A`** — one of Warm's 7 new palette-expansion colors (this file), TEXT-SAFE tier, wired into `globals.css` but not yet consumed by any live component.
+
+These are unrelated tokens that happen to land on similar hex values, not three names for the same thing and not a naming conflict to resolve. **Check which generation's token you actually mean before touching any color value in this codebase** — the name alone won't tell you, and getting this wrong silently changes the wrong theme layer.
+
 ## DECISION — `--oxide` decouples into general-content use (2026-08-22), confirmed by Pete
 
 **Confirmed directly by Pete, not inferred:** `--oxide` decouples from its original severity-pairing design intent into general-content use. This applies to the full 7-color-per-theme palette approved this session, not just `--oxide` itself — the palette was built as `--oxide`'s natural extension into general UI, so the decoupling decision covers the whole set.
