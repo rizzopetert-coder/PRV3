@@ -39,16 +39,17 @@
   --urgency: #8C4A2F;
   --urgency-text: #8C4A2F;
   /* Visual identity v3 palette expansion (Pete-approved, 2026-08-22 --
-     prompts/visual-identity-v3-palette-expansion.md). Warm theme only --
-     Dark/Neutral's own 6-color sets are approved but not yet wired, do
-     not add them here without their own pass. Usage tiers are locked in
-     that file: TEXT-SAFE (oxide/oxide-text, moss, umber, berry -- body
-     copy, links, small UI, no restriction), LARGE/DECORATIVE-ONLY
-     (taupe, dusk-blue -- headings 24px+, icons, borders, fills, never
-     body text or small links), BACKGROUND-FILL-ONLY (ochre -- solid
-     fill with dark charcoal/ink text on top only, never foreground).
-     berry is additionally CTA-exclusive: exactly once per page, primary
-     CTA only, no fallback role -- see the tracker file's pop-color rule. */
+     prompts/visual-identity-v3-palette-expansion.md). Warm's set below;
+     Dark's and Neutral's own sets are declared under their own
+     [data-theme] blocks further down, same tier discipline. Usage tiers
+     are locked in that file: TEXT-SAFE (oxide/oxide-text, moss, umber,
+     berry -- body copy, links, small UI, no restriction),
+     LARGE/DECORATIVE-ONLY (taupe, dusk-blue -- headings 24px+, icons,
+     borders, fills, never body text or small links), BACKGROUND-FILL-ONLY
+     (ochre -- solid fill with dark charcoal/ink text on top only, never
+     foreground). berry is additionally CTA-exclusive: exactly once per
+     page, primary CTA only, no fallback role -- see the tracker file's
+     pop-color rule. */
   --moss: #5C6B4A;
   --umber: #5A3A28;
   --taupe: #857C6E;
@@ -69,6 +70,17 @@
   --cta-text: #171512;
   --urgency: #B8663D;
   --urgency-text: #C9825C;
+  /* v3 palette expansion, Dark set (see the :root token block comment
+     above for the full tier discipline). All 5 are TEXT-SAFE per
+     prompts/visual-identity-v3-palette-expansion.md's Dark contrast
+     table (oxide-text already TEXT-SAFE, oxide itself stays
+     LARGE/DECORATIVE-ONLY, unchanged). fuchsia is additionally
+     CTA-exclusive, same pop-color rule as Warm's berry. */
+  --amber: #D4A24C;
+  --sage: #7C8A6B;
+  --warm-gray: #9C9186;
+  --dusty-blue: #7691A8;
+  --fuchsia: #D6559E;
 }
 
 [data-theme="neutral"] {
@@ -83,6 +95,20 @@
   --cta-text: #FFFFFF;
   --urgency: #C9622A;
   --urgency-text: #B5551F;
+  /* v3 palette expansion, Neutral set (see the :root token block comment
+     above for the full tier discipline). Tiers vs. --field per
+     prompts/visual-identity-v3-palette-expansion.md: taupe is
+     LARGE/DECORATIVE-ONLY; sage-gray and cool-gray are TEXT-SAFE vs.
+     --field but drop to LARGE/DECORATIVE-ONLY vs. paper; muted-gold is
+     LARGE/DECORATIVE-ONLY vs. --field but BACKGROUND-FILL-ONLY vs.
+     paper -- re-check against whichever background a build actually
+     uses, do not assume --field's tier carries over. plum is TEXT-SAFE
+     and additionally CTA-exclusive, same pop-color rule as Warm's berry. */
+  --taupe: #8C7A6B;
+  --sage-gray: #6B7864;
+  --cool-gray: #6B7280;
+  --muted-gold: #A68A4A;
+  --plum: #9B2C6F;
 }
 
 @theme inline {
@@ -100,14 +126,29 @@
   --color-field-raise: var(--field-raise);
   --color-oxide: var(--oxide);
   --color-oxide-text: var(--oxide-text);
-  /* v3 palette expansion (Warm only, see the :root token block comment
-     above for the full tier discipline). */
+  /* v3 palette expansion (see the :root token block comment above for
+     the full tier discipline). Warm's set lives in :root; taupe is
+     shared with Neutral's own [data-theme="neutral"] override (same
+     pattern as --oxide) so it needs only one mapping here. Dark's and
+     Neutral's remaining theme-specific names get their own mappings
+     below -- each only resolves to a real value under its own
+     [data-theme], by design (mirrors no color across themes it wasn't
+     approved for). */
   --color-moss: var(--moss);
   --color-umber: var(--umber);
   --color-taupe: var(--taupe);
   --color-dusk-blue: var(--dusk-blue);
   --color-ochre: var(--ochre);
   --color-berry: var(--berry);
+  --color-amber: var(--amber);
+  --color-sage: var(--sage);
+  --color-warm-gray: var(--warm-gray);
+  --color-dusty-blue: var(--dusty-blue);
+  --color-fuchsia: var(--fuchsia);
+  --color-sage-gray: var(--sage-gray);
+  --color-cool-gray: var(--cool-gray);
+  --color-muted-gold: var(--muted-gold);
+  --color-plum: var(--plum);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
   --color-cta-text: var(--cta-text);
