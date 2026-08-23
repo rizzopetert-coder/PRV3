@@ -411,9 +411,18 @@ _reg(_profile(
     resolution_family="Development + Roadmap",
 ))
 STATE_PROFILES["invisible_performance_management"].dimensional_vector = DimensionalVector(
+    # Candidate C, SHIPPED 2026-08-23 (prompts/scd-wcs-remediation-
+    # tracker.md) -- authority_liability 0.25 -> 0.20. Real text (this
+    # state's own descriptive_prose) is a documentation/evidentiary-
+    # weight problem, not a decision-rights one; the light touch here
+    # reduces false-rank-1 against the_unexamined_algorithm's own
+    # profiles (59->43/175) without contaminating any other state's
+    # score, ripple-audited three separate times against the real
+    # calibration pipeline (Parts 2, 3, and the 2026-08-23
+    # re-evaluation), byte-identical every time.
     aptitude_liability=0.45,
     aptitude_asset=0.15,
-    authority_liability=0.25,
+    authority_liability=0.20,
     authority_asset=0.15,
     alliance_liability=0.15,
     alliance_asset=0.15,
@@ -602,8 +611,17 @@ _reg(_profile(
     resolution_family="Roadmap + Executive Counsel",
 ))
 STATE_PROFILES["the_unexamined_algorithm"].dimensional_vector = DimensionalVector(
+    # Candidate C, SHIPPED 2026-08-23 (prompts/scd-wcs-remediation-
+    # tracker.md) -- aptitude_liability 0.35 -> 0.30. The one
+    # genuinely double-field-grounded collision found in the whole
+    # invisible_performance_management investigation: this state's
+    # own text names both an unverified-capability problem (aptitude)
+    # AND an explicit "no governance layer reviewing" decision-rights
+    # gap (authority) -- real signal on both sides, not a forced
+    # same-cluster tie-break. Reduces false-rank-1 against
+    # invisible_performance_management's own profiles (9->5/175).
     authority_liability=0.50,
-    aptitude_liability=0.35,
+    aptitude_liability=0.30,
     authority_asset=0.10,
     aptitude_asset=0.10,
     alliance_liability=0.10,
