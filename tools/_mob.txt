@@ -1270,7 +1270,7 @@ Full progression in Section 16 session log.
 
 | Desktop StateDrawer viewport overlap | StateDrawer is fixed right-0 w-80. AssemblyPanel sidebar is also right-side. Review at actual wide viewport widths before deployment — overlap likely. |
 
-| Path 1 — full diagnostic instrument | FullInstrumentPlaceholder holds the space at /diagnostic path='diagnostic'. Full instrument not built. Scope TBD. |
+| Path 1 — full diagnostic instrument | **STALE, SUPERSEDED (2026-08-23) — do not rely on this row.** FullInstrumentPlaceholder holds the space at /diagnostic path='diagnostic'. Full instrument not built. Scope TBD. **This was true when written but is no longer current: FullInstrumentPlaceholder was replaced by the real DiagnosticFlow component, commit 37ab8a7 ("Path 1 Phase 1, Stage 4: frontend linear question-flow component," 2026-07-17). The full instrument is built and live. See the Section 15 Document Registry row for web/app/diagnostic/page.tsx ("Path 1 mounts DiagnosticFlow (S71, replacing FullInstrumentPlaceholder — confirmed via direct read, page.tsx line 317)") for the correct, current status. Left in place rather than deleted, per standing discipline for correcting prior claims in an authoritative source — found stale during the 2026-08-23 independent comprehensive project assessment (prompts/prv3-comprehensive-assessment-cc.md, Item 2).** |
 
 | Shell route content | /book content complete — 52 pieces across memo/methodology/case_pattern (42 original + 8 LIB-043–050 salvage + LIB-051 essay-4 methodology + LIB-052 what-not-to-document memo), all status draft, publish decision deferred. /ask rebuilt as mailto server component (Session 58) — no longer a shell. /about/story and /about/services live. /about index intentionally unlinked. |
 
