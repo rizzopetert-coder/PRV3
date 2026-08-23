@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { bookManifest } from "@/lib/book-manifest";
 import { states } from "@/data/taxonomy";
+import BookTaxonomyListContent from "@/components/BookTaxonomyListContent";
 
 const STATE_THRESHOLD = 2;
 
@@ -66,27 +66,5 @@ export default async function StatePage({ params }: Props) {
     (p) => p.status === "published" && p.stateIds?.includes(stateId)
   );
 
-  return (
-    <main className="max-w-3xl mx-auto px-6 py-16">
-      <h1 className="font-display text-3xl text-charcoal mb-12">{state.name}</h1>
-      <ul className="divide-y divide-gray-100">
-        {pieces.map((piece) => (
-          <li key={piece.id} className="py-8">
-            <Link href={`/book/${piece.contentType}/${piece.slug}`} className="block">
-              <h2
-                className={
-                  piece.voice === "from_the_author"
-                    ? "font-display text-xl text-charcoal mb-2"
-                    : "font-ui text-xl font-medium text-charcoal mb-2"
-                }
-              >
-                {piece.title}
-              </h2>
-              <p className="font-ui text-sm text-gray-500">{piece.teaser}</p>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </main>
-  );
+  return <BookTaxonomyListContent title={state.name} pieces={pieces} />;
 }
