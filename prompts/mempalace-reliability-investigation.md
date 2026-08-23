@@ -125,3 +125,24 @@ No recommendation follows from this pass either way — that's explicitly Pete's
 - Both patched files confirmed to compile cleanly (`python -m py_compile`, zero errors) — rules out any syntax-level mistake in the patch itself, independent of the runtime checks above.
 
 **Failure mode 2 (silent exit-5): status unchanged, reconfirmed still open.** Not investigated, touched, or newly evidenced by this pass — exactly as characterized in §4 above.
+
+---
+
+## 7. SEVERITY UPDATE (2026-08-23, later same day) — this changes the practical picture, not just another data point
+
+**Do not read this as one more entry in the failure-mode table above. It's a different kind of finding: not "here's a third thing that sometimes goes wrong," but "the tool's core write operation may not currently work at all."** The two real-write attempts made during §6's own verification pass (commit `5a9ed95`) — a plain `mempalace status` call and a real `mempalace mine` against a one-file disposable test directory — **both segfaulted. Neither one was an edge case; both were about as simple as a real invocation gets.**
+
+**Cross-check performed, per explicit instruction, rather than assumed either way: is there any evidence of a real mine write actually succeeding recently, anywhere in the record?**
+
+Traced every documented `mempalace mine` outcome found, in order:
+
+1. **Confirmed successful, historically:** the MOB's own account of Sessions 56 and 62 states plainly that the cosmetic `UnicodeEncodeError` "occurred *after* data was already written" at that time — real writes were completing then, only the trailing summary print crashed.
+2. **The `hnsw:sync_threshold` fix (~2026-08-05–08):** the session that found and fixed the real non-persistence root cause verified its own fix with a real write, confirmed via `mempalace_search` actually retrieving three previously-stuck sessions' content. **This is the last documented confirmed-successful real write found anywhere in the record.**
+3. **Every attempt since, found in the MOB or this session, has failed:**
+   - MOB v4.223's own closeout note (the entry directly preceding this file's original investigation): "failed silently both attempts this stretch (a hang with zero output the prior session's close, a silent exit-code-5 failure with zero diagnostic output this session's close)" — two more real invocations, two more failures, neither a segfault.
+   - This session's original investigation (§3 above): one attempt crashed on the Unicode bug before ever reaching the write phase; a second, with that bug worked around (`PYTHONIOENCODING=utf-8`), reached the real write phase and segfaulted.
+   - This session's fix-verification pass (§6 above): two more real-write attempts, both segfaulted.
+
+**That's a minimum of four independent, real (non-dry-run) write attempts since the last confirmed success, across at least three separate sessions, failing four different ways (hang, silent exit-5, segfault, segfault) — zero successes among them.** This doesn't prove no successful write has happened anywhere unlogged — only what's actually on record was checked — but no evidence of one exists in either the MOB or this session's own history, and every attempt that *is* on record, since the fix that was last confirmed working, failed.
+
+**Practical severity, stated plainly: `mine` should currently be treated as likely non-functional for real writes, not as a tool with an intermittent reliability problem.** The dry-run path works (§6 confirmed this directly). The MCP server's `diary_write` path is architecturally distinct enough (§5) that this finding does not automatically extend to it — but it hasn't been positively re-confirmed working today either (§6's own attempt at a live MCP round-trip returned "Connection closed," a separate, already-recurring issue). No fix or further diagnosis attempted here, per explicit scope — this section exists so the next session doesn't inherit an undersold "worth investigating" characterization when the evidence now points to something more serious.
