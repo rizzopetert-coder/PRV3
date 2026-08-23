@@ -71,6 +71,13 @@ export function NavBar() {
                 >
                   The Services
                 </Link>
+                <Link
+                  href="/about/method"
+                  className="block px-4 py-2 font-ui text-sm text-gray-600 hover:text-charcoal hover:bg-paper transition-colors"
+                  onClick={() => setAboutOpen(false)}
+                >
+                  The Method
+                </Link>
               </div>
             </div>
           )}
