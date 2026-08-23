@@ -1,6 +1,6 @@
 # Visual Identity v3 — Palette Expansion (Pete-Approved Direction, 2026-08-22)
 
-Status: **DIRECTION APPROVED, NOT A FINALIZED BUILDABLE PALETTE.** The `--oxide` decoupling question (below) is now formally resolved by Pete. Draft hex values remain otherwise unfinalized — Warm theme's contrast is now real-checked (see below, 3 of 7 colors fail body-text contrast), Dark/Neutral remain unchecked, no full Gemini sign-off yet, nothing committed to `globals.css`. This file is the record of the decision itself; implementation is separate, future, unscoped work.
+Status: **DIRECTION APPROVED AND IN ACTIVE ROLLOUT.** The `--oxide` decoupling question (below) is resolved by Pete. Full 21-color contrast verification is CLOSED — every color across all three themes has a defined usage tier (see below), none left undefined or unusable — and the pop-color rule is LOCKED (Pete-confirmed). All three themes' tokens are wired into `globals.css` (Warm: commit 76815a7; Dark/Neutral: commit 2373654) and live-piloted across every page in `/about/*` — `/about/services`, `/about/story`, `/about/method`, and the `/about` hub. `ThemeSwitcher` is mounted, scoped to `/about/*` only; Gemini's architecture review of that mounting/general-accent question is independently verified (`prompts/gemini-themeswitcher-review-verification.md`, commit 1ffb3e7). This file remains the record of the original decision; implementation status is tracked here as it changes, not re-litigated.
 
 ## STANDING GOTCHA — three unrelated, visually similar green/blue tokens
 
