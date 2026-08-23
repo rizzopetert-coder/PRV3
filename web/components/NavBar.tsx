@@ -35,14 +35,22 @@ export function NavBar() {
         </Link>
         <div
           ref={aboutRef}
-          className="relative"
+          className="relative flex items-center gap-1"
           onMouseEnter={() => setAboutOpen(true)}
           onMouseLeave={() => setAboutOpen(false)}
         >
-          <button
+          <Link
+            href="/about"
             className="font-ui text-sm text-gray-600 hover:text-charcoal transition-colors"
+          >
+            About
+          </Link>
+          <button
+            type="button"
+            className="text-gray-400 hover:text-charcoal transition-colors p-1"
             aria-haspopup="true"
             aria-expanded={aboutOpen}
+            aria-label="Toggle About menu"
             onClick={() => setAboutOpen((o) => !o)}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
@@ -52,7 +60,15 @@ export function NavBar() {
               if (e.key === "Escape") setAboutOpen(false);
             }}
           >
-            About
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+              <path
+                d="M2 3.5L5 6.5L8 3.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
           {aboutOpen && (
             <div className="absolute right-0 top-full pt-2 z-50">
