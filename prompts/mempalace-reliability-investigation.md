@@ -1,6 +1,6 @@
 # MemPalace Reliability Investigation
 
-2026-08-23. Diagnostic only, per explicit instruction — no fix or replacement attempted. Every claim below traced to a real, checkable source: crash dumps, installed package files, MCP config, or a direct reproduction, not inference from the MOB's summary alone.
+2026-08-23. Originally diagnostic only. **Updated same day: the Unicode/install-routing bug (§2, §5 below) has since been fixed and verified — see the new §6 at the end of this file.** Every claim traced to a real, checkable source: crash dumps, installed package files, MCP config, or a direct reproduction, not inference from the MOB's summary alone.
 
 ## Headline finding
 
@@ -101,3 +101,27 @@ Pete's standing note flags mcp-memory-service, Cognee, self-hosted mem0, and Gra
 - Neither finding characterizes the *architecture* as unsound — both have identifiable, bounded causes rather than pointing to something systemically unreliable about MemPalace's design.
 
 No recommendation follows from this pass either way — that's explicitly Pete's call, and this investigation wasn't scoped to evaluate the alternatives themselves.
+
+## 6. Fix applied and verified (2026-08-23, same day)
+
+**Scope: the Unicode bug and install-routing only.** Failure mode 2 (silent exit-5) was not touched — stays a separate, still-open investigation, exactly as before.
+
+**Point 1, confirmed before touching anything:** re-verified the MCP config directly (`~/.claude.json`) — the PRV3 server entry hardcodes `C:\Users\rizzo\AppData\Local\Programs\Python\Python312\python.exe`, the same install `where mempalace` resolves first for a bare CLI invocation. The dev checkout's own uncommitted patch (§1) was checked against the actual bug, not trusted on sight: it correctly replaces `─` (U+2500) with `-` — a real, correct fix for the one line it touches. But a broader scan of the checkout's own `miner.py` (not just the one already-patched line) found the same character class at 4 more locations in that file alone, and a full-package scan of the **live** 3.12 install found the identical pattern at roughly 40 more sites across 16 files. The existing patch was correct but far from complete, and — as established in §1 — irrelevant regardless, since it lives in the install that doesn't run.
+
+**Point 2, decision:** fixed the live install directly (option (b) from the task), not repointing MCP config to the dev checkout (option (a)). Reasoning: the dev checkout is 133 commits ahead of `v3.3.0` on `develop` — repointing to it would pull in that entire span of unreviewed upstream changes just to get one already-drafted one-line fix, a much larger and riskier change than the bug warrants. Fixing the live install directly is narrower and targets the exact code that's actually running.
+
+**What was fixed, in the live install only (`Python312\...\mempalace\`):**
+- `miner.py`: all 5 non-ASCII characters in `print()` calls (not just the 1 the dev checkout's patch covered) — lines 607 (`→`→`->`), 779 (`—`→`--`), 784 (`─`→`-`), 814 (`✓`→`[OK]`), 852 (`—`→`--`).
+- `mcp_server.py`: both non-ASCII characters in `logger.info()` calls — line 657 (`Filed drawer: ... →`) and line 974 (the diary_write logging line flagged as a latent risk in §5 above) — both `→`→`->`.
+- Deliberately **not** fixed: the same pattern repeated ~40 more times across 14 other files (`cli.py`, `closet_llm.py`, `convo_miner.py`, `dedup.py`, `dialect.py`, `entity_detector.py`, `exporter.py`, `layers.py`, `migrate.py`, `onboarding.py`, `repair.py`, `room_detector_local.py`, `searcher.py`, `split_mega_files.py`) — none implicated in any reported failure, out of this task's explicit scope. Confirmed via source trace that `cmd_mine` calls directly into `miner.mine()` without passing through any of `cli.py`'s own affected lines, so this doesn't leave a gap in the specific failure mode being fixed. Flagging the wider pattern here for the record, not actioning it.
+- Patch script (not committed to this repo, targets files outside it): `tools/patch_mempalace_unicode_fix.py`.
+
+**Retired the redundant second install.** `pip uninstall mempalace` under the Python 3.14 interpreter removed the editable registration — `where mempalace` now resolves to exactly one entry (the fixed 3.12 install). The dev checkout directory itself (`C:\Users\rizzo\mempalace-src`) was left untouched — still on disk, git history intact, its own (now-superseded) local patch still sitting there uncommitted, fully reversible (`pip install -e` again) if ever wanted. Confirmed via `git status` inside the checkout that nothing there was touched by this pass.
+
+**Point 4, verification, and its real limits — stated plainly, not overclaimed:**
+- `mempalace mine "..." --dry-run` (the exact original failing conditions — no `PYTHONIOENCODING` override) completed cleanly, exit code 0, zero crash — directly exercising 4 of the 5 patched `miner.py` lines (607, 779, 784, 852) in a live run. An uncaught `UnicodeEncodeError` would have halted the script immediately with a non-zero exit; it didn't.
+- The 5th line (814, the `[OK]` checkmark) only fires on a real, non-dry-run write, and **full reproduction of that specific line wasn't safely possible this pass**: both a real `mempalace status` call and a real `mempalace mine` against a disposable throwaway directory segfaulted (exit 139) — the separate, already-documented failure mode 3 (§3), not the Unicode bug. New information from this: the segfault now reproduces on *every* real write attempted today, including a trivial one-file mine and a plain read-only `status` call — more reliably than previously known, not confined to large bulk-mine runs. Indirect evidence the Unicode fix holds on the write path too: no `UnicodeEncodeError` fired before the segfault, and `print()` calls execute strictly in source order, so line 814 (if still broken) would have crashed first, before chromadb's write path is ever reached.
+- `mcp_server.py`'s two fixes were not live-round-trip-tested (an actual MCP tool call) — attempted one (`mempalace_status`) and it returned "Connection closed," the same MCP connectivity failure this session has hit repeatedly for reasons unrelated to this fix, not re-diagnosed here.
+- Both patched files confirmed to compile cleanly (`python -m py_compile`, zero errors) — rules out any syntax-level mistake in the patch itself, independent of the runtime checks above.
+
+**Failure mode 2 (silent exit-5): status unchanged, reconfirmed still open.** Not investigated, touched, or newly evidenced by this pass — exactly as characterized in §4 above.
