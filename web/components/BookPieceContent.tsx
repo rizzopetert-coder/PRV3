@@ -46,7 +46,7 @@ export default function BookPieceContent({ piece, body, jsonLd }: Props) {
           p: ({ children }) => (
             <p className="font-ui text-base text-oxide-text leading-relaxed mb-5">{children}</p>
           ),
-          hr: () => <hr className="my-8 border-gray-100" />,
+          hr: () => <hr className="my-8 border-line" />,
           strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
           em: ({ children }) => <em className="italic">{children}</em>,
           ol: ({ children }) => (
