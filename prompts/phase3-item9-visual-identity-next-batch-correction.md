@@ -2,6 +2,8 @@
 
 Date: 2026-08-24. This task item was framed as a pending batch (`/ask`, `/book` hub, piece pages, aggregation pages) awaiting a drafted-but-unsent Gemini architecture review before implementation. Direct verification finds this premise doesn't match current reality.
 
+**Follow-up, same day:** a later Gemini output claimed the opposite of this finding (treating these same four surfaces as unmigrated). Re-verified against live repo content in `prompts/visual-identity-phase3-gemini-reconciliation.md` — this finding held up as correct in substance; one small, real, previously-uncaught gap was found (a bare `border-gray-100` on `BookPieceContent.tsx`'s markdown `<hr>`) that this file's own `grep -l "useTheme()"` check wasn't designed to catch. See that file for the full reconciliation.
+
 ## Search performed
 
 Looked for a drafted Gemini review request specifically for this batch: every `prompts/gemini-*.md` file in the repo was checked by name (12 files total — none scoped to a "visual identity next batch"). The closest match, `prompts/gemini-themeswitcher-review-verification.md`, is the architecture review that already cleared **before** the rollout that already shipped this session — it's the review that authorized what's now built, not a still-pending one.
