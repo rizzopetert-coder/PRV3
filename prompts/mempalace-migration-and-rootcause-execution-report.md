@@ -85,3 +85,43 @@ The migration script (`C:\mem0_trial_venv\migrate_mempalace.py`) is built, corre
 **Task B:** the `repair.py`-documented duplicate-ID/HNSW-bloat theory is the strongest lead found, but not confirmed. Running `mempalace repair scan` (read-only, against the copy, never the live install) would be the logical next step if Pete wants to pursue this further — not run in this pass, since it wasn't reached within the 45-minute cap and running an unfamiliar tool's `scan` operation for the first time deserved its own considered pass rather than being squeezed in at the very end of a time-boxed investigation.
 
 Neither task's outcome changes anything about MemPalace's status: no data was deleted, modified, or migrated destructively; the live `~/.mempalace/palace` directory was never opened by either task. This remains a pilot and a diagnostic pass, not a decision to adopt Mem0 or abandon the root-cause fix.
+
+---
+
+## Addendum — 2026-08-24: Task A full run launched (Pete's Option 1)
+
+Pete reviewed this report and chose Option 1 (run the remainder as a genuine long-running background process). Before launching, two things needed correcting rather than trusted from the summary above.
+
+### Correction: the real resume point was 1,005, not 1,050
+
+Direct verification of the actual `mempalace_migration` collection state (not trusted from this report's own earlier "1,050 migrated" claim) found **1,020** points, not 1,050 or 1,000. Breaking down by `user_id` explained why: 1,000 correctly-migrated real entries (`prv2`: 345, `prv3`: 447, `claude`: 208) plus **20 contaminating entries under a wrong namespace** (`claude_profiletest2`) — real content from an earlier profiling/timing test, written under a fake user_id rather than the real wing, left behind when the collection was cleared *between* the 50-row test and the 1,000-row test (the 50-row test's own data was wiped by that clear, and this report's "1,050" figure incorrectly summed the two tests as additive when they weren't).
+
+**Fixed before launching:** the 20 contaminating entries were deleted from the Mem0 collection (a legitimate write against the *target*, not the source — the hard constraint against writes applies to `~/.mempalace/palace`, never to Mem0's own store). A 5-row sanity test of the newly-added `--start-offset` resume logic confirmed correct behavior (collection went from 1,000 to 1,005, no duplicates). **The true, verified resume point for the full launch was offset 1,005.**
+
+### Launch method
+
+`migrate_mempalace.py` was extended with a `--start-offset` CLI argument (previously always started at 0). Launched via PowerShell's `Start-Process`, not the Bash tool's own `run_in_background` (which is tied to this session's own process lifecycle — exactly what needed to be avoided):
+
+```
+Start-Process -FilePath "C:\mem0_trial_venv\Scripts\python.exe" \
+  -ArgumentList "C:\mem0_trial_venv\migrate_mempalace.py --start-offset 1005 --batch-size 2000" \
+  -WorkingDirectory "C:\mem0_trial_venv" -WindowStyle Hidden \
+  -RedirectStandardOutput "C:\mem0_trial_venv\migration_stdout.log" \
+  -RedirectStandardError "C:\mem0_trial_venv\migration_stderr.log" -PassThru
+```
+
+Launched PID: **1036**.
+
+### Detachment — verified, not assumed
+
+Per the task's explicit instruction not to trust a clean launch return alone: checked from a **separate, independent PowerShell invocation** (its own PID, 22520 — distinct from both the launcher and the target) via `Get-CimInstance Win32_Process`. Result: PID 1036 is running; its recorded parent (PID 13412, the PowerShell process that ran `Start-Process`) **no longer exists**. The launcher has already exited; the migration process continues running as an independent, orphaned process under the OS scheduler — the correct, verifiable signature of true detachment, not inferred from the launch command returning without error.
+
+**Honest limit on this verification:** this confirms detachment from the immediate launching process, checked from a second, separate process. It does not constitute an end-to-end test across an actual CC-session boundary (this session hasn't ended yet) — that can only be confirmed by a future session finding the process (or its completed log) still there. Reported as strong, verified evidence, not an absolute guarantee.
+
+### State at launch
+
+- Progress log confirms the new run started with `start_offset=1005`, matching the corrected resume point.
+- stderr shows only benign warnings (a PostHog multi-client notice, a missing optional `spaCy` dependency) — no errors, no traceback.
+- Target: **71,790 remaining entries** (72,795 total − 1,005 already done), at the previously-confirmed ~2/s sustained rate — estimated ~9.5-10 hours to completion.
+- Log locations for future monitoring: `C:\mem0_trial_venv\migration_progress.log` (batch-level progress, per-batch sample verification already built into the script from the original 1,050-row test), `C:\mem0_trial_venv\migration_failed.jsonl` (any individual write failures), `C:\mem0_trial_venv\migration_stdout.log` / `migration_stderr.log` (raw process output), `C:\mem0_trial_venv\migration.pid` (the launched PID, for a future session to check `Get-Process -Id (Get-Content migration.pid)`).
+- Not waited on for completion this session, per explicit instruction. The final completion report (total migrated vs. 72,795, spot-check sample, any failures) is future-session work, once the log shows it's done.
