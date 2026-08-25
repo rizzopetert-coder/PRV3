@@ -448,3 +448,68 @@ Both candidates fail the same standard Phase 4's did — neither improves `built
 
 - **IPM and `the_paper_tiger`'s own-profile win rate is still 0/3 and 0/4 even after their axis corrections**, reconfirmed unchanged in this phase's baseline reruns. Logged as a known open gap for a later phase — not folded into this isolation test, per instruction.
 - **`the_paper_tiger` and `the_arbitrary_standard` now share an identical Authority-primary magnitude (0.35) post-candidate** — a new proximity risk first surfaced in Phase 4, logged here as a standing watch item, same treatment as the IPM/`the_founders_grip` flag from Phase 3/4. No testing performed on this in Phase 4b; carried forward only.
+
+---
+
+## Phase 4c — Five-Candidate Set, `built_to_fail` Reverted
+
+Date: 2026-08-24. Direction: re-test the five verified candidates (IPM, `the_paper_tiger`, `silosolation`, `the_arbitrary_standard`, `the_second_close`) with `built_to_fail` left at its currently shipped vector/salience — checking whether this narrower set is clean enough to become its own Phase 5 shipping candidate, with `built_to_fail` split off separately. **Not shipped regardless of outcome, per instruction.**
+
+### 1. False-rank-1 delta, five in-scope states
+
+| State | Before → After | Delta |
+|---|---|---|
+| `invisible_performance_management` | 43 → **0** | **−43** |
+| `the_second_close` | 5 → 1 | −4 |
+| `the_arbitrary_standard` | 0 → 0 | flat |
+| `silosolation` | 0 → 1 | +1 |
+| `the_paper_tiger` | 0 → 2 | +2 |
+
+**Identical to Phase 4's numbers for all five states, exactly.** `built_to_fail`'s presence or absence from the candidate set doesn't touch these five states' own competition against each other — confirms their internal dynamics are self-contained. The two real regressions found in Phase 4 (`the_paper_tiger`, `silosolation`) persist here unchanged; they are not `built_to_fail`-dependent.
+
+### 2. Drift on other states — larger and more consequential than Phase 4's, not smaller
+
+| State | Before → After | Delta |
+|---|---|---|
+| **`built_to_fail`** | **62 → 80** | **+18** |
+| `the_unformed_leader` | 8 → 18 | **+10** |
+| `the_overloaded_manager` | 9 → 15 | **+6** |
+| `the_undefined_role` | 3 → 7 | **+4** |
+| `the_fracture` | 0 → 2 | +2 |
+| `distributed_culture_fragmentation` | 0 → 1 | +1 |
+| `the_dormant_talent` | 6 → 7 | +1 |
+| `the_suppression_filter` | 0 → 1 | +1 |
+| `the_uninitiated` | 19 → 18 | −1 |
+
+**This is not clean.** `built_to_fail` alone absorbs +18 as a pure side effect of IPM and `the_paper_tiger` vacating the Aptitude axis — even though `built_to_fail`'s own vector and salience are byte-identical to its currently shipped values in this test. Three more Aptitude-adjacent states (`the_unformed_leader`, `the_overloaded_manager`, `the_undefined_role`) absorb a combined **+20** on top of that — magnitudes (+10, +6, +4) well outside anything seen in Phase 4's original combined-candidate drift check, which maxed at ±3 across all non-in-scope states. **Total Aptitude-cluster drift here (+38, spread across four states) is nearly identical in magnitude to Phase 4's entire `built_to_fail`-concentrated regression (+38, in one state)** — strong evidence that vacating the Aptitude axis generates a roughly constant amount of "excess dominance" that has to land somewhere; leaving `built_to_fail` sharp and unchanged doesn't avoid that cost, it just redistributes it across `built_to_fail` and its nearest Aptitude-adjacent neighbors instead of concentrating it in `built_to_fail` alone.
+
+### 3. Calibration suite
+
+**171/175 → 166/175 — a larger regression than Phase 4's six-candidate set (168/175).** Consistent with the wider, more diffuse drift found in Section 2 above touching more states than Phase 4's version did.
+
+### 4. IPM / `the_founders_grip`
+
+Still clean. 0 → 0, no new collision, unchanged from every prior check.
+
+### Reading this plainly — the fallback trigger fires here too, on two independent grounds
+
+**Not a clean set.** Two separate reasons, either sufficient alone:
+1. **By the narrow in-scope criterion** (does every in-scope state's count improve): `the_paper_tiger` (+2) and `silosolation` (+1) both regress, identically to Phase 4 — unrelated to `built_to_fail`, so splitting `built_to_fail` off doesn't resolve this.
+2. **By the newly-surfaced side effect**: this "clean" five-state set is not actually independent of `built_to_fail` — it exports a substantial, previously-unmeasured cost onto `built_to_fail` and three Aptitude-adjacent neighbors (+38 combined) purely by vacating the Aptitude axis, regardless of what `built_to_fail`'s own vector does. **This means `built_to_fail`'s problem and the other five candidates' problem are not actually separable the way the Phase 4b/4c split assumed** — fixing IPM and `the_paper_tiger`'s axis misalignment has a real, structural cost on the Aptitude cluster that doesn't go away just because `built_to_fail` itself is left untouched.
+
+**Not shipped, per instruction regardless of outcome.** This finding changes the framing for Phase 5 more than a simple pass/fail would have: it's not "five states are ready, one is hard" — it's "the whole Aptitude/Authority axis realignment this batch represents has a cost that lands somewhere in the Aptitude cluster no matter how `built_to_fail` itself is handled."
+
+---
+
+## `built_to_fail` — closing status note
+
+Three independent negative results across two search rounds, plus a fourth complication surfaced while testing whether the problem could be isolated:
+
+1. **Constrained single-axis redistribution** (the original 3-state search, `prompts/scd-wcs-3state-reshaping-search-results.md`) — ruled out. No candidate brought `built_to_fail`'s and IPM's false-rank-1 counts down together within `built_to_fail`'s own 0.90 liability budget; the fallback trigger fired then too.
+2. **Combined magnitude-only candidate** (Phase 4, this program) — ruled out. Primary lowered and floor raised together: 62→100 (+38), the largest false-rank-1 count measured anywhere in this program's history.
+3. **Both magnitude-only levers, isolated** (Phase 4b) — both ruled out independently. Floor-only: 62→84 (+22). Primary-only: 62→72 (+10). Confirmed non-additive (22+10=32 ≠ 38) — combining them costs more than either alone.
+4. **Not a `built_to_fail`-specific problem alone** (Phase 4c) — even with `built_to_fail` completely unchanged, correcting IPM's and `the_paper_tiger`'s own axis misalignment still drives `built_to_fail`'s count up +18, plus +20 more spread across three Aptitude-adjacent neighbors, purely from vacating the Aptitude axis. `built_to_fail`'s dominance is coupled to the wider Aptitude cluster's shape, not just its own.
+
+**No textual grounding exists for a shape change** — Phase 1 confirmed this a third time (unique among the six-state audit for having zero secondary-axis content anywhere in its prose), and every subsequent phase has re-confirmed it rather than finding new grounding. The only lever this program has ever had available for this state is magnitude, and every magnitude-only approach tested — constrained, combined, isolated in both directions — has failed.
+
+**`built_to_fail` is now a candidate for Gemini architecture review specifically, not the other five.** The other five candidates (IPM, `the_paper_tiger`, `silosolation`, `the_arbitrary_standard`, `the_second_close`) have their own, separate open item (Phase 4c's finding that they're not fully independent of `built_to_fail` after all — see above) but have never failed on their own textual or magnitude grounding the way `built_to_fail` has, four times over. `built_to_fail` specifically has exhausted every lever this program's own methodology can generate on its own — a case for outside architectural judgment, not another internally-generated candidate. Pete's call whether to engage Gemini on this specific question or hold the cluster; not decided here.
