@@ -52,11 +52,16 @@ SALIENCE_PROFILES = {
     # are unrelated states entirely -- a taxonomy-wide dominance
     # pattern, not a tie artifact. See
     # prompts/scd-wcs-cluster-map-findings.md for the full writeup.
+    # Phase 5 (2026-08-25) -- dual-elevated, matched to the new vector
+    # (Authority primary, Attitude secondary). Supersedes the prior
+    # shape, which compensated for the old, wrong Aptitude-primary
+    # vector inherited from built_to_fail -- that compensation no
+    # longer applies now that the vector itself is corrected.
     "the_paper_tiger": {
-        "aptitude_liability": 1.0, "aptitude_asset": 1.0,
-        "authority_liability": 1.0, "authority_asset": 1.0,
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 2.5, "authority_asset": 2.5,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
-        "attitude_liability": 1.5, "attitude_asset": 1.5,
+        "attitude_liability": 2.0, "attitude_asset": 2.0,
     },
 
     # ── APTITUDE — MEDIUM tier (primary only) ─────────────────────────────────
@@ -297,8 +302,11 @@ SALIENCE_PROFILES = {
     },
 
     # ── ALLIANCE — MEDIUM tier (primary only) ─────────────────────────────────
+    # Phase 5 (2026-08-25) -- Aptitude secondary elevated to match the
+    # new vector's real (non-floor) Aptitude value. Alliance unchanged,
+    # still dominant.
     "the_second_close": {
-        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "aptitude_liability": 2.0, "aptitude_asset": 2.0,
         "authority_liability": 0.4, "authority_asset": 0.4,
         "alliance_liability": 2.5, "alliance_asset": 2.5,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
@@ -355,10 +363,12 @@ SALIENCE_PROFILES = {
     # silosolation's own shipped score exactly on ALL-AS-01
     # (0.710304). Zero regression, zero reverse-direction ripple onto
     # the_second_close's own profiles, at every magnitude tested.
+    # Phase 5 (2026-08-25) -- weights flip to match the vector's own
+    # axis flip (Authority now primary, Alliance now secondary).
     "the_arbitrary_standard": {
         "aptitude_liability": 0.4, "aptitude_asset": 0.4,
-        "authority_liability": 2.0, "authority_asset": 2.0,
-        "alliance_liability": 2.5, "alliance_asset": 2.5,
+        "authority_liability": 2.5, "authority_asset": 2.5,
+        "alliance_liability": 2.0, "alliance_asset": 2.0,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },
 
@@ -484,9 +494,11 @@ SALIENCE_PROFILES = {
     # Seeded per the three-tier rule above from each state's draft signal_weight in
     # engine/data/states.py; secondary bumps mirror that state's dimensional_vector
     # secondary-field elevation.
-    "invisible_performance_management": {  # medium tier, primary only
-        "aptitude_liability": 2.5, "aptitude_asset": 2.5,
-        "authority_liability": 0.4, "authority_asset": 0.4,
+    # Phase 5 (2026-08-25) -- standard flat template, moved to the new
+    # vector's own axis (Authority). See engine/data/states.py.
+    "invisible_performance_management": {
+        "aptitude_liability": 0.4, "aptitude_asset": 0.4,
+        "authority_liability": 2.5, "authority_asset": 2.5,
         "alliance_liability": 0.4, "alliance_asset": 0.4,
         "attitude_liability": 0.4, "attitude_asset": 0.4,
     },

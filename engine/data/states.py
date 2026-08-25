@@ -360,14 +360,22 @@ _reg(_profile(
     resolution_family="Development + Roadmap",
 ))
 STATE_PROFILES["the_paper_tiger"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.60,
-    aptitude_asset=0.10,
-    authority_liability=0.10,
-    authority_asset=0.10,
-    alliance_liability=0.10,
-    alliance_asset=0.10,
-    attitude_liability=0.10,
-    attitude_asset=0.10,
+    # SCD-WCS full re-authoring, Phase 2 Batch 1 (2026-08-24), staged
+    # Phase 5 (2026-08-25) -- prompts/scd-wcs-full-reauthoring-
+    # program.md. Full re-authoring, independent of built_to_fail for
+    # the first time -- this state's own text ("written record no
+    # longer matches what everyone privately knows", "documented
+    # cause", "managing one employee on paper and a different one in
+    # practice") is Authority-primary/Attitude-secondary, not the
+    # Aptitude-primary shape inherited wholesale from built_to_fail.
+    aptitude_liability=0.15,
+    aptitude_asset=0.15,
+    authority_liability=0.35,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.25,
+    attitude_asset=0.15,
 )
 STATE_PROFILES["the_paper_tiger"].descriptive_prose = "A performance problem has been managed verbally for long enough that the written record no longer matches what everyone privately knows. When the organization finally needs to act on documented cause, it discovers it has been managing one employee on paper and a different one in practice. The gap surfaces in front of the people with the least patience for it."
 
@@ -411,23 +419,22 @@ _reg(_profile(
     resolution_family="Development + Roadmap",
 ))
 STATE_PROFILES["invisible_performance_management"].dimensional_vector = DimensionalVector(
-    # Candidate C, SHIPPED 2026-08-23 (prompts/scd-wcs-remediation-
-    # tracker.md) -- authority_liability 0.25 -> 0.20. Real text (this
-    # state's own descriptive_prose) is a documentation/evidentiary-
-    # weight problem, not a decision-rights one; the light touch here
-    # reduces false-rank-1 against the_unexamined_algorithm's own
-    # profiles (59->43/175) without contaminating any other state's
-    # score, ripple-audited three separate times against the real
-    # calibration pipeline (Parts 2, 3, and the 2026-08-23
-    # re-evaluation), byte-identical every time.
-    aptitude_liability=0.45,
-    aptitude_asset=0.15,
-    authority_liability=0.20,
-    authority_asset=0.15,
-    alliance_liability=0.15,
-    alliance_asset=0.15,
+    # SCD-WCS full re-authoring, Phase 2 Batch 1 (2026-08-24), staged
+    # Phase 5 (2026-08-25) -- prompts/scd-wcs-full-reauthoring-
+    # program.md. Full axis flip, supersedes Candidate C: real text
+    # ("a manager's read... is accurate... a sound judgment") directly
+    # disclaims Aptitude as the liability -- the entire deficiency
+    # described is evidentiary/documentation weight (Authority).
+    # Dry-run confirmed clean (Phase 4c): false-rank-1 43 -> 0/175,
+    # zero new collision against the_founders_grip.
+    aptitude_liability=0.10,
+    aptitude_asset=0.10,
+    authority_liability=0.60,
+    authority_asset=0.10,
+    alliance_liability=0.10,
+    alliance_asset=0.10,
     attitude_liability=0.10,
-    attitude_asset=0.15,
+    attitude_asset=0.10,
 )
 STATE_PROFILES["invisible_performance_management"].descriptive_prose = "A manager's read on an underperforming employee is accurate but was never written down, so it carries no evidentiary weight when a decision needs defending. This isn't concealment. It's an absence of documentation that turns a sound judgment into an exposed one."
 
@@ -1077,11 +1084,21 @@ _reg(_profile(
     resolution_family="Development + Intervention",
 ))
 STATE_PROFILES["the_second_close"].dimensional_vector = DimensionalVector(
-    aptitude_liability=0.15,
+    # SCD-WCS full re-authoring, Phase 2 Batch 2 (2026-08-24), staged
+    # Phase 5 (2026-08-25) -- prompts/scd-wcs-full-reauthoring-
+    # program.md. Deliberate budget expansion (0.90 -> 1.05), this
+    # program's first: within-budget redistribution (SC-2, the
+    # original 3-state search) already tested insufficient. Aptitude
+    # secondary grounded in "whatever the first fix addressed, it
+    # wasn't the actual cause" -- a real diagnostic-failure claim, not
+    # incidental undertone. Alliance concentration raised toward (not
+    # to) built_to_fail's own HIGH-tier magnitude, reflecting this
+    # state's genuine dual-axis shape.
+    aptitude_liability=0.20,
     aptitude_asset=0.15,
     authority_liability=0.15,
     authority_asset=0.15,
-    alliance_liability=0.45,
+    alliance_liability=0.55,
     alliance_asset=0.15,
     attitude_liability=0.15,
     attitude_asset=0.15,
@@ -1100,11 +1117,20 @@ _reg(_profile(
     resolution_family="Development",
 ))
 STATE_PROFILES["silosolation"].dimensional_vector = DimensionalVector(
+    # SCD-WCS full re-authoring, Phase 2 Batch 2 (2026-08-24), staged
+    # Phase 5 (2026-08-25) -- prompts/scd-wcs-full-reauthoring-
+    # program.md. Ends the mechanical tier-template tie with
+    # the_second_close/the_arbitrary_standard (origin: commit 253b345,
+    # a global metadata-keyed tier pass, not a content decision -- see
+    # prompts/scd-wcs-silosolation-arbitrary-standard-origin-
+    # investigation.md). Vector now catches up to the salience, which
+    # already correctly identified Authority as real ("isn't hostile.
+    # It's structural").
     aptitude_liability=0.15,
     aptitude_asset=0.15,
-    authority_liability=0.15,
+    authority_liability=0.25,
     authority_asset=0.15,
-    alliance_liability=0.45,
+    alliance_liability=0.35,
     alliance_asset=0.15,
     attitude_liability=0.15,
     attitude_asset=0.15,
@@ -1148,11 +1174,22 @@ _reg(_profile(
     resolution_family="Intervention + Roadmap",
 ))
 STATE_PROFILES["the_arbitrary_standard"].dimensional_vector = DimensionalVector(
+    # SCD-WCS full re-authoring, Phase 2 Batch 2 (2026-08-24), staged
+    # Phase 5 (2026-08-25) -- prompts/scd-wcs-full-reauthoring-
+    # program.md. Genuine axis flip, mirrors silosolation on the same
+    # two axes with primacy reversed: this state's text is Authority-
+    # centered ("rules that govern", "before anyone in leadership
+    # does"), corroborated independently by its own asset_axes
+    # ("Accountability Architecture", not "Relational Trust") carried
+    # unchanged since the very first commit. Ends the mechanical tier-
+    # template tie -- see silosolation's block above and
+    # prompts/scd-wcs-silosolation-arbitrary-standard-origin-
+    # investigation.md.
     aptitude_liability=0.15,
     aptitude_asset=0.15,
-    authority_liability=0.15,
+    authority_liability=0.35,
     authority_asset=0.15,
-    alliance_liability=0.45,
+    alliance_liability=0.25,
     alliance_asset=0.15,
     attitude_liability=0.15,
     attitude_asset=0.15,
