@@ -41,6 +41,16 @@ const LAYER1_ADDITION =
 const TERMS_GUIDE_TITLE = "Terminology Guide";
 const TERMS_GUIDE_TRIGGER_TEXT = "What do these terms mean";
 
+// Part 2 content for the new per-chip hover/tap explanation (this session).
+// Family-level, not per-chip -- the OR/AND filter mechanic is identical
+// for every chip within a family, verified directly against the live
+// filter predicate below (dimMatch/sigMatch), not assumed from the header
+// comment alone.
+const DIMENSION_FILTER_MECHANIC =
+  "Selecting this shows every condition in this dimension. Selecting more than one dimension shows conditions in any of them. Combined with a signature, only conditions matching both apply.";
+const SIGNATURE_FILTER_MECHANIC =
+  "Selecting this shows every condition in this signature. Selecting more than one signature shows conditions in any of them. Combined with a dimension, only conditions matching both apply.";
+
 // Signatures have no existing locked copy source (unlike dimensions, which
 // reuse PUBLIC_DIMENSION_LABELS verbatim at render time below, not
 // duplicated here) -- this is genuinely first-pass content itself, keyed
@@ -103,6 +113,104 @@ function TermsGuideContent() {
           ))}
         </dl>
       </section>
+    </>
+  );
+}
+
+// Per-chip hover/tap explanation trigger (this session). Mirrors
+// ConstellationField.tsx's LiveField hoveredDimension/tappedDimension
+// event-handling shape exactly (guarded onMouseLeave/onBlur so only the
+// currently-active key clears, preventDefault() on Enter/Space to stop
+// the native synthetic click from also firing the mobile Drawer just
+// from keyboard tab-through) -- built in this page's own v3 tokens
+// (bg-field-raise/border-line/text-oxide-text/text-ink), not
+// ConstellationField's own un-migrated bg-white/text-charcoal/text-gray-500
+// classes. A separate sibling <button>, not nested inside the existing
+// filter-toggle <button> -- nested interactive elements are invalid HTML
+// and produce unreliable click targeting in real browsers. The filter
+// button's own onClick/aria-pressed logic is untouched by this addition.
+//
+// 44x44px minimum touch target (w-11 h-11) on the trigger itself, with a
+// negative margin so the larger invisible hit area doesn't visually push
+// chips apart -- the small circled "i" glyph inside is the only visible
+// affordance, same large-hit-area/small-visible-glyph technique
+// ConstellationField's own SVG hit-rects already use.
+//
+// Desktop popover is positioned relative to THIS chip's own wrapper, not
+// a single shared floating panel computed from fixed coordinates the way
+// ConstellationField's is -- book/toc's chips sit in a flex-wrap flow
+// layout with no fixed coordinate space to anchor against, so each chip
+// needs its own local anchor, same technique the terms-guide trigger
+// above already uses for its own single panel.
+interface ChipInfoTriggerProps {
+  chipLabel: string;
+  title: string;
+  description: string;
+  mechanic: string;
+  hovered: boolean;
+  tapped: boolean;
+  // Two separate callbacks, not one onHover(active: boolean) -- a single
+  // boolean callback can't replicate ConstellationField's guarded-clear
+  // (only clear if THIS key is still the active one), since the parent's
+  // setter needs to compare against whatever key is actually hovered at
+  // call time, not just receive true/false from whichever chip last
+  // fired. Each call site below supplies its own guarded closure.
+  onHoverEnter: () => void;
+  onHoverLeave: () => void;
+  onTap: () => void;
+}
+
+function ChipInfoTrigger({
+  chipLabel,
+  title,
+  description,
+  mechanic,
+  hovered,
+  tapped,
+  onHoverEnter,
+  onHoverLeave,
+  onTap,
+}: ChipInfoTriggerProps) {
+  return (
+    <>
+      <button
+        type="button"
+        aria-label={`What ${chipLabel} means and does`}
+        aria-expanded={hovered || tapped}
+        className="flex items-center justify-center w-11 h-11 -m-2.5 shrink-0 rounded-full text-oxide-text hover:text-ink transition-colors"
+        onMouseEnter={onHoverEnter}
+        onMouseLeave={onHoverLeave}
+        onFocus={onHoverEnter}
+        onBlur={onHoverLeave}
+        onClick={onTap}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            if (hovered) onHoverLeave();
+            else onHoverEnter();
+          }
+        }}
+      >
+        <span
+          aria-hidden="true"
+          className="flex items-center justify-center w-4 h-4 rounded-full border border-line text-[10px] font-semibold leading-none"
+        >
+          i
+        </span>
+      </button>
+
+      {hovered && (
+        <div
+          className="hidden md:block absolute z-10 top-full left-0 mt-1 w-64 rounded-md border border-line bg-field-raise p-3 shadow-lg pointer-events-none"
+          role="tooltip"
+        >
+          <p className="font-ui text-xs font-semibold text-ink mb-1">{title}</p>
+          <p className="font-ui text-[11px] text-oxide-text leading-relaxed mb-2">{description}</p>
+          <p className="font-ui text-[11px] text-oxide-text leading-relaxed border-t border-line pt-2">
+            {mechanic}
+          </p>
+        </div>
+      )}
     </>
   );
 }
@@ -230,6 +338,20 @@ export default function StatesTocPage() {
   const [termsHovered, setTermsHovered] = useState(false);
   const [termsTapped, setTermsTapped] = useState(false);
 
+  // Per-chip explanation state (this session) -- separate pairs per
+  // family, mirroring ConstellationField.tsx's hoveredDimension/
+  // tappedDimension shape (a single nullable key per family, not a
+  // boolean per chip) rather than the termsHovered/termsTapped pair
+  // above, which only ever gates one fixed panel. Kept separate from
+  // that pair and from each other -- same precedent as
+  // ConstellationField's own gestaltHovered/gestaltTapped being split
+  // from hoveredDimension/tappedDimension, not folded into one shared
+  // union type.
+  const [hoveredDimension, setHoveredDimension] = useState<StateDimension | null>(null);
+  const [tappedDimension, setTappedDimension] = useState<StateDimension | null>(null);
+  const [hoveredSignature, setHoveredSignature] = useState<string | null>(null);
+  const [tappedSignature, setTappedSignature] = useState<string | null>(null);
+
   function toggleDimension(dim: StateDimension) {
     setDimensionFilters((prev) => {
       const next = new Set(prev);
@@ -332,6 +454,76 @@ export default function StatesTocPage() {
         </Drawer.Portal>
       </Drawer.Root>
 
+      {/* Mobile per-chip explanation drawers (this session) -- two more
+          independent Drawer.Root instances, same pattern as the terms
+          guide's above, one shared per family rather than one per chip.
+          Opens only from an actual click/tap on a ChipInfoTrigger above,
+          never from hover or keyboard focus alone -- ChipInfoTrigger's
+          own onKeyDown only ever calls onHoverEnter/onHoverLeave, never
+          onTap, so a keyboard user tabbing through never opens either
+          Drawer. */}
+      <Drawer.Root
+        open={Boolean(tappedDimension)}
+        onOpenChange={(open) => {
+          if (!open) setTappedDimension(null);
+        }}
+      >
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/30 z-40 md:hidden" />
+          <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-field rounded-t-2xl max-h-[80vh] flex flex-col md:hidden">
+            <Drawer.Title className="sr-only">
+              {tappedDimension ? PUBLIC_DIMENSION_LABELS[tappedDimension].title : "Dimension detail"}
+            </Drawer.Title>
+            <div className="w-10 h-1 bg-line-strong rounded-full mx-auto mt-3 mb-2 shrink-0" />
+            {tappedDimension && (
+              <div className="overflow-y-auto p-4 pb-8">
+                <p className="font-ui text-sm font-semibold text-ink mb-1">
+                  {PUBLIC_DIMENSION_LABELS[tappedDimension].title}
+                </p>
+                <p className="font-ui text-sm text-oxide-text leading-relaxed mb-3">
+                  {PUBLIC_DIMENSION_LABELS[tappedDimension].description}
+                </p>
+                <p className="font-ui text-sm text-oxide-text leading-relaxed border-t border-line pt-3">
+                  {DIMENSION_FILTER_MECHANIC}
+                </p>
+              </div>
+            )}
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+
+      <Drawer.Root
+        open={Boolean(tappedSignature)}
+        onOpenChange={(open) => {
+          if (!open) setTappedSignature(null);
+        }}
+      >
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/30 z-40 md:hidden" />
+          <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-field rounded-t-2xl max-h-[80vh] flex flex-col md:hidden">
+            <Drawer.Title className="sr-only">
+              {tappedSignature
+                ? signatures.find((s) => s.id === tappedSignature)?.name ?? "Signature detail"
+                : "Signature detail"}
+            </Drawer.Title>
+            <div className="w-10 h-1 bg-line-strong rounded-full mx-auto mt-3 mb-2 shrink-0" />
+            {tappedSignature && (
+              <div className="overflow-y-auto p-4 pb-8">
+                <p className="font-ui text-sm font-semibold text-ink mb-1">
+                  {signatures.find((s) => s.id === tappedSignature)?.name}
+                </p>
+                <p className="font-ui text-sm text-oxide-text leading-relaxed mb-3">
+                  {SIGNATURE_DEFINITIONS[tappedSignature]}
+                </p>
+                <p className="font-ui text-sm text-oxide-text leading-relaxed border-t border-line pt-3">
+                  {SIGNATURE_FILTER_MECHANIC}
+                </p>
+              </div>
+            )}
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+
       <div className="mb-10 space-y-4">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-wide text-gray-400 mb-2">
@@ -339,18 +531,30 @@ export default function StatesTocPage() {
           </p>
           <div className="flex flex-wrap gap-2">
             {DIMENSION_ORDER.map((dim) => (
-              <button
-                key={dim}
-                onClick={() => toggleDimension(dim)}
-                aria-pressed={dimensionFilters.has(dim)}
-                className={`font-mono text-xs uppercase tracking-wide rounded-full px-3 py-1 border transition-colors ${
-                  dimensionFilters.has(dim)
-                    ? "border-ink bg-ink text-cta-text"
-                    : "border-line text-oxide-text hover:border-ink"
-                }`}
-              >
-                {dim}
-              </button>
+              <div key={dim} className="relative inline-flex items-center">
+                <button
+                  onClick={() => toggleDimension(dim)}
+                  aria-pressed={dimensionFilters.has(dim)}
+                  className={`font-mono text-xs uppercase tracking-wide rounded-full px-3 py-1 border transition-colors ${
+                    dimensionFilters.has(dim)
+                      ? "border-ink bg-ink text-cta-text"
+                      : "border-line text-oxide-text hover:border-ink"
+                  }`}
+                >
+                  {dim}
+                </button>
+                <ChipInfoTrigger
+                  chipLabel={dim}
+                  title={PUBLIC_DIMENSION_LABELS[dim].title}
+                  description={PUBLIC_DIMENSION_LABELS[dim].description}
+                  mechanic={DIMENSION_FILTER_MECHANIC}
+                  hovered={hoveredDimension === dim}
+                  tapped={tappedDimension === dim}
+                  onHoverEnter={() => setHoveredDimension(dim)}
+                  onHoverLeave={() => setHoveredDimension((cur) => (cur === dim ? null : cur))}
+                  onTap={() => setTappedDimension((cur) => (cur === dim ? null : dim))}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -361,18 +565,30 @@ export default function StatesTocPage() {
           </p>
           <div className="flex flex-wrap gap-2">
             {signatures.map((sig) => (
-              <button
-                key={sig.id}
-                onClick={() => toggleSignature(sig.id)}
-                aria-pressed={signatureFilters.has(sig.id)}
-                className={`font-mono text-xs uppercase tracking-wide rounded-full px-3 py-1 border transition-colors ${
-                  signatureFilters.has(sig.id)
-                    ? "border-slate bg-slate text-paper"
-                    : "border-line text-oxide-text hover:border-slate"
-                }`}
-              >
-                {sig.name}
-              </button>
+              <div key={sig.id} className="relative inline-flex items-center">
+                <button
+                  onClick={() => toggleSignature(sig.id)}
+                  aria-pressed={signatureFilters.has(sig.id)}
+                  className={`font-mono text-xs uppercase tracking-wide rounded-full px-3 py-1 border transition-colors ${
+                    signatureFilters.has(sig.id)
+                      ? "border-slate bg-slate text-paper"
+                      : "border-line text-oxide-text hover:border-slate"
+                  }`}
+                >
+                  {sig.name}
+                </button>
+                <ChipInfoTrigger
+                  chipLabel={sig.name}
+                  title={sig.name}
+                  description={SIGNATURE_DEFINITIONS[sig.id]}
+                  mechanic={SIGNATURE_FILTER_MECHANIC}
+                  hovered={hoveredSignature === sig.id}
+                  tapped={tappedSignature === sig.id}
+                  onHoverEnter={() => setHoveredSignature(sig.id)}
+                  onHoverLeave={() => setHoveredSignature((cur) => (cur === sig.id ? null : cur))}
+                  onTap={() => setTappedSignature((cur) => (cur === sig.id ? null : sig.id))}
+                />
+              </div>
             ))}
           </div>
         </div>
