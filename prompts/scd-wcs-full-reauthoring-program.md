@@ -348,3 +348,67 @@ Both fields of every liability/asset pair are kept at the identical weight (e.g.
 ## Not done yet (Phase 3)
 
 No dry-run testing (Phase 4) for any of the six states — none of these candidate salience profiles have been run against the live pipeline, individually or as a set. Nothing written to `engine/data/salience.py` or `engine/data/states.py`. `the_uninitiated` untouched, out of scope. Two derivations flagged above as landing on unchanged values (`built_to_fail`, `silosolation`) — both explained as considered outcomes, not unreflective reuse; Phase 4 should treat all six candidates with equal scrutiny regardless of which changed on paper.
+
+---
+
+## Phase 4 — Dry-Run Testing (all six candidates, simultaneous)
+
+Date: 2026-08-24. Full 175-profile sweep, all six candidate vectors + salience applied together in-memory (not sequentially), against a fresh baseline sweep of the current shipped values. Script and methodology: purpose-built harness reusing `tools/calibration_runner.py`'s own `_run_profile_core()`/`_build_suite_v23()`, cross-validated against the independently-authored `tools/_scdwcs_full_hierarchy_measurement.py` for the baseline numbers (see methodology note below). Nothing written to `engine/data/states.py` or `engine/data/salience.py` — in-memory mutation only, restored before exit.
+
+**A real bug was caught and fixed before any result below was trusted, per this program's own standing discipline.** The first pass of this dry run counted every profile's rank-1 winner as a "false-rank-1," including cases where a state correctly won its own dedicated profile — inflating `built_to_fail`'s baseline to 65/175 instead of the correct 62/175 (its own 3 legitimate profile wins, double-counted as false positives). Caught by cross-checking against the independently-authored `tools/_scdwcs_full_hierarchy_measurement.py`, which reproduced the previously-established 62/43/5 baseline exactly. Fixed (exclude `rank1 == target_state` from the false-rank-1 tally) and the full sweep re-run. All numbers below are post-fix.
+
+### 1. False-rank-1 delta, in-scope states
+
+| State | Before | After | Delta | Own profiles won |
+|---|---|---|---|---|
+| `invisible_performance_management` | 43 | **0** | **−43** | 0/3 → 0/3 |
+| `the_paper_tiger` | 0 | 2 | **+2** | 0/4 → 0/4 |
+| `built_to_fail` | 62 | **100** | **+38** | 3/3 → 3/3 |
+| `silosolation` | 0 | 1 | +1 | 0/3 → 0/3 |
+| `the_arbitrary_standard` | 0 | 0 | +0 | 0/3 → 0/3 |
+| `the_second_close` | 5 | 1 | **−4** | 0/3 → 0/3 |
+
+**2 of 6 improved (IPM sharply, `the_second_close` moderately), 1 flat (`the_arbitrary_standard`), 3 worsened (`the_paper_tiger`, `silosolation` slightly; `built_to_fail` severely — a 61% relative increase, the single largest false-rank-1 count recorded anywhere in this program's history for any state).**
+
+### 2. Drift on other states — named and explained, not aggregated
+
+8 of the ~52 out-of-scope states moved, all by ±1 or ±2:
+
+| State | Before → After | Plausible mechanism |
+|---|---|---|
+| `distributed_culture_fragmentation` | 0 → 1 | Alliance-axis state; `the_second_close`/`silosolation`/`the_arbitrary_standard`'s Alliance-field redistribution plausibly shifts adjacent Alliance signal. |
+| `planning_authority_gap` | 5 → 6 | Authority-axis state; three of the six candidates (IPM, `the_paper_tiger`, `the_arbitrary_standard`) moved onto or strengthened Authority this batch. |
+| `the_fracture` | 0 → 2 | Alliance-axis, already documented as adjacent to the rank-6 cluster; `the_second_close`'s sharper Alliance concentration (0.45→0.55) plausibly redirects some Alliance-adjacent signal here. |
+| `the_overloaded_manager` | 9 → 8 | Aptitude/Authority dual-axis; modest improvement plausibly from `built_to_fail`'s reduced Aptitude concentration freeing one profile. |
+| `the_undefined_role` | 3 → 4 | Aptitude-primary; plausibly affected by the same Aptitude-axis reshuffling as `built_to_fail`'s own expansion (see mechanism diagnostic below). |
+| `the_unexamined_algorithm` | 5 → 7 | Authority-primary, one of the four known non-0.90-sum states, already flagged this session for cross-cluster asymmetry; plausibly affected by the Authority-axis moves. |
+| `the_unformed_leader` | 8 → 7 | Aptitude/Attitude dual-axis; modest improvement, same direction as `the_overloaded_manager`. |
+| `the_uninitiated` | 19 → 18 | Rank-2 Authority cluster; modest improvement, plausibly from Authority-axis redistribution. `the_uninitiated` itself untouched, per standing instruction. |
+
+All eight moves are small (≤2 profiles) and directionally explicable as ripple from the batch's own axis reshuffling (three states added to or strengthened on Authority; Alliance redistributed within the rank-6 cluster). **No unexplained or large-magnitude drift found** — the drift itself is not what fires the fallback trigger; the in-scope regressions are (Section 1).
+
+### 3. IPM / `the_founders_grip` watch item — resolved clean
+
+`the_founders_grip`: 0 → 0. **No new collision.** IPM's axis flip to Authority-primary did not create any measurable overlap with `the_founders_grip`'s own HIGH-tier Authority vector in this sweep. The watch item flagged in Phase 3 does not materialize as a problem — noted for completeness, not a factor in the fallback trigger below.
+
+### 4. Full calibration suite
+
+**Before: 171/175. After: 168/175 — a 3-point regression.** Consistent with, and smaller in magnitude than, the false-rank-1 findings above (the suite's lenient cluster/prominence pass criteria absorb most of `built_to_fail`'s expansion, same documented gap this program has flagged every time it's measured both metrics together — the suite undercounts real rank-1 degradation, but here it still moved, unlike the 3-state search's candidates which held the suite flat at 171/175 while false-rank-1 still changed underneath).
+
+### Mechanism diagnostic — why `built_to_fail` grew so much, run to ground rather than left as a number
+
+**Not a narrow, single-axis effect.** `built_to_fail`'s 38 new false-rank-1 wins are NOT concentrated on former Aptitude-axis rivals (IPM, `the_paper_tiger` no longer compete there at all). The victim list spans every dimension: `the_wrong_reward` and `culture_drift` (Attitude, 3 each), `pay_exposure`, `the_unexamined_algorithm`, `compression_crisis` (Authority), `distributed_culture_fragmentation` (Alliance), `the_arbitrary_standard` (this batch's own Authority-primary candidate, now also a `built_to_fail` victim) — 15 different states lost at least one profile to `built_to_fail`, 41 profiles total.
+
+**Root cause, traced empirically rather than assumed: raising the floor, not lowering the primary, is what broadened `built_to_fail`'s footprint.** The candidate's intent was to *reduce* dominance by softening concentration (0.60→0.50 primary, 0.10→0.15 floor). But weighted cosine similarity's numerator is a dot product summed across **all eight fields** — raising the floor on Authority/Alliance/Attitude from 0.10 to 0.15 increases `built_to_fail`'s raw alignment with *any* profile carrying signal on those axes, not just Aptitude ones, while the denominator (the vector's own magnitude) grows more slowly (square-root scaling). The primary-field decrease reduced `built_to_fail`'s edge on genuinely Aptitude-heavy profiles as intended, but the floor increase — intended only as "don't introduce a fake secondary axis, just soften the shape" — turned out to be the dominant effect, and it works in the *opposite* direction from what the Phase 2 citation predicted. **This reverses this program's own working theory from Phase 2:** the risk wasn't sharper concentration on the primary field, it was raising the uniform floor. A future candidate, if this cluster is revisited, should treat these as two independently-tunable levers, not a single "soften the state" move — and the flag process that caught the original 0.60→0.70 error should have also caught this, since it's the same class of insufficiently-tested magnitude assumption.
+
+**Two new candidate-vs-candidate collisions, not visible until all six were tested together — the entire reason this phase specified testing the set, not sequentially.** `the_paper_tiger` (candidate: Authority 0.35/Attitude 0.25) and `the_arbitrary_standard` (candidate: Authority 0.35/Alliance 0.25) now share an identical Authority-primary magnitude, differing only in secondary axis — geometrically closer to each other than either was to anything else pre-batch. `the_paper_tiger`'s 2 new false wins are both against `hr_capture` (`AUT-HC-01`, `AUT-HC-02`), not `the_arbitrary_standard` directly, but the shared-magnitude proximity is a real, newly-introduced structural risk worth tracking if either candidate is revised. `silosolation` (Alliance 0.35/Authority 0.25) and `the_arbitrary_standard` (Authority 0.35/Alliance 0.25) are exact axis-mirrors of each other — `silosolation`'s 1 new false win is against `the_burned_credibility` (`ATT-BC-03`), not `the_arbitrary_standard` either, but the mirrored shape is the same category of newly-introduced proximity risk.
+
+**A residual finding independent of the fallback trigger, worth carrying forward regardless of what happens to this candidate set: neither IPM nor `the_paper_tiger` wins any of its own dedicated profiles even after the axis correction (0/3 and 0/4, both unchanged from baseline).** The re-authoring fixed the *textual* misalignment (Phase 1's whole premise) and dramatically cut IPM's false-rank-1 footprint (43→0), but did not yet achieve either state's most basic practical goal of winning its own profiles outright. Something beyond axis correction — likely magnitude, now that the axis itself is right — is still needed for these two specifically.
+
+---
+
+## FALLBACK TRIGGER FIRED — stopping per standing safeguard, nothing shipped
+
+Per this program's own condition (same safeguard the 3-state search used): **the trigger fires when an in-scope state's count fails to improve.** Three of six do here — `the_paper_tiger` (+2), `silosolation` (+1), and `built_to_fail` (+38, severe). `built_to_fail`'s regression alone — the largest false-rank-1 count measured anywhere in this program's history — is sufficient on its own to trigger a stop.
+
+**Nothing written to `engine/data/states.py` or `engine/data/salience.py`, as instructed regardless of outcome.** No candidate from this six-state set is safe to ship as authored. The clearest, most actionable finding is `built_to_fail`'s floor-increase mechanism (above) — this is a concrete, falsifiable lead for a revised candidate, not just a negative result: the fix likely needs to separate "lower the primary" from "raise the floor" and test each lever's contribution independently, rather than moving both simultaneously as Batch 1's candidate did. IPM's and `the_second_close`'s improvements are real and worth preserving in any revision. `the_arbitrary_standard`'s flat result and the two new candidate-vs-candidate proximity risks (`the_paper_tiger`/`the_arbitrary_standard`, `silosolation`/`the_arbitrary_standard`) are also worth weighing before any re-attempt. `the_uninitiated` untouched throughout. Awaiting Pete's direction — revise `built_to_fail`'s candidate specifically (isolating the floor-vs-primary levers) and re-test, revise more broadly, or pause this cluster.
