@@ -266,3 +266,85 @@ Date: 2026-08-24. `invisible_performance_management`, `the_paper_tiger`, `built_
 ## Not done yet (Batch 1)
 
 No salience derived (Phase 3). No dry-run testing (Phase 4). Nothing written to `engine/data/states.py`. `the_uninitiated` untouched, out of scope. `built_to_fail`'s direction corrected (concentration decrease, 0.60→0.50) per Pete's confirmation, after the withdrawn 0.60→0.70 candidate was flagged as backwards — the correction's own text above names and explains what was withdrawn and why, so the flag-and-correct sequence stays on record even though the original candidate's numbers were replaced, not struck through.
+
+---
+
+## Phase 3 — Joint Salience Derivation
+
+Date: 2026-08-24. All six candidate vectors from Batch 1 and Batch 2. No dry-run testing yet — that's Phase 4, run once against the full six-state set together. Salience derived fresh from each candidate's new vector shape, per instruction — not reused from current shipped salience, except where noted and explained below.
+
+**Conventions used — both already established in this taxonomy, no new pattern invented:**
+- **Standard flat (single-axis states):** dominant field 2.5/2.5 (liability/asset), all three others 0.4/0.4. Used taxonomy-wide for HIGH- and MEDIUM-tier single-axis states, including `built_to_fail`'s own current salience.
+- **Dual-elevated (genuine two-axis states):** primary field 2.5/2.5, secondary field 2.0/2.0, remaining two fields 0.4/0.4. This is `silosolation`'s and `the_arbitrary_standard`'s own already-shipped convention (commits `cf2abeb`, `e9a2750`) — reused here as an existing precedent for every other candidate that turned out dual-axis, not invented fresh per state. The 2.0 secondary weight itself was empirically margin-searched only once before (`the_arbitrary_standard`'s own shipped fix) — reused here as a reasonable starting point, not re-validated for the other three dual-axis candidates. **Phase 4 needs to confirm 2.0 is sufficient in each new case, same as every magnitude choice in this program.**
+
+Both fields of every liability/asset pair are kept at the identical weight (e.g. `aptitude_liability` and `aptitude_asset` always match) — this pairing is universal across every existing `SALIENCE_PROFILES` entry checked this session, and no Phase 2 candidate proposed differentiating a field's liability half from its asset half, so there's no basis to break the pattern here.
+
+### `invisible_performance_management` (IPM)
+
+**Candidate vector shape:** single-axis, Authority-primary (0.60/0.10 HIGH tier).
+
+**Current shipped salience:** standard flat, Aptitude-primary (2.5/2.5 aptitude, 0.4/0.4 elsewhere) — matched the *old* vector's axis, now stale.
+
+**New candidate:** standard flat, moved to the new primary — `authority_liability/asset 2.5/2.5`, `aptitude_liability/asset 0.4/0.4`, `alliance_liability/asset 0.4/0.4`, `attitude_liability/asset 0.4/0.4`.
+
+**Citation:** the candidate vector is single-axis with no secondary grounding (Phase 1, Phase 2), so the standard flat template applies directly — salience simply follows the vector's own axis flip, weighting the field that's now actually dominant. No compensating elevation proposed beyond the standard template; the vector correction itself (0.20→0.60 on Authority) is expected to carry the differentiation, consistent with how every other single-axis state in the taxonomy is weighted.
+
+**Watch item for Phase 4, not a flag against this derivation:** `the_founders_grip` is also HIGH-tier, Authority-primary (0.60/0.10), and was independently identified in the Session 17 retrospective as a secondary "sink" for Authority-heavy profiles. Standard flat salience doesn't address IPM/`the_founders_grip` overlap one way or the other — worth checking in Phase 4's drift comparison, not something Phase 3's salience choice should try to pre-solve without evidence.
+
+### `the_paper_tiger`
+
+**Candidate vector shape:** dual-axis, Authority-primary/Attitude-secondary (0.35/0.25 LOW/CLUSTER).
+
+**Current shipped salience:** individually reshaped to compensate for the *old*, wrong (Aptitude-primary, inherited) vector — attitude 1.5/1.5 (highest), authority 1.0/1.0, aptitude 1.0/1.0, alliance 0.4/0.4 (lowest). This shape exists specifically because the vector was wrong; now that the vector itself is being corrected, this salience is obsolete on its own terms, not just superseded by convention.
+
+**New candidate:** dual-elevated, matched to the new vector — `authority_liability/asset 2.5/2.5` (primary), `attitude_liability/asset 2.0/2.0` (secondary), `aptitude_liability/asset 0.4/0.4`, `alliance_liability/asset 0.4/0.4`.
+
+**Citation:** matches the candidate vector's own primary/secondary split exactly (Authority > Attitude), using the dual-elevated convention already established for `silosolation`/`the_arbitrary_standard`. This is a genuinely new derivation, not a reuse — none of the four current shipped weights survive unchanged (aptitude drops from 1.0 to 0.4, authority rises from 1.0 to 2.5, alliance stays lowest but the relative gap changes, attitude drops from the current highest position 1.5 to 2.0's secondary position). The old salience's job (compensating for a bad vector) no longer exists once the vector itself is fixed.
+
+### `built_to_fail`
+
+**Candidate vector shape:** single-axis, Aptitude-primary, decreased concentration (0.50/0.15).
+
+**Current shipped salience:** standard flat, Aptitude-primary (2.5/2.5 aptitude, 0.4/0.4 elsewhere) — unmodified since this state's original tier assignment.
+
+**New candidate: unchanged — standard flat, same field.** `aptitude_liability/asset 2.5/2.5`, all three others `0.4/0.4`.
+
+**Flagged explicitly, per instruction — this is a considered derivation that lands on the same value as today, not a lazy reuse:** the axis hasn't changed (still Aptitude, still single-axis, per Phase 1's third confirmation of zero secondary-axis grounding), so the standard flat template still applies mechanically. **The real question is whether salience should be elevated beyond the flat template to compensate for the vector's own reduced magnitude (0.60→0.50) — and the answer here is deliberately no.** Elevating salience to compensate would partially undo the vector correction through a different mechanism, working directly against the goal Pete confirmed last turn (reduce `built_to_fail`'s false-rank-1 count by reducing its geometric reach, not preserve its old reach through a different lever). Salience and vector magnitude both contribute to a state's effective dominance in the weighted cosine formula; using one to backfill what the other was deliberately reduced to achieve would be self-defeating. **Kept at the standard, unelevated flat template on purpose.**
+
+### `silosolation`
+
+**Candidate vector shape:** dual-axis, Alliance-primary/Authority-secondary (0.35/0.25 LOW/CLUSTER).
+
+**Current shipped salience:** Alliance 2.5/2.5 (primary), Authority 2.0/2.0 (secondary), Aptitude/Attitude 0.4/0.4 — already dual-elevated, shipped in commit `cf2abeb`.
+
+**New candidate: identical to current shipped salience.** `alliance_liability/asset 2.5/2.5`, `authority_liability/asset 2.0/2.0`, `aptitude_liability/asset 0.4/0.4`, `attitude_liability/asset 0.4/0.4`.
+
+**Flagged explicitly, per instruction — this is not a reuse in violation of the "derive fresh" instruction, it's the expected outcome of the vector correction's own design.** Batch 2's `silosolation` candidate was authored specifically to make the vector "catch up" to a salience that was already correctly diagnosing Authority as real (see Batch 2 above) — the salience was never the broken half of this pair, the vector was. Re-deriving salience fresh from the new vector's shape via the dual-elevated convention necessarily produces the same weights that already exist, because the new vector's shape (Alliance-primary/Authority-secondary) is exactly what the existing salience was already built for. Confirming this independently (rather than assuming it) is the point of doing the derivation at all — it is a coincidence in *outcome*, not in *method*.
+
+**One real change worth naming:** this salience's role shifts. Previously documented as "honest partial fix, tie-break-only" (`cf2abeb`'s own comment) because it was compensating for a vector `silosolation` shared with two other states. Now that the vector itself is genuinely distinct (Batch 2), salience is doing its normal job — weighting an already-differentiated shape — not emergency tie-breaking. The numbers are unchanged; what they're accomplishing is not.
+
+### `the_arbitrary_standard`
+
+**Candidate vector shape:** dual-axis, Authority-primary/Alliance-secondary (0.35/0.25 LOW/CLUSTER) — the mirror of `silosolation`'s shape, axes swapped.
+
+**Current shipped salience:** Authority 2.0/2.0 (secondary-weighted today), Alliance 2.5/2.5 (primary-weighted today) — shipped in commit `e9a2750`, matched to the *old* shared Alliance-primary vector.
+
+**New candidate:** the weights flip to match the new vector's own axis flip — `authority_liability/asset 2.5/2.5` (now primary), `alliance_liability/asset 2.0/2.0` (now secondary), `aptitude_liability/asset 0.4/0.4`, `attitude_liability/asset 0.4/0.4`.
+
+**Citation:** a genuine, substantive change, not a reuse — the field carrying 2.5 and the field carrying 2.0 swap outright, matching the origin investigation's own finding (this program's prior work) that `the_arbitrary_standard`'s text is more purely Authority-centered than `silosolation`'s, and the Batch 2 vector candidate's own axis flip (Authority now primary in the vector, not just a same-cluster secondary). Salience now matches vector shape for the first time since this state's original tier assignment — every prior version of this state's salience was compensating for a vector it didn't actually match (first the shared flat template, then the partial Authority-secondary fix against an unchanged Alliance-primary vector).
+
+### `the_second_close`
+
+**Candidate vector shape:** dual-axis, Alliance-primary (increased to 0.55, budget-expanded) / Aptitude-secondary (0.20, new).
+
+**Current shipped salience:** standard flat, Alliance-primary (2.5/2.5 alliance, 0.4/0.4 elsewhere) — never individually touched before this program.
+
+**New candidate:** dual-elevated — `alliance_liability/asset 2.5/2.5` (unchanged, still primary), `aptitude_liability/asset 0.4 → 2.0/2.0` (new secondary), `authority_liability/asset 0.4/0.4` (unchanged), `attitude_liability/asset 0.4/0.4` (unchanged).
+
+**Citation:** matches the vector's own new shape — Alliance stays dominant (unchanged weight, since the vector's own primary field increased but the axis itself didn't move), Aptitude gets the same 2.0 secondary elevation used for the other three dual-axis candidates, grounded in Phase 1's formalized misdiagnosis-signal finding (sentence 3, "wasn't the actual cause") now that the vector itself carries a real, non-floor Aptitude value to weight. No flag here — unlike `built_to_fail`, this state's vector change was a deliberate *increase* in both primary magnitude and secondary presence, both aimed at the same goal (closing the gap against `built_to_fail`), so elevating the matching salience field works with the vector correction's intent rather than against it.
+
+---
+
+## Not done yet (Phase 3)
+
+No dry-run testing (Phase 4) for any of the six states — none of these candidate salience profiles have been run against the live pipeline, individually or as a set. Nothing written to `engine/data/salience.py` or `engine/data/states.py`. `the_uninitiated` untouched, out of scope. Two derivations flagged above as landing on unchanged values (`built_to_fail`, `silosolation`) — both explained as considered outcomes, not unreflective reuse; Phase 4 should treat all six candidates with equal scrutiny regardless of which changed on paper.
