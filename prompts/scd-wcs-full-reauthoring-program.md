@@ -534,3 +534,17 @@ Date: 2026-08-25.
 **`built_to_fail` is documented as a known structural boundary of the current metric, not a solved or actively-searched problem.** No further candidate vector search is planned for this state under this program unless new textual grounding or a new lever is identified.
 
 **The five other candidates — IPM, `the_paper_tiger`, `silosolation`, `the_arbitrary_standard`, `the_second_close` — remain unaffected by this entry and are not re-opened by it.** Their own status (Phase 4/4c results, the unresolved own-profile-win gap for IPM/`the_paper_tiger`, the `the_paper_tiger`/`the_arbitrary_standard` proximity watch item) stands exactly as recorded above, independent of `built_to_fail`'s closure.
+
+---
+
+## Phase 5 — Shipped
+
+Date: 2026-08-25. **Commit `f88a7c2`.** Explicit go-ahead given after staged-and-verified per the standing safeguard (staging, dry-run, and final pre-ship check all reported before any commit).
+
+`invisible_performance_management`, `the_paper_tiger`, `silosolation`, `the_arbitrary_standard`, `the_second_close` shipped to `engine/data/states.py` (`dimensional_vector`, all five) and `engine/data/salience.py` (`SALIENCE_PROFILES`, four of five — `silosolation`'s salience was already correct and untouched, per Phase 3's finding). Applied via `tools/patch_scdwcs_phase5_five_candidate_ship.py`, dry-run reviewed before write. **`built_to_fail` explicitly out of scope, unchanged, still at its shipped 0.60/0.10 HIGH-tier values.**
+
+**Patch script left untracked in git, not committed alongside.** Checked directly before deciding: every prior single-candidate SCD-WCS patch script in `tools/` (`patch_scdwcs_candidateC_ship.py`, the rank-5/6/7/8 salience pilots, the paper_shield/`the_unsolved_problem` re-clustering scripts) is untracked — the sole exception is the large, foundational Session 17 taxonomy-wide tier-standardization script, committed once as part of a much bigger structural change. This program's own `prompts/scd-wcs-full-reauthoring-program.md` is already the complete, citation-by-citation record of every value and every reason — more complete than the patch script itself would be as documentation. Consistent with the stronger, more specific, more recent precedent rather than the older, larger-scope exception.
+
+**Final pre-ship check, against the exact staged files (not a re-derivation) — identical to Phase 4c across every state checked:** IPM 43→0, `the_second_close` 5→1, `the_arbitrary_standard` 0→0, `silosolation` 0→1, `the_paper_tiger` 0→2, `built_to_fail` (untouched, side-effect only) 62→80, all eight other named drift states matched exactly, suite 166/175, zero new IPM/`the_founders_grip` collision. One process note: the first comparison pass flagged a false mismatch (four states — `culture_drift`, `identity_erosion`, `planning_authority_gap`, `the_unexamined_algorithm` — came back nonzero against an incomplete expected-values list); resolved by reverting the two engine files to HEAD temporarily (backed up first, `web/content/book/methodology/hr-capture.md`'s unrelated pre-existing edit left untouched throughout), confirming the true baseline for all four was unchanged, then restoring and re-verifying the staged files. 45/45 vitest passing — no web-layer regression, as expected for a Python-only data change.
+
+**Program status: the five-candidate cluster is shipped. `built_to_fail` remains a documented, halted structural boundary, not part of this ship.** `the_uninitiated` untouched throughout the entire program, per standing instruction.
