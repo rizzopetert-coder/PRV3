@@ -139,3 +139,65 @@ Two states (`built_to_fail`, `silosolation`'s Alliance-primacy) have vectors tha
 - **`silosolation`** / **`the_arbitrary_standard`** — correct dominant axis (Alliance for silosolation; arguably Authority for the_arbitrary_standard), correct secondary axis identified (Authority) but encoded only in salience, already empirically shown insufficient; the two states' texts also argue for distinguishing them from each other, not just from `the_second_close`.
 
 No candidate vectors proposed here, per instruction. This is the input Phase 2 works from.
+
+---
+
+## Decision — `silosolation` / `the_arbitrary_standard` Differentiation (Pete, 2026-08-24)
+
+**Decision: differentiate `silosolation` and `the_arbitrary_standard` fully — author two distinct vectors, ending the tie.** Full fact-finding behind this decision: `prompts/scd-wcs-silosolation-arbitrary-standard-origin-investigation.md`.
+
+**Rationale:**
+1. The shared vector originated as a mechanical artifact of a global template-mapping pass (commit `253b345`, "Session 17: tier standardization") that assigned both states the identical `(0.15,0.15,0.15,0.15,0.45,0.15,0.15,0.15)` vector purely because they shared `(primary_dimension="Alliance", signal_weight="medium")` metadata — not a content decision that these two states represent the same real-world pattern.
+2. Every prior mention of the tie, across 14 `prompts/` files and both salience-fix commits (`cf2abeb`, `e9a2750`), treats it as a problem to close — never as intentional design.
+3. The two texts describe genuinely different organizational patterns: `silosolation` is horizontal, team-to-team information/coordination failure; `the_arbitrary_standard` is vertical, individual-to-rule fairness and leadership-visibility failure.
+4. No calibration profile has ever tested the two states against each other — all 6 dedicated profiles describe disjoint real-world scenarios with fully disjoint companion-state sets, so the tie has been invisible rather than validated by any test.
+
+**Note on program sequencing:** no "Phase 2 — Batch 1" section exists yet in this file — the `built_to_fail`/`the_paper_tiger`/IPM candidate-authoring pass has not been executed under this program. "Batch 2" numbering here follows Pete's own framing of this dispatch and reflects that `the_second_close` was originally grouped with that cluster in the 2026-08-24 constrained search, then held back from any full-re-authoring candidate work pending this origin investigation. It does not imply Batch 1 is complete — flagged here so the numbering isn't misread later as a completed step.
+
+---
+
+## Phase 2 — Candidate Vectors (Batch 2)
+
+Date: 2026-08-24. `silosolation`, `the_arbitrary_standard`, `the_second_close`. Candidate `dimensional_vector` values only — no salience derivation (Phase 3, done jointly once all three are set), no dry-run testing (Phase 4). Every value below cites the specific text supporting it; magnitude choices are flagged as provisional pending Phase 4's empirical confirmation, consistent with this program's own standing discipline that a candidate is a starting hypothesis, not a shipped value.
+
+### `silosolation`
+
+**Current:** alliance_liability 0.45 (dominant) / aptitude, authority, attitude all 0.15 (floor) — the shared Cluster-B template.
+
+**Candidate:** `alliance_liability 0.35` (primary, down from 0.45) / `authority_liability 0.25` (new secondary, up from 0.15 floor) / `aptitude_liability 0.15` (unchanged) / `attitude_liability 0.15` (unchanged). All asset fields unchanged at 0.15. Liability sum: 0.90 (unchanged, within-budget redistribution — no magnitude case found for expanding this state's total).
+
+**Citation:** Alliance stays dominant — three separate clauses carry it: "Teams that need each other's information to do their jobs well," "operating as if they don't," "the same friction hostility would [produce]." Authority becomes a real secondary, not floor noise — the text's own pivot sentence exists specifically to redirect the causal explanation away from a relational reading: *"The isolation isn't hostile. It's structural"* is a direct authorial move stating the mechanism is organizational/governance-structural, not interpersonal. "Each optimizing for its own metrics without visibility into how that affects anyone else" reinforces this — metrics and visibility are accountability-structure concerns, matching this taxonomy's own established Authority vocabulary (see `planning_authority_gap`'s parallel "Operational & Structural" framing, already cited as precedent for this state's existing salience choice). Aptitude and Attitude stay at floor — no textual grounding for either; Attitude is in fact explicitly disclaimed ("isn't hostile" rules out a motivation-based reading).
+
+**Directly answers the framing question:** this candidate makes the vector catch up to the existing salience (Authority already at 2.0, dual-elevated with Alliance's 2.5) rather than the reverse — the salience was already correctly diagnosing Authority as real; the vector previously had nothing there for it to weight.
+
+**Magnitude note:** 0.35/0.25 matches this taxonomy's own existing "real dual-axis" convention (the LOW/CLUSTER tier, used by 15 other states for exactly this shape — a genuine primary + genuine secondary, both text-grounded). Chosen for consistency with existing precedent rather than an arbitrary new split; Phase 4 should confirm this magnitude is sufficient to break the tie and win `silosolation`'s own dedicated profiles, not assumed.
+
+### `the_arbitrary_standard`
+
+**Current:** alliance_liability 0.45 (dominant) / aptitude, authority, attitude all 0.15 (floor) — same shared template as `silosolation`.
+
+**Candidate:** `authority_liability 0.35` (new primary — axis flip, up from 0.15 floor) / `alliance_liability 0.25` (retained secondary, down from 0.45) / `aptitude_liability 0.15` (unchanged) / `attitude_liability 0.15` (unchanged). All asset fields unchanged at 0.15. Liability sum: 0.90.
+
+**Citation:** this is a genuine axis flip, not a same-cluster secondary addition, because the text's center of gravity is Authority, not Alliance. Four of the state's textual elements are governance/rule-enforcement content: "The rules that govern who gets what treatment," "aren't applied consistently," "the pattern of who benefits isn't accidental," and — the clearest single marker — "People notice the inconsistency well before anyone in leadership does," a direct leadership-visibility/governance-awareness gap claim. Alliance is retained as a real secondary, not eliminated, because "who gets what treatment" and "who benefits" do describe a genuine differential impact on people, distinguishing this state from a pure process-compliance story. "Even if nobody designed it on purpose" disclaims Attitude, same disclaiming pattern as `silosolation`'s "isn't hostile" — both floor.
+
+**Independent corroborating evidence, not derived from the prose itself:** this state's `asset_axes` — `["Governance Discipline", "Accountability Architecture"]` — have carried an Authority-flavored pairing since the very first commit (`c79179b`), untouched by any tier-standardization pass. `silosolation`'s asset pairing is `["Governance Discipline", "Relational Trust"]` — explicitly relational. The two states were never given matching asset-axis metadata even when their liability vectors were made identical, which independently supports treating `the_arbitrary_standard` as Authority-primary and `silosolation` as Alliance-primary/Authority-secondary, not the same shape with different labels.
+
+**Resulting differentiation from `silosolation`:** both states now involve the same two dimensions (Alliance, Authority) but with primacy reversed — `silosolation` 0.35 Alliance / 0.25 Authority, `the_arbitrary_standard` 0.35 Authority / 0.25 Alliance. A mirrored, text-grounded distinction rather than an arbitrary numeric split.
+
+### `the_second_close`
+
+**Current:** alliance_liability 0.45 (dominant) / aptitude, authority, attitude all 0.15 (floor).
+
+**Candidate:** `alliance_liability 0.55` (concentration increase, up from 0.45) / `aptitude_liability 0.20` (new secondary, up from 0.15 floor) / `authority_liability 0.15` (unchanged) / `attitude_liability 0.15` (unchanged). All asset fields unchanged at 0.15. Liability sum: **1.05 — a deliberate budget expansion, this program's first use of lever (a)** (Section 1a), not a within-0.90 redistribution.
+
+**Citation for the Aptitude secondary:** formalized in Phase 1 — sentence 3, *"Whatever the first fix addressed, it wasn't the actual cause,"* is a direct, unhedged diagnostic-failure claim, not incidental undertone. It is the narrative's causal engine: the relationship is failing a second time specifically *because* the underlying diagnostic work was wrong the first time. Alliance (S1, "renegotiated once already"; S4, "less willing to extend trust a second time") remains the dominant frame — the state is still fundamentally about a relationship under strain — but Aptitude is the stated mechanism, not a side remark, and belongs off the floor.
+
+**Citation and rationale for the budget expansion (not just redistribution):** this program's own prior empirical work already tested a within-budget dual-axis move for this exact state and found it insufficient. `SC-2` (the 2026-08-24 3-state search) tested alliance 0.45→0.35 / aptitude 0.15→0.25 — functionally the same LOW/CLUSTER-convention shape now proposed for `silosolation` above — and found `the_second_close`'s own-profile rank moved only 10→8, still losing badly to `built_to_fail` (own_score 0.703→0.721, a 0.157-point gap barely dented). Section 4 of the scoping document already diagnosed why: `the_second_close`'s dominant field (0.45) is structurally *diffuse* relative to `built_to_fail`'s sharp 0.60 concentration, and weighted cosine similarity rewards concentration — no amount of within-budget redistribution can close a gap that is fundamentally about peak sharpness, not axis choice. The scoping document's own Section 5 question 1 flagged this directly: raising the total budget, not just reallocating it, is the one untested lever for this state. **0.55 is chosen as a middle position, not `built_to_fail`'s full 0.60**, because `the_second_close` is genuinely dual-axis (per the Aptitude finding above) rather than single-axis like `built_to_fail` — a real secondary claims some of the budget increase rather than all of it going to sharpen Alliance alone. For reference, this taxonomy's own HIGH tier (single-axis, 0.60/0.10) is used by other pure Alliance-primary states (`the_fracture`, `decision_blindness`); 0.55 sits deliberately just under that ceiling to reflect this state's real secondary content, not at the ceiling itself.
+
+**Flagged explicitly: this is the first candidate in this program that changes a state's total liability budget, not just its allocation.** Phase 4 needs to confirm this actually improves `the_second_close`'s own-profile standing without disproportionate drift elsewhere — a budget expansion is a larger structural move than anything tested in the 3-state search, and untested at this magnitude.
+
+---
+
+## Not done yet (Batch 2)
+
+No salience derived for any of the three states (Phase 3). No dry-run testing (Phase 4) — none of these candidates have been run against the live pipeline. Nothing written to `engine/data/states.py`. `the_uninitiated` untouched, out of scope. Batch 1 (`built_to_fail`/`the_paper_tiger`/IPM) not started.
