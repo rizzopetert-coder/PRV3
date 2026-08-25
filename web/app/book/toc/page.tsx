@@ -70,15 +70,15 @@ function TermsGuideContent() {
       <section aria-labelledby="terms-guide-dimensions">
         <h3
           id="terms-guide-dimensions"
-          className="font-ui text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-2"
+          className="font-ui text-[11px] font-semibold uppercase tracking-wide text-oxide-text mb-2"
         >
           Dimensions
         </h3>
         <dl className="space-y-2 mb-4">
           {DIMENSION_ORDER.map((dim) => (
             <div key={dim}>
-              <dt className="font-ui text-xs font-semibold text-charcoal capitalize">{dim}</dt>
-              <dd className="font-ui text-[11px] text-gray-500 leading-relaxed">
+              <dt className="font-ui text-xs font-semibold text-oxide-text capitalize">{dim}</dt>
+              <dd className="font-ui text-[11px] text-oxide-text leading-relaxed">
                 {PUBLIC_DIMENSION_LABELS[dim].description}
               </dd>
             </div>
@@ -88,15 +88,15 @@ function TermsGuideContent() {
       <section aria-labelledby="terms-guide-signatures">
         <h3
           id="terms-guide-signatures"
-          className="font-ui text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-2"
+          className="font-ui text-[11px] font-semibold uppercase tracking-wide text-oxide-text mb-2"
         >
           Signatures
         </h3>
         <dl className="space-y-2">
           {signatures.map((sig) => (
             <div key={sig.id}>
-              <dt className="font-ui text-xs font-semibold text-charcoal">{sig.name}</dt>
-              <dd className="font-ui text-[11px] text-gray-500 leading-relaxed">
+              <dt className="font-ui text-xs font-semibold text-oxide-text">{sig.name}</dt>
+              <dd className="font-ui text-[11px] text-oxide-text leading-relaxed">
                 {SIGNATURE_DEFINITIONS[sig.id]}
               </dd>
             </div>
@@ -155,7 +155,7 @@ const MEDIA_LINKS = computeMediaLinks();
 function ResolutionFamilyBadge({ resolutionFamily }: { resolutionFamily: string }) {
   const parts = resolutionFamily.split(" + ").map((p) => p.trim());
   return (
-    <p className="font-ui text-xs text-gray-500">
+    <p className="font-ui text-xs text-oxide-text">
       {parts.map((part, i) => {
         const anchor = RESOLUTION_FAMILY_ANCHORS[part];
         const label = translateResolutionFamily(part);
@@ -183,10 +183,10 @@ function StateCard({ entry }: { entry: BookStateEntry }) {
   return (
     <div
       id={stateIdToSlug(entry.id)}
-      className="rounded-xl border border-gray-200 bg-white p-5 flex flex-col gap-3"
+      className="rounded-xl border border-line bg-field p-5 flex flex-col gap-3"
     >
       <div className="flex flex-wrap gap-1.5">
-        <span className="font-mono text-[10px] uppercase tracking-wide text-gray-400 border border-gray-200 rounded-full px-2 py-0.5">
+        <span className="font-mono text-[10px] uppercase tracking-wide text-oxide-text border border-line rounded-full px-2 py-0.5">
           {entry.dimension}
         </span>
         {memberships.map((sigId) => {
@@ -203,13 +203,13 @@ function StateCard({ entry }: { entry: BookStateEntry }) {
         })}
       </div>
 
-      <h3 className="font-display text-lg text-charcoal">{entry.name}</h3>
-      <p className="font-ui text-sm text-gray-500 leading-relaxed">{entry.descriptiveProse}</p>
+      <h3 className="font-display text-lg text-oxide-text">{entry.name}</h3>
+      <p className="font-ui text-sm text-oxide-text leading-relaxed">{entry.descriptiveProse}</p>
 
       <ResolutionFamilyBadge resolutionFamily={entry.resolutionFamily} />
 
       {media && (
-        <Link href={media.href} className="font-ui text-sm text-charcoal underline hover:no-underline">
+        <Link href={media.href} className="font-ui text-sm text-oxide-text underline hover:no-underline">
           {media.label} →
         </Link>
       )}
@@ -306,7 +306,7 @@ export default function StatesTocPage() {
 
         {termsHovered && (
           <div
-            className="hidden md:block absolute z-10 top-full left-0 w-80 max-h-96 overflow-y-auto rounded-md border border-gray-200 bg-white p-4 shadow-lg"
+            className="hidden md:block absolute z-10 top-full left-0 w-80 max-h-96 overflow-y-auto rounded-md border border-line bg-field p-4 shadow-lg"
             onMouseLeave={() => setTermsHovered(false)}
           >
             <TermsGuideContent />
@@ -321,11 +321,11 @@ export default function StatesTocPage() {
       <Drawer.Root open={termsTapped} onOpenChange={setTermsTapped}>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/30 z-40 md:hidden" />
-          <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl max-h-[80vh] flex flex-col md:hidden">
+          <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-field rounded-t-2xl max-h-[80vh] flex flex-col md:hidden">
             <Drawer.Title className="sr-only">{TERMS_GUIDE_TITLE}</Drawer.Title>
-            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-3 mb-2 shrink-0" />
+            <div className="w-10 h-1 bg-line-strong rounded-full mx-auto mt-3 mb-2 shrink-0" />
             <div className="overflow-y-auto p-4 pb-8">
-              <p className="font-ui text-sm font-semibold text-charcoal mb-3">{TERMS_GUIDE_TITLE}</p>
+              <p className="font-ui text-sm font-semibold text-oxide-text mb-3">{TERMS_GUIDE_TITLE}</p>
               <TermsGuideContent />
             </div>
           </Drawer.Content>
@@ -345,8 +345,8 @@ export default function StatesTocPage() {
                 aria-pressed={dimensionFilters.has(dim)}
                 className={`font-mono text-xs uppercase tracking-wide rounded-full px-3 py-1 border transition-colors ${
                   dimensionFilters.has(dim)
-                    ? "border-charcoal bg-charcoal text-paper"
-                    : "border-gray-300 text-gray-600 hover:border-charcoal"
+                    ? "border-ink bg-ink text-cta-text"
+                    : "border-line text-oxide-text hover:border-ink"
                 }`}
               >
                 {dim}
@@ -368,7 +368,7 @@ export default function StatesTocPage() {
                 className={`font-mono text-xs uppercase tracking-wide rounded-full px-3 py-1 border transition-colors ${
                   signatureFilters.has(sig.id)
                     ? "border-slate bg-slate text-paper"
-                    : "border-gray-300 text-gray-600 hover:border-slate"
+                    : "border-line text-oxide-text hover:border-slate"
                 }`}
               >
                 {sig.name}
