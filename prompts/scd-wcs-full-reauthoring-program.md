@@ -201,3 +201,68 @@ Date: 2026-08-24. `silosolation`, `the_arbitrary_standard`, `the_second_close`. 
 ## Not done yet (Batch 2)
 
 No salience derived for any of the three states (Phase 3). No dry-run testing (Phase 4) — none of these candidates have been run against the live pipeline. Nothing written to `engine/data/states.py`. `the_uninitiated` untouched, out of scope. Batch 1 (`built_to_fail`/`the_paper_tiger`/IPM) not started.
+
+---
+
+## Verification — does anything in the scoring engine assume a fixed/capped vector sum?
+
+Date: 2026-08-24. Requested before `the_second_close`'s Batch 2 candidate (liability sum 1.05, vs. the 0.90 convention 54/58 states follow) proceeds any further. **No changes made — read-only verification.**
+
+**Answer: No.** Nothing in `rank_states()`, the salience-pairing logic, or SCD-WCS's normalization math assumes, requires, or is calibrated against a fixed state-vector total. Checked exhaustively, not just at the formula level:
+
+1. **`rank_states()` / `_weighted_cosine_similarity` (`engine/accumulation.py:524-593`).** A state's `dimensional_vector` is read in exactly one place in the entire engine — line 573, `profile_dict = profile.dimensional_vector.as_dict()` — and used directly as `vec_B` in the weighted cosine formula: `sim = sum(w*A*B) / (sqrt(sum(w*A^2)) * sqrt(sum(w*B^2)))`. The denominator's `sqrt(sum(w * vec_B ** 2))` term computes each state's own magnitude fresh, per state, from whatever values it actually holds — there is no external normalization constant, no division by an assumed total, no reference to 0.90 or any other fixed budget anywhere in the function. This is also *why* the earlier scale-invariance test held empirically (uniformly scaling `the_second_close`'s vector by ×1.3 left its score unchanged) — the formula is self-normalizing per-vector by construction, not because of an assumed fixed sum.
+2. **Salience-pairing (`SALIENCE_PROFILES` → `rank_states()`'s `salience_weights` parameter).** Consumed as a flat per-field multiplier dict (`w = np.array([sw.get(f, 1.0) ...])`), applied identically to both the numerator cross-term and both halves of the denominator. No sum-based logic, no dependency on the paired state's vector total.
+3. **`engine/contract.py`'s `_compute_asset_score()` / `_compute_liability_score()`.** These do divide by a total (`total_liability / total_all`), but operate on the **session's** `accumulated_vector`, never on a state's `dimensional_vector` — confirmed via the same grep: `dimensional_vector` appears in exactly one file (`accumulation.py`, the `rank_states()` line above) across the entire live engine, outside of `engine/data/states.py` itself.
+4. **`compute_liability_dispersion()` / `compute_cascade_risk()` (`engine/accumulation.py:355-438`).** Same distinction — entropy/dispersion math operates on the session's `accumulated_vector`, not any state's profile vector.
+5. **Retired floor-multiplier system (`engine/output.py:34-36, 172-186`, `SIGNAL_FLOOR_MULTIPLIER_*`, `SIGNAL_FLOOR_CEILING`).** Explicitly marked "RETIRED v21" in-line. Confirmed dead: `grep` for `compute_floor`/`SIGNAL_FLOOR`/`floors[` across `engine/*.py` returns zero call sites outside `output.py`'s own retired block. Not part of the live `rank_states()` path (which is v21+, SCD-WCS).
+6. **`DimensionalVector` dataclass and `_profile()`/`_reg()` (`engine/data/states.py`).** No `assert`, validation, or normalization step anywhere in the class or its construction helpers checking a field sum. `engine/data/validate.py`'s only vector-related check is whether a state is still at the uncalibrated `BASELINE_VALUE` placeholder (0.25 across all fields) — a "has this been calibrated yet" check, unrelated to budget totals.
+
+**Existing production evidence corroborating this, not just code-reading:** 4 of the 58 states already ship with non-0.90 liability sums today (`the_unexamined_algorithm` 1.00, `the_unsolved_problem` 0.95, `distributed_culture_fragmentation` 1.00, `leadership_deafness` 0.80 — confirmed in the earlier Gemini-review-verification pass), and the engine has been scoring and ranking against all of them in every calibration run this entire program, without incident. `the_second_close`'s proposed 1.05 would be a fifth exception, not a first-of-its-kind risk.
+
+**Conclusion: the budget expansion is safe to test in Phase 4 as far as engine-level assumptions go.** Whether 1.05 is the *right* magnitude for `the_second_close` specifically is an empirical question for Phase 4, not a structural risk to the pipeline.
+
+---
+
+## Phase 2 — Candidate Vectors (Batch 1)
+
+Date: 2026-08-24. `invisible_performance_management`, `the_paper_tiger`, `built_to_fail` — the original 3-state constrained-search cluster, now re-authored under full re-authoring rather than within-budget redistribution. No salience derivation (Phase 3), no dry-run testing (Phase 4).
+
+### `invisible_performance_management` (IPM)
+
+**Current:** aptitude_liability 0.45 (dominant) / authority_liability 0.20 / alliance_liability 0.15 / attitude_liability 0.10. Sum 0.90.
+
+**Candidate:** `authority_liability 0.60` (new primary, up from 0.20) / `aptitude_liability 0.10` (down from 0.45, to floor) / `alliance_liability 0.10` (down from 0.15, to floor) / `attitude_liability 0.10` (unchanged). All asset fields moved uniformly to 0.10 (from 0.15) for tier-shape consistency, see note below. Liability sum: 0.90 (unchanged — a full axis flip within the existing budget, not an expansion).
+
+**Citation:** the starkest single divergence in this whole program (Phase 1). The text is entirely about evidentiary weight and documentation — *"carries no evidentiary weight when a decision needs defending... an absence of documentation"* — with no Alliance or Attitude content anywhere. Critically, it does not merely omit an Aptitude case, it **directly disclaims one**: *"A manager's read on an underperforming employee is accurate... a sound judgment"* is an unambiguous statement that the underlying capability/diagnostic read is not the deficiency. This is the only state in the audit where the text actively argues against its own vector's current dominant field, rather than simply not supporting it. Authority becomes the sole real axis; this is a single-axis state, matching the shape this taxonomy already uses for `built_to_fail` itself and 10 other states — the **HIGH tier** (0.60 primary / 0.10 floor elsewhere), chosen over a dual-axis shape because the text gives no grounding for any second dimension once Aptitude is correctly removed.
+
+**Asset-floor note (flagged, not text-grounded):** moving IPM's four asset fields from 0.15 to 0.10 is a tier-shape consistency choice, not something the prose argues for directly — it matches the HIGH tier's established convention (uniform 0.10 across all non-primary fields, liability and asset alike) and avoids introducing a mixed-floor shape (0.10 liability / 0.15 asset) that has no precedent anywhere in the current taxonomy. Noted explicitly per this program's own discipline of citing what's text-grounded versus structurally chosen.
+
+### `the_paper_tiger`
+
+**Current:** identical to `built_to_fail` — aptitude_liability 0.60 (dominant) / authority, alliance, attitude all 0.10 (floor). Sum 0.90.
+
+**Candidate:** `authority_liability 0.35` (new primary, up from 0.10) / `attitude_liability 0.25` (new secondary, up from 0.10) / `aptitude_liability 0.15` (down from 0.60, to floor) / `alliance_liability 0.15` (up from 0.10, floor-to-floor convention shift, see below). All asset fields moved to 0.15 (from 0.10). Liability sum: 0.90.
+
+**Citation:** the largest shape divergence found in Phase 1, authored here fully independent of `built_to_fail` for the first time. Authority-primary: *"the written record no longer matches what everyone privately knows,"* *"act on documented cause,"* *"managing one employee on paper"* — three separate, direct evidentiary/documentation references, the same register this taxonomy already uses to mark Authority content (compare IPM's near-identical vocabulary above). Attitude-secondary: the say/do gap is itself the state's central mechanism, not incidental — *"it has been managing one employee on paper and a different one in practice"* is a direct performative discrepancy between stated/recorded behavior and actual behavior, the same shape this taxonomy already encodes as Attitude elsewhere (`the_diversity_ceiling`'s stated-vs-actual gap, already noted as precedent in Phase 1). No Aptitude content anywhere — the 0.60 aptitude figure was confirmed in Phase 1 to be wholesale inherited from `built_to_fail`, not independently authored; dropped to floor. This is a genuine dual-axis state, so it moves to the **LOW/CLUSTER tier** shape (0.35 primary / 0.25 secondary / 0.15 floor elsewhere) — the same convention already applied to `silosolation` in Batch 2 for the same reason (two real, text-grounded axes).
+
+**Asset-floor note (flagged, not text-grounded):** as with IPM, the asset-field shift (0.10→0.15) is a tier-convention-consistency move matching the LOW/CLUSTER shape's established uniform floor, not an independently text-grounded change.
+
+### `built_to_fail`
+
+**Current:** aptitude_liability 0.60 (dominant, HIGH tier) / authority, alliance, attitude all 0.10 (floor). Sum 0.90. Already the sharpest single-axis magnitude in the entire taxonomy, tied with 10 other HIGH-tier states.
+
+**Requested candidate, authored as specified:** `aptitude_liability 0.60 → 0.70` (concentration increase), floor fields unchanged at 0.10 each. Liability sum: 0.90 → **1.00**, a deliberate budget expansion (this program's second use of lever (a), after `the_second_close`'s in Batch 2).
+
+**Citation:** unchanged from every prior pass in this program (Phase 1, the 3-state search, the scoping document) — the text is confirmed a third time here to carry zero secondary-axis content: *"The role's scope exceeds what any reasonable allocation of resources could support... told to make it work rather than given what making it work would require... the next person inherits the same impossible math"* is single-dimension aptitude/capability-scope content throughout, with no Authority, Alliance, or Attitude material to cite. There is no new text to ground this candidate in beyond what's already been cited three times — the only available lever is magnitude, per this state's own standing "hardest open question" status (Section 6 of the scoping document).
+
+**Flagged before this candidate goes any further: the requested direction (increase) appears to run counter to what this program's own evidence says drives `built_to_fail`'s actual measured problem.** `built_to_fail` is not under-dominant — at 62/175 (35.4%) false-rank-1, it is the single largest false-rank-1 source in this program's six-state scope, the opposite situation from `the_second_close` (5/175, under-dominant, where a concentration *increase* is grounded in Section 4's cosine-similarity reasoning — a diffuse vector losing to a sharper rival). Two independent pieces of this program's own evidence point the other way for `built_to_fail` specifically:
+- The Session 17 tier-standardization retrospective (`tools/phase2_score_distribution_v10.md`, cited in the origin investigation) found that HIGH-tier concentration is exactly what turned other single-axis states (`paper_shield`, `the_founders_grip`) into dominant "sinks" — its own language: *"HIGH tier concentration... makes these states too geometrically accessible to any [axis]-heavy profile — not just the target state's own profile."* Weighted cosine similarity is directional; a sharper vector is closer, not farther, from any profile carrying real signal on that axis, whether or not that profile is actually built_to_fail's own target.
+- The 3-state search's own `BTF-1` candidate (weakening concentration slightly, 0.60→0.55, with an added off-axis field) made `built_to_fail`'s own false-rank-1 count worse (62→82) — but that candidate confounded two changes at once (reduced concentration *and* added an ungrounded secondary axis), so it doesn't cleanly test concentration alone in either direction.
+
+**This candidate is authored as literally requested (0.60→0.70, sum 0.90→1.00) so it's available for the record, but not treated as self-evidently correct.** Given the mechanism above, an increase would be expected to widen `built_to_fail`'s reach into other states' profiles, not narrow it — worsening the exact problem this program exists to fix, unless the intent here is something other than reducing false-rank-1 (e.g., securing `built_to_fail`'s own 3 legitimate profiles at an even wider margin while treating its false-rank-1 reduction as something that resolves indirectly, once IPM and `the_paper_tiger` stop competing with it on the Aptitude axis at all following their own re-authoring above). **Recommend confirming intended direction before this candidate proceeds to Phase 3 or 4** — a concentration *decrease* (same-axis only, no new field, unlike `BTF-1`) is the untested alternative this program's own evidence would suggest testing instead, if the goal is reducing `built_to_fail`'s false-rank-1 count specifically.
+
+---
+
+## Not done yet (Batch 1)
+
+No salience derived (Phase 3). No dry-run testing (Phase 4). Nothing written to `engine/data/states.py`. `the_uninitiated` untouched, out of scope. `built_to_fail`'s candidate direction flagged for Pete's confirmation before proceeding, per above.
