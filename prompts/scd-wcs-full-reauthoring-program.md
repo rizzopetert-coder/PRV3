@@ -412,3 +412,39 @@ All eight moves are small (≤2 profiles) and directionally explicable as ripple
 Per this program's own condition (same safeguard the 3-state search used): **the trigger fires when an in-scope state's count fails to improve.** Three of six do here — `the_paper_tiger` (+2), `silosolation` (+1), and `built_to_fail` (+38, severe). `built_to_fail`'s regression alone — the largest false-rank-1 count measured anywhere in this program's history — is sufficient on its own to trigger a stop.
 
 **Nothing written to `engine/data/states.py` or `engine/data/salience.py`, as instructed regardless of outcome.** No candidate from this six-state set is safe to ship as authored. The clearest, most actionable finding is `built_to_fail`'s floor-increase mechanism (above) — this is a concrete, falsifiable lead for a revised candidate, not just a negative result: the fix likely needs to separate "lower the primary" from "raise the floor" and test each lever's contribution independently, rather than moving both simultaneously as Batch 1's candidate did. IPM's and `the_second_close`'s improvements are real and worth preserving in any revision. `the_arbitrary_standard`'s flat result and the two new candidate-vs-candidate proximity risks (`the_paper_tiger`/`the_arbitrary_standard`, `silosolation`/`the_arbitrary_standard`) are also worth weighing before any re-attempt. `the_uninitiated` untouched throughout. Awaiting Pete's direction — revise `built_to_fail`'s candidate specifically (isolating the floor-vs-primary levers) and re-test, revise more broadly, or pause this cluster.
+
+---
+
+## Phase 4b — Lever Isolation, `built_to_fail` Only
+
+Date: 2026-08-24. Direction: the other five Batch 1/2 candidates don't need changes from Phase 4's result — isolate `built_to_fail`'s two conflated levers instead of revising the whole batch. Each candidate tested **alone**, with all other 57 states (including the other five candidates) left at their current shipped values, not their Batch 1/2 candidates — a clean single-state isolation, same methodology as the original 3-state search. Baseline reconfirmed at 62/175, matching every prior measurement this session. Nothing written to disk.
+
+**Candidate A — floor-only:** `authority_liability`/`alliance_liability`/`attitude_liability` 0.10 → 0.15, `aptitude_liability` unchanged at 0.60. All asset fields unchanged at 0.10.
+
+**Candidate B — primary-only:** `aptitude_liability` 0.60 → 0.50, all three floor liability fields unchanged at 0.10. All asset fields unchanged at 0.10.
+
+### Results
+
+| | `built_to_fail` false-rank-1 | Delta | Own profiles won | Suite |
+|---|---|---|---|---|
+| Baseline | 62 | — | 3/3 | 171/175 |
+| **Candidate A (floor-only)** | **84** | **+22** | 3/3 | 171/175 |
+| **Candidate B (primary-only)** | **72** | **+10** | 3/3 | 171/175 |
+| (for reference) Phase 4's combined candidate | 100 | +38 | 3/3 | 168/175 |
+
+**Neither lever improves `built_to_fail`'s own count in isolation — both make it worse.** Candidate A (floor-only) is more than twice as harmful as Candidate B (primary-only): +22 vs +10. This confirms the Phase 4 mechanism finding — raising the floor is the more damaging move — but it also shows something Phase 4 alone couldn't: **lowering the primary alone doesn't help either, it still hurts, just less.** The original Phase 2 theory (concentration decrease reduces false-rank-1) is wrong in both isolated directions, not just wrong because of how the two levers interacted when combined.
+
+**Confirmed non-additive, worse than either lever's sum:** 22 + 10 = 32, but the combined candidate measured 38 in Phase 4 — a genuine superadditive interaction, not just "the bigger of the two problems." Isolating the levers didn't just identify which one is worse, it revealed that combining them costs more than either contributes on its own.
+
+**Side effect worth naming, not part of the isolation question itself:** in both candidates, IPM's own false-rank-1 count dropped as a side effect of `built_to_fail`'s vector change alone — 43→23 (−20) under Candidate A, 43→32 (−11) under Candidate B — even though IPM's own vector was untouched in this test. `built_to_fail` becoming more competitive on Authority/Alliance/Attitude (Candidate A) or less dominant on Aptitude (Candidate B) both appear to pull some of IPM's own false wins toward `built_to_fail` instead, rather than genuinely resolving them. Net across the pair: Candidate A is +22/−20 (net +2), Candidate B is +10/−11 (net −1) — closer to redistribution between the two states than a real fix to either, the same whack-a-mole shape this program's very first constrained search already found for this exact pair.
+
+**Known-rival and full drift:** clean under both candidates. Candidate A: one small drift (`the_unformed_leader` 8→7, −1) plus `the_overloaded_manager` (9→8, −1) outside the named rival list; nothing else moved. Candidate B: one small drift (`the_unexamined_algorithm` 5→6, +1); nothing else moved. No large or unexplained drift under either isolated candidate — the severe, broad-spectrum drift Phase 4 found (41 profiles across 15 victim states) was specific to the *combined* candidate, not present in either lever alone.
+
+### Reading this plainly
+
+Both candidates fail the same standard Phase 4's did — neither improves `built_to_fail`'s own false-rank-1 count, so neither is shippable as tested. But this isn't a wash: it rules out the entire "soften `built_to_fail`'s concentration, either by raising the floor or lowering the primary" family of fixes at these magnitudes, in isolation or combined, and it reframes the IPM interaction as redistribution rather than resolution. Consistent with the program's very first finding (the 3-state search's own fallback trigger): `built_to_fail`'s dominance keeps resisting every magnitude-only lever tested so far, isolated or combined, textually grounded or not. **Not shipped. No new candidate proposed here** — this was isolation and measurement only, per the dispatch.
+
+### Flagged for the record, no action taken
+
+- **IPM and `the_paper_tiger`'s own-profile win rate is still 0/3 and 0/4 even after their axis corrections**, reconfirmed unchanged in this phase's baseline reruns. Logged as a known open gap for a later phase — not folded into this isolation test, per instruction.
+- **`the_paper_tiger` and `the_arbitrary_standard` now share an identical Authority-primary magnitude (0.35) post-candidate** — a new proximity risk first surfaced in Phase 4, logged here as a standing watch item, same treatment as the IPM/`the_founders_grip` flag from Phase 3/4. No testing performed on this in Phase 4b; carried forward only.
