@@ -571,8 +571,8 @@ export default function StatesTocPage() {
                   aria-pressed={signatureFilters.has(sig.id)}
                   className={`font-mono text-xs uppercase tracking-wide rounded-full px-3 py-1 border transition-colors ${
                     signatureFilters.has(sig.id)
-                      ? "border-slate bg-slate text-paper"
-                      : "border-line text-oxide-text hover:border-slate"
+                      ? "border-(--slate) bg-(--slate) text-cta-text in-data-[theme=neutral]:border-slate in-data-[theme=neutral]:bg-slate in-data-[theme=neutral]:text-paper"
+                      : "border-line text-oxide-text hover:border-(--slate) in-data-[theme=neutral]:hover:border-slate"
                   }`}
                 >
                   {sig.name}
