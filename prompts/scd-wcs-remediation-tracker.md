@@ -144,6 +144,18 @@ Distinguishes two structurally different repairs that both currently get filed u
 
 ---
 
+**3-STATE CONSTRAINED VECTOR RESHAPING SEARCH, 2026-08-24 — FALLBACK TRIGGER FIRED, NOTHING SHIPPED.** Pete-approved, Gemini-proposed approach: redistribute liability mass within each of `built_to_fail`/`invisible_performance_management`/`the_second_close`'s own real 0.90 total, guided by textual grounding, not full re-authoring. `the_uninitiated` explicitly parked, untouched. Full detail: `prompts/scd-wcs-3state-reshaping-search-results.md`.
+
+Pre-search verification caught two real errors in Gemini's own review before any candidate was tested (`prompts/scd-wcs-gemini-review-verification.md`): the "0.90 Total Liability Invariant" is real for 54/58 states but not universal (4 real exceptions, none caused by this session's own edits), and Gemini's own IPM baseline (`authority_liability=0.25`) was stale — the real, current, post-Candidate-C value is 0.20. Corrected before any candidate math was built on it.
+
+**5 candidates tested, full dry-run, zero drift confirmed on all 57 other states in every case:** IPM-1 (apt 0.45→0.40/auth 0.20→0.25) and IPM-2 (apt 0.45→0.35/auth 0.20→0.30) both improved IPM's own false-rank-1 count (43→38, then 43→17) but drove `built_to_fail`'s substantially worse (62→72, then 62→78) — the same whack-a-mole pattern this program already documented, now reproduced with fresh numbers for this exact pair. A weakly-grounded `built_to_fail` candidate (tested for information only, explicitly not recommended given no real textual support was found) made `built_to_fail`'s own metric *worse* (62→82), not better. Two `the_second_close` candidates (alliance→aptitude shifts, textually grounded via "wasn't the actual cause") both made its own metric worse (5→7) and barely moved its own-profile score — its real gap to `built_to_fail` (0.157) is too large for any budget-neutral move to close.
+
+**Fallback trigger (the program's own standing safeguard) fired as designed:** no candidate brought both `built_to_fail`'s and IPM's false-rank-1 counts down together. Full calibration suite held at 171/175 (same 4 pre-existing failures) even under the most aggressive candidate tested — reported alongside the real false-rank-1 degradation it doesn't capture, not left to stand alone as reassurance the lenient metric can't actually provide here.
+
+**Conclusion: this cluster needs genuine taxonomy-wide re-authoring, not constrained redistribution — confirmed via real dry-run testing against the live pipeline, not just prior theoretical reasoning.** Directly corroborates the standing Track 2 whack-a-mole finding already on record in this tracker, now with concrete numbers for this specific 3-state search rather than a general pattern claim. Nothing written to `engine/data/states.py`. Pete's call on whether/when to open the full re-authoring project.
+
+---
+
 ## How to use this
 
 Pete fills in the "Pete's call" column whenever he has a real instinct
