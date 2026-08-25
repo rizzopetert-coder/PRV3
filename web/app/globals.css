@@ -83,6 +83,15 @@
   /* --hover-ink deliberately NOT overridden here -- see the :root block's
      comment. Stays #26241F in every theme. */
   --field: #171512;
+  /* --background/--foreground: mirror --field/--ink exactly. The base
+     Session 58 pair (:root, lines 4-5) was never redefined per theme --
+     confirmed 2026-08-25 as a real gap affecting every Visual Identity
+     v3 route (a live WCAG AA failure in Dark theme wherever text sits
+     on the unstyled canvas). See tools/_mob.txt Section 13a and
+     prompts/global-canvas-background-foreground-gap-gemini-review-
+     verification.md for the full verified record. */
+  --background: #171512;
+  --foreground: #EDEAE3;
   --field-raise: #201E1A;
   --oxide: #B8663D;
   --oxide-text: #C9825C;
@@ -110,6 +119,14 @@
   /* --hover-ink deliberately NOT overridden here -- see the :root block's
      comment. Stays #26241F in every theme. */
   --field: #FFFFFF;
+  /* --background/--foreground: mirror --field/--ink exactly, same as
+     Dark. #FFFFFF, not the old fixed #F6F3ED paper tone -- confirmed
+     that value was unexamined inheritance from :root, not a deliberate
+     choice (ServicesPageContent.tsx's bg-paper is a real but
+     component-scoped precedent, not a sitewide one -- see the Round 2
+     verification above). */
+  --background: #FFFFFF;
+  --foreground: #34383C;
   --field-raise: #EFE6D0;
   --oxide: #4A6B85;
   --oxide-text: #3D5A72;
