@@ -513,3 +513,24 @@ Three independent negative results across two search rounds, plus a fourth compl
 **No textual grounding exists for a shape change** — Phase 1 confirmed this a third time (unique among the six-state audit for having zero secondary-axis content anywhere in its prose), and every subsequent phase has re-confirmed it rather than finding new grounding. The only lever this program has ever had available for this state is magnitude, and every magnitude-only approach tested — constrained, combined, isolated in both directions — has failed.
 
 **`built_to_fail` is now a candidate for Gemini architecture review specifically, not the other five.** The other five candidates (IPM, `the_paper_tiger`, `silosolation`, `the_arbitrary_standard`, `the_second_close`) have their own, separate open item (Phase 4c's finding that they're not fully independent of `built_to_fail` after all — see above) but have never failed on their own textual or magnitude grounding the way `built_to_fail` has, four times over. `built_to_fail` specifically has exhausted every lever this program's own methodology can generate on its own — a case for outside architectural judgment, not another internally-generated candidate. Pete's call whether to engage Gemini on this specific question or hold the cluster; not decided here.
+
+---
+
+## `built_to_fail` — final closing entry: candidate search halted
+
+Date: 2026-08-25.
+
+**Decision: halt candidate vector search for `built_to_fail`.**
+
+**Basis: this program's own four independent negative results — not Gemini's structural reasoning.** Zero textual grounding for any shape change, confirmed three separate times in Phase 1. Both magnitude-only levers tested and failed: floor-only +22, primary-only +10, combined +38 and confirmed non-additive (22+10=32 ≠ 38) — all measured directly via dry-run in Phases 4 and 4b, against the live 175-profile pipeline, not theorized. That evidence alone is sufficient grounds for this decision, independent of anything Gemini said.
+
+**Gemini review outcome** (full detail: `prompts/scd-wcs-built-to-fail-gemini-response-verification.md`): the core conservation-math claim — weighted cosine similarity summed across all eight fields, matched against `rank_states()` — is verified against live code exactly. **Everything downstream of that is not reliable and must not be treated as established:**
+- The proposed `generate_answers()` mechanism ("off-axis noise accumulates systematically") is wrong in kind. The real, already-documented confound is on-axis answer identity across same-primary-dimension states (`_damped_weak_option()`'s own docstring, `tools/calibration_runner.py:228-233`), not off-axis noise leakage.
+- **Margin gating, offered as one of two paths to genuine reduction, is real and live in `engine/output.py` — but runs post-ranking and cannot influence which state wins rank-1.** Flagged explicitly here so it is not re-proposed in a future session without rechecking this: `apply_signal_floor()`/`SCD_WCS_MARGIN_GATE` exist and are called (`engine/output.py:794`), but `state_distribution`'s `rank`/`score` fields come directly from `rank_states()`'s raw output (`engine/contract.py:372-384`) — the margin gate only sets a separate `above_floor` flag, never touches rank.
+- The proposed orthogonal-basis test is not executable as specified (no orthogonalization utility exists anywhere in this codebase) and its own stated population is wrong — it referred to "6 Aptitude state vectors"; the live, current count is **9**.
+
+**State plainly: the structural question of whether SCD-WCS's geometry conserves false-rank-1 mass within a shared-dimension cluster remains open.** This session's evidence — the near-equal totals between concentrating +38 in `built_to_fail` alone (Phase 4) versus spreading it across `built_to_fail` and three neighbors (Phase 4c) — is consistent with conservation, but does not prove it. **The halt decision on `built_to_fail` does not depend on that question being resolved.** It rests on the four negative results alone.
+
+**`built_to_fail` is documented as a known structural boundary of the current metric, not a solved or actively-searched problem.** No further candidate vector search is planned for this state under this program unless new textual grounding or a new lever is identified.
+
+**The five other candidates — IPM, `the_paper_tiger`, `silosolation`, `the_arbitrary_standard`, `the_second_close` — remain unaffected by this entry and are not re-opened by it.** Their own status (Phase 4/4c results, the unresolved own-profile-win gap for IPM/`the_paper_tiger`, the `the_paper_tiger`/`the_arbitrary_standard` proximity watch item) stands exactly as recorded above, independent of `built_to_fail`'s closure.
