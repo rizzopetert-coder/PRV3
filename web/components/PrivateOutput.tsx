@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { PrivateOutputPayload, SeverityTier, StateRef } from "@/lib/types";
 import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
@@ -88,6 +89,12 @@ interface PrivateOutputProps {
   // for Path 1 is explicitly out of scope this phase. Default true —
   // existing self-select callers are unaffected.
   enableSharing?: boolean;
+  // Real Transaction Path, Phase 1 (e-signature only, this session).
+  // Suppresses the Engage CTA (Block 6) — identical suppression pattern to
+  // enableSharing above. Default true; set false on the dev/test preview
+  // viewer (web/app/dev/diagnostic-preview/[id]/page.tsx) so a synthetic,
+  // fast-forwarded result can never trigger a real Dropbox Sign request.
+  enableEngage?: boolean;
 }
 
 export default function PrivateOutput({
@@ -95,6 +102,7 @@ export default function PrivateOutput({
   selectedStateIds,
   intake,
   enableSharing = true,
+  enableEngage = true,
 }: PrivateOutputProps) {
   const liabilityText = payload.synthesis.liability_condition_text;
   const anchorText = payload.synthesis.asset_resolution_anchor_text;
@@ -370,7 +378,27 @@ export default function PrivateOutput({
         </div>
       )}
 
-      {/* Block 6 — friction_tax_estimate: null in Path B — render nothing */}
+      {/* Block 6 — Engage CTA (Real Transaction Path, Phase 1). Links out
+          to the standalone /engage intake (name + email only, per Phase
+          1's e-signature-only scope) rather than carrying any diagnostic
+          result data forward — Dropbox Sign's hosted signing flow needs
+          nothing from this payload. enableEngage mirrors enableSharing's
+          suppression pattern exactly (see prop doc comment above). */}
+      {enableEngage && (
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-3">
+            Ready to move on this?
+          </p>
+          <Link
+            href="/engage"
+            className="inline-block bg-charcoal text-white font-ui text-sm font-medium px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            Start the engagement →
+          </Link>
+        </div>
+      )}
+
+      {/* Block 7 — friction_tax_estimate: null in Path B — render nothing */}
     </div>
   );
 }

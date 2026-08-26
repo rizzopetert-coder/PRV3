@@ -67,6 +67,7 @@ export default async function DevDiagnosticPreviewPage({ params }: DevPreviewPag
             principalRole: "",
           }}
           enableSharing={false}
+          enableEngage={false}
         />
       </div>
     </main>
