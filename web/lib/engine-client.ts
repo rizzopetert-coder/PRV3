@@ -330,7 +330,23 @@ export async function invokeComplete(
   const response = await engineFetch(resolveEnginePath("/api/complete"), payload);
 
   if (!response.ok) {
-    throw new Error(`Complete invocation failed: ${response.status}`);
+    // Root-cause pass, this session: the body (api/engine.py's HTTPException
+    // detail -- e.g. the real TypeError/ValueError/KeyError message) was
+    // being discarded entirely, leaving only the HTTP status code visible
+    // anywhere, including Vercel's own server logs. FastAPI's default
+    // HTTPException handler returns {"detail": "..."} as JSON -- parsed
+    // when possible, falling back to the raw text for any other shape.
+    const bodyText = await response.text();
+    let detail = bodyText;
+    try {
+      const parsed = JSON.parse(bodyText);
+      if (parsed && typeof parsed.detail === "string") {
+        detail = parsed.detail;
+      }
+    } catch {
+      // Not JSON -- bodyText as-is is still more useful than nothing.
+    }
+    throw new Error(`Complete invocation failed: ${response.status} -- ${detail}`);
   }
 
   return response.json() as Promise<EngineResult>;

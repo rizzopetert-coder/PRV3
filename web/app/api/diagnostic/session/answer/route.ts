@@ -286,8 +286,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: "in_progress", question: nextQuestion, label });
   }
 
-  // Q34 just answered — completion. Route into the real accumulation-based
-  // engine pipeline (Path A), not Path B's declared-diagnosis shortcut.
+  // Q34 just answered — completion. Persist the fully-accumulated final
+  // state BEFORE calling the engine -- mirrors the non-last-question
+  // branch's own save-then-call order above. Without this, a failure in
+  // invokeComplete() below left Redis showing the session's state from
+  // BEFORE this final answer, so a resume (or a retry) saw the exact same
+  // stuck pre-completion state forever -- confirmed live this session (a
+  // real Production 400 from a downstream engine validation error left a
+  // test session permanently unable to progress). Known residual risk,
+  // not solved here (bigger scope than this fix, per explicit instruction):
+  // next_question_id is unchanged (there is no "next" for the final
+  // question), so a raw retry of the identical request would still pass
+  // validateIndexInvariant() and re-accumulate this answer a second time.
+  await saveSession(session);
+
+  // Route into the real accumulation-based engine pipeline (Path A), not
+  // Path B's declared-diagnosis shortcut.
   const engineResult = await invokeComplete({
     accumulated_vector: session.accumulated_vector,
     intake: session.intake,

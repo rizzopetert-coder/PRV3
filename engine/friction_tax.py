@@ -356,14 +356,39 @@ def get_industry_wage(industry: str) -> Optional[float]:
     return entry[0] if entry is not None else None
 
 
-def resolve_headcount_bucket(headcount: int) -> str:
+def resolve_headcount_bucket(headcount) -> str:
     """
     Map a precise headcount int (engine/data/intake.py's
     HEADCOUNT_FIELD_SPEC) to its HEADCOUNT_BUCKETS bucket string.
     Boundaries match the field spec's increment schedule exactly.
     Genuinely new -- confirmed via repo-wide grep that no equivalent
     function existed anywhere before this.
+
+    Path 1 completion bugfix (legacy string organization_size): headcount
+    may also arrive as a string -- session/start/route.ts's
+    validateIntake() deliberately accepts a legacy non-numeric
+    organization_size ("soft transition," Priority Queue item 14 --
+    number-only collapse scheduled separately, not preempted here). The
+    real legacy format is always one of this module's own
+    HEADCOUNT_BUCKETS values (the old 6-value dropdown this stepper
+    replaced -- engine/data/intake.py's own header comment), so that
+    case is a pure pass-through, not a conversion. A numeric-looking
+    string is parsed and bucketed normally, for real calibration
+    precision. Any other string is passed through unresolved --
+    PAYROLL_BASELINE_GRID.get((org_size, industry)) already tolerates an
+    unrecognized key as a graceful miss (compute_friction_tax()'s own
+    calibration_complete check already treats that as "missing data,"
+    not a crash), so this degrades the same documented way the function
+    already handles any other unrecognized (org_size, industry) pair --
+    not a new fallback behavior invented here.
     """
+    if isinstance(headcount, str):
+        if headcount in HEADCOUNT_BUCKETS:
+            return headcount
+        try:
+            headcount = int(headcount)
+        except ValueError:
+            return headcount
     if headcount < 25:
         return "Under 25"
     if headcount < 100:
