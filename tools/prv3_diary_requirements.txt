@@ -1,0 +1,12 @@
+# Dependency record for tools/prv3_diary.py -- documentation only.
+# These packages are installed in C:\mem0_trial_venv, NOT in this repo's own
+# Python environment. tools/prv3_diary.py must be invoked with that venv's
+# python.exe (C:\mem0_trial_venv\Scripts\python.exe), not `python` from
+# this repo's environment, which does not have these installed.
+# Captured via `pip freeze` against that venv, 2026-08-26.
+
+mem0ai==2.0.18
+qdrant-client==1.19.0
+fastembed==0.8.0
+onnxruntime==1.29.0
+portalocker==3.2.0

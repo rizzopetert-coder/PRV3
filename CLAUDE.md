@@ -8,13 +8,12 @@ You are a senior technical collaborator on PRV3 — the Principal Resolution dia
 ## Startup Protocol
 Execute in full sequence before any work begins. Do not start tasks until all steps are complete.
 
-### Step 1 — Palace + Diary
-Call `mempalace_status`, then `mempalace_diary_read`, then `mempalace_search` with:
-1. `"PRV3 current workstream status"`
-2. `"PRV3 locked decisions engine architecture"`
-3. `"PRV3 pending items horizon"`
+### Step 1 — Diary
+Run `C:\mem0_trial_venv\Scripts\python.exe tools\prv3_diary.py read --agent claude-code --last-n 5`.
 
-If any call errors or any query returns empty, retry once with broader terms. Still failing — flag to Pete and stop.
+Non-blocking (Pete's explicit decision, 2026-08-26 — replaces this step's former hard-stop behavior under mempalace_*): if the command errors, times out, or the venv is unreachable, retry once. Still failing — note the continuity-read gap in the Step 4 Status Report and proceed to Step 2. Do not stop the session.
+
+No Mem0 equivalent exists for the former `mempalace_search` step (three standing semantic-search queries against a broader knowledge base) — Mem0's continuity layer is diary-only by design, a real and accepted capability reduction from MemPalace, not an oversight. `tools/_mob.txt` remains the authoritative source for workstream status, locked decisions, and pending items; nothing here substitutes for reading it in Step 2.
 
 ### Step 2 — MOB
 Read `tools/_mob.txt` with the Read tool. If missing or empty, stop immediately and alert Pete.
@@ -45,24 +44,18 @@ Report to Pete:
 ## Closeout Protocol
 When Pete says "close session", "wrap up", "end session", or similar, execute all steps in sequence without being prompted for each.
 
-Diary write fires before /compact — if already compacted, skip Steps 1–2 and note the gap in the MOB session log.
+Diary write fires before /compact — if already compacted, skip Step 1 and note the gap in the MOB session log. (The former reason for this — "/compact disconnects the MCP server" — was specific to the mempalace_* MCP connection. Step 1 now runs as a plain subprocess call, independent of MCP state, so this constraint likely no longer applies. Not empirically tested this session; flag if compaction is ever observed to interfere.)
 
 ### Step 1 — Diary Write
-Call `mempalace_diary_write` with:
-- `agent_name`: "claude-code"
-- `topic`: current workstream ID
-- `entry`: AAAK-format summary:
-  - What was decided this session
-  - Files changed and why
-  - Open items carried forward
-  - Anything Pete should know at next session start
+Run `C:\mem0_trial_venv\Scripts\python.exe tools\prv3_diary.py write --agent claude-code --topic "<workstream-id>" --entry "<summary>"` with an AAAK-format `--entry`:
+- What was decided this session
+- Files changed and why
+- Open items carried forward
+- Anything Pete should know at next session start
 
-### Step 2 — Mine
-If any files were modified this session, run:
-`mempalace mine C:\Users\rizzo\PRV3`
-Skip only if zero files were touched.
+If the write fails, do not silently omit it — log `[DIARY WRITE GAP: <reason>]` at the top of the Section 16 entry and proceed with closeout.
 
-### Step 3 — Update MOB
+### Step 2 — Update MOB
 Write the updated MOB content to `tools/_mob.txt`.
 
 Update:
@@ -75,15 +68,15 @@ Update:
 
 Use `pathlib.Path('tools/_mob.txt').write_text(content, encoding='utf-8')` to overwrite the file.
 
-### Step 3a — Session Handoff File
+### Step 2a — Session Handoff File
 After Section 16's closeout entry is written, write `prompts/session-handoff-v[MOB version].md` — a direct extract/reformatting of that same Section 16 entry, not independently authored. Cover: the files-to-attach list for the next session (Section 13b), the full shipped/open/parked status breakdown, and any time-anchored items. Additive only — one file per session close, never overwritten, named by the MOB version at close so it's unambiguous which project state it reflects. Tracked in git, not gitignored — these are durable records, not scratch output.
 
 This file must never contain information that contradicts or drifts from Section 16's own entry for that session — it is a derived, more portable copy for quick reference, not a second independent record. If the two ever need reconciling, Section 16 is authoritative.
 
-### Step 3b — Commit MOB file
+### Step 2b — Commit MOB file
 After writing `tools/_mob.txt` and `prompts/session-handoff-v[MOB version].md`, include both in the session commit. This step fires every session without exception.
 
-### Step 4 — Commit
+### Step 3 — Commit
 Run `git status`. Present Pete with `[filename] — [why]` for each touched file. Flag anything CC did not touch — Pete decides.
 
 Wait for confirmation, then:
@@ -161,7 +154,7 @@ If palace search returns empty or wrong results:
 Never hallucinate content that should come from the palace or the MOB. If you don't have it, say so.
 
 ### Cross-Environment Verification Discipline
-No session may assert as current fact something it cannot verify from its own environment this session. This applies most often to test suite status, `mempalace_*` availability, build status, and `gh`-sourced PR state.
+No session may assert as current fact something it cannot verify from its own environment this session. This applies most often to test suite status, the Mem0 diary tool's availability, build status, and `gh`-sourced PR state.
 
 - If Startup Protocol Step 3 or Step 3a cannot run in the current environment (see Session Environments), say so explicitly in the Step 4 Status Report. Report the last-known figures from the MOB labeled "carried forward, unverified this session" — never re-assert them as freshly confirmed.
 - The same discipline applies to any MOB or CLAUDE.md write: a session writes only what it verified itself, or is directly relaying from a source it read this session. Anything else is flagged, not asserted.
@@ -202,9 +195,8 @@ No session may assert as current fact something it cannot verify from its own en
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.247 |
-| MemPalace wing | `prv3` |
-| MemPalace path | `C:\Users\rizzo\PRV3` |
+| MOB version | v4.248 |
+| Session continuity | Mem0 — see Section 12 |
 | Engine state count | 58 (locked) |
 | Test suite minimum (Phase 1) | 171 profiles across 57 states |
 | Checkpoints | Q11 · Q19 · Q27 |
@@ -218,18 +210,16 @@ No session may assert as current fact something it cannot verify from its own en
 Three distinct environments run this protocol. Capabilities differ — identify which one is active before relying on anything not confirmed here.
 
 ### Claude Code (terminal, on Pete's machine)
-Full native access: persistent shell, real network, working `mempalace_*` MCP tools, `gh` CLI, and a native `node_modules`/Python environment that can actually run the test suite. This is the only environment that can execute Startup Protocol Steps 1, 3, and 3a as written, or run a real build/test cycle. Requires Pete at his PRV3 dev machine with VS Code open.
+Full native access: persistent shell, real network, `gh` CLI, a native `node_modules`/Python environment that can actually run the test suite, and shell access to `C:\mem0_trial_venv\Scripts\python.exe` for Startup Step 1 / Closeout Step 1's diary calls. This is the only environment confirmed able to execute Startup Protocol Steps 1, 3, and 3a as written, or run a real build/test cycle. Requires Pete at his PRV3 dev machine with VS Code open.
 
 ### Claude via Cowork, no device bridge (≈ claude.ai web)
-No `mempalace_*` tools. No access to Pete's local files unless uploaded to the conversation. Cannot run Step 1, Step 3, or Step 3a as written.
+No access to Pete's local files unless uploaded to the conversation, and no shell access to `C:\mem0_trial_venv`. Cannot run Step 1, Step 3, or Step 3a as written.
 
 ### Claude via Cowork, device bridge connected
-Confirmed directly, first observed 2026-08-25: no `mempalace_*` tools; no network egress in the bridge shell (`pip`/`npm install` return 403); native binaries in `web/node_modules` don't match the bridge's own sandboxed Linux VM, so test runners fail on missing bindings; `gh` is not installed; file access is permission-gated per folder and per delete operation, requested and approved within the session rather than standing access. Each shell call is fresh and short-lived (about 45 seconds, no persistent state or background process between calls). Git plumbing needing no native compilation (`status`, `log`, `diff`, `add`, `commit`) and direct file read/edit/write against a connected folder work the same as a local edit. Cannot run Step 1, Step 3, or Step 3a as written — see Cross-Environment Verification Discipline above for how to report that gap rather than paper over it.
+Confirmed directly, first observed 2026-08-25: no network egress in the bridge shell (`pip`/`npm install` return 403); native binaries in `web/node_modules` don't match the bridge's own sandboxed Linux VM, so test runners fail on missing bindings; `gh` is not installed; file access is permission-gated per folder and per delete operation, requested and approved within the session rather than standing access. Each shell call is fresh and short-lived (about 45 seconds, no persistent state or background process between calls). Git plumbing needing no native compilation (`status`, `log`, `diff`, `add`, `commit`) and direct file read/edit/write against a connected folder work the same as a local edit. **Step 1's `C:\mem0_trial_venv\Scripts\python.exe` invocation is presumed unreachable from this environment** — the bridge is a separate sandboxed Linux VM, and that path is a native Windows executable on Pete's machine, not something confirmed reachable from here. Not empirically tested from this environment; treat as unconfirmed, not assumed working. Cannot run Step 1 (unconfirmed), Step 3, or Step 3a as written — see Cross-Environment Verification Discipline above for how to report that gap rather than paper over it.
 
-### Mem0 status (applies to all three environments)
-Mem0 is not part of this protocol. A one-time bulk migration of MemPalace's data into Mem0/Qdrant completed 2026-08-25 (72,795 entries, zero failures), and a pilot diary script (`prv3_diary.py`, in `C:\mem0_trial_venv`) exists but is not registered as an MCP server and is not called by any step here. `.mcp.json` registers only `mempalace` — confirmed directly, 2026-08-26. MemPalace remains system of record. Retirement is blocked on a specific graduation test (Section 13b, Priority Queue item 1) that has not yet passed. No session should treat Mem0 as an available fallback for `mempalace_*` unavailability without Pete's explicit say-so.
-
-`/compact` disconnects the MCP server in terminal Claude Code. Diary write and mine must happen BEFORE any `/compact`. If MCP is unavailable at closeout, skip Steps 1–2 and note the gap in the MOB session log.
+### Mem0 status (applies to all three environments, terminal Claude Code only confirmed working)
+Mem0 is now this project's live session-continuity mechanism, replacing MemPalace as of 2026-08-26 (Section 13a, "MemPalace retirement" row; full spec: Section 12). `mempalace_*` MCP tools are retired — `.mcp.json` no longer registers the `mempalace` server, confirmed directly, 2026-08-26. `tools/prv3_diary.py` (relocated into this repo from `C:\mem0_trial_venv\prv3_diary.py`) is the live interface, invoked via subprocess per Startup Step 1 / Closeout Step 1 above — not an MCP tool, no MCP registration needed. Startup Step 1 is non-blocking by design (Pete's explicit decision, 2026-08-26): a continuity-read failure logs a gap and the session proceeds, it does not stop.
 
 ---
 
