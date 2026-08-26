@@ -20,7 +20,7 @@ If any call errors or any query returns empty, retry once with broader terms. St
 Read `tools/_mob.txt` with the Read tool. If missing or empty, stop immediately and alert Pete.
 
 ### Step 3 — Engine State Check
-Run the test suite (or equivalent). Report pass/fail. Flag any failures before proceeding.
+Run the test suite (or equivalent). Report pass/fail. Flag any failures before proceeding. If the current environment cannot run the test suite (see Session Environments), do not substitute a partial or indirect check that produces false confidence — report the gap per Cross-Environment Verification Discipline.
 
 ### Step 3a — Research Integration Check
 Run `gh pr list --label research-refresh --state open` to check for unreviewed refresh PRs.
@@ -160,6 +160,13 @@ If palace search returns empty or wrong results:
 
 Never hallucinate content that should come from the palace or the MOB. If you don't have it, say so.
 
+### Cross-Environment Verification Discipline
+No session may assert as current fact something it cannot verify from its own environment this session. This applies most often to test suite status, `mempalace_*` availability, build status, and `gh`-sourced PR state.
+
+- If Startup Protocol Step 3 or Step 3a cannot run in the current environment (see Session Environments), say so explicitly in the Step 4 Status Report. Report the last-known figures from the MOB labeled "carried forward, unverified this session" — never re-assert them as freshly confirmed.
+- The same discipline applies to any MOB or CLAUDE.md write: a session writes only what it verified itself, or is directly relaying from a source it read this session. Anything else is flagged, not asserted.
+- This is the same standard already applied to Gemini's output under Architectural Decisions, extended here to every Claude-side environment, not just the third party.
+
 ### Engine Rules
 - All engine writes use Python patch scripts with dry-run verification
 - `engine/data/states.py` is the authoritative state registry — 57 states
@@ -195,7 +202,7 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.245 |
+| MOB version | v4.247 |
 | MemPalace wing | `prv3` |
 | MemPalace path | `C:\Users\rizzo\PRV3` |
 | Engine state count | 58 (locked) |
@@ -206,10 +213,23 @@ Never hallucinate content that should come from the palace or the MOB. If you do
 
 ---
 
-## MemPalace Note
-`mempalace_status`, `mempalace_diary_read`, `mempalace_diary_write`, and `mempalace_search` are available as MCP tools in terminal Claude Code sessions only. Not available in claude.ai web sessions.
+## Session Environments
 
-`/compact` disconnects the MCP server. Diary write and mine must happen BEFORE any `/compact`. If MCP is unavailable at closeout, skip Steps 1–2 and note the gap in the MOB session log.
+Three distinct environments run this protocol. Capabilities differ — identify which one is active before relying on anything not confirmed here.
+
+### Claude Code (terminal, on Pete's machine)
+Full native access: persistent shell, real network, working `mempalace_*` MCP tools, `gh` CLI, and a native `node_modules`/Python environment that can actually run the test suite. This is the only environment that can execute Startup Protocol Steps 1, 3, and 3a as written, or run a real build/test cycle. Requires Pete at his PRV3 dev machine with VS Code open.
+
+### Claude via Cowork, no device bridge (≈ claude.ai web)
+No `mempalace_*` tools. No access to Pete's local files unless uploaded to the conversation. Cannot run Step 1, Step 3, or Step 3a as written.
+
+### Claude via Cowork, device bridge connected
+Confirmed directly, first observed 2026-08-25: no `mempalace_*` tools; no network egress in the bridge shell (`pip`/`npm install` return 403); native binaries in `web/node_modules` don't match the bridge's own sandboxed Linux VM, so test runners fail on missing bindings; `gh` is not installed; file access is permission-gated per folder and per delete operation, requested and approved within the session rather than standing access. Each shell call is fresh and short-lived (about 45 seconds, no persistent state or background process between calls). Git plumbing needing no native compilation (`status`, `log`, `diff`, `add`, `commit`) and direct file read/edit/write against a connected folder work the same as a local edit. Cannot run Step 1, Step 3, or Step 3a as written — see Cross-Environment Verification Discipline above for how to report that gap rather than paper over it.
+
+### Mem0 status (applies to all three environments)
+Mem0 is not part of this protocol. A one-time bulk migration of MemPalace's data into Mem0/Qdrant completed 2026-08-25 (72,795 entries, zero failures), and a pilot diary script (`prv3_diary.py`, in `C:\mem0_trial_venv`) exists but is not registered as an MCP server and is not called by any step here. `.mcp.json` registers only `mempalace` — confirmed directly, 2026-08-26. MemPalace remains system of record. Retirement is blocked on a specific graduation test (Section 13b, Priority Queue item 1) that has not yet passed. No session should treat Mem0 as an available fallback for `mempalace_*` unavailability without Pete's explicit say-so.
+
+`/compact` disconnects the MCP server in terminal Claude Code. Diary write and mine must happen BEFORE any `/compact`. If MCP is unavailable at closeout, skip Steps 1–2 and note the gap in the MOB session log.
 
 ---
 
