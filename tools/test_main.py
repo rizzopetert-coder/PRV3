@@ -392,15 +392,34 @@ with mock.patch.dict("sys.modules", {"anthropic": None}):
     # 26. One 18mo_plus duration_band input -> raw=2.0 -> score=33.33 ->
     # Entrenched. First non-"Emerging" tier ever produced in this project.
     # Checkpoint 3 (SeverityResult per-state redesign): severity_follow_on_id
-    # must map to _CP_VECTOR's real lead state (the_founders_grip, confirmed
-    # via a direct run -- multi_state, identified_states[0] =
-    # the_founders_grip) for the top-level severity to reflect it, now that
-    # severity.tier resolves per-state instead of broadcasting. SEVER-28 is
-    # the_founders_grip's real, locked mapping (Section 9 of the scoping
-    # doc) -- SEVER-04 (used here before this fix) is one of the 11
-    # explicitly unmapped SEVER-IDs and would correctly contribute to no
-    # state under the new architecture, same class of gap as the original
-    # ATT-UT-01 defect this whole redesign exists to fix.
+    # must map to a real state -- the_founders_grip, via SEVER-28, its real,
+    # locked mapping (Section 9 of the scoping doc). SEVER-04 (used here
+    # before this fix) is one of the 11 explicitly unmapped SEVER-IDs and
+    # would correctly contribute to no state under the new architecture,
+    # same class of gap as the original ATT-UT-01 defect this whole redesign
+    # exists to fix.
+    #
+    # CORRECTED 2026-08-26: asserted against severity["by_state"] for
+    # the_founders_grip specifically, not the top-level severity dict.
+    # _CP_VECTOR's single-axis probe ({"authority_liability": 5.0}) produces
+    # an exact 8-way cosine-similarity tie -- the_founders_grip,
+    # invisible_performance_management, the_exposed, hr_capture,
+    # heard_and_ignored, the_tolerated_violation, sequential_decision_
+    # blindness, and disparate_impact_architecture all carry byte-identical
+    # dimensional_vector AND SALIENCE_PROFILES entries, confirmed directly
+    # (Section 13a Decision Register, "8-way dimensional_vector/
+    # SALIENCE_PROFILES tie" row). No probe vector can ever break this tie --
+    # identical points produce identical cosine similarity to any input, by
+    # construction. rank_states()'s stable sort then resolves it by
+    # STATE_PROFILES dict insertion order, a cosmetic artifact carrying no
+    # real signal, same documented mechanism as the decision_paralysis/
+    # the_lost_map tie. The top-level severity dict only ever reflects
+    # identified_states[0], so asserting against it made this test hostage
+    # to that insertion-order artifact rather than to anything the
+    # Checkpoint 3 redesign actually guarantees. severity["by_state"]
+    # threads the real, per-state-correct result regardless of ranking
+    # position -- confirmed via direct run that the_founders_grip's own
+    # by_state entry is Entrenched/33.33 today, exactly as expected.
     out_entrenched = run_accumulated_engine(
         _CP_VECTOR, _LOCKED_INTAKE, 27,
         severity_inputs=[{
@@ -409,18 +428,23 @@ with mock.patch.dict("sys.modules", {"anthropic": None}):
             "duration_band": "18mo_plus",
         }],
     )
+    fg_entry_entrenched = next(
+        e for e in out_entrenched["severity"]["by_state"]
+        if e["state_id"] == "the_founders_grip"
+    )
     check(
-        "run_accumulated_engine: 1x 18mo_plus duration_band -> tier=Entrenched, score=33.33",
-        out_entrenched["severity"]["tier"] == "Entrenched"
-        and abs(out_entrenched["severity"]["score"] - 33.33) < 0.01,
-        f"got tier={out_entrenched['severity']['tier']!r}, score={out_entrenched['severity']['score']!r}",
+        "run_accumulated_engine: 1x 18mo_plus duration_band -> the_founders_grip by_state tier=Entrenched, score=33.33",
+        fg_entry_entrenched["tier"] == "Entrenched"
+        and abs(fg_entry_entrenched["score_0_100"] - 33.33) < 0.01,
+        f"got tier={fg_entry_entrenched['tier']!r}, score={fg_entry_entrenched['score_0_100']!r}",
     )
 
     # 27. Two 18mo_plus duration_band inputs -> raw=4.0 -> score=66.67 ->
     # Endemic. Both mapped to SEVER-28/the_founders_grip, same reasoning
     # as test 26 -- a duplicate follow_on_id across two inputs is harmless
     # for this raw-arithmetic check (compute_state_severity() groups by
-    # intended state, not by follow_on_id uniqueness).
+    # intended state, not by follow_on_id uniqueness). Same by_state
+    # correction as test 26, same reason.
     out_endemic = run_accumulated_engine(
         _CP_VECTOR, _LOCKED_INTAKE, 27,
         severity_inputs=[
@@ -430,11 +454,15 @@ with mock.patch.dict("sys.modules", {"anthropic": None}):
              "duration_band": "18mo_plus"},
         ],
     )
+    fg_entry_endemic = next(
+        e for e in out_endemic["severity"]["by_state"]
+        if e["state_id"] == "the_founders_grip"
+    )
     check(
-        "run_accumulated_engine: 2x 18mo_plus duration_band -> tier=Endemic, score=66.67",
-        out_endemic["severity"]["tier"] == "Endemic"
-        and abs(out_endemic["severity"]["score"] - 66.67) < 0.01,
-        f"got tier={out_endemic['severity']['tier']!r}, score={out_endemic['severity']['score']!r}",
+        "run_accumulated_engine: 2x 18mo_plus duration_band -> the_founders_grip by_state tier=Endemic, score=66.67",
+        fg_entry_endemic["tier"] == "Endemic"
+        and abs(fg_entry_endemic["score_0_100"] - 66.67) < 0.01,
+        f"got tier={fg_entry_endemic['tier']!r}, score={fg_entry_endemic['score_0_100']!r}",
     )
 
     # 28. CALIBRATION TARGET exposure, confirmed not assumed: named_condition/
