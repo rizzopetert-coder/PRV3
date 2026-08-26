@@ -152,6 +152,9 @@ export interface CheckpointResult {
   fires: boolean;
   distinguishers: string[]; // DIST-[cluster]-## IDs
   top_cluster: string | null;
+  // Narrative modulation (Phase 3) -- mirrors
+  // CheckpointResultPayload's own field exactly (engine-client.ts).
+  narrative_trigger: boolean;
 }
 
 export interface DiagnosticSession {
@@ -201,6 +204,32 @@ export interface DiagnosticSession {
   // each splice site (checkpoint distinguishers, severity follow-ons,
   // Q28's Q06-conditional splice) in the answer route.
   question_labels: Record<string, string>;
+  // Narrative modulation (Phase 3). narrative_fired guards against
+  // firing twice, same role as severityFollowOnAlreadyAsked() plays
+  // for SEVER-## follow-ons. pending_narrative_prompt is non-null
+  // exactly when the client has been sent a narrative prompt it
+  // hasn't answered yet -- session/resume reads this to reconstruct
+  // the same state without a second LLM call. pending_completion is
+  // true exactly when the final core question has already been
+  // answered but narrative hasn't fired yet -- distinguishes "resume
+  // into the next question" from "resume into completion" once the
+  // narrative response arrives. The remaining fields mirror
+  // NarrativeProcessResult (engine-client.ts) exactly, persisted
+  // across the request boundary between /session/narrative and
+  // whatever request later completes the session.
+  narrative_fired: boolean;
+  narrative_response: string;
+  narrative_severity_addition: number;
+  narrative_trigger_point: "Q27" | "Q34" | null;
+  narrative_overall_confidence: number;
+  narrative_signals_count: number;
+  pre_narrative_rankings: Array<{ state_id: string; rank: number; score: number; distance: number }> | null;
+  // Ceiling binding fix, this session -- mirrors pre_narrative_rankings
+  // exactly. Populated at the same site (session/narrative/route.ts),
+  // from the same invokeNarrativeProcess() result.
+  post_narrative_rankings: Array<{ state_id: string; rank: number; score: number; distance: number }> | null;
+  pending_narrative_prompt: string | null;
+  pending_completion: boolean;
 }
 
 // Anonymized calibration-relevant record — the only thing that survives
@@ -374,6 +403,16 @@ export async function createSession(intake: PrivateIntakeEcho): Promise<Diagnost
     severity_inputs: [],
     severity_follow_on_origins: {},
     question_labels: {},
+    narrative_fired: false,
+    narrative_response: "",
+    narrative_severity_addition: 0,
+    narrative_trigger_point: null,
+    narrative_overall_confidence: 0,
+    narrative_signals_count: 0,
+    pre_narrative_rankings: null,
+    post_narrative_rankings: null,
+    pending_narrative_prompt: null,
+    pending_completion: false,
   };
 
   await redis.set(sessionKey(session.session_id), JSON.stringify(session), {

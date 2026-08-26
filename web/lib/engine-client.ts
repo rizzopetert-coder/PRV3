@@ -279,6 +279,10 @@ export interface CheckpointResultPayload {
   fires: boolean;
   distinguishers: string[];
   top_cluster: string | null;
+  // Narrative modulation (Phase 3) -- True whenever Q27 itself fires
+  // (evaluate_checkpoint() already computed this internally; this
+  // wire field is what surfaces it). False for Q11/Q19 always.
+  narrative_trigger: boolean;
 }
 
 export async function invokeCheckpoint(
@@ -322,6 +326,30 @@ export interface CompletePayload {
   // engine/main.py::_build_signal_map_context()). Session data only,
   // never option_id-to-weight info computed client-side -- P-03.
   answers_log: AnswerLogEntry[];
+  // Narrative modulation (Phase 3) -- all six optional/undefined when
+  // narrative never fired this session, preserving every existing
+  // caller's behavior exactly. narrative_trigger_point mirrors
+  // SessionData.narrative_trigger's own locked vocabulary
+  // ("Q27" | "Q34" | None) -- "Q34" means the standard/end-of-
+  // sequence trigger, not the literal question, matching that
+  // dataclass's pre-existing contract rather than inventing a new
+  // value. The remaining fields (overall_confidence/signals_count/
+  // pre_narrative_rankings) are exactly what invokeNarrativeProcess()
+  // returned earlier this session, round-tripped through Redis --
+  // same P-03 status as accumulated_vector already crossing this
+  // boundary every request.
+  narrative_response?: string;
+  narrative_severity_addition?: number;
+  narrative_trigger_point?: "Q27" | "Q34";
+  narrative_overall_confidence?: number;
+  narrative_signals_count?: number;
+  pre_narrative_rankings?: Array<{ state_id: string; rank: number; score: number; distance: number }>;
+  // Ceiling binding fix (this session's own verification pass) -- the
+  // 12pp state probability ceiling's enforced rankings, threaded
+  // through to run_accumulated_engine() so it's used directly in place
+  // of a fresh rank_states() call, same optional/undefined-when-absent
+  // shape as pre_narrative_rankings above.
+  post_narrative_rankings?: Array<{ state_id: string; rank: number; score: number; distance: number }>;
 }
 
 export async function invokeComplete(
@@ -360,6 +388,66 @@ export interface QuestionCopy {
   question_text: string;
   format: "forced_choice" | "weighted_multi_select";
   options: Array<{ option_id: string; option_text: string }>;
+}
+
+// ---------------------------------------------------------------------------
+// Narrative modulation (Phase 3)
+// ---------------------------------------------------------------------------
+
+export interface NarrativePromptPayload {
+  accumulated_vector: AccumulatedVector;
+  answered_question_count: number;
+}
+
+export interface NarrativePromptResult {
+  prompt: string;
+  is_fallback: boolean;
+}
+
+export async function invokeNarrativePrompt(
+  payload: NarrativePromptPayload,
+): Promise<NarrativePromptResult> {
+  const response = await engineFetch(resolveEnginePath("/api/narrative-prompt"), payload);
+
+  if (!response.ok) {
+    throw new Error(`Narrative-prompt invocation failed: ${response.status}`);
+  }
+
+  return response.json() as Promise<NarrativePromptResult>;
+}
+
+export interface NarrativeProcessPayload {
+  accumulated_vector: AccumulatedVector;
+  narrative_text: string;
+  answered_question_count: number;
+}
+
+// Mirrors process_narrative_response()'s return shape exactly
+// (engine/main.py) -- the caller persists all five fields on the
+// session and threads them into a later CompletePayload so
+// assemble_output()'s narrative_modulation output block reports real
+// values instead of defaults.
+export interface NarrativeProcessResult {
+  accumulated_vector: AccumulatedVector;
+  narrative_severity_addition: number;
+  narrative_overall_confidence: number;
+  narrative_signals_count: number;
+  pre_narrative_rankings: Array<{ state_id: string; rank: number; score: number; distance: number }>;
+  // Ceiling binding fix, this session -- mirrors process_narrative_
+  // response()'s new return key exactly (engine/main.py).
+  post_narrative_rankings: Array<{ state_id: string; rank: number; score: number; distance: number }>;
+}
+
+export async function invokeNarrativeProcess(
+  payload: NarrativeProcessPayload,
+): Promise<NarrativeProcessResult> {
+  const response = await engineFetch(resolveEnginePath("/api/narrative-process"), payload);
+
+  if (!response.ok) {
+    throw new Error(`Narrative-process invocation failed: ${response.status}`);
+  }
+
+  return response.json() as Promise<NarrativeProcessResult>;
 }
 
 export interface CondensedFinancialRange {

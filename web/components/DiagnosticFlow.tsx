@@ -180,6 +180,9 @@ type FlowState =
   | { phase: "intake" }
   | { phase: "loading" }
   | { phase: "question"; sessionId: string; question: QuestionCopy; label: QuestionLabel }
+  // Narrative modulation (Phase 3) -- returned by session/answer or
+  // session/resume in place of the next question, once, per session.
+  | { phase: "narrative"; sessionId: string; prompt: string }
   | { phase: "complete"; result: PrivateOutputPayload }
   | { phase: "error"; message: string };
 
@@ -352,6 +355,49 @@ function IntakeForm({
         className="w-full bg-charcoal text-white font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed mt-3"
       >
         Begin the diagnostic
+      </button>
+    </div>
+  );
+}
+
+// ── Narrative view (Phase 3) ───────────────────────────────────────────────────
+//
+// Mirrors QuestionView's layout wrapper and SignificantEventsField's
+// textarea styling (IntakeForm, above) -- no new visual pattern
+// introduced. Skip is a real, first-class path: the submit button is
+// never disabled on empty text (unlike every other form in this
+// component) -- narrative is "used surgically," an enhancement per
+// P-04, not a mandatory gate.
+
+function NarrativeView({
+  prompt,
+  onSubmit,
+}: {
+  prompt: string;
+  onSubmit: (text: string) => void;
+}) {
+  const [text, setText] = useState("");
+
+  return (
+    <div className="max-w-xl mx-auto px-6 py-16">
+      <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-6">
+        In your own words
+      </p>
+      <h2 className="font-display text-xl md:text-2xl text-charcoal mb-8 leading-snug">
+        {prompt}
+      </h2>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Optional — write as much or as little as you'd like."
+        rows={6}
+        className="w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-charcoal focus:outline-none focus:border-charcoal resize-none mb-3"
+      />
+      <button
+        onClick={() => onSubmit(text)}
+        className="w-full bg-charcoal text-white font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+      >
+        {text.trim().length > 0 ? "Continue" : "Skip this"}
       </button>
     </div>
   );
@@ -537,6 +583,10 @@ export default function DiagnosticFlow() {
         return;
       }
       const data = await res.json();
+      if (data.status === "narrative") {
+        setState({ phase: "narrative", sessionId, prompt: data.prompt });
+        return;
+      }
       setState({
         phase: "question",
         sessionId,
@@ -615,6 +665,8 @@ export default function DiagnosticFlow() {
       const data = await res.json();
       if (data.status === "complete") {
         setState({ phase: "complete", result: data.result as PrivateOutputPayload });
+      } else if (data.status === "narrative") {
+        setState({ phase: "narrative", sessionId, prompt: data.prompt });
       } else {
         setState({
           phase: "question",
@@ -626,6 +678,45 @@ export default function DiagnosticFlow() {
     } catch {
       setState({ phase: "error", message: ERROR_COPY });
     }
+  }
+
+  // Narrative modulation (Phase 3) -- same shape as handleAnswer above,
+  // just posting to a different route. An empty text submission is a
+  // deliberate skip, not an error -- session/narrative/route.ts handles
+  // it as a real, first-class case.
+  async function handleNarrativeSubmit(text: string) {
+    if (state.phase !== "narrative") return;
+    const { sessionId } = state;
+
+    setState({ phase: "loading" });
+    try {
+      const res = await fetch("/api/diagnostic/session/narrative", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, narrative_text: text }),
+      });
+      if (!res.ok) {
+        setState({ phase: "error", message: ERROR_COPY });
+        return;
+      }
+      const data = await res.json();
+      if (data.status === "complete") {
+        setState({ phase: "complete", result: data.result as PrivateOutputPayload });
+      } else {
+        setState({
+          phase: "question",
+          sessionId,
+          question: data.question,
+          label: data.label,
+        });
+      }
+    } catch {
+      setState({ phase: "error", message: ERROR_COPY });
+    }
+  }
+
+  if (state.phase === "narrative") {
+    return <NarrativeView prompt={state.prompt} onSubmit={handleNarrativeSubmit} />;
   }
 
   if (state.phase === "complete") {

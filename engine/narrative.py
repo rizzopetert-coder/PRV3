@@ -19,7 +19,8 @@ import json
 from dataclasses import dataclass, field
 from typing import Optional
 
-from engine.data.states import DIMENSIONAL_FIELDS
+from engine.data.states import DIMENSIONAL_FIELDS, STATE_PROFILES
+from engine.data.salience import SALIENCE_PROFILES
 from engine.accumulation import StateRanking, rank_states
 
 
@@ -410,8 +411,12 @@ def apply_narrative_modulation(
         for f in DIMENSIONAL_FIELDS
     }
 
-    # Re-rank on updated vector
-    post_rankings = rank_states(updated_vector, answered_question_count)
+    # Re-rank on updated vector -- SALIENCE_PROFILES-weighted, matching
+    # pre_rankings above and every rank_states() call in engine/main.py
+    # (fixed this session -- was silently falling back to unweighted
+    # cosine similarity, inert until Bug 1's fix made this value flow
+    # through to real completion).
+    post_rankings = rank_states(updated_vector, answered_question_count, SALIENCE_PROFILES)
 
     # Enforce state probability ceiling (IV.3)
     final_rankings = enforce_state_probability_ceiling(pre_rankings, post_rankings)
@@ -479,3 +484,198 @@ class NarrativeModulationEngine:
         if self.extraction_result is None:
             return []
         return list(self.extraction_result.severity_indicators)
+
+
+# ── Section V integration: severity_indicators -> SeverityEngine ──────────────
+#
+# Found during this session's Gemini architecture review (prompts/
+# narrative-modulation-phase3-gemini-request.md): SeverityIndicator has no
+# schema overlap with SeverityInput/add_input(), but a SEPARATE, already-
+# built, already-ceiling-enforced path exists -- SeverityEngine.
+# set_narrative_contribution(raw_addition: float) (engine/severity.py),
+# feeding NARRATIVE_SEVERITY_CEILING_POINTS (25.0, real and referenced in
+# live scoring logic there). This module's own SEVERITY_CEILING=0.25
+# constant above is a separate, never-referenced-elsewhere declaration --
+# not the real ceiling in effect, which is severity.py's. Kept as-is here
+# rather than removed, to avoid an unrelated edit in this same pass; worth
+# reconciling or removing in a future cleanup, flagged not fixed.
+
+def compute_narrative_severity_addition(
+    extraction_result: NarrativeExtractionResult,
+) -> float:
+    """
+    Converts extracted severity_indicators into the single raw_addition
+    value SeverityEngine.set_narrative_contribution() expects -- the real
+    path for narrative's severity contribution (Section V.1/V.2), not
+    SeverityInput/add_input(), which this data's shape can't satisfy.
+    raw_addition must sit on compute_raw_severity()'s own raw scale (per
+    set_narrative_contribution()'s own docstring) -- real SEVER-##
+    triggers contribute roughly 1.0-3.0 raw points each
+    (duration_weight * population_weight), so this formula's per-
+    indicator ceiling of 1.0 (confidence times confidence, both in
+    [0,1]) mirrors that rough magnitude rather than an unrelated scale.
+
+    Confirmation-and-elevation spirit carried over from
+    build_modulation_vector() (IV.2): weighted by
+    overall_confidence * indicator.confidence, summed across every
+    extracted severity_indicators entry. Below CONFIDENCE_FLOOR,
+    contributes nothing -- mirrors apply_narrative_modulation()'s own
+    floor check exactly, so a low-confidence narrative response never
+    touches severity even where dimensional modulation is also skipped.
+
+    CALIBRATION TARGET: this weighting formula is a reasonable starting
+    construction for this build, not derived from real data -- same
+    status as every other CALIBRATION TARGET constant in this engine,
+    flagged as such rather than presented as precisely derived.
+    """
+    if extraction_result.overall_confidence < CONFIDENCE_FLOOR:
+        return 0.0
+    oc = extraction_result.overall_confidence
+    return sum(oc * ind.confidence for ind in extraction_result.severity_indicators)
+
+
+# ── III.3 generation: the principal-facing narrative prompt itself ────────────
+#
+# Zero code existed anywhere for this direction before this build --
+# extract_signals() (above) only ever extracts FROM a narrative response.
+# P-04 (locked): "Narrative prompt used surgically. Dynamically
+# generated. Not static." New system prompt below is real content-
+# authoring for this build, not a verbatim spec transcription --
+# flagged as such for review.
+
+NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT: str = """\
+You write ONE open-ended question for a principal completing an \
+organizational diagnostic. Your question invites them to describe, in \
+their own words, something happening in their organization that the \
+structured questions so far may not have fully captured.
+
+You are given internal signal only -- never repeat it back, never name \
+it, never let the principal infer it from your phrasing. Use it only to \
+make your question observationally relevant, not diagnostic or leading.
+
+RULES
+- Up to 3 concise sentences: an observational opener, then the \
+open-ended question itself. No explanation after the question.
+- Never name a condition, pattern, or diagnosis. Never use clinical or \
+assessment language ("we've identified," "this suggests," "your \
+organization shows signs of").
+- Never presuppose an answer or imply a problem exists. The principal \
+may have nothing further to add, and the question must not penalize \
+that.
+- Ground the question in the general theme of the internal signal (e.g. \
+authority/decision-making, capability/skill, relationships/\
+coordination, culture/behavior) without naming the specific condition \
+or citing the signal directly.
+- Plain, direct language. No jargon. Second person ("you," "your \
+organization").
+- Output ONLY the question text. No markdown, no quotation marks, no \
+JSON, no surrounding punctuation beyond the question itself.
+"""
+
+_NARRATIVE_PROMPT_FALLBACK: str = (
+    "Is there anything about what's happening in your organization right "
+    "now that you'd want to describe in your own words, even if it "
+    "hasn't come up in the questions so far?"
+)
+
+
+@dataclass
+class NarrativePromptResult:
+    """
+    Result of one generate_narrative_prompt() call.
+    """
+    prompt:      str
+    is_fallback: bool
+    parse_error: str = ""
+
+
+def _build_prompt_generation_input(context: dict) -> str:
+    """
+    Builds the user-message content for generate_narrative_prompt() from
+    build_narrative_prompt_context()'s output. Internal-only signal --
+    state_id/descriptive_prose never reach the principal, only inform
+    what the LLM writes (same P-03 discipline get_question_copy()
+    already applies elsewhere in this engine, applied here to prompt
+    INPUT rather than output). Falls back to a generic framing if no
+    top state is available (e.g. a fully flat/zero-signal session).
+    """
+    top_states = context.get("top_states", [])
+    if not top_states:
+        return (
+            "No strong signal yet in any particular direction. Write a "
+            "general, open-ended question inviting the principal to add "
+            "anything relevant in their own words."
+        )
+    lines = ["Internal signal (never reveal these details to the principal):"]
+    for entry in top_states[:3]:
+        profile = STATE_PROFILES.get(entry.get("state_id", ""))
+        if profile is None:
+            continue
+        prose = profile.descriptive_prose or ""
+        lines.append(f"- {profile.primary_dimension} axis, rank {entry.get('rank')}: {prose}")
+    lines.append(
+        f"\nCurrent entropy: {context.get('entropy')}/{context.get('max_entropy')} "
+        "(higher = less certainty in the current picture)."
+    )
+    return "\n".join(lines)
+
+
+def generate_narrative_prompt(
+    context: dict,
+    model: str = "claude-sonnet-4-6",
+    client=None,
+    timeout: float = 15.0,
+) -> NarrativePromptResult:
+    """
+    Generate the principal-facing narrative question -- P-04 locked
+    ("dynamically generated, not static"). Mirrors
+    engine/output_synthesis.py::synthesize()'s pattern exactly: direct
+    Anthropic call, max_retries=0, the same 15.0s LOCKED timeout real
+    Production latency data justified for this class of call
+    (tools/_mob.txt Section 13a, "Synthesis pipeline failing on
+    Production"). On any failure, returns the static fallback rather
+    than ever blocking the live flow -- narrative modulation is
+    confirmation-and-elevation only, never load-bearing for completion.
+
+    context: build_narrative_prompt_context()'s output (top_states,
+    entropy, max_entropy) -- internal signal only, used to inform theme
+    relevance. Never exposes state_id, dimension names, or scores to
+    the principal -- enforced by the system prompt's own instruction,
+    not by omission from context alone.
+    """
+    try:
+        import anthropic as _anthropic
+    except ImportError:
+        return NarrativePromptResult(
+            prompt=_NARRATIVE_PROMPT_FALLBACK, is_fallback=True,
+            parse_error="anthropic package not installed",
+        )
+
+    if client is None:
+        client = _anthropic.Anthropic(max_retries=0)
+
+    user_content = _build_prompt_generation_input(context)
+
+    try:
+        message = client.messages.create(
+            model=model,
+            max_tokens=150,
+            temperature=0.6,
+            system=NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user_content}],
+            timeout=timeout,
+        )
+        text = message.content[0].text.strip()
+    except Exception as e:
+        return NarrativePromptResult(
+            prompt=_NARRATIVE_PROMPT_FALLBACK, is_fallback=True,
+            parse_error=f"API error: {e}",
+        )
+
+    if not text:
+        return NarrativePromptResult(
+            prompt=_NARRATIVE_PROMPT_FALLBACK, is_fallback=True,
+            parse_error="empty response",
+        )
+
+    return NarrativePromptResult(prompt=text, is_fallback=False)

@@ -45,6 +45,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Session already complete" }, { status: 400 });
   }
 
+  // Narrative modulation (Phase 3) -- a pending narrative prompt isn't a
+  // QUESTION_LIBRARY entry, so it needs its own resume branch, same
+  // reason the live flow itself returns a distinct {status: "narrative"}
+  // response instead of a normal question. Reconstructed from the
+  // already-generated prompt text -- no second LLM call.
+  if (session.pending_narrative_prompt !== null) {
+    return NextResponse.json({ status: "narrative", prompt: session.pending_narrative_prompt });
+  }
+
   const question = await invokeQuestionCopy(session.next_question_id);
   const label = resolveQuestionLabel(session.next_question_id, session.question_labels);
 

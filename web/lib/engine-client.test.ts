@@ -31,9 +31,10 @@ describe("CompletePayload shape (Stage 4 — checkpoint_results addition)", () =
         fires: true,
         distinguishers: ["DIST-CM-01"],
         top_cluster: "C-Manager",
+        narrative_trigger: false,
       },
-      q19: { entropy: 1.1, threshold: 0.4, fires: false, distinguishers: [], top_cluster: null },
-      q27: { entropy: 0.2, threshold: 0.2, fires: false, distinguishers: [], top_cluster: null },
+      q19: { entropy: 1.1, threshold: 0.4, fires: false, distinguishers: [], top_cluster: null, narrative_trigger: false },
+      q27: { entropy: 0.2, threshold: 0.2, fires: false, distinguishers: [], top_cluster: null, narrative_trigger: false },
     };
     const payload: CompletePayload = {
       accumulated_vector: ZERO_VECTOR,

@@ -13,6 +13,8 @@ from engine.main import (
     run_accumulated_engine,
     run_condensed_engine,
     get_question_copy,
+    process_narrative_response,
+    generate_narrative_prompt_for_session,
 )
 from engine.friction_tax import get_industry_wage
 
@@ -159,13 +161,89 @@ async def complete(request: Request):
         checkpoint_results = payload.get("checkpoint_results", {}) if isinstance(payload, dict) else {}
         severity_inputs = payload.get("severity_inputs", []) if isinstance(payload, dict) else []
         answers_log = payload.get("answers_log", []) if isinstance(payload, dict) else []
+        # Narrative modulation (Phase 3) -- both default to ""/0.0,
+        # matching run_accumulated_engine()'s own defaults exactly, so a
+        # session that never triggers narrative sends neither field and
+        # nothing changes for it.
+        narrative_response = payload.get("narrative_response", "") if isinstance(payload, dict) else ""
+        narrative_severity_addition = payload.get("narrative_severity_addition", 0.0) if isinstance(payload, dict) else 0.0
+        narrative_trigger_point = payload.get("narrative_trigger_point") if isinstance(payload, dict) else None
+        narrative_overall_confidence = payload.get("narrative_overall_confidence", 0.0) if isinstance(payload, dict) else 0.0
+        narrative_signals_count = payload.get("narrative_signals_count", 0) if isinstance(payload, dict) else 0
+        pre_narrative_rankings = payload.get("pre_narrative_rankings") if isinstance(payload, dict) else None
+        # Ceiling binding fix, this session -- mirrors pre_narrative_rankings
+        # exactly. See run_accumulated_engine()'s own docstring/comment
+        # (engine/main.py) for why this must be used directly rather than
+        # recomputed from accumulated_vector.
+        post_narrative_rankings = payload.get("post_narrative_rankings") if isinstance(payload, dict) else None
         result = run_accumulated_engine(
             accumulated_vector, intake, answered_question_count, checkpoint_results,
-            severity_inputs, answers_log,
+            severity_inputs, answers_log, narrative_response, narrative_severity_addition,
+            narrative_trigger_point, narrative_overall_confidence, narrative_signals_count,
+            pre_narrative_rankings, post_narrative_rankings,
         )
         return JSONResponse(content=result)
     except KeyError as e:
         raise HTTPException(status_code=400, detail=f"Unknown state ID: {e}")
+    except (TypeError, ValueError) as e:
+        raise HTTPException(status_code=400, detail=f"Invalid payload: {e}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Engine error")
+
+
+@app.post("/api/narrative-prompt")
+async def narrative_prompt(request: Request):
+    # Narrative modulation (Phase 3) -- generates the principal-facing
+    # narrative question. Same pattern as /api/checkpoint: ranks the
+    # session's current accumulated vector internally, never returns
+    # rankings/state_ids/scores (P-03) -- only the prompt text and a
+    # fallback flag cross this boundary.
+    _check_secret(request)
+
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+    try:
+        accumulated_vector = payload.get("accumulated_vector", {}) if isinstance(payload, dict) else {}
+        answered_question_count = payload.get("answered_question_count", 0) if isinstance(payload, dict) else 0
+        result = generate_narrative_prompt_for_session(accumulated_vector, answered_question_count)
+        return JSONResponse(content=result)
+    except (TypeError, ValueError) as e:
+        raise HTTPException(status_code=400, detail=f"Invalid payload: {e}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Engine error")
+
+
+@app.post("/api/narrative-process")
+async def narrative_process(request: Request):
+    # Narrative modulation (Phase 3) -- extracts signals from the
+    # principal's free-text response and applies confidence-gated
+    # dimensional modulation. Does NOT call SeverityEngine or complete
+    # the session -- narrative_severity_addition is returned for the
+    # caller to thread into a LATER /api/complete call, same "thin
+    # wire-shape adapter, no orchestration duplicated" pattern as
+    # every other endpoint here.
+    _check_secret(request)
+
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+    try:
+        accumulated_vector = payload.get("accumulated_vector", {}) if isinstance(payload, dict) else {}
+        narrative_text = payload.get("narrative_text", "") if isinstance(payload, dict) else ""
+        answered_question_count = payload.get("answered_question_count", 0) if isinstance(payload, dict) else 0
+        # Returns accumulated_vector, narrative_severity_addition,
+        # narrative_overall_confidence, narrative_signals_count, and
+        # pre_narrative_rankings -- the caller persists all five and
+        # threads them into a LATER /api/complete call so
+        # assemble_output()'s narrative_modulation output block reports
+        # real values, not defaults.
+        result = process_narrative_response(accumulated_vector, narrative_text, answered_question_count)
+        return JSONResponse(content=result)
     except (TypeError, ValueError) as e:
         raise HTTPException(status_code=400, detail=f"Invalid payload: {e}")
     except Exception:

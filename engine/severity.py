@@ -559,7 +559,7 @@ class SeverityEngine:
             score_0_100_with_narrative=final_score,
             tier=tier,
             tier_description=SEVERITY_TIER_DESCRIPTIONS[tier],
-            narrative_contribution_0_100=narrative_0_100,
+            narrative_contribution_0_100=capped,
             narrative_ceiling_applied=narrative_ceiling_applied,
             input_count=len(self.accumulator.inputs),
             state_severity=state_severity,

@@ -289,15 +289,34 @@ def narrative_should_fire(
     already_fired: bool = False,
 ) -> bool:
     """
-    Determine whether the narrative prompt should fire at this point.
+    Reference implementation of the trigger rule (Section III.3) -- kept
+    for spec-fidelity and documentation, NOT called by the live wiring.
+    Narrative modulation (Phase 3 build, this session) implements the
+    equivalent decision in web/app/api/diagnostic/session/answer/route.ts
+    instead, reading evaluate_checkpoint()'s own narrative_trigger field
+    off the wire directly -- the same pattern every other checkpoint
+    outcome (fires, distinguishers) already uses in this codebase, so
+    narrative firing isn't decided a second, separate way.
 
     Rules (Section III.3):
-      Standard trigger: always fires after Q34, regardless of entropy.
+      Standard trigger: fires once the core question sequence ends,
+                        regardless of entropy. Originally specified as
+                        "after Q34" -- the literal last core question
+                        when this was authored. The core sequence has
+                        since grown past Q34 (Q51 today), so the live
+                        implementation fires against whichever question
+                        is actually last, not a hardcoded position.
       Early trigger:    fires at Q27 if entropy > THRESHOLD_Q27.
-      Replaces rule:    if narrative fired at Q27 (early), it does NOT fire at Q34.
+      Replaces rule:    if narrative fired early (Q27), it does NOT fire
+                        again at the end of the core sequence.
 
     Parameters:
-      checkpoint_position: "Q27" | "Q34"
+      checkpoint_position: "Q27" | "Q34" -- "Q34" here means "the
+                           standard/end-of-sequence trigger," kept as a
+                           literal string for backward compatibility
+                           with this function's existing signature
+                           rather than renamed, since it has no live
+                           caller to break either way.
       entropy:             current Shannon Entropy at this checkpoint
       already_fired:       True if narrative has already fired this session
 

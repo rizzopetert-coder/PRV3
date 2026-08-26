@@ -160,9 +160,11 @@ _CP_VECTOR = {"authority_liability": 5.0}
 result_cp = run_checkpoint("Q11", _CP_VECTOR, 11, [])
 
 # 16. run_checkpoint returns exactly the CheckpointResultPayload contract
+# narrative_trigger added (Narrative modulation Phase 3, this session) --
+# evaluate_checkpoint() already computed it; this just surfaces it on the wire.
 check(
     "run_checkpoint: returns exactly the wire-contract keys",
-    set(result_cp.keys()) == {"entropy", "threshold", "fires", "distinguishers", "top_cluster"},
+    set(result_cp.keys()) == {"entropy", "threshold", "fires", "distinguishers", "top_cluster", "narrative_trigger"},
     f"got keys: {sorted(result_cp.keys())}",
 )
 check(

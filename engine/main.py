@@ -14,6 +14,7 @@ Exceptions propagate. Error handling is the caller's responsibility (api/engine.
 
 from typing import Optional
 from dataclasses import asdict
+from types import SimpleNamespace
 
 from engine.accumulation import (
     IntakeData,
@@ -26,13 +27,23 @@ from engine.accumulation import (
 from engine.severity import SeverityEngine, SeverityInput
 from engine.output import OutputEngine
 from engine.contract import SessionData, assemble_output, _compute_asset_score, _compute_liability_score
-from engine.checkpoint import evaluate_checkpoint, checkpoint_result_from_wire
+from engine.checkpoint import (
+    evaluate_checkpoint,
+    checkpoint_result_from_wire,
+    build_narrative_prompt_context,
+)
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.data.questions import QUESTION_LIBRARY
 from engine.data.salience import SALIENCE_PROFILES
 from engine.output_synthesis import OutputSynthesisEngine, SynthesisResult
 from engine.resolution_families import translate_resolution_family
 from engine.data.fallback_synthesis import get_fallback_synthesis
+from engine.narrative import (
+    extract_signals,
+    apply_narrative_modulation,
+    generate_narrative_prompt,
+    compute_narrative_severity_addition,
+)
 
 
 def run_engine(
@@ -459,7 +470,112 @@ def run_checkpoint(
         "fires": result.fires,
         "distinguishers": [q.question_id for q in result.distinguishers],
         "top_cluster": result.top_cluster,
+        # Narrative modulation (Phase 3) -- evaluate_checkpoint() already
+        # computes this (True whenever Q27's own entropy check fires);
+        # this is the entire remaining wire-shape gap for the early
+        # trigger, confirmed absent by direct read before this fix.
+        "narrative_trigger": result.narrative_trigger,
     }
+
+
+# ── Narrative modulation (Phase 3) orchestrator ────────────────────────────────
+
+def process_narrative_response(
+    accumulated_vector: dict,
+    narrative_text: str,
+    answered_question_count: int,
+) -> dict:
+    """
+    Path 1 narrative modulation orchestrator. Extracts signals from the
+    principal's free-text narrative response, applies confidence-gated
+    dimensional modulation (confirmation-and-elevation only, 12%
+    state-probability ceiling), and computes the raw severity addition
+    for SeverityEngine.set_narrative_contribution() at completion.
+    Mirrors run_checkpoint()'s own thin-wire-shape-adapter role -- no
+    orchestration logic duplicated here beyond what narrative.py's own
+    functions already provide.
+
+    Ceiling binding, this session's own verification fix: the 12-point
+    state ceiling (enforce_state_probability_ceiling(), called inside
+    apply_narrative_modulation()) is computed once, against rankings at
+    the exact moment narrative fires, and returned here as
+    post_narrative_rankings -- threaded by the caller into
+    run_accumulated_engine()'s post_narrative_rankings parameter, which
+    uses it DIRECTLY in place of a fresh rank_states() call at
+    completion. Previously this capped result was computed correctly
+    but discarded (_final_rankings, never used), so the ceiling never
+    actually constrained what reached a session -- confirmed via direct
+    testing, not assumed.
+
+    RESIDUAL LIMITATION (early Q27 trigger only, unchanged by the above
+    fix): for the standard (last-core-question) trigger this snapshot
+    is exactly right, nothing is accumulated afterward. For the early
+    (Q27) trigger, further core questions get answered and accumulated
+    on top of this vector afterward, and post_narrative_rankings is a
+    snapshot taken before that later accumulation -- it binds what the
+    session actually uses, but is not re-verified against the vector's
+    true final state at completion. This function takes the simple,
+    honest path (bind the ceiling as computed at time-of-firing) rather
+    than inventing an unproven defer-to-completion mechanism.
+
+    Returns {"accumulated_vector": dict, "narrative_severity_addition": float,
+    "pre_narrative_rankings": list, "post_narrative_rankings": list, ...}.
+    On any extraction failure (API error, missing package),
+    extract_signals() itself already returns a zero-confidence result --
+    modulation and severity addition both become no-ops, matching
+    apply_narrative_modulation()'s own "no modulation" floor-check
+    path (post_narrative_rankings then equals pre_narrative_rankings,
+    same values, no cap ever triggers on a no-op). The live flow is
+    never blocked by a narrative-extraction failure.
+    """
+    pre_rankings = rank_states(accumulated_vector, answered_question_count, SALIENCE_PROFILES)
+    extraction_result = extract_signals(narrative_text)
+    updated_vector, final_rankings = apply_narrative_modulation(
+        accumulated_vector, extraction_result, pre_rankings, answered_question_count,
+    )
+    severity_addition = compute_narrative_severity_addition(extraction_result)
+    return {
+        "accumulated_vector": updated_vector,
+        "narrative_severity_addition": severity_addition,
+        # engine/contract.py::assemble_output()'s narrative_modulation
+        # output block needs these at completion time -- found while
+        # wiring SessionData below, not part of the original plan.
+        # Serialized to plain dicts (same P-03 status as
+        # accumulated_vector already crossing this boundary every
+        # request today, not a new exposure category).
+        "narrative_overall_confidence": extraction_result.overall_confidence,
+        "narrative_signals_count": len(extraction_result.identified_signals),
+        "pre_narrative_rankings": [
+            {"state_id": r.state_id, "rank": r.rank, "score": r.score, "distance": r.distance}
+            for r in pre_rankings
+        ],
+        # Ceiling binding fix -- see docstring above. Same plain-dict
+        # shape as pre_narrative_rankings.
+        "post_narrative_rankings": [
+            {"state_id": r.state_id, "rank": r.rank, "score": r.score, "distance": r.distance}
+            for r in final_rankings
+        ],
+    }
+
+
+def generate_narrative_prompt_for_session(
+    accumulated_vector: dict,
+    answered_question_count: int,
+) -> dict:
+    """
+    Thin wire-shape adapter for the new /api/narrative-prompt route --
+    ranks the session's current accumulated vector (same reference
+    pattern as run_checkpoint()/run_accumulated_engine()), builds the
+    narrative prompt context, and generates the principal-facing
+    question. Returns ONLY the prompt text and a fallback flag --
+    rankings/state_ids/scores never cross this boundary (P-03), exactly
+    the same discipline get_question_copy() already enforces for
+    question content.
+    """
+    rankings = rank_states(accumulated_vector, answered_question_count, SALIENCE_PROFILES)
+    context = build_narrative_prompt_context(rankings)
+    result = generate_narrative_prompt(context)
+    return {"prompt": result.prompt, "is_fallback": result.is_fallback}
 
 
 def _build_signal_map_context(
@@ -608,6 +724,13 @@ def run_accumulated_engine(
     checkpoint_results: Optional[dict] = None,
     severity_inputs: Optional[list] = None,
     answers_log: Optional[list] = None,
+    narrative_response: str = "",
+    narrative_severity_addition: float = 0.0,
+    narrative_trigger_point: Optional[str] = None,
+    narrative_overall_confidence: float = 0.0,
+    narrative_signals_count: int = 0,
+    pre_narrative_rankings: Optional[list] = None,
+    post_narrative_rankings: Optional[list] = None,
 ) -> dict:
     """
     Path 1 completion orchestrator ("Path A" -- real accumulation-based
@@ -618,7 +741,16 @@ def run_accumulated_engine(
     instead of Path B's synthetic score=1.0 declared rankings. Same
     reference pattern as tools/calibration_runner.py's run_profile().
 
-    Phase 1 has no narrative modulation -- narrative_response is always "".
+    Narrative modulation (Phase 3): narrative_response is the principal's
+    free-text response, threaded straight into synthesize() (which
+    already accepted this parameter -- only the hardcoded "" at this
+    call site changed). narrative_severity_addition is the raw value
+    from engine.narrative.compute_narrative_severity_addition(),
+    threaded into SeverityEngine.set_narrative_contribution() below
+    before .score() -- the real, already-built, already-ceiling-
+    enforced path (engine/severity.py). Both default to "" / 0.0,
+    preserving every existing caller's behavior exactly (Path B and
+    any Path 1 session that never triggers narrative).
 
     Severity follow-on wiring (Path 1 only): severity_inputs is an optional
     list of dicts, each shaped like accumulate_one_answer()'s
@@ -660,11 +792,34 @@ def run_accumulated_engine(
     """
     intake_data = _locked_intake_to_engine_intake(intake)
 
-    final_rankings = rank_states(accumulated_vector, answered_question_count, SALIENCE_PROFILES)
+    # Ceiling binding fix (this session's own verification pass): when
+    # narrative modulation fired and produced a ceiling-enforced
+    # rankings list, use it directly instead of a fresh rank_states()
+    # call -- the 12pp state probability ceiling (enforce_state_
+    # probability_ceiling(), engine/narrative.py) is expressed as a
+    # constraint on RANKINGS, not on accumulated_vector, and there is no
+    # vector that would reproduce an arbitrary post-hoc-capped ranking
+    # set through this same salience-weighted distance computation --
+    # recomputing from accumulated_vector here would silently discard
+    # the cap every time, which is exactly the bug this fixes. None
+    # (the default) preserves today's exact behavior for every existing
+    # caller and any session that never triggers narrative.
+    if post_narrative_rankings:
+        final_rankings = [
+            StateRanking(
+                rank=r["rank"], state_id=r["state_id"],
+                distance=r["distance"], score=r["score"],
+            )
+            for r in post_narrative_rankings
+        ]
+    else:
+        final_rankings = rank_states(accumulated_vector, answered_question_count, SALIENCE_PROFILES)
 
     severity_engine = SeverityEngine()
     for severity_input in (severity_inputs or []):
         severity_engine.add_input(SeverityInput(**severity_input))
+    if narrative_severity_addition:
+        severity_engine.set_narrative_contribution(narrative_severity_addition)
     severity_result = severity_engine.score()
 
     output_engine = OutputEngine()
@@ -703,7 +858,7 @@ def run_accumulated_engine(
             resolution_family=commercial_family,
             asset_score=asset_obj["score"],
             liability_score=liability_obj["score"],
-            narrative_response="",
+            narrative_response=narrative_response,
             intake=intake,
             signal_map_context=signal_map_context,
         )
@@ -715,6 +870,35 @@ def run_accumulated_engine(
     trajectory_result = _compute_trajectory_context(answers_log or [], intake_data, duration_band)
 
     checkpoint_results = checkpoint_results or {}
+
+    # Narrative modulation (Phase 3) -- reconstructs a minimal duck-typed
+    # stand-in for NarrativeExtractionResult exposing exactly the two
+    # attributes assemble_output() actually reads (overall_confidence,
+    # len(identified_signals)) rather than round-tripping the full
+    # nested dataclass (identified_signals' real content is never used
+    # downstream of extraction itself). None when narrative never fired
+    # this session (narrative_trigger_point is None), matching
+    # narrative_result's own Optional default.
+    narrative_result = (
+        SimpleNamespace(
+            overall_confidence=narrative_overall_confidence,
+            identified_signals=[None] * narrative_signals_count,
+        )
+        if narrative_trigger_point is not None
+        else None
+    )
+    pre_narrative_rankings_objs = (
+        [
+            StateRanking(
+                rank=r["rank"], state_id=r["state_id"],
+                distance=r["distance"], score=r["score"],
+            )
+            for r in pre_narrative_rankings
+        ]
+        if pre_narrative_rankings
+        else None
+    )
+
     session_data = SessionData(
         session_id=SessionData.new_session_id(),
         intake=intake_data,
@@ -722,6 +906,9 @@ def run_accumulated_engine(
         accumulated_vector=accumulated_vector,
         output_package=output_package,
         severity_result=severity_result,
+        narrative_result=narrative_result,
+        narrative_trigger=narrative_trigger_point,
+        pre_narrative_rankings=pre_narrative_rankings_objs,
         checkpoint_q11=checkpoint_result_from_wire("Q11", checkpoint_results.get("q11")),
         checkpoint_q19=checkpoint_result_from_wire("Q19", checkpoint_results.get("q19")),
         checkpoint_q27=checkpoint_result_from_wire("Q27", checkpoint_results.get("q27")),

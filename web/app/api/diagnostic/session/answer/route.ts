@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   getSession,
   saveSession,
-  completeSession,
   spliceDistinguishers,
   isLastQuestionInSequence,
   validateIndexInvariant,
@@ -16,15 +15,11 @@ import {
 import {
   invokeAccumulate,
   invokeCheckpoint,
-  invokeComplete,
   invokeQuestionCopy,
+  invokeNarrativePrompt,
+  type CheckpointResultPayload,
 } from "@/lib/engine-client";
-import type {
-  PrivateOutputPayload,
-  StateRef,
-  SynthesisFields,
-} from "@/lib/types";
-import { translateResolutionFamily } from "@/lib/resolution-family";
+import { completeDiagnosticSession } from "@/lib/diagnostic-completion";
 
 // Checkpoint ID mapping (Phase 2) — Q27 has two branch IDs (Q27A/Q27B)
 // depending on intake.significant_events; Phase 1's locked intake adapter
@@ -234,6 +229,8 @@ export async function POST(request: NextRequest) {
   // session, guarded by the slot-null check (the index invariant above
   // should already prevent replaying a question_id, but this doesn't rely
   // on that alone, per explicit instruction).
+  let checkpointResult: CheckpointResultPayload | undefined;
+
   const checkpointPosition = checkpointIdMap[question_id];
   if (checkpointPosition && checkpointSlot(session, checkpointPosition) === null) {
     const alreadyAsked = session.answers_log
@@ -244,7 +241,7 @@ export async function POST(request: NextRequest) {
     // this route's existing philosophy for the index invariant above. A
     // checkpoint call that fails must not be treated as "evaluated, did
     // not fire."
-    const checkpointResult = await invokeCheckpoint({
+    checkpointResult = await invokeCheckpoint({
       checkpoint_position: checkpointPosition,
       accumulated_vector: session.accumulated_vector,
       // True live count at this exact moment, not derived from
@@ -276,6 +273,41 @@ export async function POST(request: NextRequest) {
   // hardcoded position 34.
   const isLastQuestion = isLastQuestionInSequence(session.question_sequence, currentIndex);
 
+  // Narrative modulation (Phase 3) -- fires at most once per session
+  // (!session.narrative_fired guards both trigger paths). Early trigger:
+  // Q27's own checkpoint already computed narrative_trigger internally
+  // (evaluate_checkpoint(), engine/checkpoint.py) -- this route just
+  // reads it off the wire, the same pattern every other checkpoint
+  // outcome (fires, distinguishers) already uses here. Standard trigger:
+  // isLastQuestion, matching SessionData.narrative_trigger's own locked
+  // "Q34" label for "the end-of-sequence trigger," not the literal
+  // question (the core sequence has grown past Q34 since that
+  // vocabulary was authored).
+  const narrativeShouldFireNow =
+    !session.narrative_fired && (checkpointResult?.narrative_trigger === true || isLastQuestion);
+
+  if (narrativeShouldFireNow) {
+    if (!isLastQuestion) {
+      const nextQuestionId = session.question_sequence[currentIndex + 1];
+      session.next_question_id = nextQuestionId;
+    } else {
+      // No "next" question exists -- mark completion pending so
+      // session/narrative knows to complete, not advance, once the
+      // principal's response comes back. Mirrors this same
+      // save-before-engine-call discipline the completion branch below
+      // already follows.
+      session.pending_completion = true;
+    }
+
+    const promptResult = await invokeNarrativePrompt({
+      accumulated_vector: session.accumulated_vector,
+      answered_question_count: session.answers_log.length,
+    });
+    session.pending_narrative_prompt = promptResult.prompt;
+    await saveSession(session);
+    return NextResponse.json({ status: "narrative", prompt: promptResult.prompt });
+  }
+
   if (!isLastQuestion) {
     const nextQuestionId = session.question_sequence[currentIndex + 1];
     session.next_question_id = nextQuestionId;
@@ -286,107 +318,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: "in_progress", question: nextQuestion, label });
   }
 
-  // Q34 just answered — completion. Persist the fully-accumulated final
-  // state BEFORE calling the engine -- mirrors the non-last-question
-  // branch's own save-then-call order above. Without this, a failure in
-  // invokeComplete() below left Redis showing the session's state from
-  // BEFORE this final answer, so a resume (or a retry) saw the exact same
-  // stuck pre-completion state forever -- confirmed live this session (a
-  // real Production 400 from a downstream engine validation error left a
-  // test session permanently unable to progress). Known residual risk,
-  // not solved here (bigger scope than this fix, per explicit instruction):
-  // next_question_id is unchanged (there is no "next" for the final
-  // question), so a raw retry of the identical request would still pass
-  // validateIndexInvariant() and re-accumulate this answer a second time.
+  // isLastQuestion, and narrative already fired earlier (the Q27 early
+  // trigger) -- proceed straight to completion. Persist the
+  // fully-accumulated final state BEFORE calling the engine -- mirrors
+  // the non-last-question branch's own save-then-call order above.
+  // Without this, a failure in the engine call left Redis showing the
+  // session's state from BEFORE this final answer, so a resume (or a
+  // retry) saw the exact same stuck pre-completion state forever --
+  // confirmed live in an earlier session (a real Production 400 from a
+  // downstream engine validation error left a test session permanently
+  // unable to progress). Known residual risk, not solved here (bigger
+  // scope than that fix, per explicit instruction at the time): if
+  // narrative already fired, next_question_id is unchanged (there is no
+  // "next" for the final question), so a raw retry of the identical
+  // request would still pass validateIndexInvariant() and re-accumulate
+  // this answer a second time.
   await saveSession(session);
-
-  // Route into the real accumulation-based engine pipeline (Path A), not
-  // Path B's declared-diagnosis shortcut.
-  const engineResult = await invokeComplete({
-    accumulated_vector: session.accumulated_vector,
-    intake: session.intake,
-    answered_question_count: session.answers_log.length,
-    checkpoint_results: {
-      q11: session.checkpoint_q11,
-      q19: session.checkpoint_q19,
-      q27: session.checkpoint_q27,
-    },
-    severity_inputs: session.severity_inputs,
-    answers_log: session.answers_log,
-  });
-
-  const allEngineStates = engineResult.identified_states;
-  if (allEngineStates.length === 0) {
-    return NextResponse.json({ error: "Engine returned no states" }, { status: 500 });
-  }
-
-  // Path A weighting — real normalized cosine scores, not Path B's equal
-  // weight. Mirrors the doc comment already on StateRef in web/lib/types.ts:
-  // "Path A (full diagnostic): weight = score_i / sum(all_returned_scores)".
-  const totalScore = allEngineStates.reduce((sum, s) => sum + s.score, 0);
-  const stateRefs: StateRef[] = allEngineStates.map((s) => ({
-    id: s.state_id,
-    name: s.state_name,
-    weight: totalScore > 0 ? s.score / totalScore : 1 / allEngineStates.length,
-    descriptive_prose: s.descriptive_prose,
-  }));
-
-  const engSynthesis = engineResult.synthesis;
-  const synthesis: SynthesisFields = engSynthesis
-    ? {
-        liability_condition_text:     engSynthesis.liability_condition_text,
-        asset_resolution_anchor_text: engSynthesis.asset_resolution_anchor_text,
-        framing_text:                 engSynthesis.framing_text,
-        observable_indicators:        engSynthesis.observable_indicators,
-        resolution_framing_text:      engSynthesis.resolution_framing_text,
-        headline:                     engSynthesis.headline,
-        synthesis_confidence:         engSynthesis.synthesis_confidence,
-        is_fallback:                  engSynthesis.is_fallback,
-      }
-    : {
-        liability_condition_text:     "",
-        asset_resolution_anchor_text: "",
-        framing_text:                 "",
-        observable_indicators:        [],
-        resolution_framing_text:      "",
-        headline:                     "",
-        synthesis_confidence:         0.0,
-        is_fallback:                  true,
-      };
-
-  const privatePayload: PrivateOutputPayload = {
-    synthesis,
-
-    primary_state: stateRefs[0],
-    secondary_states: stateRefs.slice(1),
-
-    severity: engineResult.severity.tier,
-    severity_by_state: engineResult.severity.by_state,
-
-    resolution_family: translateResolutionFamily(engineResult.private_output.resolution_routing),
-    resolution_routing: engineResult.private_output.resolution_routing,
-
-    friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
-    legal_tail_risk_exposure: engineResult.private_output.legal_tail_risk_exposure,
-
-    cascade_risk: engineResult.private_output.cascade_risk,
-    causation_pattern: engineResult.private_output.causation_pattern,
-    trajectory: engineResult.private_output.trajectory,
-    urgency_window: engineResult.private_output.urgency_window,
-
-    intake: session.intake,
-
-    dimension_summary: engineResult.dimension_summary,
-    primary_asset_domain: engineResult.asset_score.primary_asset_domain,
-  };
-
-  // Transition Rule — strips identifiable data the moment status becomes
-  // complete. session itself is never marked "complete" and re-saved; it
-  // is deleted outright inside completeSession().
-  await completeSession(
-    session,
-    stateRefs.map((s) => ({ id: s.id, name: s.name, weight: s.weight })),
-  );
-
-  return NextResponse.json({ status: "complete", result: privatePayload });
+  return completeDiagnosticSession(session);
 }
