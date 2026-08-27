@@ -29,10 +29,10 @@ describe("spliceDistinguishers", () => {
 
     // Input untouched.
     expect(template).toEqual([...PHASE_1_QUESTION_SEQUENCE]);
-    expect(template).toHaveLength(42);
+    expect(template).toHaveLength(47);
 
     // Output matches Stage 3's hand-traced shape exactly.
-    expect(result).toHaveLength(44);
+    expect(result).toHaveLength(49);
     expect(result[currentIndex]).toBe("Q11");
     expect(result[currentIndex + 1]).toBe("DIST-CM-01");
     expect(result[currentIndex + 2]).toBe("DIST-CM-02");
@@ -111,7 +111,7 @@ describe("severity follow-on splice — reuses spliceDistinguishers() directly",
 
     const result = spliceDistinguishers(template, q22Index, ["SEVER-04"]);
 
-    expect(result).toHaveLength(43);
+    expect(result).toHaveLength(48);
     expect(result[q22Index]).toBe("Q22");
     expect(result[q22Index + 1]).toBe("SEVER-04");
     expect(result[q22Index + 2]).toBe("Q23");
@@ -123,7 +123,7 @@ describe("severity follow-on splice — reuses spliceDistinguishers() directly",
     // Q22 triggers a severity follow-on.
     const q22Index = sequence.indexOf("Q22");
     sequence = spliceDistinguishers(sequence, q22Index, ["SEVER-04"]);
-    expect(sequence).toHaveLength(43);
+    expect(sequence).toHaveLength(48);
 
     // Q19 (checkpoint position, earlier in the sequence) — real order
     // wouldn't have Q19 fire after Q22 in a live session, but this proves
@@ -131,7 +131,7 @@ describe("severity follow-on splice — reuses spliceDistinguishers() directly",
     // applied to the same evolving array.
     const q19Index = sequence.indexOf("Q19");
     sequence = spliceDistinguishers(sequence, q19Index, ["DIST-CC-01"]);
-    expect(sequence).toHaveLength(44);
+    expect(sequence).toHaveLength(49);
 
     expect(sequence[q19Index + 1]).toBe("DIST-CC-01");
     // Q22's own splice, further down the array, is unaffected in content
@@ -177,8 +177,8 @@ describe("Q28/Q31 parked (live-session investigation)", () => {
     expect(PHASE_1_QUESTION_SEQUENCE).not.toContain("Q31");
   });
 
-  it("TOTAL_CORE_QUESTIONS reflects the 42-entry sequence, not a stale hardcoded 32", () => {
-    expect(TOTAL_CORE_QUESTIONS).toBe(42);
+  it("TOTAL_CORE_QUESTIONS reflects the 47-entry sequence, not a stale hardcoded 32", () => {
+    expect(TOTAL_CORE_QUESTIONS).toBe(47);
     expect(TOTAL_CORE_QUESTIONS).toBe(PHASE_1_QUESTION_SEQUENCE.length);
   });
 });
@@ -245,12 +245,13 @@ describe("resolveQuestionLabel", () => {
 });
 
 describe("regression — Stage 3 trace (c): three compounding checkpoint splices", () => {
-  it("Q11+2, Q19+1, Q27B+3 compound correctly, landing Q34 at index 36 of a length-48 sequence", () => {
-    // Base length is 42 (Q28/Q29/Q31 parked before Q34's position; Q40-Q44
-    // and Q46-Q51 added after it -- see PHASE_1_QUESTION_SEQUENCE's own
+  it("Q11+2, Q19+1, Q27B+3 compound correctly, landing Q34 at index 36 of a length-53 sequence", () => {
+    // Base length is 47 (Q28/Q29/Q31 parked before Q34's position; Q35-Q39
+    // and Q40-Q51 added after it -- see PHASE_1_QUESTION_SEQUENCE's own
     // comment). Q11/Q19/Q27B all sit before both the removal and addition
     // points, so their own base indices are unchanged from before; only
-    // the totals below (and Q34's final index) differ.
+    // the totals below differ. Q34's own final index (36) is also
+    // unchanged, since Q35-Q39 insert after Q34, not before it.
     let sequence: string[] = [...PHASE_1_QUESTION_SEQUENCE];
 
     // Q11 fires with 2 distinguishers.
@@ -260,14 +261,14 @@ describe("regression — Stage 3 trace (c): three compounding checkpoint splices
       "DIST-CM-01",
       "DIST-CM-02",
     ]);
-    expect(sequence).toHaveLength(44);
+    expect(sequence).toHaveLength(49);
 
     // Q19 fires with 1 distinguisher — its index has shifted +2 from the
     // first splice.
     currentIndex = sequence.indexOf("Q19");
     expect(currentIndex).toBe(20);
     sequence = spliceDistinguishers(sequence, currentIndex, ["DIST-CC-01"]);
-    expect(sequence).toHaveLength(45);
+    expect(sequence).toHaveLength(50);
 
     // Q27B fires with 3 distinguishers — its index has shifted +3
     // cumulative from the first two splices.
@@ -278,7 +279,7 @@ describe("regression — Stage 3 trace (c): three compounding checkpoint splices
       "DIST-X-02",
       "DIST-X-03",
     ]);
-    expect(sequence).toHaveLength(48);
+    expect(sequence).toHaveLength(53);
 
     // Q34's own index after all three splices compound. It is no longer
     // the true final question -- Q40-Q44/Q46-Q51 exist after it in the

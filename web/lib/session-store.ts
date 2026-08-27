@@ -8,8 +8,9 @@
 //
 // Phase 1 scope: linear core sequence (see PHASE_1_QUESTION_SEQUENCE) plus
 // live splices -- Phase 2 checkpoint distinguishers, severity follow-ons,
-// and Q28's Q06-conditional splice are all wired and live. No narrative
-// modulation, no Aptitude addenda (Q35-Q39).
+// and Q28's Q06-conditional splice are all wired and live. Aptitude addenda
+// (Q35-Q39) are wired too, as plain unconditional core questions. No
+// narrative modulation.
 // next_question_id is a string (question ID), not a positional integer —
 // dynamic splice-based assignment does not require a schema change.
 //
@@ -81,6 +82,14 @@ export const PHASE_1_QUESTION_SEQUENCE: readonly string[] = [
   "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17", "Q18", "Q19", "Q20",
   "Q21", "Q22", "Q23", "Q24", "Q25", "Q26", "Q27B", "Q30",
   "Q32", "Q33", "Q34",
+  // Aptitude addenda (Q35-Q39) -- authored Session 14, never previously
+  // added to this array. Plain unconditional core questions (no
+  // severity_trigger, no conditional-splice metadata in
+  // engine/data/questions.py), inserted at their own authored
+  // sequence_position (35-39). Already answered unconditionally by every
+  // profile in tools/calibration_runner.py's _CORE_QUESTION_IDS loop --
+  // this closes a live/calibration mismatch, not new uncalibrated signal.
+  "Q35", "Q36", "Q37", "Q38", "Q39",
   // MC_CENTROID_39 recalibration, Step 1 core expansion (this session) --
   // Q40-Q49 close severity-tier reachability for 7 states; Q50-Q51 are
   // the_inner_circle's own two questions (58th state). Full content/
