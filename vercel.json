@@ -35,6 +35,14 @@
       "dest": "/api/engine.py"
     },
     {
+      "src": "/api/narrative-prompt",
+      "dest": "/api/engine.py"
+    },
+    {
+      "src": "/api/narrative-process",
+      "dest": "/api/engine.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "/web/$1"
     }
