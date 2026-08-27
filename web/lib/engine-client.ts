@@ -343,13 +343,14 @@ export interface CompletePayload {
   narrative_trigger_point?: "Q27" | "Q34";
   narrative_overall_confidence?: number;
   narrative_signals_count?: number;
-  pre_narrative_rankings?: Array<{ state_id: string; rank: number; score: number; distance: number }>;
-  // Ceiling binding fix (this session's own verification pass) -- the
-  // 12pp state probability ceiling's enforced rankings, threaded
-  // through to run_accumulated_engine() so it's used directly in place
-  // of a fresh rank_states() call, same optional/undefined-when-absent
-  // shape as pre_narrative_rankings above.
-  post_narrative_rankings?: Array<{ state_id: string; rank: number; score: number; distance: number }>;
+  // Pure Stateful Modulation with Completion Re-ranking (this session's
+  // fix, replacing pre_narrative_rankings/post_narrative_rankings) --
+  // accumulated_vector exactly as it stood before narrative's
+  // modulation was applied. run_accumulated_engine() derives both
+  // halves of the 12pp ceiling comparison from this and the session's
+  // TRUE final accumulated_vector at completion time, rather than a
+  // ranking snapshot frozen at whichever question narrative fired on.
+  pre_narrative_vector?: AccumulatedVector;
 }
 
 export async function invokeComplete(
@@ -423,19 +424,19 @@ export interface NarrativeProcessPayload {
 }
 
 // Mirrors process_narrative_response()'s return shape exactly
-// (engine/main.py) -- the caller persists all five fields on the
+// (engine/main.py) -- the caller persists all four fields on the
 // session and threads them into a later CompletePayload so
 // assemble_output()'s narrative_modulation output block reports real
 // values instead of defaults.
 export interface NarrativeProcessResult {
   accumulated_vector: AccumulatedVector;
+  // Pure Stateful Modulation with Completion Re-ranking (this session's
+  // fix) -- accumulated_vector exactly as it stood before this
+  // modulation was applied. See CompletePayload's own field above.
+  pre_narrative_vector: AccumulatedVector;
   narrative_severity_addition: number;
   narrative_overall_confidence: number;
   narrative_signals_count: number;
-  pre_narrative_rankings: Array<{ state_id: string; rank: number; score: number; distance: number }>;
-  // Ceiling binding fix, this session -- mirrors process_narrative_
-  // response()'s new return key exactly (engine/main.py).
-  post_narrative_rankings: Array<{ state_id: string; rank: number; score: number; distance: number }>;
 }
 
 export async function invokeNarrativeProcess(

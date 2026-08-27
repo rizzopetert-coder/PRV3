@@ -87,8 +87,9 @@ export async function POST(request: NextRequest) {
   session.narrative_trigger_point = session.pending_completion ? "Q34" : "Q27";
   session.narrative_overall_confidence = result.narrative_overall_confidence;
   session.narrative_signals_count = result.narrative_signals_count;
-  session.pre_narrative_rankings = result.pre_narrative_rankings;
-  session.post_narrative_rankings = result.post_narrative_rankings;
+  // Pure Stateful Modulation with Completion Re-ranking (this session's
+  // fix) -- see session-store.ts's own field comment.
+  session.pre_narrative_vector = result.pre_narrative_vector;
   session.pending_narrative_prompt = null;
 
   if (session.pending_completion) {

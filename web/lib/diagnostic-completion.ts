@@ -46,8 +46,9 @@ export async function completeDiagnosticSession(
     narrative_trigger_point: session.narrative_trigger_point ?? undefined,
     narrative_overall_confidence: session.narrative_fired ? session.narrative_overall_confidence : undefined,
     narrative_signals_count: session.narrative_fired ? session.narrative_signals_count : undefined,
-    pre_narrative_rankings: session.pre_narrative_rankings ?? undefined,
-    post_narrative_rankings: session.post_narrative_rankings ?? undefined,
+    // Pure Stateful Modulation with Completion Re-ranking (this
+    // session's fix) -- see session-store.ts's own field comment.
+    pre_narrative_vector: session.pre_narrative_vector ?? undefined,
   });
 
   const allEngineStates = engineResult.identified_states;

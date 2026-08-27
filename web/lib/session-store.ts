@@ -232,11 +232,16 @@ export interface DiagnosticSession {
   narrative_trigger_point: "Q27" | "Q34" | null;
   narrative_overall_confidence: number;
   narrative_signals_count: number;
-  pre_narrative_rankings: Array<{ state_id: string; rank: number; score: number; distance: number }> | null;
-  // Ceiling binding fix, this session -- mirrors pre_narrative_rankings
-  // exactly. Populated at the same site (session/narrative/route.ts),
-  // from the same invokeNarrativeProcess() result.
-  post_narrative_rankings: Array<{ state_id: string; rank: number; score: number; distance: number }> | null;
+  // Pure Stateful Modulation with Completion Re-ranking (this session's
+  // fix, replacing pre_narrative_rankings/post_narrative_rankings) --
+  // accumulated_vector exactly as it stood before narrative's
+  // modulation was applied. Populated at session/narrative/route.ts
+  // from invokeNarrativeProcess()'s result, threaded into
+  // diagnostic-completion.ts's CompletePayload at true completion so
+  // run_accumulated_engine() can re-derive the 12pp ceiling comparison
+  // against the session's real final accumulated_vector, not a
+  // snapshot frozen at whichever question narrative fired on.
+  pre_narrative_vector: AccumulatedVector | null;
   pending_narrative_prompt: string | null;
   pending_completion: boolean;
 }
@@ -418,8 +423,7 @@ export async function createSession(intake: PrivateIntakeEcho): Promise<Diagnost
     narrative_trigger_point: null,
     narrative_overall_confidence: 0,
     narrative_signals_count: 0,
-    pre_narrative_rankings: null,
-    post_narrative_rankings: null,
+    pre_narrative_vector: null,
     pending_narrative_prompt: null,
     pending_completion: false,
   };

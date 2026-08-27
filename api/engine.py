@@ -170,17 +170,18 @@ async def complete(request: Request):
         narrative_trigger_point = payload.get("narrative_trigger_point") if isinstance(payload, dict) else None
         narrative_overall_confidence = payload.get("narrative_overall_confidence", 0.0) if isinstance(payload, dict) else 0.0
         narrative_signals_count = payload.get("narrative_signals_count", 0) if isinstance(payload, dict) else 0
-        pre_narrative_rankings = payload.get("pre_narrative_rankings") if isinstance(payload, dict) else None
-        # Ceiling binding fix, this session -- mirrors pre_narrative_rankings
-        # exactly. See run_accumulated_engine()'s own docstring/comment
-        # (engine/main.py) for why this must be used directly rather than
-        # recomputed from accumulated_vector.
-        post_narrative_rankings = payload.get("post_narrative_rankings") if isinstance(payload, dict) else None
+        # Pure Stateful Modulation with Completion Re-ranking (this
+        # session's fix) -- accumulated_vector exactly as it stood
+        # before narrative's modulation was applied. See
+        # run_accumulated_engine()'s own docstring/comment
+        # (engine/main.py) for why this is re-ranked fresh here rather
+        # than any snapshot being used directly.
+        pre_narrative_vector = payload.get("pre_narrative_vector") if isinstance(payload, dict) else None
         result = run_accumulated_engine(
             accumulated_vector, intake, answered_question_count, checkpoint_results,
             severity_inputs, answers_log, narrative_response, narrative_severity_addition,
             narrative_trigger_point, narrative_overall_confidence, narrative_signals_count,
-            pre_narrative_rankings, post_narrative_rankings,
+            pre_narrative_vector,
         )
         return JSONResponse(content=result)
     except KeyError as e:

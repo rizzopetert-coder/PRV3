@@ -40,9 +40,11 @@ from engine.resolution_families import translate_resolution_family
 from engine.data.fallback_synthesis import get_fallback_synthesis
 from engine.narrative import (
     extract_signals,
-    apply_narrative_modulation,
+    build_modulation_vector,
+    enforce_state_probability_ceiling,
     generate_narrative_prompt,
     compute_narrative_severity_addition,
+    CONFIDENCE_FLOOR,
 )
 
 
@@ -487,74 +489,98 @@ def process_narrative_response(
 ) -> dict:
     """
     Path 1 narrative modulation orchestrator. Extracts signals from the
-    principal's free-text narrative response, applies confidence-gated
-    dimensional modulation (confirmation-and-elevation only, 12%
-    state-probability ceiling), and computes the raw severity addition
-    for SeverityEngine.set_narrative_contribution() at completion.
-    Mirrors run_checkpoint()'s own thin-wire-shape-adapter role -- no
+    principal's free-text narrative response and applies confidence-
+    gated dimensional modulation (confirmation-and-elevation only) to
+    accumulated_vector, once, at the moment narrative fires. Mirrors
+    run_checkpoint()'s own thin-wire-shape-adapter role -- no
     orchestration logic duplicated here beyond what narrative.py's own
     functions already provide.
 
-    Ceiling binding, this session's own verification fix: the 12-point
-    state ceiling (enforce_state_probability_ceiling(), called inside
-    apply_narrative_modulation()) is computed once, against rankings at
-    the exact moment narrative fires, and returned here as
-    post_narrative_rankings -- threaded by the caller into
-    run_accumulated_engine()'s post_narrative_rankings parameter, which
-    uses it DIRECTLY in place of a fresh rank_states() call at
-    completion. Previously this capped result was computed correctly
-    but discarded (_final_rankings, never used), so the ceiling never
-    actually constrained what reached a session -- confirmed via direct
-    testing, not assumed.
+    Pure Stateful Modulation with Completion Re-ranking (this session's
+    fix, replacing the prior ceiling-binding approach, Gemini-reviewed
+    and independently verified against live source before this build):
+    this function no longer computes or freezes a ranking or a
+    ceiling-enforced result at trigger time. It applies
+    build_modulation_vector()'s output to accumulated_vector
+    element-wise and returns BOTH the updated vector and
+    pre_narrative_vector -- accumulated_vector exactly as it stood
+    before this modulation was applied. The caller persists
+    pre_narrative_vector alongside the (still-accumulating)
+    accumulated_vector; both are threaded into run_accumulated_engine()
+    at true completion, where rank_states() is called fresh against
+    each and enforce_state_probability_ceiling() (engine/narrative.py)
+    is applied THERE, against the session's real final state -- not a
+    snapshot from whenever narrative happened to fire.
 
-    RESIDUAL LIMITATION (early Q27 trigger only, unchanged by the above
-    fix): for the standard (last-core-question) trigger this snapshot
-    is exactly right, nothing is accumulated afterward. For the early
-    (Q27) trigger, further core questions get answered and accumulated
-    on top of this vector afterward, and post_narrative_rankings is a
-    snapshot taken before that later accumulation -- it binds what the
-    session actually uses, but is not re-verified against the vector's
-    true final state at completion. This function takes the simple,
-    honest path (bind the ceiling as computed at time-of-firing) rather
-    than inventing an unproven defer-to-completion mechanism.
+    RESOLVES the previously-documented residual limitation: for the
+    early (Q27) trigger, further core questions answered afterward were
+    previously invisible to the ceiling calculation --
+    post_narrative_rankings bound what the session actually used, but
+    was never re-verified against the vector's true final state. That
+    gap is now closed: both halves of the ceiling comparison are
+    computed at true completion, against whatever accumulated_vector
+    genuinely is by then.
 
-    Returns {"accumulated_vector": dict, "narrative_severity_addition": float,
-    "pre_narrative_rankings": list, "post_narrative_rankings": list, ...}.
-    On any extraction failure (API error, missing package),
-    extract_signals() itself already returns a zero-confidence result --
-    modulation and severity addition both become no-ops, matching
-    apply_narrative_modulation()'s own "no modulation" floor-check
-    path (post_narrative_rankings then equals pre_narrative_rankings,
-    same values, no cap ever triggers on a no-op). The live flow is
+    PRECISION NOTE 1 (confirmed during this session's verification pass
+    of Gemini's architecture review, not just Gemini's original
+    phrasing): the zero-prior confirmation gate inside
+    build_modulation_vector() is a one-shot check -- it fires once, at
+    trigger time, against accumulated_vector as it stood then, and
+    nothing about later core-question accumulation can retroactively
+    bypass it. That fact is what makes deferring the ranking/ceiling
+    step to completion safe to build -- it is a separate claim from
+    "the timing gap didn't matter," which it did (see the live
+    verification numbers this fix was built against).
+
+    PRECISION NOTE 2: severity's per-state calculation
+    (engine/severity.py::compute_state_severity()) is isolated from
+    vector modulation SPECIFICALLY -- it never reads accumulated_vector
+    or rankings, narrative-derived or otherwise. It is NOT isolated
+    from narrative generally: narrative still affects severity via a
+    separate, non-vector, non-timing-sensitive channel
+    (narrative_severity_addition, computed once directly from
+    extraction_result.severity_indicators via
+    compute_narrative_severity_addition(), independent of
+    accumulated_vector and unaffected by this fix either way).
+
+    Returns {"accumulated_vector": dict, "pre_narrative_vector": dict,
+    "narrative_severity_addition": float, "narrative_overall_confidence":
+    float, "narrative_signals_count": int}. On any extraction failure
+    (API error, missing package), extract_signals() itself already
+    returns a zero-confidence result -- modulation becomes a no-op
+    (updated_vector equals accumulated_vector, unchanged), matching the
+    confidence-floor check's own "no modulation" path. The live flow is
     never blocked by a narrative-extraction failure.
+
+    answered_question_count is retained in the signature for call-site
+    stability (api/engine.py, web/lib/engine-client.ts still send it)
+    but is no longer read here -- ranking, and therefore any use of
+    this count, is now entirely deferred to completion time.
     """
-    pre_rankings = rank_states(accumulated_vector, answered_question_count, SALIENCE_PROFILES)
     extraction_result = extract_signals(narrative_text)
-    updated_vector, final_rankings = apply_narrative_modulation(
-        accumulated_vector, extraction_result, pre_rankings, answered_question_count,
-    )
+
+    if extraction_result.overall_confidence < CONFIDENCE_FLOOR:
+        updated_vector = dict(accumulated_vector)
+    else:
+        modulation = build_modulation_vector(extraction_result, accumulated_vector)
+        updated_vector = {
+            f: accumulated_vector.get(f, 0.0) + modulation.get(f, 0.0)
+            for f in DIMENSIONAL_FIELDS
+        }
+
     severity_addition = compute_narrative_severity_addition(extraction_result)
     return {
         "accumulated_vector": updated_vector,
+        # Pure Stateful Modulation with Completion Re-ranking -- the
+        # pre-modulation baseline, retained so run_accumulated_engine()
+        # can re-derive both halves of the ceiling comparison against
+        # the session's true final state, not a Q27-time snapshot.
+        "pre_narrative_vector": dict(accumulated_vector),
         "narrative_severity_addition": severity_addition,
         # engine/contract.py::assemble_output()'s narrative_modulation
-        # output block needs these at completion time -- found while
-        # wiring SessionData below, not part of the original plan.
-        # Serialized to plain dicts (same P-03 status as
-        # accumulated_vector already crossing this boundary every
-        # request today, not a new exposure category).
+        # output block needs these at completion time.
         "narrative_overall_confidence": extraction_result.overall_confidence,
         "narrative_signals_count": len(extraction_result.identified_signals),
-        "pre_narrative_rankings": [
-            {"state_id": r.state_id, "rank": r.rank, "score": r.score, "distance": r.distance}
-            for r in pre_rankings
-        ],
-        # Ceiling binding fix -- see docstring above. Same plain-dict
-        # shape as pre_narrative_rankings.
-        "post_narrative_rankings": [
-            {"state_id": r.state_id, "rank": r.rank, "score": r.score, "distance": r.distance}
-            for r in final_rankings
-        ],
     }
 
 
@@ -729,8 +755,7 @@ def run_accumulated_engine(
     narrative_trigger_point: Optional[str] = None,
     narrative_overall_confidence: float = 0.0,
     narrative_signals_count: int = 0,
-    pre_narrative_rankings: Optional[list] = None,
-    post_narrative_rankings: Optional[list] = None,
+    pre_narrative_vector: Optional[dict] = None,
 ) -> dict:
     """
     Path 1 completion orchestrator ("Path A" -- real accumulation-based
@@ -747,10 +772,26 @@ def run_accumulated_engine(
     call site changed). narrative_severity_addition is the raw value
     from engine.narrative.compute_narrative_severity_addition(),
     threaded into SeverityEngine.set_narrative_contribution() below
-    before .score() -- the real, already-built, already-ceiling-
-    enforced path (engine/severity.py). Both default to "" / 0.0,
-    preserving every existing caller's behavior exactly (Path B and
-    any Path 1 session that never triggers narrative).
+    before .score() -- independent of accumulated_vector/rankings
+    entirely (engine/severity.py::compute_state_severity() is isolated
+    from vector modulation specifically, not from narrative generally --
+    see process_narrative_response()'s own docstring, Precision Note 2).
+    Both default to "" / 0.0, preserving every existing caller's
+    behavior exactly (Path B and any Path 1 session that never triggers
+    narrative).
+
+    pre_narrative_vector (Pure Stateful Modulation with Completion
+    Re-ranking, this session's fix): accumulated_vector exactly as it
+    stood immediately before process_narrative_response() applied its
+    modulation, None when narrative never fired this session. When
+    present, both pre_rankings (from this vector) and post_rankings
+    (from accumulated_vector, the session's TRUE final state) are
+    computed fresh here and passed through
+    enforce_state_probability_ceiling() -- resolving the prior residual
+    limitation where the early (Q27) trigger's ceiling was bound to a
+    snapshot that never saw further core-question accumulation. See
+    process_narrative_response()'s own docstring for the full mechanism
+    and this session's two confirmed precision notes.
 
     Severity follow-on wiring (Path 1 only): severity_inputs is an optional
     list of dicts, each shaped like accumulate_one_answer()'s
@@ -792,26 +833,43 @@ def run_accumulated_engine(
     """
     intake_data = _locked_intake_to_engine_intake(intake)
 
-    # Ceiling binding fix (this session's own verification pass): when
-    # narrative modulation fired and produced a ceiling-enforced
-    # rankings list, use it directly instead of a fresh rank_states()
-    # call -- the 12pp state probability ceiling (enforce_state_
-    # probability_ceiling(), engine/narrative.py) is expressed as a
-    # constraint on RANKINGS, not on accumulated_vector, and there is no
-    # vector that would reproduce an arbitrary post-hoc-capped ranking
-    # set through this same salience-weighted distance computation --
-    # recomputing from accumulated_vector here would silently discard
-    # the cap every time, which is exactly the bug this fixes. None
-    # (the default) preserves today's exact behavior for every existing
-    # caller and any session that never triggers narrative.
-    if post_narrative_rankings:
-        final_rankings = [
-            StateRanking(
-                rank=r["rank"], state_id=r["state_id"],
-                distance=r["distance"], score=r["score"],
-            )
-            for r in post_narrative_rankings
-        ]
+    # Pure Stateful Modulation with Completion Re-ranking (this
+    # session's fix, resolving the previously-documented Q27 timing
+    # gap): when narrative fired, re-derive both halves of the 12pp
+    # ceiling comparison at TRUE completion, not a snapshot frozen at
+    # whichever question narrative happened to fire on.
+    # pre_narrative_vector is accumulated_vector exactly as it stood
+    # the instant before process_narrative_response() applied its
+    # modulation; accumulated_vector here is the TRUE final vector,
+    # reflecting every core question answered through the end of the
+    # session. Reuses enforce_state_probability_ceiling()
+    # (engine/narrative.py) completely unchanged -- the same
+    # already-load-bearing primitive, not a new mechanism.
+    #
+    # For the standard (last-core-question) trigger, zero further
+    # accumulation happens after that trigger by construction, so
+    # pre_narrative_vector and accumulated_vector are no further apart
+    # here than they were under the prior single-snapshot approach --
+    # this produces byte-identical results to before for that path
+    # (verified empirically, not assumed, as part of this fix's own
+    # live verification pass).
+    #
+    # PRECISION NOTE, confirmed during this session's verification of
+    # Gemini's architecture review: the zero-prior confirmation gate
+    # inside build_modulation_vector() is a separate, one-shot check
+    # that fires once at narrative's own trigger time and cannot be
+    # retroactively bypassed by later core questions -- that fact is
+    # what makes deferring this ranking step safe to build. It does not
+    # by itself mean the timing gap this fix resolves was ever
+    # harmless; those are different claims.
+    #
+    # None (the default) preserves today's exact behavior for every
+    # existing caller and any session that never triggers narrative.
+    pre_rankings = None
+    if pre_narrative_vector is not None:
+        pre_rankings = rank_states(pre_narrative_vector, answered_question_count, SALIENCE_PROFILES)
+        post_rankings = rank_states(accumulated_vector, answered_question_count, SALIENCE_PROFILES)
+        final_rankings = enforce_state_probability_ceiling(pre_rankings, post_rankings)
     else:
         final_rankings = rank_states(accumulated_vector, answered_question_count, SALIENCE_PROFILES)
 
@@ -887,18 +945,11 @@ def run_accumulated_engine(
         if narrative_trigger_point is not None
         else None
     )
-    pre_narrative_rankings_objs = (
-        [
-            StateRanking(
-                rank=r["rank"], state_id=r["state_id"],
-                distance=r["distance"], score=r["score"],
-            )
-            for r in pre_narrative_rankings
-        ]
-        if pre_narrative_rankings
-        else None
-    )
-
+    # pre_rankings, if narrative fired, is already a real list of
+    # StateRanking objects from the rank_states() call above -- no
+    # wire-shape conversion needed (unlike the prior approach, which
+    # received pre_narrative_rankings as plain dicts over the network
+    # boundary and had to reconstruct StateRanking objects from them).
     session_data = SessionData(
         session_id=SessionData.new_session_id(),
         intake=intake_data,
@@ -908,7 +959,7 @@ def run_accumulated_engine(
         severity_result=severity_result,
         narrative_result=narrative_result,
         narrative_trigger=narrative_trigger_point,
-        pre_narrative_rankings=pre_narrative_rankings_objs,
+        pre_narrative_rankings=pre_rankings,
         checkpoint_q11=checkpoint_result_from_wire("Q11", checkpoint_results.get("q11")),
         checkpoint_q19=checkpoint_result_from_wire("Q19", checkpoint_results.get("q19")),
         checkpoint_q27=checkpoint_result_from_wire("Q27", checkpoint_results.get("q27")),
