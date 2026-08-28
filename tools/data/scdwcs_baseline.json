@@ -1,0 +1,1583 @@
+{
+  "commit_sha": "24686bd5241b496317bf7a349b586a458533bcc5",
+  "generated_at": "2026-08-28T14:09:36.854734+00:00",
+  "profile_count": 175,
+  "profiles": {
+    "ALL-AS-01": {
+      "rank1": "built_to_fail",
+      "target_state": "the_arbitrary_standard",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "silosolation"
+      ]
+    },
+    "ALL-AS-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_arbitrary_standard",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "ALL-AS-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_arbitrary_standard",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "ALL-DB-01": {
+      "rank1": "the_uninitiated",
+      "target_state": "decision_blindness",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "ALL-DB-02": {
+      "rank1": "planning_authority_gap",
+      "target_state": "decision_blindness",
+      "top3": [
+        "planning_authority_gap",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "ALL-DB-03": {
+      "rank1": "planning_authority_gap",
+      "target_state": "decision_blindness",
+      "top3": [
+        "planning_authority_gap",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "ALL-FR-01": {
+      "rank1": "the_second_close",
+      "target_state": "the_fracture",
+      "top3": [
+        "the_second_close",
+        "the_suppression_filter",
+        "the_fracture"
+      ]
+    },
+    "ALL-FR-02": {
+      "rank1": "the_fracture",
+      "target_state": "the_fracture",
+      "top3": [
+        "the_fracture",
+        "decision_blindness",
+        "the_second_close"
+      ]
+    },
+    "ALL-FR-03": {
+      "rank1": "the_fracture",
+      "target_state": "the_fracture",
+      "top3": [
+        "the_fracture",
+        "decision_blindness",
+        "the_second_close"
+      ]
+    },
+    "ALL-SC-01": {
+      "rank1": "built_to_fail",
+      "target_state": "the_second_close",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_undefined_role"
+      ]
+    },
+    "ALL-SC-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_second_close",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_undefined_role"
+      ]
+    },
+    "ALL-SC-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_second_close",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_undefined_role"
+      ]
+    },
+    "ALL-SF-01": {
+      "rank1": "the_suppression_filter",
+      "target_state": "the_suppression_filter",
+      "top3": [
+        "the_suppression_filter",
+        "the_unformed_leader",
+        "the_undefined_role"
+      ]
+    },
+    "ALL-SF-02": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_suppression_filter",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "ALL-SF-03": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_suppression_filter",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "ALL-SI-01": {
+      "rank1": "distributed_culture_fragmentation",
+      "target_state": "silosolation",
+      "top3": [
+        "distributed_culture_fragmentation",
+        "the_second_close",
+        "the_suppression_filter"
+      ]
+    },
+    "ALL-SI-02": {
+      "rank1": "the_fracture",
+      "target_state": "silosolation",
+      "top3": [
+        "the_fracture",
+        "decision_blindness",
+        "the_second_close"
+      ]
+    },
+    "ALL-SI-03": {
+      "rank1": "the_fracture",
+      "target_state": "silosolation",
+      "top3": [
+        "the_fracture",
+        "decision_blindness",
+        "the_second_close"
+      ]
+    },
+    "APT-BF-01": {
+      "rank1": "built_to_fail",
+      "target_state": "built_to_fail",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "APT-BF-02": {
+      "rank1": "built_to_fail",
+      "target_state": "built_to_fail",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "paper_shield"
+      ]
+    },
+    "APT-BF-03": {
+      "rank1": "built_to_fail",
+      "target_state": "built_to_fail",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "paper_shield"
+      ]
+    },
+    "APT-DT-01": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "the_dormant_talent",
+      "top3": [
+        "the_overloaded_manager",
+        "the_undefined_role",
+        "built_to_fail"
+      ]
+    },
+    "APT-DT-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_dormant_talent",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "APT-DT-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_dormant_talent",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "APT-OM-01": {
+      "rank1": "built_to_fail",
+      "target_state": "the_overloaded_manager",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "paper_shield"
+      ]
+    },
+    "APT-OM-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_overloaded_manager",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "APT-OM-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_overloaded_manager",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "paper_shield"
+      ]
+    },
+    "APT-PT-00": {
+      "rank1": "built_to_fail",
+      "target_state": "the_paper_tiger",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_overloaded_manager"
+      ]
+    },
+    "APT-PT-01": {
+      "rank1": "built_to_fail",
+      "target_state": "the_paper_tiger",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_overloaded_manager"
+      ]
+    },
+    "APT-PT-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_paper_tiger",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_overloaded_manager"
+      ]
+    },
+    "APT-PT-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_paper_tiger",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "paper_shield"
+      ]
+    },
+    "APT-UL-01": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unformed_leader",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_unsolved_problem"
+      ]
+    },
+    "APT-UL-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unformed_leader",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_overloaded_manager"
+      ]
+    },
+    "APT-UL-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unformed_leader",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "paper_shield"
+      ]
+    },
+    "APT-UR-01": {
+      "rank1": "built_to_fail",
+      "target_state": "the_undefined_role",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "paper_shield"
+      ]
+    },
+    "APT-UR-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_undefined_role",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "paper_shield"
+      ]
+    },
+    "APT-UR-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_undefined_role",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "paper_shield"
+      ]
+    },
+    "ATT-BC-01": {
+      "rank1": "the_dormant_talent",
+      "target_state": "the_burned_credibility",
+      "top3": [
+        "the_dormant_talent",
+        "the_unformed_leader",
+        "identity_erosion"
+      ]
+    },
+    "ATT-BC-02": {
+      "rank1": "planning_authority_gap",
+      "target_state": "the_burned_credibility",
+      "top3": [
+        "planning_authority_gap",
+        "the_paper_tiger",
+        "invisible_influence_architecture"
+      ]
+    },
+    "ATT-BC-03": {
+      "rank1": "silosolation",
+      "target_state": "the_burned_credibility",
+      "top3": [
+        "silosolation",
+        "the_overloaded_manager",
+        "the_suppression_filter"
+      ]
+    },
+    "ATT-BCP-01": {
+      "rank1": "culture_drift",
+      "target_state": "the_broken_compass",
+      "top3": [
+        "culture_drift",
+        "wellbeing_theater",
+        "identity_erosion"
+      ]
+    },
+    "ATT-BCP-02": {
+      "rank1": "culture_drift",
+      "target_state": "the_broken_compass",
+      "top3": [
+        "culture_drift",
+        "wellbeing_theater",
+        "identity_erosion"
+      ]
+    },
+    "ATT-BCP-03": {
+      "rank1": "culture_drift",
+      "target_state": "the_broken_compass",
+      "top3": [
+        "culture_drift",
+        "wellbeing_theater",
+        "identity_erosion"
+      ]
+    },
+    "ATT-BS-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_basement_standard",
+      "top3": [
+        "the_unformed_leader",
+        "the_dormant_talent",
+        "the_overloaded_manager"
+      ]
+    },
+    "ATT-BS-02": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "the_basement_standard",
+      "top3": [
+        "the_overloaded_manager",
+        "the_unformed_leader",
+        "the_undefined_role"
+      ]
+    },
+    "ATT-BS-03": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "the_basement_standard",
+      "top3": [
+        "the_overloaded_manager",
+        "the_unformed_leader",
+        "the_undefined_role"
+      ]
+    },
+    "ATT-CD-01": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "culture_drift",
+      "top3": [
+        "the_overloaded_manager",
+        "built_to_fail",
+        "the_dormant_talent"
+      ]
+    },
+    "ATT-CD-02": {
+      "rank1": "built_to_fail",
+      "target_state": "culture_drift",
+      "top3": [
+        "built_to_fail",
+        "the_dormant_talent",
+        "the_unformed_leader"
+      ]
+    },
+    "ATT-CD-03": {
+      "rank1": "built_to_fail",
+      "target_state": "culture_drift",
+      "top3": [
+        "built_to_fail",
+        "the_dormant_talent",
+        "the_unformed_leader"
+      ]
+    },
+    "ATT-DC-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_diversity_ceiling",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "ATT-DC-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_diversity_ceiling",
+      "top3": [
+        "built_to_fail",
+        "the_unformed_leader",
+        "the_overloaded_manager"
+      ]
+    },
+    "ATT-DC-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_diversity_ceiling",
+      "top3": [
+        "built_to_fail",
+        "the_unformed_leader",
+        "the_overloaded_manager"
+      ]
+    },
+    "ATT-GD-01": {
+      "rank1": "identity_erosion",
+      "target_state": "groundhog_day",
+      "top3": [
+        "identity_erosion",
+        "the_culture_that_wasnt",
+        "narrative_lock"
+      ]
+    },
+    "ATT-GD-02": {
+      "rank1": "the_dormant_talent",
+      "target_state": "groundhog_day",
+      "top3": [
+        "the_dormant_talent",
+        "the_unformed_leader",
+        "the_overloaded_manager"
+      ]
+    },
+    "ATT-GD-03": {
+      "rank1": "the_dormant_talent",
+      "target_state": "groundhog_day",
+      "top3": [
+        "the_dormant_talent",
+        "the_unformed_leader",
+        "the_overloaded_manager"
+      ]
+    },
+    "ATT-IB-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "invisible_burnout",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "paper_shield"
+      ]
+    },
+    "ATT-IB-02": {
+      "rank1": "built_to_fail",
+      "target_state": "invisible_burnout",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-IB-03": {
+      "rank1": "built_to_fail",
+      "target_state": "invisible_burnout",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-IE-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "identity_erosion",
+      "top3": [
+        "the_unformed_leader",
+        "the_unsolved_problem",
+        "built_to_fail"
+      ]
+    },
+    "ATT-IE-02": {
+      "rank1": "built_to_fail",
+      "target_state": "identity_erosion",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-IE-03": {
+      "rank1": "built_to_fail",
+      "target_state": "identity_erosion",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-IT-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_inside_track",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "ATT-IT-02": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "the_inside_track",
+      "top3": [
+        "the_overloaded_manager",
+        "the_unformed_leader",
+        "the_dormant_talent"
+      ]
+    },
+    "ATT-IT-03": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "the_inside_track",
+      "top3": [
+        "the_overloaded_manager",
+        "the_unformed_leader",
+        "the_dormant_talent"
+      ]
+    },
+    "ATT-LD-01": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "leadership_deafness",
+      "top3": [
+        "the_overloaded_manager",
+        "the_unformed_leader",
+        "the_undefined_role"
+      ]
+    },
+    "ATT-LD-02": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "leadership_deafness",
+      "top3": [
+        "the_overloaded_manager",
+        "the_unformed_leader",
+        "the_undefined_role"
+      ]
+    },
+    "ATT-LD-03": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "leadership_deafness",
+      "top3": [
+        "the_overloaded_manager",
+        "the_unformed_leader",
+        "the_undefined_role"
+      ]
+    },
+    "ATT-NL-01": {
+      "rank1": "the_dormant_talent",
+      "target_state": "narrative_lock",
+      "top3": [
+        "the_dormant_talent",
+        "the_unformed_leader",
+        "identity_erosion"
+      ]
+    },
+    "ATT-NL-02": {
+      "rank1": "the_dormant_talent",
+      "target_state": "narrative_lock",
+      "top3": [
+        "the_dormant_talent",
+        "identity_erosion",
+        "the_culture_that_wasnt"
+      ]
+    },
+    "ATT-NL-03": {
+      "rank1": "the_dormant_talent",
+      "target_state": "narrative_lock",
+      "top3": [
+        "the_dormant_talent",
+        "identity_erosion",
+        "the_culture_that_wasnt"
+      ]
+    },
+    "ATT-TCWW-01": {
+      "rank1": "built_to_fail",
+      "target_state": "the_culture_that_wasnt",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-TCWW-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_culture_that_wasnt",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-TCWW-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_culture_that_wasnt",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-UD-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_unlocked_door",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-UD-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unlocked_door",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-UD-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unlocked_door",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-UH-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_unreported_hazard",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-UH-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unreported_hazard",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-UH-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unreported_hazard",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-UT-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_untouchable",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "ATT-UT-02": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_untouchable",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-UT-03": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_untouchable",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_unsolved_problem"
+      ]
+    },
+    "ATT-WNS-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "what_nobody_says",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "ATT-WNS-02": {
+      "rank1": "built_to_fail",
+      "target_state": "what_nobody_says",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_unformed_leader"
+      ]
+    },
+    "ATT-WNS-03": {
+      "rank1": "built_to_fail",
+      "target_state": "what_nobody_says",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_unformed_leader"
+      ]
+    },
+    "ATT-WR-01": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "the_wrong_reward",
+      "top3": [
+        "the_overloaded_manager",
+        "the_unformed_leader",
+        "the_undefined_role"
+      ]
+    },
+    "ATT-WR-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_wrong_reward",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_unformed_leader"
+      ]
+    },
+    "ATT-WR-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_wrong_reward",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_unformed_leader"
+      ]
+    },
+    "AUT-DN-01": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "dueling_narratives",
+      "top3": [
+        "the_overloaded_manager",
+        "built_to_fail",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-DN-02": {
+      "rank1": "built_to_fail",
+      "target_state": "dueling_narratives",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_unsolved_problem"
+      ]
+    },
+    "AUT-DN-03": {
+      "rank1": "built_to_fail",
+      "target_state": "dueling_narratives",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-DP-01": {
+      "rank1": "the_uninitiated",
+      "target_state": "decision_paralysis",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-DP-02": {
+      "rank1": "the_uninitiated",
+      "target_state": "decision_paralysis",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-DP-03": {
+      "rank1": "the_uninitiated",
+      "target_state": "decision_paralysis",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-EX-01": {
+      "rank1": "built_to_fail",
+      "target_state": "the_exposed",
+      "top3": [
+        "built_to_fail",
+        "planning_authority_gap",
+        "the_uninitiated"
+      ]
+    },
+    "AUT-EX-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_exposed",
+      "top3": [
+        "built_to_fail",
+        "the_unexamined_algorithm",
+        "the_uninitiated"
+      ]
+    },
+    "AUT-EX-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_exposed",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "planning_authority_gap"
+      ]
+    },
+    "AUT-FG-01": {
+      "rank1": "the_uninitiated",
+      "target_state": "the_founders_grip",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-FG-02": {
+      "rank1": "the_uninitiated",
+      "target_state": "the_founders_grip",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-FG-03": {
+      "rank1": "the_uninitiated",
+      "target_state": "the_founders_grip",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-HC-01": {
+      "rank1": "the_paper_tiger",
+      "target_state": "hr_capture",
+      "top3": [
+        "the_paper_tiger",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "AUT-HC-02": {
+      "rank1": "the_paper_tiger",
+      "target_state": "hr_capture",
+      "top3": [
+        "the_paper_tiger",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-HC-03": {
+      "rank1": "the_uninitiated",
+      "target_state": "hr_capture",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-HI-01": {
+      "rank1": "the_uninitiated",
+      "target_state": "heard_and_ignored",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-HI-02": {
+      "rank1": "the_undefined_role",
+      "target_state": "heard_and_ignored",
+      "top3": [
+        "the_undefined_role",
+        "the_overloaded_manager",
+        "planning_authority_gap"
+      ]
+    },
+    "AUT-HI-03": {
+      "rank1": "the_uninitiated",
+      "target_state": "heard_and_ignored",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-IA-01": {
+      "rank1": "built_to_fail",
+      "target_state": "invisible_influence_architecture",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-IA-02": {
+      "rank1": "built_to_fail",
+      "target_state": "invisible_influence_architecture",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-IA-03": {
+      "rank1": "built_to_fail",
+      "target_state": "invisible_influence_architecture",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "planning_authority_gap"
+      ]
+    },
+    "AUT-LC-01": {
+      "rank1": "built_to_fail",
+      "target_state": "leadership_continuity_risk",
+      "top3": [
+        "built_to_fail",
+        "the_unexamined_algorithm",
+        "the_uninitiated"
+      ]
+    },
+    "AUT-LC-02": {
+      "rank1": "built_to_fail",
+      "target_state": "leadership_continuity_risk",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_overloaded_manager"
+      ]
+    },
+    "AUT-LC-03": {
+      "rank1": "built_to_fail",
+      "target_state": "leadership_continuity_risk",
+      "top3": [
+        "built_to_fail",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "AUT-LM-01": {
+      "rank1": "the_uninitiated",
+      "target_state": "the_lost_map",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-LM-02": {
+      "rank1": "the_uninitiated",
+      "target_state": "the_lost_map",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-LM-03": {
+      "rank1": "the_uninitiated",
+      "target_state": "the_lost_map",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-PE-01": {
+      "rank1": "the_undefined_role",
+      "target_state": "pay_exposure",
+      "top3": [
+        "the_undefined_role",
+        "the_overloaded_manager",
+        "built_to_fail"
+      ]
+    },
+    "AUT-PE-02": {
+      "rank1": "built_to_fail",
+      "target_state": "pay_exposure",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "paper_shield"
+      ]
+    },
+    "AUT-PE-03": {
+      "rank1": "built_to_fail",
+      "target_state": "pay_exposure",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-PF-01": {
+      "rank1": "the_undefined_role",
+      "target_state": "the_pay_fog",
+      "top3": [
+        "the_undefined_role",
+        "the_overloaded_manager",
+        "planning_authority_gap"
+      ]
+    },
+    "AUT-PF-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_pay_fog",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-PF-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_pay_fog",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-PL-01": {
+      "rank1": "the_unexamined_algorithm",
+      "target_state": "the_policy_lag",
+      "top3": [
+        "the_unexamined_algorithm",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "AUT-PL-02": {
+      "rank1": "the_unexamined_algorithm",
+      "target_state": "the_policy_lag",
+      "top3": [
+        "the_unexamined_algorithm",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "AUT-PL-03": {
+      "rank1": "the_unexamined_algorithm",
+      "target_state": "the_policy_lag",
+      "top3": [
+        "the_unexamined_algorithm",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "AUT-PS-01": {
+      "rank1": "built_to_fail",
+      "target_state": "paper_shield",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_overloaded_manager"
+      ]
+    },
+    "AUT-PS-02": {
+      "rank1": "built_to_fail",
+      "target_state": "paper_shield",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_overloaded_manager"
+      ]
+    },
+    "AUT-PS-03": {
+      "rank1": "built_to_fail",
+      "target_state": "paper_shield",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-TP-01": {
+      "rank1": "built_to_fail",
+      "target_state": "transition_paralysis",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unformed_leader"
+      ]
+    },
+    "AUT-TP-02": {
+      "rank1": "built_to_fail",
+      "target_state": "transition_paralysis",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_overloaded_manager"
+      ]
+    },
+    "AUT-TP-03": {
+      "rank1": "built_to_fail",
+      "target_state": "transition_paralysis",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-TV-01": {
+      "rank1": "the_unexamined_algorithm",
+      "target_state": "the_tolerated_violation",
+      "top3": [
+        "the_unexamined_algorithm",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "AUT-TV-02": {
+      "rank1": "the_uninitiated",
+      "target_state": "the_tolerated_violation",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "AUT-TV-03": {
+      "rank1": "the_unexamined_algorithm",
+      "target_state": "the_tolerated_violation",
+      "top3": [
+        "the_unexamined_algorithm",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "AUT-UA-01": {
+      "rank1": "the_undefined_role",
+      "target_state": "the_unexamined_algorithm",
+      "top3": [
+        "the_undefined_role",
+        "the_overloaded_manager",
+        "built_to_fail"
+      ]
+    },
+    "AUT-UA-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unexamined_algorithm",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-UA-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unexamined_algorithm",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-UN-01": {
+      "rank1": "built_to_fail",
+      "target_state": "the_uninitiated",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "paper_shield"
+      ]
+    },
+    "AUT-UN-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_uninitiated",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "AUT-UN-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_uninitiated",
+      "top3": [
+        "built_to_fail",
+        "the_undefined_role",
+        "the_overloaded_manager"
+      ]
+    },
+    "AUT-UP-01": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unsolved_problem",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_overloaded_manager"
+      ]
+    },
+    "AUT-UP-02": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unsolved_problem",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_overloaded_manager"
+      ]
+    },
+    "AUT-UP-03": {
+      "rank1": "built_to_fail",
+      "target_state": "the_unsolved_problem",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_unsolved_problem"
+      ]
+    },
+    "EXP-CC-01": {
+      "rank1": "the_undefined_role",
+      "target_state": "compression_crisis",
+      "top3": [
+        "the_undefined_role",
+        "the_overloaded_manager",
+        "built_to_fail"
+      ]
+    },
+    "EXP-CC-02": {
+      "rank1": "built_to_fail",
+      "target_state": "compression_crisis",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_unformed_leader"
+      ]
+    },
+    "EXP-CC-03": {
+      "rank1": "the_undefined_role",
+      "target_state": "compression_crisis",
+      "top3": [
+        "the_undefined_role",
+        "built_to_fail",
+        "the_overloaded_manager"
+      ]
+    },
+    "EXP-CO-01": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "cultural_overtime",
+      "top3": [
+        "the_overloaded_manager",
+        "the_unformed_leader",
+        "the_undefined_role"
+      ]
+    },
+    "EXP-CO-02": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "cultural_overtime",
+      "top3": [
+        "the_overloaded_manager",
+        "built_to_fail",
+        "the_unformed_leader"
+      ]
+    },
+    "EXP-CO-03": {
+      "rank1": "built_to_fail",
+      "target_state": "cultural_overtime",
+      "top3": [
+        "built_to_fail",
+        "the_undefined_role",
+        "the_overloaded_manager"
+      ]
+    },
+    "EXP-DCF-01": {
+      "rank1": "the_suppression_filter",
+      "target_state": "distributed_culture_fragmentation",
+      "top3": [
+        "the_suppression_filter",
+        "the_overloaded_manager",
+        "silosolation"
+      ]
+    },
+    "EXP-DCF-02": {
+      "rank1": "built_to_fail",
+      "target_state": "distributed_culture_fragmentation",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_unformed_leader"
+      ]
+    },
+    "EXP-DCF-03": {
+      "rank1": "built_to_fail",
+      "target_state": "distributed_culture_fragmentation",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_undefined_role"
+      ]
+    },
+    "EXP-DIA-01": {
+      "rank1": "the_uninitiated",
+      "target_state": "disparate_impact_architecture",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "EXP-DIA-02": {
+      "rank1": "the_uninitiated",
+      "target_state": "disparate_impact_architecture",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "EXP-DIA-03": {
+      "rank1": "the_uninitiated",
+      "target_state": "disparate_impact_architecture",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "EXP-HDA-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "human_displacement_anxiety",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "paper_shield"
+      ]
+    },
+    "EXP-HDA-02": {
+      "rank1": "built_to_fail",
+      "target_state": "human_displacement_anxiety",
+      "top3": [
+        "built_to_fail",
+        "the_unformed_leader",
+        "the_dormant_talent"
+      ]
+    },
+    "EXP-HDA-03": {
+      "rank1": "built_to_fail",
+      "target_state": "human_displacement_anxiety",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_undefined_role"
+      ]
+    },
+    "EXP-IC-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "the_inner_circle",
+      "top3": [
+        "the_unformed_leader",
+        "the_dormant_talent",
+        "built_to_fail"
+      ]
+    },
+    "EXP-IC-02": {
+      "rank1": "culture_drift",
+      "target_state": "the_inner_circle",
+      "top3": [
+        "culture_drift",
+        "wellbeing_theater",
+        "the_diversity_ceiling"
+      ]
+    },
+    "EXP-IC-03": {
+      "rank1": "the_dormant_talent",
+      "target_state": "the_inner_circle",
+      "top3": [
+        "the_dormant_talent",
+        "built_to_fail",
+        "the_unformed_leader"
+      ]
+    },
+    "EXP-IPM-01": {
+      "rank1": "built_to_fail",
+      "target_state": "invisible_performance_management",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "paper_shield"
+      ]
+    },
+    "EXP-IPM-02": {
+      "rank1": "built_to_fail",
+      "target_state": "invisible_performance_management",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_unsolved_problem"
+      ]
+    },
+    "EXP-IPM-03": {
+      "rank1": "built_to_fail",
+      "target_state": "invisible_performance_management",
+      "top3": [
+        "built_to_fail",
+        "the_unsolved_problem",
+        "the_overloaded_manager"
+      ]
+    },
+    "EXP-MAF-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "motivational_architecture_failure",
+      "top3": [
+        "the_unformed_leader",
+        "the_dormant_talent",
+        "the_overloaded_manager"
+      ]
+    },
+    "EXP-MAF-02": {
+      "rank1": "the_unformed_leader",
+      "target_state": "motivational_architecture_failure",
+      "top3": [
+        "the_unformed_leader",
+        "culture_drift",
+        "wellbeing_theater"
+      ]
+    },
+    "EXP-MAF-03": {
+      "rank1": "the_undefined_role",
+      "target_state": "motivational_architecture_failure",
+      "top3": [
+        "the_undefined_role",
+        "the_unformed_leader",
+        "the_overloaded_manager"
+      ]
+    },
+    "EXP-PAG-01": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "planning_authority_gap",
+      "top3": [
+        "the_overloaded_manager",
+        "the_undefined_role",
+        "built_to_fail"
+      ]
+    },
+    "EXP-PAG-02": {
+      "rank1": "built_to_fail",
+      "target_state": "planning_authority_gap",
+      "top3": [
+        "built_to_fail",
+        "the_overloaded_manager",
+        "the_undefined_role"
+      ]
+    },
+    "EXP-PAG-03": {
+      "rank1": "the_overloaded_manager",
+      "target_state": "planning_authority_gap",
+      "top3": [
+        "the_overloaded_manager",
+        "built_to_fail",
+        "planning_authority_gap"
+      ]
+    },
+    "EXP-SDB-01": {
+      "rank1": "the_uninitiated",
+      "target_state": "sequential_decision_blindness",
+      "top3": [
+        "the_uninitiated",
+        "leadership_continuity_risk",
+        "decision_paralysis"
+      ]
+    },
+    "EXP-SDB-02": {
+      "rank1": "planning_authority_gap",
+      "target_state": "sequential_decision_blindness",
+      "top3": [
+        "planning_authority_gap",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "EXP-SDB-03": {
+      "rank1": "planning_authority_gap",
+      "target_state": "sequential_decision_blindness",
+      "top3": [
+        "planning_authority_gap",
+        "the_uninitiated",
+        "leadership_continuity_risk"
+      ]
+    },
+    "EXP-WT-01": {
+      "rank1": "the_unformed_leader",
+      "target_state": "wellbeing_theater",
+      "top3": [
+        "the_unformed_leader",
+        "the_overloaded_manager",
+        "the_dormant_talent"
+      ]
+    },
+    "EXP-WT-02": {
+      "rank1": "culture_drift",
+      "target_state": "wellbeing_theater",
+      "top3": [
+        "culture_drift",
+        "wellbeing_theater",
+        "the_diversity_ceiling"
+      ]
+    },
+    "EXP-WT-03": {
+      "rank1": "built_to_fail",
+      "target_state": "wellbeing_theater",
+      "top3": [
+        "built_to_fail",
+        "paper_shield",
+        "the_undefined_role"
+      ]
+    }
+  },
+  "taxonomy_state_count": 58
+}
