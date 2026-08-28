@@ -314,9 +314,11 @@ SALIENCE_PROFILES = {
     # SCD-WCS remediation pilot (rank-6 cluster, silosolation-only
     # partial fix): previously shared this exact tuple with
     # the_second_close and the_arbitrary_standard -- all three tied
-    # exactly on every calibration profile (confirmed 175/175 via
-    # tools/_scdwcs_decomposition_rank6.py and
-    # tools/_salience_pilot_search_rank6.py before this change).
+    # exactly on every calibration profile, confirmed by running the
+    # real calibration pipeline (run_profile -> rank_states) across all
+    # 175 profiles and checking for byte-identical scores across the
+    # trio (a direct decomposition, not a heuristic), and separately
+    # via tools/_salience_pilot_search_rank6.py before this change.
     # Differentiated per the real descriptive_prose
     # (engine/data/states.py): cross-team structural/decision-
     # visibility gap ("not hostile... structural") -- Authority
@@ -354,8 +356,12 @@ SALIENCE_PROFILES = {
     # language runs through all three dedicated profiles ("documented
     # criteria", "documentation" x2, "rules apply differently") --
     # Authority secondary raised. Alliance (2.5/2.5) unchanged, still
-    # dominant. dimensional_vector UNCHANGED -- salience-only
-    # confirmed sufficient (tools/_scdwcs_phase7_arbitrary_standard.py).
+    # dominant. dimensional_vector UNCHANGED -- salience-only confirmed
+    # sufficient via a mechanical falsification sweep (magnitudes 0.4
+    # baseline -> 1.0/2.0/5.0/10.0/20.0/30.0) against the real
+    # 175-profile calibration pipeline, plus a direct vector-level test
+    # confirming dimensional_vector itself did not need to move off its
+    # authored 0.15 floor.
     # Magnitude 2.0 landed via proper margin search across 1.0-3.0
     # (tools/_salience_pilot_search_arbitrary_standard.py): smallest
     # candidate clearing the thin-margin zone on ALL-AS-02/03
