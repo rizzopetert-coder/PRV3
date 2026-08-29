@@ -193,7 +193,7 @@ def _locked_intake_to_engine_intake(intake: dict) -> IntakeData:
     """
     jurisdiction = intake.get("jurisdiction", "")
     return IntakeData(
-        headcount=intake.get("organization_size", ""),
+        headcount=intake.get("organization_size", 0),
         industry=intake.get("industry", ""),
         org_type="",
         jurisdictions=[jurisdiction] if jurisdiction else [],
@@ -976,10 +976,12 @@ def run_condensed_engine(
     Category D (free condensed diagnostic) completion orchestrator, this
     session. Deliberately does NOT call assemble_output() -- that function
     builds the full VII.1 contract, which has a hard dependency Category
-    D's industry-only intake can't satisfy: compute_friction_tax() requires
-    a numeric session.intake.headcount and crashes on the empty-string
-    default (confirmed via a real end-to-end run during this session's own
-    verification pass, not assumed safe). assemble_output() also computes
+    D's industry-only intake can't satisfy: compute_friction_tax() needs a
+    real headcount, and Category D's intake never collects one -- its
+    session.intake.headcount is a synthetic placeholder (0, organization_size
+    string|number collapse, 2026-08-29), so any friction-tax number computed
+    against it would be meaningless, not a real estimate for that
+    respondent's organization. assemble_output() also computes
     several other full-diagnostic-only fields (narrative_modulation,
     jurisdiction_flags, causation_pattern, urgency_window, legal exposure)
     Category D has no use for. This returns a smaller, self-contained dict
