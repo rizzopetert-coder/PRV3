@@ -6,6 +6,8 @@
 
 import type { ShareableOutputPayload } from "@/lib/types";
 import { severityAccentTokens } from "@/components/ConstellationField";
+import ContextOrientation from "@/components/ContextOrientation";
+import { getResultsOrientation } from "@/data/orientation-copy";
 
 function Rule() {
   return (
@@ -54,6 +56,15 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
 
   return (
     <div className="max-w-2xl">
+
+      {/* Contextual orientation — sits above Block 1, singleton per render. */}
+      <div className="mb-3">
+        <ContextOrientation
+          variant="inline"
+          topic="output-shareable"
+          {...getResultsOrientation(payload.severity, payload.resolution_family)}
+        />
+      </div>
 
       {/* Block 1 — Header bar */}
       <div className="flex items-center justify-between pb-3">

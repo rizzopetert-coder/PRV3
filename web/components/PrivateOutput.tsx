@@ -6,6 +6,8 @@ import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
 import { stateIdToSlug } from "@/lib/state-slug";
+import ContextOrientation from "@/components/ContextOrientation";
+import { getResultsOrientation } from "@/data/orientation-copy";
 
 // First-sentence extraction for a secondary state's short-version summary
 // (Block 4b) -- splits on the first sentence-ending period, not a hard
@@ -139,6 +141,17 @@ export default function PrivateOutput({
 
   return (
     <div className="max-w-2xl">
+
+      {/* Contextual orientation — highest-value surface per the reviewed
+          architecture. Sits above Block 1, singleton per render (one
+          result, one orientation), not per-block. */}
+      <div className="mb-3">
+        <ContextOrientation
+          variant="inline"
+          topic="output-private"
+          {...getResultsOrientation(payload.severity, payload.resolution_family)}
+        />
+      </div>
 
       {/* Block 1 — Condition header. Hero typographic treatment
           (Direction 3, this session): the primary condition name gets
