@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import type { PrivateOutputPayload } from "@/lib/types";
 import { SIGNIFICANT_EVENT_OPTIONS } from "@/lib/types";
 import PrivateOutput from "@/components/PrivateOutput";
+import ContextOrientation from "@/components/ContextOrientation";
+import { ORIENTATION_COPY } from "@/data/orientation-copy";
 
 // ---------------------------------------------------------------------------
 // Path 1 (Session 71, Phase 1) — live sequential-question diagnostic.
@@ -716,7 +718,17 @@ export default function DiagnosticFlow() {
   }
 
   if (state.phase === "narrative") {
-    return <NarrativeView prompt={state.prompt} onSubmit={handleNarrativeSubmit} />;
+    return (
+      <>
+        <NarrativeView prompt={state.prompt} onSubmit={handleNarrativeSubmit} />
+        <ContextOrientation
+          variant="floating"
+          topic="diagnostic-narrative"
+          className="bottom-6 right-6"
+          {...ORIENTATION_COPY["diagnostic-narrative"]}
+        />
+      </>
+    );
   }
 
   if (state.phase === "complete") {
@@ -772,6 +784,12 @@ export default function DiagnosticFlow() {
   }
 
   if (state.phase === "question") {
+    // Checkpoint distinguishers arrive as a spliced label, not a distinct
+    // FlowState phase (DiagnosticFlow has no literal "checkpoint" state) --
+    // this is the real distinction the spec's "core questions / checkpoint"
+    // templating maps onto. See prompts/context-orientation-build-plan.md
+    // section 1.1.
+    const topic = state.label.kind === "spliced" ? "diagnostic-checkpoint" : "diagnostic-question";
     return (
       <>
         <div className="max-w-xl mx-auto px-6 pt-6 flex items-center justify-between">
@@ -794,10 +812,26 @@ export default function DiagnosticFlow() {
           label={state.label}
           onAnswer={handleAnswer}
         />
+        <ContextOrientation
+          variant="floating"
+          topic={topic}
+          className="bottom-6 right-6"
+          {...ORIENTATION_COPY[topic]}
+        />
       </>
     );
   }
 
   // state.phase === "intake"
-  return <IntakeForm intake={intake} onChange={setIntake} onSubmit={handleStart} />;
+  return (
+    <>
+      <IntakeForm intake={intake} onChange={setIntake} onSubmit={handleStart} />
+      <ContextOrientation
+        variant="floating"
+        topic="diagnostic-intake"
+        className="bottom-6 right-6"
+        {...ORIENTATION_COPY["diagnostic-intake"]}
+      />
+    </>
+  );
 }
