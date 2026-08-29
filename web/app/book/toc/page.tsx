@@ -9,6 +9,8 @@ import { states as taxonomyStates, signatures } from "@/data/taxonomy";
 import { bookManifest } from "@/lib/book-manifest";
 import { translateResolutionFamily } from "@/lib/resolution-family";
 import { PUBLIC_DIMENSION_LABELS } from "@/lib/book-taxonomy-labels";
+import ContextOrientation from "@/components/ContextOrientation";
+import { ORIENTATION_COPY } from "@/data/orientation-copy";
 
 // Filterable grid, replacing the prior dimension-grouped flat list.
 // Two independent tag families -- dimension (4, from book-state-index.ts)
@@ -388,6 +390,20 @@ export default function StatesTocPage() {
         by signature, or both.
       </p>
       <p className="font-ui text-base text-gray-600 mb-4">{LAYER1_ADDITION}</p>
+
+      {/* Contextual orientation affordance -- a distinct, separately-scoped
+          trigger from the Terminology Guide below. That one explains what
+          individual terms mean; this one explains what this whole page is
+          and how it relates to actually taking the diagnostic. Placed
+          first in document flow, own topic/copy, no shared state with
+          termsHovered/termsTapped. */}
+      <div className="mb-4">
+        <ContextOrientation
+          variant="inline"
+          topic="book-toc"
+          {...ORIENTATION_COPY["book-toc"]}
+        />
+      </div>
 
       {/* Gestalt Pass Layer 2 (this session) -- combined terminology
           guide. Trigger placed in normal document flow, after the intro
