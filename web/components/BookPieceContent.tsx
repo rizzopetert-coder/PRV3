@@ -4,6 +4,8 @@ import ReactMarkdown from "react-markdown";
 import type { BookPiece } from "@/lib/book-manifest";
 import { useTheme } from "@/components/ThemeSwitcher";
 import { HEADING_ACCENT_CLASS } from "@/lib/theme-role-tokens";
+import ContextOrientation from "@/components/ContextOrientation";
+import { getBookPieceOrientation } from "@/data/orientation-copy";
 
 // Dark/Neutral rollout, Gemini-cleared batch (this session). h1 and the
 // markdown-rendered h2/h3 -> heading accent (Pete's call for h1;
@@ -33,6 +35,13 @@ export default function BookPieceContent({ piece, body, jsonLd }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
+      <div className="mb-4">
+        <ContextOrientation
+          variant="inline"
+          topic={`book-piece-${piece.contentType}`}
+          {...getBookPieceOrientation(piece.contentType, piece.voice)}
+        />
+      </div>
       <h1 className={headingClass}>{piece.title}</h1>
       <p className="font-ui text-sm text-oxide-text mb-8">{piece.teaser}</p>
       <ReactMarkdown
