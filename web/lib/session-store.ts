@@ -252,9 +252,7 @@ export interface DiagnosticSession {
 // status flips to "complete".
 export interface AnonymizedCompletion {
   industry: string;
-  // string | number is TEMPORARY -- same follow-up as IntakeEcho
-  // (web/lib/types.ts) to collapse to number-only later.
-  organization_size: string | number;
+  organization_size: number;
   final_state_rankings: Array<{ id: string; name: string; weight: number }>;
   completed_at: string; // ISO 8601
 }
