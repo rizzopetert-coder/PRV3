@@ -130,7 +130,7 @@
   --field-raise: #EFE6D0;
   --oxide: #4A6B85;
   --oxide-text: #3D5A72;
-  --slate: #7A7E82;
+  --slate: #6E7276; /* was #7A7E82, restores WCAG AA 4.86:1 vs #FFFFFF */
   --line: rgba(52, 56, 60, 0.10);
   --line-strong: rgba(52, 56, 60, 0.18);
   --cta-text: #FFFFFF;
