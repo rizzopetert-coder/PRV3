@@ -429,7 +429,7 @@ prompt_text = _build_synthesis_prompt(
     asset_score=0.15,
     liability_score=0.60,
     narrative_response="Leadership keeps deferring the hard calls.",
-    intake={"organization_size": "medium", "industry": "healthcare", "role_level": "director"},
+    intake={"organization_size": 150, "industry": "healthcare", "role_level": "director"},
 )
 
 check(
@@ -464,7 +464,7 @@ prompt_with_events = _build_synthesis_prompt(
     liability_score=0.60,
     narrative_response="Leadership keeps deferring the hard calls.",
     intake={
-        "organization_size": "medium", "industry": "healthcare", "role_level": "director",
+        "organization_size": 150, "industry": "healthcare", "role_level": "director",
         "significant_events": ["acquisition_or_merger"],
     },
 )
@@ -482,7 +482,7 @@ prompt_none_event = _build_synthesis_prompt(
     liability_score=0.60,
     narrative_response="Leadership keeps deferring the hard calls.",
     intake={
-        "organization_size": "medium", "industry": "healthcare", "role_level": "director",
+        "organization_size": 150, "industry": "healthcare", "role_level": "director",
         "significant_events": ["none"],
     },
 )
@@ -499,7 +499,7 @@ prompt_missing_event = _build_synthesis_prompt(
     asset_score=0.15,
     liability_score=0.60,
     narrative_response="Leadership keeps deferring the hard calls.",
-    intake={"organization_size": "medium", "industry": "healthcare", "role_level": "director"},
+    intake={"organization_size": 150, "industry": "healthcare", "role_level": "director"},
 )
 check(
     "_build_synthesis_prompt: omits significant_events section when absent from intake",

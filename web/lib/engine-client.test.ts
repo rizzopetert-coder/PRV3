@@ -13,7 +13,7 @@ import { ZERO_VECTOR } from "./session-store";
 // fail to compile, not just fail an assertion.
 
 const BASE_INTAKE = {
-  organization_size: "51-200",
+  organization_size: 150,
   industry: "Technology",
   role_level: "CEO",
   tenure_in_role: "",

@@ -77,7 +77,12 @@ PRODUCTION_HOST = "prv-3.vercel.app"
 TOTAL_CORE_QUESTIONS = 32  # web/lib/session-store.ts's PHASE_1_QUESTION_SEQUENCE.length
 
 DEFAULT_INTAKE = {
-    "organization_size": "100-249",
+    # Numeric midpoint of the old "100-249" bucket -- was a legacy string,
+    # confirmed the live source of 4 stale AnonymizedCompletion records in
+    # Redis's diagnostic-aggregate list (organization_size collapse recon,
+    # 2026-08-29). Fixed ahead of the string|number type collapse so this
+    # tool stops producing new legacy-format entries once that ships.
+    "organization_size": 175,
     "industry": "Technology",
     "role_level": "C-suite",
     "tenure_in_role": "3-5 years",
