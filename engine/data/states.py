@@ -8,8 +8,8 @@ low/cluster=0.25 (baseline). Asset fields at 0.25. Salience weights for
 residual collisions derived from Phase 1 Confusion Matrix analysis.
 
 Source documents:
-  - State names and signal architecture: PRV3_Question_Signal_Map.docx (May 2026)
-  - Severity range, resolution family, axis descriptions: PRV3_State_Taxonomy_Profiles.docx (April 2026)
+  - State names and signal architecture: documents/PRV3_Question_Signal_Map.docx (May 2026)
+  - Severity range, resolution family, axis descriptions: documents/PRV3_State_Taxonomy_Profiles.docx (April 2026)
   - Canonical dimension/cluster assignments: PRV3_MOB_v1.2.md (May 2026)
 
 NOTE — COUNT: Aptitude (7), Authority (22), Alliance (7), Attitude (21) = 57.
@@ -72,7 +72,7 @@ SIGNAL_WEIGHTS = ("high", "medium", "low", "cluster")
 
 CLUSTER_IDS = ("C-Manager", "C-Culture", "C-Silence", "C-InfoFlow")
 
-# Liability Risk Framework categories (source: PRV3_Frameworks.docx)
+# Liability Risk Framework categories (source: documents/PRV3_Frameworks.docx)
 LIABILITY_CATEGORIES = (
     "Legal & Compliance",
     "Financial & Economic",
@@ -85,7 +85,7 @@ LIABILITY_CATEGORIES = (
     "Strategic",
 )
 
-# Leadership Competency Framework domains (source: PRV3_Frameworks.docx)
+# Leadership Competency Framework domains (source: documents/PRV3_Frameworks.docx)
 ASSET_DOMAINS = (
     "Accountability Architecture",
     "Adaptive Capacity",

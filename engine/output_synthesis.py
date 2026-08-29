@@ -10,7 +10,7 @@ No partial LLM survival — coherence over completeness (Gemini Q2, S42).
 Context object: state_name, severity_tier, resolution_family (commercial name),
 asset_score, liability_score, narrative_response, intake, signal_map_context.
 
-Spec reference: PRV3_Output_Synthesis_Prompts_v1.0.docx — Session 42.
+Spec reference: documents/PRV3_Output_Synthesis_Prompts_v1.0.docx — Session 42.
 """
 
 from __future__ import annotations

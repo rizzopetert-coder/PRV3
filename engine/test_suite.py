@@ -22,7 +22,7 @@ pass_criterion on ExpectedOutput (optional override):
   top_3_with_escalation_flag — top 3 AND severity.escalation_flag must be True
   None                       — profile-implied default applies
 
-Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section VII.2
+Spec reference: documents/PRV3_Scoring_Architecture_Spec_v1.docx, Section VII.2
 """
 
 from __future__ import annotations

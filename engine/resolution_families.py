@@ -137,7 +137,7 @@ def apply_causation_override(
 # ── Static fallback copy ───────────────────────────────────────────────────────
 # Used when output_synthesis.py LLM call times out or fails.
 # Keyed by (commercial_name, severity_tier). Compound keys use severity_tier=None.
-# Source: PRV3_Resolution_Families_Copy_v3.0.docx — Session 42.
+# Source: documents/PRV3_Resolution_Families_Copy_v3.0.docx — Session 42.
 
 RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
 

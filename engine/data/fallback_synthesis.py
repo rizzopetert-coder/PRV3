@@ -10,7 +10,7 @@ Keyed by (commercial_name, severity_tier).
 Single-service keys use severity_tier ("Emerging" | "Entrenched" | "Endemic").
 Compound keys use severity_tier=None (tier-agnostic copy).
 
-Source: PRV3_Resolution_Families_Copy_v3.0.docx via RESOLUTION_FALLBACK_COPY.
+Source: documents/PRV3_Resolution_Families_Copy_v3.0.docx via RESOLUTION_FALLBACK_COPY.
 """
 
 from __future__ import annotations

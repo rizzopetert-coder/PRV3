@@ -11,7 +11,7 @@ VI.5  Shareable Output Structure
 Takes the final state distribution (post-narrative modulation), severity result,
 and asset score; applies the signal floor; routes to single or multi-state output.
 
-Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section VI
+Spec reference: documents/PRV3_Scoring_Architecture_Spec_v1.docx, Section VI
 """
 
 from __future__ import annotations

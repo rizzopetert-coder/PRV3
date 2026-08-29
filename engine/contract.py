@@ -9,7 +9,7 @@ Key names, data types, and field presence are immutable per spec VII.1.
 This module is the interface boundary between the scoring engine and all
 downstream systems (renderer, test suite, future integrations).
 
-Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section VII
+Spec reference: documents/PRV3_Scoring_Architecture_Spec_v1.docx, Section VII
 """
 
 from __future__ import annotations

@@ -10,7 +10,7 @@ The narrative prompt response is processed by an LLM that extracts dimensional
 signals and returns confidence scores. Output modulates — confirmation and
 elevation only. Cannot introduce new state probability for zero-prior states.
 
-Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section IV
+Spec reference: documents/PRV3_Scoring_Architecture_Spec_v1.docx, Section IV
 """
 
 from __future__ import annotations

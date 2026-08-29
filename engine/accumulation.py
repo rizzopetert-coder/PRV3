@@ -7,7 +7,7 @@ II.2  Vector Accumulation
 II.3  Signal Reliability Coefficient Application
 II.4  Cosine Similarity and State Ranking
 
-Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section II
+Spec reference: documents/PRV3_Scoring_Architecture_Spec_v1.docx, Section II
 """
 
 import math

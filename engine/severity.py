@@ -10,7 +10,7 @@ Severity accumulation is independent and orthogonal from dimensional vector
 accumulation. It operates on conditional severity follow-on question answers
 (SEVER-01 through SEVER-12) and produces a severity tier classification.
 
-Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section V
+Spec reference: documents/PRV3_Scoring_Architecture_Spec_v1.docx, Section V
 """
 
 from __future__ import annotations

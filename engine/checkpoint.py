@@ -11,7 +11,7 @@ calculates Shannon Entropy on the normalized score distribution. If entropy
 exceeds the threshold, the engine routes to distinguisher questions (Q11, Q19)
 or fires the narrative prompt early (Q27).
 
-Spec reference: PRV3_Scoring_Architecture_Spec_v1.docx, Section III
+Spec reference: documents/PRV3_Scoring_Architecture_Spec_v1.docx, Section III
 """
 
 from dataclasses import dataclass, field
