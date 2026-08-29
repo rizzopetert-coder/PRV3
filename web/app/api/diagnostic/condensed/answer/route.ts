@@ -59,7 +59,7 @@ function validateBody(body: unknown): body is AnswerBody {
 // safe by direct read.
 function toPrivateIntakeEchoShape(industry: string): PrivateIntakeEcho {
   return {
-    organization_size: "",
+    organization_size: 0,
     industry,
     role_level: "",
     tenure_in_role: "",

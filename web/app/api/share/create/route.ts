@@ -49,6 +49,19 @@ function computeWeights(
 // Intake mapping
 // ---------------------------------------------------------------------------
 
+// Same coercion as web/app/api/result/route.ts's parseOrgSize() -- kept as
+// a separate local copy rather than a shared import, matching this
+// project's standing preference for a few duplicated lines over a new
+// shared module (same precedent as STATE_RESOLUTION_FAMILY's existing
+// triplication across routes). Real number passes through; anything else
+// (this was previously a blind `as string` cast with no validation at all)
+// coerces via Number(), falling back to 0.
+function toOrgSize(value: unknown): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 function mapIntake(engineIntake: Record<string, unknown>): ShareableIntakeEcho {
   const jurisdictions = Array.isArray(engineIntake.jurisdictions)
     ? (engineIntake.jurisdictions as string[])
@@ -57,7 +70,7 @@ function mapIntake(engineIntake: Record<string, unknown>): ShareableIntakeEcho {
     ? (engineIntake.significant_events as string[])
     : ["none"];
   return {
-    organization_size: (engineIntake.org_size as string) ?? "",
+    organization_size: toOrgSize(engineIntake.org_size),
     industry: (engineIntake.industry as string) ?? "",
     role_level: (engineIntake.principal_role as string) ?? "",
     tenure_in_role: "",

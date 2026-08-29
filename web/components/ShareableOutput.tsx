@@ -27,14 +27,7 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
 
   const hasIndustry = Boolean(payload.intake.industry);
   const hasOrgSize = Boolean(payload.intake.organization_size);
-  // organization_size is string | number (Phase 2 soft-transition union) --
-  // a precise int renders "~N employees"; a share record still carrying a
-  // legacy bucket string (written before this deployment, within the 30-day
-  // KV transition window) renders bare, exactly as it did before this change.
-  const orgSizeDisplay =
-    typeof payload.intake.organization_size === "number"
-      ? `~${payload.intake.organization_size} employees`
-      : payload.intake.organization_size;
+  const orgSizeDisplay = `~${payload.intake.organization_size} employees`;
   let clientIdentifier: string;
   if (hasIndustry && hasOrgSize) {
     clientIdentifier = `${payload.intake.industry} · ${orgSizeDisplay} · ${createdDate}`;

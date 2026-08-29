@@ -168,7 +168,7 @@ export default function DiagnosticFixturePicker() {
     // web/lib/engine-client.ts). Not reused between the two -- the existing
     // /dev/diagnostic-preview page keeps the same split.
     intake: {
-      organization_size: "",
+      organization_size: 0,
       industry: "",
       role_level: "",
       tenure_in_role: "",

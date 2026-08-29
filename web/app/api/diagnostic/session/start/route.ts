@@ -17,12 +17,8 @@ const VALID_SIGNIFICANT_EVENTS = new Set(SIGNIFICANT_EVENT_OPTIONS.map((o) => o.
 function validateIntake(body: unknown): body is PrivateIntakeEcho {
   if (typeof body !== "object" || body === null) return false;
   const b = body as Record<string, unknown>;
-  // Soft transition (locked decision) -- accepts a real int from the new
-  // stepper UI or a legacy non-empty bucket string, never hard-rejects
-  // an old-format submission.
   const validOrgSize =
-    (typeof b.organization_size === "number" && Number.isFinite(b.organization_size)) ||
-    (typeof b.organization_size === "string" && b.organization_size.length > 0);
+    typeof b.organization_size === "number" && Number.isFinite(b.organization_size);
   const validSignificantEvents =
     Array.isArray(b.significant_events) &&
     b.significant_events.length > 0 &&

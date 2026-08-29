@@ -45,17 +45,12 @@ function computeWeights(
 
 // Never throws. Real headcount int passes through unchanged; a numeric
 // string (defensive -- shouldn't occur from the Python side, but the web
-// boundary shouldn't trust that) parses to a number; a legacy bucket
-// string ("100-249") is not numeric and passes through as-is; missing/
-// null falls back to "".
-function parseOrgSize(value: unknown): string | number {
-  if (typeof value === "number") return value;
-  if (value === null || value === undefined) return "";
-  if (typeof value === "string") {
-    const parsed = Number(value);
-    return value.trim() !== "" && Number.isFinite(parsed) ? parsed : value;
-  }
-  return "";
+// boundary shouldn't trust that) parses to a number; missing/non-numeric
+// falls back to 0.
+function parseOrgSize(value: unknown): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function mapIntake(engineIntake: Record<string, unknown>): PrivateIntakeEcho {
