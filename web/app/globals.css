@@ -230,6 +230,28 @@
   }
 }
 
+/* SignatureField (this session) -- see the .signature-ring-breathe /
+   .signature-quad-breathe utility comment below for gating/usage. */
+@keyframes signature-ring-breathe {
+  0%, 100% {
+    opacity: 0.16;
+    transform: scale(0.985);
+  }
+  50% {
+    opacity: 0.38;
+    transform: scale(1.015);
+  }
+}
+
+@keyframes signature-quad-breathe {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.015) rotate(1.2deg);
+  }
+}
+
 /* ConstellationField assembly animation (Direction 1 Refinement, Category E,
    this session) -- stroke-only "draw-in" on mount for the live-mode weighted
    shape, via the pathLength={1} normalization trick (no JS perimeter-length
@@ -293,6 +315,33 @@
   @media (prefers-reduced-motion: no-preference) {
     .animate-fade-up-gated {
       animation: fade-up 300ms ease-out both;
+    }
+  }
+
+  /* SignatureField (this session) -- homepage hero replacement for
+     <ConstellationField mode="ambient" />, built to match the approved
+     mockup's breathing-rings/vertex-dots visual language (see
+     web/components/home/SignatureField.tsx's own header comment for the
+     full rationale). Gated identically to .animate-fade-up-gated above --
+     when reduced motion IS preferred, neither class applies any animation
+     at all, so rings/quad render at their static resting values (the
+     inline opacity on each ring, and the implicit no-transform resting
+     state on the quad's <g>) rather than a suppressed-but-jumpy animation. */
+  @media (prefers-reduced-motion: no-preference) {
+    .signature-ring-breathe {
+      animation: signature-ring-breathe 7s ease-in-out infinite;
+    }
+    .signature-quad-breathe {
+      /* transform-box: view-box + a pixel transform-origin, not the
+         default fill-box/bounding-box center -- the quad's own bounding
+         box center ((276+624)/2, (117+465)/2) = (450, 291) does not equal
+         its true visual center (450, 320), since the four per-axis
+         weights aren't symmetric (apt=0.35/all=0.25 differ). Scaling or
+         rotating around the wrong point would visibly wobble the shape
+         off-center every cycle. */
+      transform-box: view-box;
+      transform-origin: 450px 320px;
+      animation: signature-quad-breathe 8s ease-in-out infinite;
     }
   }
 

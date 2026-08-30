@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ConstellationField } from "@/components/ConstellationField";
+import { SignatureField } from "@/components/home/SignatureField";
 import { WayfindingGrid } from "@/components/home/WayfindingGrid";
 import { useScrollReveal } from "@/components/home/useScrollReveal";
 
@@ -129,26 +129,13 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Signature field -- ConstellationField mode="ambient" reused
-              directly, unmodified (zero-parameter, self-contained). Axis
-              labels are a homepage-local overlay, not a change to the
-              shared component -- AmbientField() renders no labels today,
-              only LiveField does. */}
-          <div className="relative aspect-900/640 w-full">
-            <ConstellationField mode="ambient" />
-            <span className="absolute top-2 left-1/2 -translate-x-1/2 font-mono text-[10px] tracking-widest text-(--home-slate)">
-              APTITUDE
-            </span>
-            <span className="absolute right-1 top-1/2 -translate-y-1/2 font-mono text-[10px] tracking-widest text-(--home-slate)">
-              AUTHORITY
-            </span>
-            <span className="absolute bottom-2 left-1/2 -translate-x-1/2 font-mono text-[10px] tracking-widest text-(--home-slate)">
-              ALLIANCE
-            </span>
-            <span className="absolute left-1 top-1/2 -translate-y-1/2 font-mono text-[10px] tracking-widest text-(--home-slate)">
-              ATTITUDE
-            </span>
-          </div>
+          {/* Signature field -- SignatureField (homepage-local), not
+              ConstellationField mode="ambient" -- that component's static
+              outline fell short of the approved mockup (no breathing
+              rings, no vertex dots, no ambient motion), confirmed by Pete
+              against a live screenshot. ConstellationField.tsx itself is
+              untouched -- see SignatureField.tsx's own header comment. */}
+          <SignatureField />
         </section>
 
         {/* Credential band */}
