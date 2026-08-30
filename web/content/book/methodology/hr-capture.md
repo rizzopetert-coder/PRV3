@@ -2,7 +2,7 @@
 
 HR reports to the person it's supposed to provide independent oversight of. If you have a concern about that specific person, you already know, without having to be told, exactly where not to bring it.
 
-The function still exists in every visible way. People still get onboarded, benefits still get administered, an HR seat still shows up clearly on the org chart. What it structurally cannot do is its actual job — provide oversight independent of organizational politics — and the people who most need that oversight figured out the limitation long before anyone in leadership said so out loud, if anyone ever has.
+The function still exists in every visible way. People still get onboarded, benefits still get administered, an HR seat still shows up clearly on the org chart. What it structurally cannot do is its actual job, provide oversight independent of organizational politics, and the people who most need that oversight figured out the limitation long before anyone in leadership said so out loud, if anyone ever has.
 
 ---
 
@@ -12,7 +12,7 @@ This rarely looks like HR being incompetent, careless, or complicit in any delib
 
 ### What Employees Have Already Concluded
 
-Once someone tests this arrangement — brings a real concern forward and watches what happens — and either nothing changes or they themselves end up treated differently afterward, that lesson doesn't stay contained to their individual situation. It spreads through the organization the way most consequential information does, informally and reliably. People stop bringing HR anything that touches the protected person, and the organization loses its early-warning system for precisely the category of issue it most needs one for. By the time something serious eventually surfaces through a different channel entirely — an employment lawyer, a regulator, a resignation letter that goes considerably further than a typical exit — HR had the structural position to catch the problem early and never had the actual independence to use it.
+Once someone tests this arrangement, brings a real concern forward and watches what happens, and either nothing changes or they themselves end up treated differently afterward, that lesson doesn't stay contained to their individual situation. It spreads through the organization the way most consequential information does, informally and reliably. People stop bringing HR anything that touches the protected person, and the organization loses its early-warning system for precisely the category of issue it most needs one for. By the time something serious eventually surfaces through a different channel entirely, an employment lawyer, a regulator, a resignation letter that goes considerably further than a typical exit, HR had the structural position to catch the problem early and never had the actual independence to use it.
 
 ### What the Silence Around HR Sounds Like
 
@@ -24,7 +24,7 @@ Once someone tests this arrangement — brings a real concern forward and watche
 
 ### A New Hire Inherits the Same Incentive
 
-Replacing whoever currently sits in the HR seat changes essentially nothing if the reporting structure underneath them stays the same. A new hire faces the identical choice the moment they actually start doing the job: protect the working relationship with the person who controls their standing and continued employment, or protect the people who need independent oversight from that same person — and most people, reasonably, make the same choice their predecessor did, for exactly the same underlying reasons.
+Replacing whoever currently sits in the HR seat changes essentially nothing if the reporting structure underneath them stays the same. A new hire faces the identical choice the moment they actually start doing the job: protect the working relationship with the person who controls their standing and continued employment, or protect the people who need independent oversight from that same person, and most people, reasonably, make the same choice their predecessor did, for exactly the same underlying reasons.
 
 ### What Independence Actually Requires
 

@@ -1,4 +1,4 @@
-Silosolation is what happens when self-contained teams learn to function well individually while producing less than the sum of their parts collectively. Each team is fine on its own. The organization, taken as a whole, isn't — and the gap between those two things is where the best people quietly burn out.
+Silosolation is what happens when self-contained teams learn to function well individually while producing less than the sum of their parts collectively. Each team is fine on its own. The organization, taken as a whole, isn't, and the gap between those two things is where the best people quietly burn out.
 
 A routine question gets forwarded across departments, loops in more people than it needs, and by the time it reaches reply twenty, the original question is buried and the person who actually has the answer isn't even on the thread.
 
@@ -36,11 +36,11 @@ Let's make it concrete.
 
 **Decision latency.** A decision that should take a day takes two weeks because it requires sign-off from teams that don't trust each other. Every decision becomes a negotiation. Every negotiation surfaces the underlying conflicts that nobody has resolved. The calendar fills with alignment meetings. The actual work waits.
 
-**Duplicated effort.** Each silo builds its own version of capabilities that should exist once. You've got three teams running their own analytics because nobody trusts the central data team. You've got two different customer success processes because sales and support couldn't agree on a handoff. The redundancy isn't a hedge against risk — it's a tax on efficiency.
+**Duplicated effort.** Each silo builds its own version of capabilities that should exist once. You've got three teams running their own analytics because nobody trusts the central data team. You've got two different customer success processes because sales and support couldn't agree on a handoff. The redundancy isn't a hedge against risk. It's a tax on efficiency.
 
 **Opportunity cost.** The initiatives that would require real cross-functional collaboration just... don't get proposed. People have learned that anything requiring coordination across the silos is going to be painful. So they scope their ideas to fit inside their own walls. The big swings don't get swung. The organization stays smaller than it should be.
 
-**Talent drain.** The people who wanted to do work that matters — work that requires the organization to function as a whole — eventually conclude that this isn't the place for that. They don't leave in dramatic fashion. They just quietly find somewhere that doesn't make simple things so hard.
+**Talent drain.** The people who wanted to do work that matters, work that requires the organization to function as a whole, eventually conclude that this isn't the place for that. They don't leave in dramatic fashion. They just quietly find somewhere that doesn't make simple things so hard.
 
 Add it up. The number is bigger than anyone wants to admit.
 
@@ -70,7 +70,7 @@ Not the org chart. The actual points of friction. Where does information stop fl
 
 Once you see the seams clearly, you can start to see what needs to change. Some of it is structural: different reporting lines, different incentive structures, different forums for cross-functional work. Some of it is behavioral: leaders who need to model collaboration instead of territorial defense. Some of it is just permission: making it okay to surface the friction instead of working around it.
 
-The organizations that solve Silosolation describe a specific moment when it starts to turn. Usually it's the first time a cross-functional decision gets made cleanly — not through weeks of negotiation, but through a process that actually works. People notice. They start to believe that maybe things could be different.
+The organizations that solve Silosolation describe a specific moment when it starts to turn. Usually it's the first time a cross-functional decision gets made cleanly, not through weeks of negotiation, but through a process that actually works. People notice. They start to believe that maybe things could be different.
 
 That belief is where the change actually happens. Everything before that is just another email chain waiting for someone to reply-all.
 
@@ -86,7 +86,7 @@ The answer tells you where to start. Not everywhere at once: that's how improvem
 
 Then move to the next one.
 
-It's not glamorous work. There's no single intervention that makes all the silos disappear. But the organizations that do it well — that systematically close the gaps between teams — describe something that feels almost structural. Like the organization got better at being an organization. Like things that used to be hard just... started working.
+It's not glamorous work. There's no single intervention that makes all the silos disappear. But the organizations that do it well, that systematically close the gaps between teams, describe something that feels almost structural. Like the organization got better at being an organization. Like things that used to be hard just... started working.
 
 That's available to you. But it starts with naming the specific seams that are currently broken.
 

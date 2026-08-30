@@ -8,23 +8,23 @@ The org chart drawn at twenty doesn't work at eighty. The processes built for a 
 
 The Undefined Role is a success problem. That's the frustrating part.
 
-The organization is growing because something is working. The product, the market fit, the team — something is genuinely good. The growth is real. The momentum is real. And the natural response to real momentum is to run faster, hire faster, ship faster.
+The organization is growing because something is working. The product, the market fit, the team: something is genuinely good. The growth is real. The momentum is real. And the natural response to real momentum is to run faster, hire faster, ship faster.
 
 Nobody stops to ask whether the systems can handle the pace. Because stopping feels like losing. Because the market won't wait. Because the investors are expecting the next milestone and the next one after that. Because everyone is so busy executing that there's no time to examine whether the thing they're executing against was built for an organization half this size.
 
 The roles that made sense at twenty start to blur at forty and completely dissolve at eighty. The person who was "doing a bit of everything" is now theoretically responsible for seventeen things and actually doing three of them while the other fourteen fall through cracks nobody has time to notice. The meeting that was "the place where we align" is now either a mob of thirty people where nothing gets decided or a relic that half the org doesn't know exists.
 
-And the workarounds — God, the workarounds. People are building shadow processes to route around the ones that don't work anymore. There's a Slack DM network that's more effective than any official channel. Someone, somewhere, is maintaining a spreadsheet that should be a system, and everyone knows it, and nobody has the bandwidth to fix it.
+And the workarounds, God, the workarounds. People are building shadow processes to route around the ones that don't work anymore. There's a Slack DM network that's more effective than any official channel. Someone, somewhere, is maintaining a spreadsheet that should be a system, and everyone knows it, and nobody has the bandwidth to fix it.
 
 ---
 
 ## The People Who Absorb It
 
-There's a profile of person who ends up carrying The Undefined Role on their back. Usually someone who was there early. Someone who "knows where the bodies are buried" — which really means they know which processes are fake and which ones actually matter, who to ask to get things done versus who to ask if you want the official answer.
+There's a profile of person who ends up carrying The Undefined Role on their back. Usually someone who was there early. Someone who "knows where the bodies are buried": which really means they know which processes are fake and which ones actually matter, who to ask to get things done versus who to ask if you want the official answer.
 
 These people are exhausted. They became the human glue holding the organization together while the formal systems failed to keep pace. They answer the same questions seventeen times a day because there's no documentation. They patch the same holes because there's no process. They mentor the same new hires because onboarding is whatever they have time to make up between meetings.
 
-They're also, usually, too busy to tell anyone how bad it is. Or they've told people and nothing changed and now they've stopped expecting anything to change. They're running the math on how much longer they can sustain this pace before something breaks — their output, their patience, their willingness to keep showing up.
+They're also, usually, too busy to tell anyone how bad it is. Or they've told people and nothing changed and now they've stopped expecting anything to change. They're running the math on how much longer they can sustain this pace before something breaks: their output, their patience, their willingness to keep showing up.
 
 These are exactly the people you can't afford to lose. And they're exactly the people most likely to leave if the infrastructure doesn't catch up.
 
@@ -66,7 +66,7 @@ The market pressure is real. The investor expectations are real. The competition
 
 "Later" doesn't come. There's always another sprint, another quarter, another thing that needs to happen before there's time to build the systems that should have been built six months ago. The deficit compounds. The workarounds become the system. The chaos becomes "just how we do things."
 
-The people who could slow things down — the founders, the leadership team — are usually the ones most attached to the pace. They remember when the scrappiness was a feature. They built an identity around moving fast. Admitting that the speed has become a liability feels like admitting they broke something by succeeding.
+The people who could slow things down, the founders, the leadership team, are usually the ones most attached to the pace. They remember when the scrappiness was a feature. They built an identity around moving fast. Admitting that the speed has become a liability feels like admitting they broke something by succeeding.
 
 ---
 
@@ -80,4 +80,4 @@ The work itself is usually straightforward once the space is carved out. Map the
 
 What's hard is creating the permission to do that work. Because it means slowing down. It means admitting the machine isn't as well-built as the pitch deck suggests. It means the people who've been saying "this is fine" have to acknowledge that it isn't.
 
-If the pace has been getting faster while the infrastructure falls further behind, that gap doesn't close on its own — it has to become as much of a priority as the product it's supporting.
+If the pace has been getting faster while the infrastructure falls further behind, that gap doesn't close on its own. It has to become as much of a priority as the product it's supporting.
