@@ -1,6 +1,6 @@
 If your most critical leader left tomorrow, with no warning, could you say specifically who steps in, whether they're ready, and what the first ninety days look like?
 
-Most organizations can't. What exists instead is a list of names in a shared drive, dusted off once a year for the board meeting — a CEO with two names next to her role, a CFO with one, a VP of Engineering with a question mark because the internal candidate left eight months ago and nobody updated it. That's not a plan. It's a wish.
+Most organizations can't. What exists instead is a list of names in a shared drive, dusted off once a year for the board meeting: a CEO with two names next to her role, a CFO with one, a VP of Engineering with a question mark because the internal candidate left eight months ago and nobody updated it. That's not a plan. It's a wish.
 
 ---
 
@@ -38,9 +38,9 @@ One of the mental traps in succession planning is confusing the criticality of a
 
 Yes, the VP of Engineering is critical. The organization cannot function without that role being filled by someone competent. That's a structural reality.
 
-But is *this specific VP of Engineering* irreplaceable? That's a different question. And the answer is almost always no. They're great at their job — that's why they're in it — but there are other people on the planet who could do this job. Maybe not identically. Maybe not without transition costs. But the role can be filled.
+But is *this specific VP of Engineering* irreplaceable? That's a different question. And the answer is almost always no. They're great at their job, that's why they're in it, but there are other people on the planet who could do this job. Maybe not identically. Maybe not without transition costs. But the role can be filled.
 
-The succession plan exists to make that transition manageable. To ensure that when the current person leaves — and they will leave, eventually, one way or another — the organization doesn't fall into chaos.
+The succession plan exists to make that transition manageable. To ensure that when the current person leaves, and they will leave, eventually, one way or another, the organization doesn't fall into chaos.
 
 The people who are most resistant to succession planning are often the people who benefit from being seen as irreplaceable. That's not always conscious. But the conversation about who could succeed someone is also, implicitly, a conversation about whether that person is as uniquely essential as they've been treated.
 

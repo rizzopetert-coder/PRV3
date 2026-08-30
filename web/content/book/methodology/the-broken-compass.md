@@ -30,7 +30,7 @@ Last month, the priority was Product A. This month, you're hearing rumors that P
 
 So you hedge. You make progress on both things, committing fully to neither. You learn to read the political winds before allocating your time. You get good at presenting your work in whatever frame seems most favored this week.
 
-This is exhausting. It's also rational. You're responding logically to an illogical situation. The problem isn't that you're not executing — the problem is that no one has told you clearly what to execute on. So you're doing your best impression of someone who knows what they're doing while quietly hoping someone will eventually clarify things.
+This is exhausting. It's also rational. You're responding logically to an illogical situation. The problem isn't that you're not executing. The problem is that no one has told you clearly what to execute on. So you're doing your best impression of someone who knows what they're doing while quietly hoping someone will eventually clarify things.
 
 (They won't. Not unless something changes at the leadership level.)
 
@@ -42,7 +42,7 @@ The leaders know. That's the thing. They're not unaware that they're pulling in 
 
 They just haven't been willing to have the conversation that would resolve it. And there are reasons for that.
 
-Sometimes the conversation is too hard. The real disagreement is about something fundamental — the kind of company this should be, the role of specific people in the future, whether a particular leader belongs on the team anymore. Easier to talk about "strategy" than to have that conversation.
+Sometimes the conversation is too hard. The real disagreement is about something fundamental: the kind of company this should be, the role of specific people in the future, whether a particular leader belongs on the team anymore. Easier to talk about "strategy" than to have that conversation.
 
 Sometimes the conversation has already happened and failed. The offsite was supposed to be the place where this got hashed out. It didn't work. Now everyone's a little burned out on the whole alignment thing. Let's just focus on execution and hope the strategy stuff sorts itself out.
 
@@ -72,7 +72,7 @@ The Broken Compass doesn't resolve through another strategy process. You've done
 
 It resolves when the leadership team has the conversation they've been avoiding.
 
-Not the meta-conversation about how they should communicate better. The actual conversation. The one where someone says "I don't think we agree about where we're going, and I think we need to figure that out before we do anything else." The one where the real disagreement — the one underneath the proxy disagreements — finally gets surfaced and worked through.
+Not the meta-conversation about how they should communicate better. The actual conversation. The one where someone says "I don't think we agree about where we're going, and I think we need to figure that out before we do anything else." The one where the real disagreement, the one underneath the proxy disagreements, finally gets surfaced and worked through.
 
 That conversation is uncomfortable. It might involve acknowledging that someone's vision isn't going to win. It might involve revisiting decisions that felt settled. It might involve personal dynamics that have been managed around instead of addressed.
 
@@ -84,7 +84,7 @@ But it's the only thing that works. You cannot operationalize your way out of a 
 
 When an organization tells us they have a strategy problem or an execution problem, we start with a question.
 
-*Has the divergence been named directly, in a room with all the relevant people — or has it only been discussed in subsets and side conversations?*
+*Has the divergence been named directly, in a room with all the relevant people, or has it only been discussed in subsets and side conversations?*
 
 Usually the answer is the latter. Everyone knows there's a disagreement. It's been discussed one-on-one. It's been acknowledged in smaller groups. But the full cast has never been in the same room for the actual conversation. The one where you can't retreat to safe territory because everyone's watching.
 

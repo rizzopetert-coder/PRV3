@@ -1,12 +1,12 @@
 Why would an organization with coordinated decision-making, low structural friction, and engaged leadership go looking for a diagnostic tool at all?
 
-Most Anchor organizations wouldn't, which is part of why this is the rarest finding in the diagnostic system — not because healthy organizations are rare, but because they rarely go looking. You did anyway, maybe after Googling "signs of organizational health" or running a diagnostic built for crisis and getting told, correctly, that you're fine. Which felt right. But also incomplete.
+Most Anchor organizations wouldn't, which is part of why this is the rarest finding in the diagnostic system, not because healthy organizations are rare, but because they rarely go looking. You did anyway, maybe after Googling "signs of organizational health" or running a diagnostic built for crisis and getting told, correctly, that you're fine. Which felt right. But also incomplete.
 
 ---
 
 ## What You've Built
 
-The Anchor is the rarest finding in the diagnostic system. Not because healthy organizations are rare — they're not — but because healthy organizations don't usually go looking for diagnostic tools. They don't need to. Things are working.
+The Anchor is the rarest finding in the diagnostic system. Not because healthy organizations are rare (they're not), but because healthy organizations don't usually go looking for diagnostic tools. They don't need to. Things are working.
 
 You're here anyway. That's interesting.
 
@@ -30,9 +30,9 @@ Here's how it usually happens:
 
 **Scale.** The organization grows. New people join. The cultural assumptions that everyone shared when there were forty people don't automatically transmit to the eighty people who weren't there. The decision-making processes that worked at one speed struggle at another. The relationships that made everything function become stretched too thin to carry the same weight.
 
-**Transition.** A founder moves on. A key leader leaves. Someone who was load-bearing in ways nobody fully understood until they were gone is suddenly gone. The organization has to figure out how to do what they did without them — and often discovers that what they did was holding more together than anyone realized.
+**Transition.** A founder moves on. A key leader leaves. Someone who was load-bearing in ways nobody fully understood until they were gone is suddenly gone. The organization has to figure out how to do what they did without them, and often discovers that what they did was holding more together than anyone realized.
 
-**Success.** Ironically, this is the most dangerous one. The organization succeeds. The success produces pressure — investor expectations, market expansion, the need to scale faster. The pressure creates urgency. The urgency squeezes out the slack that allowed for the culture maintenance, the relationship building, the things that felt like luxuries but were actually infrastructure.
+**Success.** Ironically, this is the most dangerous one. The organization succeeds. The success produces pressure: investor expectations, market expansion, the need to scale faster. The pressure creates urgency. The urgency squeezes out the slack that allowed for the culture maintenance, the relationship building, the things that felt like luxuries but were actually infrastructure.
 
 None of this is inevitable. But it's common. And it's more common in healthy organizations than people admit, because healthy organizations aren't looking for the warning signs. They think they're immune.
 
@@ -48,7 +48,7 @@ Most healthy organizations have never mapped this. They know things are good. Th
 
 The next step is building redundancy. Not bureaucracy. The last thing a healthy organization needs is to process itself into paralysis. But systems that don't depend on any single person's presence to keep working. Documentation that actually captures the way decisions get made. Succession plans that exist before they're needed.
 
-And then there's transmission. How do the cultural norms get to new people? How does the thing that makes this place different survive the dilution of growth? The organizations that stay healthy through scale are the ones that figure out how to make the implicit explicit — how to teach what everyone used to just know because they were in the room.
+And then there's transmission. How do the cultural norms get to new people? How does the thing that makes this place different survive the dilution of growth? The organizations that stay healthy through scale are the ones that figure out how to make the implicit explicit: how to teach what everyone used to just know because they were in the room.
 
 ---
 
@@ -74,6 +74,6 @@ Not about what's wrong. There isn't much. About what you're holding and how you'
 
 It's a different kind of conversation than the one most organizations have with outside advisors. You're not asking for diagnosis. You're asking for protection. For a sharper edge on something that's already working.
 
-That's worth doing. The organizations that treat their health as an asset worth protecting — that stay intentional about the conditions that created it — are the ones that hold it through the transitions that break everyone else.
+That's worth doing. The organizations that treat their health as an asset worth protecting, that stay intentional about the conditions that created it, are the ones that hold it through the transitions that break everyone else.
 
 If that's you, what's worth having isn't a diagnosis. It's a conversation about what you're protecting and how.

@@ -1,4 +1,4 @@
-Most business cases aren't predictions. They're arguments optimized for approval, not accuracy — a hockey-stick projection, an assumptions tab nobody opens, a risk section that acknowledges things could go wrong without engaging with what happens if they do.
+Most business cases aren't predictions. They're arguments optimized for approval, not accuracy: a hockey-stick projection, an assumptions tab nobody opens, a risk section that acknowledges things could go wrong without engaging with what happens if they do.
 
 Six months or eighteen months later, the project that looked like a layup on paper turns into a postmortem. The timeline slipped. The costs were higher. The benefits materialized slower than projected, if they materialized at all.
 
@@ -8,13 +8,13 @@ Six months or eighteen months later, the project that looked like a layup on pap
 
 Here's the unspoken dynamic in most organizations.
 
-The person building the business case has an incentive to get it approved. Their project, their budget, their headcount depends on it. They're not lying — they believe in what they're proposing — but they're also not going to build a case that makes approval harder than it needs to be.
+The person building the business case has an incentive to get it approved. Their project, their budget, their headcount depends on it. They're not lying (they believe in what they're proposing), but they're also not going to build a case that makes approval harder than it needs to be.
 
 The person approving it has limited time and a stack of other proposals. They're looking for a reason to say yes or a reason to say no. They're not doing a deep interrogation of every assumption. They're scanning for red flags and trusting that the detailed work was done.
 
 So both sides quietly cooperate to produce a document that neither fully believes. The assumptions are generous but not outlandish. The projections are ambitious but not obviously impossible. The risks are acknowledged but not seriously engaged. Everyone does their job. The business case gets approved. And then reality arrives.
 
-This isn't corruption. It's not incompetence. It's a system that rewards a specific kind of optimism and punishes a specific kind of honesty. The person who says "I'm actually not sure this will work" doesn't get funded. The person who says "this will definitely work" does — and then spends the next two years explaining why it didn't.
+This isn't corruption. It's not incompetence. It's a system that rewards a specific kind of optimism and punishes a specific kind of honesty. The person who says "I'm actually not sure this will work" doesn't get funded. The person who says "this will definitely work" does, and then spends the next two years explaining why it didn't.
 
 ---
 
@@ -66,7 +66,7 @@ And then the organization does a postmortem. The postmortem concludes that the a
 
 ## The Question We Ask
 
-When an organization is struggling with initiative execution — too many projects failing, resources scattered across bets that aren't paying off — we don't start with portfolio review. We start with a question.
+When an organization is struggling with initiative execution, too many projects failing, resources scattered across bets that aren't paying off, we don't start with portfolio review. We start with a question.
 
 *What was the last project that failed, and what did the original business case say would happen?*
 
@@ -74,6 +74,6 @@ The gap between those two things is diagnostic. If the business case said one th
 
 Nobody sets out to build a fantasy. But if the system rewards optimism and punishes honesty, fantasies are what you'll get. Changing the system is hard. It requires leadership that's willing to fund uncertainty honestly and a culture that treats conservative estimates as rigorous rather than weak.
 
-That's the work — and it's worth doing now, before the next business case gets built the same way.
+That's the work, and it's worth doing now, before the next business case gets built the same way.
 
 — Principal Resolution

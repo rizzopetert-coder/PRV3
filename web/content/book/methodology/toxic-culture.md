@@ -1,4 +1,4 @@
-Toxic cultures rarely announce themselves with an incident. They teach the rules by example — who gets protected, who gets pushed out, what happens to the person who said the thing everyone else was already thinking — until everyone in the building has learned which parts of themselves to leave in the car before walking in.
+Toxic cultures rarely announce themselves with an incident. They teach the rules by example, who gets protected, who gets pushed out, what happens to the person who said the thing everyone else was already thinking, until everyone in the building has learned which parts of themselves to leave in the car before walking in.
 
 The values are usually on the wall somewhere, printed in the right font. The gap between what's written there and what actually gets rewarded is where the culture actually lives, and most people working inside it can describe that gap in specific, granular detail well before anyone with the authority to close it admits it exists.
 
@@ -24,7 +24,7 @@ That's not a strategy. It's just what happens when nobody's willing to name the 
 
 You can diagnose a toxic culture without a survey. You just have to know where to look.
 
-**Who's leaving.** Not the number — the pattern. Are you losing your best people at the eighteen-month mark? Are they all from the same team, or the same level, or the same profile? Do they leave and then quietly warn their friends not to apply? The exit interview won't tell you this. The exit interview is theater. What they say to their friends six months later: that's the real data.
+**Who's leaving.** Not the number: the pattern. Are you losing your best people at the eighteen-month mark? Are they all from the same team, or the same level, or the same profile? Do they leave and then quietly warn their friends not to apply? The exit interview won't tell you this. The exit interview is theater. What they say to their friends six months later: that's the real data.
 
 **Who's silent.** In a healthy culture, people push back. They ask hard questions. They say "I don't think that's going to work" in the meeting instead of in the parking lot afterward. In a toxic culture, the silence is loud. Nobody challenges the plan. Nobody flags the risk. Everyone nods, and then the thing fails exactly the way three people in the room knew it would fail, and nobody's surprised except the person who should have been told.
 
@@ -56,7 +56,7 @@ It means looking directly at the behaviors that are being protected and deciding
 
 The first time a protected behavior meets an actual consequence, the culture shifts. The shift has less to do with punishment than with visibility: everyone else in the organization sees that the rules are real now. That the gap between the poster and the practice just got a lot smaller.
 
-That's the moment people start to believe things might actually change. And that belief — that "oh, they're serious" moment — is where culture change actually starts.
+That's the moment people start to believe things might actually change. And that belief, that "oh, they're serious" moment, is where culture change actually starts.
 
 Everything before that is just the values poster with better lighting.
 
@@ -70,7 +70,7 @@ When someone tells us they have a culture problem, we don't start with a survey.
 
 Sometimes the answer is quick. They've known for years. They've just been waiting for someone to say it out loud in a room where it might actually lead somewhere.
 
-Sometimes the answer is complicated. The protected person is a founder, or a top seller, or someone's college roommate. The cost isn't just a conversation — it's a reckoning with how the organization got here and who benefits from it staying this way.
+Sometimes the answer is complicated. The protected person is a founder, or a top seller, or someone's college roommate. The cost isn't just a conversation. It's a reckoning with how the organization got here and who benefits from it staying this way.
 
 Either way, that's where the work starts. Not with the values poster. Not with the engagement survey. With the specific, named, human-shaped problem that everyone knows about and nobody has been willing to touch.
 

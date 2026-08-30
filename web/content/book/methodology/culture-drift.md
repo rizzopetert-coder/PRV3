@@ -26,7 +26,7 @@ A leadership team triples in size, and the new VPs were hired for what they'd ac
 
 The gap between "values are still officially in force" and "leadership doesn't operate by them" is not a measurement error. It's the most precise description available of what drift actually is.
 
-If both numbers were low, the organization would have a clear, named culture problem — people would know the values changed and could talk about it directly. If both numbers were high, the culture would genuinely be intact. The specific combination — high belief that the official story still holds, combined with high belief that leadership doesn't live it — is what makes drift different from an honest cultural pivot. The organization hasn't admitted anything changed. It's still telling itself, and new hires, the original story, while everyone who's been there long enough quietly knows the story stopped being true a while ago.
+If both numbers were low, the organization would have a clear, named culture problem: people would know the values changed and could talk about it directly. If both numbers were high, the culture would genuinely be intact. The specific combination, high belief that the official story still holds, combined with high belief that leadership doesn't live it, is what makes drift different from an honest cultural pivot. The organization hasn't admitted anything changed. It's still telling itself, and new hires, the original story, while everyone who's been there long enough quietly knows the story stopped being true a while ago.
 
 ---
 
@@ -36,7 +36,7 @@ If both numbers were low, the organization would have a clear, named culture pro
 
 **Nobody can point to the moment it started.** Drift, almost by definition, has no clean origin. If you ask when this began and the honest answer is "it's hard to say," that absence of a clear starting point is itself part of the diagnosis.
 
-**The growth event and the cultural complaint line up in time, even if nobody has explicitly connected them.** Rapid headcount growth, a leadership layer added quickly, several new senior hires in a short window — these often precede the moment drift becomes noticeable, even though no one decision in that sequence looks like the cause.
+**The growth event and the cultural complaint line up in time, even if nobody has explicitly connected them.** Rapid headcount growth, a leadership layer added quickly, several new senior hires in a short window: these often precede the moment drift becomes noticeable, even though no one decision in that sequence looks like the cause.
 
 ---
 
@@ -52,7 +52,7 @@ The seventy-four percent who already believe leadership has drifted from the fou
 
 This isn't fixed by republishing the same values with new enthusiasm. The words were never the problem. What's missing is the lived demonstration that used to make those words credible, and that has to be rebuilt deliberately rather than assumed to still be happening on its own.
 
-That starts with leadership, specifically, choosing a small number of the original behaviors that mattered most — the kind of disagreement that was once encouraged, the pace of decision-making that used to signal urgency, whatever the specific texture of the original culture actually was — and visibly modeling them again, consistently, in view of the people who'll notice whether it's real. Tenured employees are the most important audience for this, not because they're the most vocal, but because they're the ones with the original reference point. They'll know within weeks whether what they're watching is real or another version of the same story.
+That starts with leadership, specifically, choosing a small number of the original behaviors that mattered most, the kind of disagreement that was once encouraged, the pace of decision-making that used to signal urgency, whatever the specific texture of the original culture actually was, and visibly modeling them again, consistently, in view of the people who'll notice whether it's real. Tenured employees are the most important audience for this, not because they're the most vocal, but because they're the ones with the original reference point. They'll know within weeks whether what they're watching is real or another version of the same story.
 
 If your organization's stated values haven't changed but the way it actually operates clearly has, that gap is not a communications problem. It's the thing the organization needs to address directly, starting with admitting it's there.
 

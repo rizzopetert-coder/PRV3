@@ -24,9 +24,9 @@ By the time it's clearly too much, the organization has a sunk-cost problem of i
 
 ## What Six Months In Actually Looks Like
 
-The first few weeks usually feel like onboarding friction — normal confusion, normal ramp-up. Somewhere around month three or four, you begin to realize you cannot remember a week in which everything that was supposed to get done, got done. Not because of any skill gap. Because the math was never going to work.
+The first few weeks usually feel like onboarding friction: normal confusion, normal ramp-up. Somewhere around month three or four, you begin to realize you cannot remember a week in which everything that was supposed to get done, got done. Not because of any skill gap. Because the math was never going to work.
 
-What the hiring process promised — the authority, the resources, the support — and what actually happens each day are two lines that never intersected after the start date. By month six, the person in the role is choosing daily which fires to leave burning, while quietly absorbing the cost of decisions nobody above them seems to register as a structural problem. The exhaustion isn't from the work being hard. It's from the work being impossible at the pace and with the resources actually provided, while being evaluated as though it were merely difficult.
+What the hiring process promised, the authority, the resources, the support, and what actually happens each day are two lines that never intersected after the start date. By month six, the person in the role is choosing daily which fires to leave burning, while quietly absorbing the cost of decisions nobody above them seems to register as a structural problem. The exhaustion isn't from the work being hard. It's from the work being impossible at the pace and with the resources actually provided, while being evaluated as though it were merely difficult.
 
 ---
 
@@ -34,7 +34,7 @@ What the hiring process promised — the authority, the resources, the support �
 
 **The role has high recent turnover, and each departure got an individual explanation.** Not the right fit. Needed more support. Decided to pursue something else. Each story sounds plausible alone. Strung together, they're describing the same role, not a coincidence of unrelated people.
 
-**The scope was sold differently than it's actually structured.** It just never came together the way it was described — less authority, fewer resources, more isolation than the interview suggested.
+**The scope was sold differently than it's actually structured.** It just never came together the way it was described: less authority, fewer resources, more isolation than the interview suggested.
 
 **"Figure it out" is the default answer to structural complaints.** When someone raises that the scope doesn't match the resourcing, and the response is encouragement rather than investigation, that's the organization treating a structural gap as a character test.
 
@@ -42,9 +42,9 @@ What the hiring process promised — the authority, the resources, the support �
 
 ## Why Hiring Better Doesn't Fix It
 
-The instinct, after a departure, is to look for a stronger candidate next time — someone more resilient, more resourceful, better at managing up. Sometimes those competencies help mask the issue longer. They don't change the underlying math, and eventually the same outcome arrives with someone the organization can even less afford to lose.
+The instinct, after a departure, is to look for a stronger candidate next time: someone more resilient, more resourceful, better at managing up. Sometimes those competencies help mask the issue longer. They don't change the underlying math, and eventually the same outcome arrives with someone the organization can even less afford to lose.
 
-The role doesn't need a better person. It needs a better design. Less scope, more resources, more information, better role clarity. Without at least looking at it honestly, new hires are at higher risk of repeating the same outcome — and the organization learns the hard way that recurring turnover here wasn't coincidence, wasn't bad hires, and wasn't exactly poor management. It was poor job design and scope creep.
+The role doesn't need a better person. It needs a better design. Less scope, more resources, more information, better role clarity. Without at least looking at it honestly, new hires are at higher risk of repeating the same outcome, and the organization learns the hard way that recurring turnover here wasn't coincidence, wasn't bad hires, and wasn't exactly poor management. It was poor job design and scope creep.
 
 ---
 
