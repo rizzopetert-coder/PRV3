@@ -1,6 +1,6 @@
 There's a specific kind of exhaustion that comes from working for someone who can't see themselves clearly.
 
-You know the version of them that shows up in the all-hands — confident, articulate, full of talk about transparency and growth mindset. And you know the version that shows up in the room when things get hard — defensive, dismissive, somehow always the smartest person at the table even when they're obviously wrong. The gap between those two people is where your energy goes to die.
+You know the version of them that shows up in the all-hands: confident, articulate, full of talk about transparency and growth mindset. And you know the version that shows up in the room when things get hard: defensive, dismissive, somehow always the smartest person at the table even when they're obviously wrong. The gap between those two people is where your energy goes to die.
 
 The worst part? They have no idea. Or maybe they have some idea, somewhere deep down, but they've built enough insulation around themselves that the signal can't get through anymore. The feedback that would help them stops at the door. The people who might tell them the truth have learned not to bother. And so they keep operating on a self-image that diverged from reality somewhere around the third promotion, and everyone around them pays the tax.
 
@@ -44,7 +44,7 @@ Here's the problem: by the time someone needs a 360, they've usually built an im
 
 They read the feedback through a defensive lens. The critical comments are from people who "don't get it." The patterns are dismissed as isolated incidents. The gaps between self-assessment and other-assessment are explained away with context the reviewers didn't have. The process becomes something to survive rather than something to learn from.
 
-And even when the feedback does land — when something breaks through — the behavior change rarely sticks. The leader makes adjustments for a few weeks, maybe a few months. Then the pressure comes back, the old patterns reassert themselves, and everyone who participated in the 360 learns that nothing really changed.
+And even when the feedback does land, when something breaks through, the behavior change rarely sticks. The leader makes adjustments for a few weeks, maybe a few months. Then the pressure comes back, the old patterns reassert themselves, and everyone who participated in the 360 learns that nothing really changed.
 
 The problem isn't the tool. The problem is that the conditions for hearing hard feedback don't exist. The leader doesn't have a relationship with anyone who can deliver truth in a way that actually gets through. The incentive structures still reward the old behavior. The organization hasn't changed anything about the environment that created the problem in the first place.
 
@@ -56,7 +56,7 @@ If you're a leader reading this and feeling that uncomfortable prickle of recogn
 
 The thing that closes the gap isn't a feedback process. It's a relationship.
 
-Specifically, it's a relationship with someone who has permission to tell you the truth — not the edited version, the real version — and who you trust enough to hear it from. Someone who isn't angling for anything. Someone who isn't scared of you. Someone who can say "that thing you did in the meeting today landed really badly, and here's why" and you'll actually take it in instead of defending against it.
+Specifically, it's a relationship with someone who has permission to tell you the truth, not the edited version, the real version, and who you trust enough to hear it from. Someone who isn't angling for anything. Someone who isn't scared of you. Someone who can say "that thing you did in the meeting today landed really badly, and here's why" and you'll actually take it in instead of defending against it.
 
 That person might be a coach. It might be a peer from outside the organization. It might be an old mentor. It might be a consultant who's been given explicit permission to be direct. Whoever it is, the relationship has to be structurally different from the other relationships in your life. It has to exist outside the power dynamics that broke your feedback loop in the first place.
 
@@ -66,7 +66,7 @@ And then the work is just... maintenance. Regular contact with someone who can s
 
 ## The Question We Ask
 
-When we're working with an organization where leadership self-perception has become a liability — and by the way, the presenting problem is almost never described that way, it's described as a "communication issue" or "team dynamics" or "resistance to the strategy" — we ask a version of this question.
+When we're working with an organization where leadership self-perception has become a liability, and by the way, the presenting problem is almost never described that way, it's described as a "communication issue" or "team dynamics" or "resistance to the strategy," we ask a version of this question.
 
 *When was the last time someone told this leader something they didn't want to hear, and what happened next?*
 

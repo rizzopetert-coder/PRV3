@@ -4,7 +4,7 @@ The question isn't whether something is wrong. The question is whether there's s
 
 Let me save you some time: if you're asking the question, there's probably still time. Barely. But there's time.
 
-At Endemic severity, the organization isn't just struggling — it's actively destabilizing. Key people are leaving or have already left. Decisions that should take hours are taking weeks or not happening at all. The financial bleed is real and visible. The thing that everyone's been managing around has finally become unmanageable.
+At Endemic severity, the organization isn't just struggling. It's actively destabilizing. Key people are leaving or have already left. Decisions that should take hours are taking weeks or not happening at all. The financial bleed is real and visible. The thing that everyone's been managing around has finally become unmanageable.
 
 This is the moment where the cavalry either shows up or it doesn't. Where the hard conversation finally happens or the window closes for good. Where someone takes responsibility for the mess or everyone scatters to protect themselves.
 
@@ -48,7 +48,7 @@ Endemic severity doesn't have that luxury. By the time you're here, you're in tr
 
 This isn't strategy. This is damage control. And it requires a different mindset than most leaders are comfortable with.
 
-You have to be willing to make decisions with incomplete information because waiting for complete information means not deciding at all. You have to be willing to cut things that are failing even if it means admitting you were wrong to start them. You have to be willing to have the conversation you've been avoiding — probably several of them — because the cost of continuing to avoid them just became higher than the cost of having them.
+You have to be willing to make decisions with incomplete information because waiting for complete information means not deciding at all. You have to be willing to cut things that are failing even if it means admitting you were wrong to start them. You have to be willing to have the conversation you've been avoiding, probably several of them, because the cost of continuing to avoid them just became higher than the cost of having them.
 
 The people who navigate this successfully aren't the ones who make perfect decisions. They're the ones who make decisions at all.
 
@@ -74,7 +74,7 @@ But there's one question underneath all of them.
 
 *Is every member of the leadership team aligned on the decision to bring outside involvement in, or is there someone who is privately opposed?*
 
-This matters because Endemic severity requires speed. It requires unity. It requires the ability to make hard calls without relitigating them in the hallway afterward. If someone on the team is quietly undermining the effort — protecting themselves, protecting someone who should have been addressed long ago, waiting to see which way things break — you're not going to move fast enough. The window will close while you're still arguing about whether it's open.
+This matters because Endemic severity requires speed. It requires unity. It requires the ability to make hard calls without relitigating them in the hallway afterward. If someone on the team is quietly undermining the effort, protecting themselves, protecting someone who should have been addressed long ago, waiting to see which way things break, you're not going to move fast enough. The window will close while you're still arguing about whether it's open.
 
 The organizations that make it through are the ones where leadership is genuinely aligned on the severity of the situation and the need to act. The ones that don't make it are usually the ones where someone was still playing politics while the building was on fire.
 
@@ -88,7 +88,7 @@ What I can tell you is that Endemic severity is survivable. We've seen organizat
 
 But the window is real. And it's not going to stay open while you think about it.
 
-If you're reading this and recognizing your situation, the time for gathering information is mostly over. The time for acting is now. Whatever conversation you've been putting off — have it this week. Whatever decision you've been deferring — make it. Whatever help you need that you haven't asked for — ask.
+If you're reading this and recognizing your situation, the time for gathering information is mostly over. The time for acting is now. Whatever conversation you've been putting off: have it this week. Whatever decision you've been deferring: make it. Whatever help you need that you haven't asked for: ask.
 
 The cavalry isn't coming unless you call for it.
 

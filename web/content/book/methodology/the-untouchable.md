@@ -1,6 +1,6 @@
 Some people become impossible to hold accountable, not because of what they did once, but because of what the organization decided, repeatedly and mostly without saying so out loud, that tolerating them was easier than addressing them.
 
-The specific leverage varies — institutional history, technical dependency, a personal relationship with someone powerful — but the mechanism is the same: real deference, earned once, that never got revisited as the person or the organization changed. Leadership usually knows. The cost compounds quietly for years before it becomes undeniable, and by then it's already expensive to fix.
+The specific leverage varies: institutional history, technical dependency, a personal relationship with someone powerful. But the mechanism is the same: real deference, earned once, that never got revisited as the person or the organization changed. Leadership usually knows. The cost compounds quietly for years before it becomes undeniable, and by then it's already expensive to fix.
 
 ---
 
@@ -44,7 +44,7 @@ It's not simple. You already knew that.
 
 The Untouchable has been protected for a reason. Maybe multiple reasons. Unpacking that protection means confronting things the organization would rather not confront. The founding relationship that's run its course. The technical debt that's been deferred for years. The board dynamics that nobody talks about openly. The possibility that the person's departure might actually be disruptive in the short term.
 
-And there's the fear. The fear that you're wrong — that maybe the person isn't really the problem, and you'll blow up a relationship for nothing. The fear that you're right — and that addressing it will be as hard as you think it will be. The fear of what you'll find when you start pulling the thread.
+And there's the fear. The fear that you're wrong, that maybe the person isn't really the problem, and you'll blow up a relationship for nothing. The fear that you're right, and that addressing it will be as hard as you think it will be. The fear of what you'll find when you start pulling the thread.
 
 So instead, you manage around it. You hope the person will leave on their own. You restructure their role into something less damaging. You wait for the next reorg to solve it organically. You tell yourself it's not that bad.
 
@@ -58,7 +58,7 @@ Here's the part that surprises people: when organizations finally address an Unt
 
 The institutional knowledge that seemed irreplaceable turns out to be transferable. The relationships that seemed load-bearing turn out to be more resilient than expected. The team that seemed dependent on this person turns out to have been held back by them.
 
-And the signal it sends — that the rules actually apply, that performance actually matters, that the organization is willing to do hard things — changes everything downstream. The people who were considering leaving decide to stay. The people who had stopped pushing back start pushing back again. The culture starts to recover.
+And the signal it sends, that the rules actually apply, that performance actually matters, that the organization is willing to do hard things, changes everything downstream. The people who were considering leaving decide to stay. The people who had stopped pushing back start pushing back again. The culture starts to recover.
 
 The first few weeks are hard. Nobody's pretending otherwise. But the thing you've been dreading for years usually takes about ninety days to move through. And on the other side of it, you wonder why you waited so long.
 
@@ -66,7 +66,7 @@ The first few weeks are hard. Nobody's pretending otherwise. But the thing you'v
 
 ## The Question We Ask
 
-When someone tells us they have an Untouchable situation — and honestly, they usually don't use those words, they say something like "we have a leadership challenge" or "there's a key person issue" — we start with a question.
+When someone tells us they have an Untouchable situation, and honestly, they usually don't use those words, they say something like "we have a leadership challenge" or "there's a key person issue," we start with a question.
 
 *If this person left tomorrow, what would actually break, and how long would it take to fix?*
 

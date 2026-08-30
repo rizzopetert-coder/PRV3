@@ -1,4 +1,4 @@
-An engineer reports to both a functional manager and a project manager. When their priorities align, the arrangement is invisible. When they conflict, the engineer becomes the shock absorber — negotiating whose meeting to prioritize, absorbing friction two managers created and never resolved between themselves.
+An engineer reports to both a functional manager and a project manager. When their priorities align, the arrangement is invisible. When they conflict, the engineer becomes the shock absorber: negotiating whose meeting to prioritize, absorbing friction two managers created and never resolved between themselves.
 
 Matrix structures promise the best of both worlds: functional expertise and project agility. In practice, most organizations implement the reporting lines without building the decision-making infrastructure that makes the structure functional. The lines change. The conflict resolution doesn't. The people in the middle get crushed.
 
@@ -10,11 +10,11 @@ The pitch for matrix organizations goes something like this:
 
 In a traditional hierarchy, you report to one boss. Simple, but inflexible. If you're an engineer who works on marketing projects, you're either in the engineering org (and marketing has no authority over your priorities) or you're embedded in marketing (and you lose connection to your technical community). Neither is great.
 
-The matrix solves this! You report to your functional manager for the "how" — standards, methods, career development — and to your project manager for the "what": priorities, deliverables, deadlines. Both relationships are clear and complementary. You get the best of both worlds.
+The matrix solves this! You report to your functional manager for the "how": standards, methods, career development. And to your project manager for the "what": priorities, deliverables, deadlines. Both relationships are clear and complementary. You get the best of both worlds.
 
 That's the theory.
 
-Here's the reality: you now have two people who think they have authority over your time. When things are going well, this is fine. When things are going badly — when project deadlines conflict with functional priorities, when resources are constrained, when one manager needs you full-time and the other needs you half-time — you become the person who has to negotiate your way out of the conflict.
+Here's the reality: you now have two people who think they have authority over your time. When things are going well, this is fine. When things are going badly, when project deadlines conflict with functional priorities, when resources are constrained, when one manager needs you full-time and the other needs you half-time, you become the person who has to negotiate your way out of the conflict.
 
 You're not empowered to choose. You're responsible for managing a contradiction that your bosses created and neither of them has resolved. The matrix didn't eliminate the conflict. It relocated it. Downward.
 
@@ -72,7 +72,7 @@ I should be fair: some organizations run effective matrices. It's not impossible
 
 **Aligned incentives.** The functional manager and the project manager are measured on shared outcomes, not competing ones. When the project succeeds, the functional manager gets credit for their people's contribution. Neither one benefits from the other one failing.
 
-**Real escalation paths.** When conflict happens — and it will happen — there's a way to resolve it quickly, with someone who has authority to make a call. Not endless meetings. Not "let's take this offline." A decision.
+**Real escalation paths.** When conflict happens, and it will happen, there's a way to resolve it quickly, with someone who has authority to make a call. Not endless meetings. Not "let's take this offline." A decision.
 
 **Permission to flag friction.** The people in the middle can say "this isn't working" without it being career-limiting. The organization treats matrix friction as a design problem to be fixed, not a personal failing of the people experiencing it.
 
