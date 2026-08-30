@@ -2,7 +2,7 @@
 
 You didn't get the interview. Or you did, and the offer never materialized, or the raise you expected didn't come through, or your review landed noticeably lower than you'd anticipated. Somewhere in that entire process, an automated tool made or substantially shaped the underlying decision before any actual person ever meaningfully looked at your file.
 
-Nobody here necessarily set out to build something genuinely unfair to anyone. The efficiency gains were real and measurable, the vendor's original pitch was genuinely compelling, and the tool got adopted specifically because it demonstrably worked — faster, more consistent, and considerably cheaper than the available human alternative. Nobody, in the time since, has actually looked closely at what the tool is genuinely optimizing for underneath that consistent, efficient surface.
+Nobody here necessarily set out to build something genuinely unfair to anyone. The efficiency gains were real and measurable, the vendor's original pitch was genuinely compelling, and the tool got adopted specifically because it demonstrably worked: faster, more consistent, and considerably cheaper than the available human alternative. Nobody, in the time since, has actually looked closely at what the tool is genuinely optimizing for underneath that consistent, efficient surface.
 
 ---
 
@@ -18,7 +18,7 @@ That log, contrary to how it might feel, doesn't protect the organization in any
 
 ### What an Unaudited Tool Looks Like From the Inside
 
-**Employment decisions — hiring, ongoing performance evaluation, compensation — are meaningfully shaped by some form of automated tool.** Screening, ranking, algorithmic scoring, or automated recommendation in any way that meaningfully narrows what an actual human decision-maker ultimately sees and considers.
+**Employment decisions, hiring, ongoing performance evaluation, compensation, are meaningfully shaped by some form of automated tool.** Screening, ranking, algorithmic scoring, or automated recommendation in any way that meaningfully narrows what an actual human decision-maker ultimately sees and considers.
 
 **Nobody currently employed at the organization can actually explain the specific criteria the tool applies in practice.** Ask the person who originally approved the vendor contract to describe the underlying weighting logic. If the honest answer amounts to "the vendor handles that part," this condition is unambiguously present.
 
@@ -26,14 +26,14 @@ That log, contrary to how it might feel, doesn't protect the organization in any
 
 ### Two Questions, Only One Asked
 
-Pointing confidently to real time saved or genuine cost reduced doesn't actually answer the separate and more consequential question of whether the underlying criteria driving those savings are themselves lawful — those are genuinely two entirely separate questions, and to date only one of them has actually been asked by anyone at the organization. A tool can reliably deliver real, measurable efficiency gains and simultaneously be quietly generating legal claims nobody has noticed yet, precisely because efficiency and legal exposure aren't ever measured along the same axis, and improvement on one tells you essentially nothing about the other.
+Pointing confidently to real time saved or genuine cost reduced doesn't actually answer the separate and more consequential question of whether the underlying criteria driving those savings are themselves lawful, those are genuinely two entirely separate questions, and to date only one of them has actually been asked by anyone at the organization. A tool can reliably deliver real, measurable efficiency gains and simultaneously be quietly generating legal claims nobody has noticed yet, precisely because efficiency and legal exposure aren't ever measured along the same axis, and improvement on one tells you essentially nothing about the other.
 
 ### The Audit Has to Happen Before the Claim Does
 
 **First, obtain the actual underlying criteria directly from the vendor: not the polished marketing description, but the genuine underlying weighting logic itself.** If the vendor is unwilling or genuinely unable to provide this level of detail, that refusal is itself important information the organization should weigh heavily.
 
-**Second, run a proper disparate impact analysis on the organization's own recent decisions that the tool meaningfully influenced, broken out explicitly by protected class.** This is a well-established, standard analytical approach, not some novel or experimental one — it has simply rarely been applied specifically to this particular tool until now.
+**Second, run a proper disparate impact analysis on the organization's own recent decisions that the tool meaningfully influenced, broken out explicitly by protected class.** This is a well-established, standard analytical approach, not some novel or experimental one. It has simply rarely been applied specifically to this particular tool until now.
 
-**Third, decide, based directly on what that audit actually finds, whether to adjust the underlying criteria, add meaningful human review at the actual decision point, or discontinue the tool's use entirely.** Not a predetermined default outcome in any direction — a genuine decision made with the actual data in hand, rather than simply continuing to rely on the vendor's original assurances.
+**Third, decide, based directly on what that audit actually finds, whether to adjust the underlying criteria, add meaningful human review at the actual decision point, or discontinue the tool's use entirely.** Not a predetermined default outcome in any direction: a genuine decision made with the actual data in hand, rather than simply continuing to rely on the vendor's original assurances.
 
 The tool has already made a substantial number of real decisions at this point. What genuinely hasn't happened yet is anyone actually checking whether it made those decisions lawfully.
