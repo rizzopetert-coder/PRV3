@@ -9,6 +9,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
+import { MobileMenu } from "@/components/MobileMenu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -94,6 +95,12 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <NavBar />
+        {/* Homepage restructure (this session) -- mounted as a sibling to
+            NavBar, not inside it. NavBar.tsx is explicitly out of scope
+            (Pete's instruction, 2026-08-29); MobileMenu is fully
+            self-contained (own fixed trigger + overlay), so this is the
+            only wiring point needed. */}
+        <MobileMenu />
         {children}
       </body>
     </html>
