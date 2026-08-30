@@ -1,147 +1,177 @@
+"use client";
+
 import Link from "next/link";
 import { ConstellationField } from "@/components/ConstellationField";
+import { WayfindingGrid } from "@/components/home/WayfindingGrid";
+import { useScrollReveal } from "@/components/home/useScrollReveal";
+
+// Homepage restructure (this session) -- copy below is Pete's final
+// approved text, pulled verbatim from the approved HTML mockup, not
+// paraphrased or re-derived. Palette is strict local scope via the
+// .home-scope wrapper (globals.css) -- --home-paper/--home-field-raise/
+// --home-slate never touch the sitewide --color-paper/--color-slate flat
+// tokens (see globals.css comment: --color-slate is the live render color
+// for every non-Endemic severity badge, a global change would silently
+// recolor real client diagnostic output).
+
+const TAGS = [
+  "Leadership behaviors",
+  "Planning",
+  "Structures",
+  "Policies",
+  "Practices",
+  "Incentives",
+  "Disincentives",
+  "Benefits",
+];
+
+function VoiceSection() {
+  const { ref, className } = useScrollReveal<HTMLDivElement>();
+
+  return (
+    <section ref={ref} className={`max-w-3xl mx-auto ${className}`}>
+      <p className="font-mono text-xs tracking-widest text-(--home-slate) mb-6">
+        THE PERSPECTIVE
+      </p>
+      <p className="font-display text-2xl md:text-3xl leading-relaxed text-charcoal mb-6">
+        Many of the &quot;people problems&quot; leaders describe are the
+        symptoms of deeper conditions that are more challenging to work
+        through. Because they&apos;re more challenging, and often require
+        leaders to look in the mirror, it is often easier for leaders to
+        believe they&apos;re a training or a PIP or a termination away from
+        resolving their problems. But workplace performance and behaviors
+        are significantly influenced by leadership behaviors: consistency,
+        accountability, strong communication, and a fundamental
+        understanding of the organization&apos;s values. Consistent
+        leadership behaviors result in more consistent employee behaviors,
+        and more consistent, more predictable results.
+      </p>
+      <p className="font-ui text-base leading-relaxed text-charcoal opacity-80 mb-4">
+        Clients don&apos;t need another framework or slide deck. They want a
+        confidant and advisor with a perspective they know they can trust. A
+        partner with a genuine understanding of their business, their
+        history, their values, and what they&apos;re actually trying to
+        build. And given all that, someone who can filter out the noise and
+        give the objective truth.
+      </p>
+      <p className="font-ui text-base leading-relaxed text-charcoal opacity-80 mb-10">
+        I don&apos;t tell you what decision to make. Decide what&apos;s best
+        for your business, and give me the marching orders. We&apos;ll help
+        you get there.
+      </p>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-(--home-slate) text-white flex items-center justify-center font-display text-lg shrink-0">
+          P
+        </div>
+        <p className="font-ui text-sm text-charcoal opacity-70">
+          Founder, Principal Resolution
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function CloserSection() {
+  const { ref, className } = useScrollReveal<HTMLDivElement>();
+
+  return (
+    <section ref={ref} className={`text-center max-w-xl mx-auto ${className}`}>
+      <h2 className="font-display text-3xl text-charcoal mb-4">
+        Give the Diagnostic a try.
+      </h2>
+      <p className="font-ui text-base text-charcoal opacity-70 mb-8">
+        No pitch, no pressure. If anything sounds familiar, reach out.
+      </p>
+      <Link
+        href="/diagnostic"
+        className="inline-block bg-charcoal text-white font-ui text-sm font-medium px-6 py-3 hover:bg-gray-700 transition-colors"
+      >
+        Begin the diagnostic →
+      </Link>
+    </section>
+  );
+}
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-paper">
-      <div className="max-w-2xl mx-auto px-6 py-16 md:px-10 md:py-24">
+    <main className="home-scope bg-(--home-paper) min-h-screen">
+      <div className="max-w-5xl mx-auto px-6 py-16 md:px-10 md:py-24 space-y-24">
 
-        {/* Section 1 — Opening statements (hero) — Stage 4 proof point.
-            Wrapper mechanics (relative + overflow-hidden + absolute-inset
-            motif behind centered-z-index content) ported from
-            mockups/pr-ambient-constellation-animation.html's .hero/.
-            ambient-svg/.hero-content rules. Copy and left alignment are
-            this site's own existing approved content, not the mockup's
-            placeholder text — only the layout technique is borrowed. */}
-        <section className="relative overflow-hidden min-h-105 flex items-center mb-16">
-          <ConstellationField mode="ambient" />
-          <div className="relative z-10">
-            <p className="font-display text-3xl md:text-5xl leading-tight text-charcoal my-8 md:my-12">
-              People problems are usually structural problems wearing a
-              person&apos;s name.
+        {/* Hero */}
+        <section className="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <p className="font-mono text-xs tracking-widest text-(--home-slate) mb-4">
+              PRINCIPAL RESOLUTION
             </p>
-            <p className="font-display text-3xl md:text-5xl leading-tight text-charcoal my-8 md:my-12">
-              No fixed methodology. Every read starts from your organization, not
-              a template applied to it.
+            <h1 className="font-display text-4xl md:text-5xl leading-tight text-charcoal mb-6">
+              What looks like a people problem is usually{" "}
+              <em className="not-italic font-semibold text-(--home-slate)">
+                structural
+              </em>
+              .
+            </h1>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {TAGS.map((tag) => (
+                <span
+                  key={tag}
+                  className="font-ui text-xs uppercase tracking-wide text-(--home-slate) border border-(--home-slate) px-3 py-1"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <p className="font-ui text-base text-charcoal opacity-80 leading-relaxed">
+              Issues and inconsistencies with these things often produce
+              &quot;people problems&quot; while masking the deeper
+              fundamentals underneath. I help leaders find the real
+              conditions threatening their organization, then work through
+              what is found together.
             </p>
-            {/* Muted-text technique ported from the mockup's .lede rule
-                (opacity on the base ink color, not a separate gray
-                shade) — applied here to match the hero specifically;
-                Sections 2/3 below keep the site's existing gray-scale
-                treatment, which is a hierarchy choice independent of
-                which token system is active. */}
-            <p className="font-ui text-base text-charcoal opacity-70 mt-4">
-              If something in your organization isn&apos;t working and you
-              can&apos;t quite name it, you&apos;ve come to the right place.
-            </p>
+          </div>
+
+          {/* Signature field -- ConstellationField mode="ambient" reused
+              directly, unmodified (zero-parameter, self-contained). Axis
+              labels are a homepage-local overlay, not a change to the
+              shared component -- AmbientField() renders no labels today,
+              only LiveField does. */}
+          <div className="relative aspect-900/640 w-full">
+            <ConstellationField mode="ambient" />
+            <span className="absolute top-2 left-1/2 -translate-x-1/2 font-mono text-[10px] tracking-widest text-(--home-slate)">
+              APTITUDE
+            </span>
+            <span className="absolute right-1 top-1/2 -translate-y-1/2 font-mono text-[10px] tracking-widest text-(--home-slate)">
+              AUTHORITY
+            </span>
+            <span className="absolute bottom-2 left-1/2 -translate-x-1/2 font-mono text-[10px] tracking-widest text-(--home-slate)">
+              ALLIANCE
+            </span>
+            <span className="absolute left-1 top-1/2 -translate-y-1/2 font-mono text-[10px] tracking-widest text-(--home-slate)">
+              ATTITUDE
+            </span>
           </div>
         </section>
 
-        {/* Section 2 — Three paths */}
-        <section className="mb-16 space-y-10">
+        {/* Credential band */}
+        <p className="font-mono text-xs tracking-widest text-(--home-slate) text-center">
+          58 STATES · 4 DIMENSIONS · 1 INSTRUMENT
+        </p>
 
-          {/* Orientation copy — closes the site-wide orientation gap
-              (Section 13, item 5) alongside the diagnostic-to-services
-              funnel clarification, per Pete's direction to handle both
-              together. Sits directly above the three entry points below,
-              sharing this section's own space-y-10 rhythm rather than a
-              separate margin, so it reads as one continuous run into the
-              buttons rather than a fourth separated block. Second
-              paragraph echoes the three button labels below verbatim --
-              keep in sync if those labels ever change. */}
-          <div className="space-y-4">
-            <p className="font-ui text-base text-charcoal">
-              The diagnostic names the specific condition producing the
-              friction inside an organization, whatever&apos;s driving it,
-              however it&apos;s showing up. From there,{" "}
-              <Link href="/about/services" className="underline hover:text-hover-ink">
-                what we do
-              </Link>{" "}
-              depends on what it finds.
-            </p>
-            <p className="font-ui text-base text-charcoal">
-              Not sure where to start? Begin the diagnostic if something
-              specific is already on your mind. Explore the conditions if
-              you want to see whether this is a known pattern first. Just
-              ask if you&apos;d rather talk it through before doing
-              either.
-            </p>
-          </div>
+        <VoiceSection />
 
-          {/* Path 1 — primary */}
-          <div className="space-y-2" data-emphasis="primary">
-            <h2 className="font-display text-xl font-bold text-charcoal">
-              Start with the diagnostic.
-            </h2>
-            <p className="font-ui text-base text-gray-600">
-              Answer questions. Get a precise read of what your organization is
-              carrying.
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/diagnostic"
-                className="inline-block bg-charcoal text-white font-ui text-sm font-medium px-6 py-3 hover:bg-gray-700 transition-colors"
-              >
-                Begin the diagnostic →
-              </Link>
-            </div>
-          </div>
-
-          {/* Path 2 — secondary */}
-          <div className="space-y-2" data-emphasis="secondary">
-            <h3 className="font-ui text-lg font-semibold text-charcoal">
-              Start by recognizing what&apos;s familiar.
-            </h3>
-            <p className="font-ui text-sm text-gray-600">
-              Select the conditions that sound like yours. See what they mean
-              together.
-            </p>
-            <div className="pt-1">
-              <Link
-                href="/diagnostic"
-                className="inline-block border border-charcoal text-charcoal font-ui text-sm font-medium px-5 py-2 hover:bg-gray-100 transition-colors"
-              >
-                Explore the conditions →
-              </Link>
-            </div>
-          </div>
-
-          {/* Path 3 — secondary */}
-          <div className="space-y-2" data-emphasis="secondary">
-            <h3 className="font-ui text-lg font-semibold text-charcoal">
-              Come with a specific situation.
-            </h3>
-            <p className="font-ui text-sm text-gray-600">
-              If you already know what you&apos;re dealing with, start a
-              conversation directly.
-            </p>
-            <div className="pt-1">
-              <Link
-                href="/ask"
-                className="inline-block border border-charcoal text-charcoal font-ui text-sm font-medium px-5 py-2 hover:bg-gray-100 transition-colors"
-              >
-                Just ask →
-              </Link>
-            </div>
-          </div>
-
-          {/* Content link */}
-          <div className="pt-2">
-            <Link
-              href="/book"
-              className="font-ui text-sm text-gray-500 hover:text-hover-ink transition-colors"
-            >
-              Explore the research and thinking behind the work. →
-            </Link>
-          </div>
-        </section>
-
-        {/* Section 3 — Footer line */}
-        <section className="mt-16">
-          <p className="font-ui text-sm text-gray-400">
-            Principal Resolution.
+        {/* Wayfinding */}
+        <section>
+          <p className="font-mono text-xs tracking-widest text-(--home-slate) mb-6 text-center">
+            WHERE TO GO FROM HERE
           </p>
+          <WayfindingGrid />
         </section>
+
+        <CloserSection />
+
+        {/* Footer */}
+        <p className="font-ui text-sm text-gray-400 text-center">
+          Principal Resolution.
+        </p>
 
       </div>
     </main>
