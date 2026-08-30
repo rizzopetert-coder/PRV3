@@ -2,7 +2,7 @@ Another one just put in notice.
 
 You saw it coming, sort of. They'd been quieter lately. Less engaged in meetings. The LinkedIn activity uptick you noticed but didn't mention to anyone. And now here they are, two weeks notice, polite smile, something about an exciting opportunity they couldn't pass up.
 
-HR will do the exit interview. The feedback will be professional and vague — "looking for growth," "ready for a new challenge," "really enjoyed my time here." You'll add it to the file with the other exit interviews that all sound weirdly similar. And then you'll move on to backfilling the role, hoping the next person sticks around longer.
+HR will do the exit interview. The feedback will be professional and vague: "looking for growth," "ready for a new challenge," "really enjoyed my time here." You'll add it to the file with the other exit interviews that all sound weirdly similar. And then you'll move on to backfilling the role, hoping the next person sticks around longer.
 
 But here's the thing that's been nagging at you, maybe for a while now: this isn't random. It's a pattern. Same type of person. Same tenure band. Same quiet, professional departure. Same polite fiction about why they're leaving.
 
@@ -48,7 +48,7 @@ The standard response to an exit pattern is a retention program. More competitiv
 
 These things aren't useless. But they miss the actual problem most of the time.
 
-People don't leave for five percent more money. They leave because something broke — their relationship with their manager, their belief in the direction, their sense that they could have an impact, their trust that the organization would do the right thing. The money is just the permission slip. The recruiter call is just the catalyst. The actual cause is almost always relational or cultural, and it almost always happened months before the resignation.
+People don't leave for five percent more money. They leave because something broke: their relationship with their manager, their belief in the direction, their sense that they could have an impact, their trust that the organization would do the right thing. The money is just the permission slip. The recruiter call is just the catalyst. The actual cause is almost always relational or cultural, and it almost always happened months before the resignation.
 
 Retention programs treat the symptom. The symptom is that people are leaving. The cause is that something in the environment made leaving feel like the right choice.
 
@@ -78,7 +78,7 @@ Let's do the math you've been avoiding.
 
 Every departure costs you the recruiting effort to replace them. The ramp time for the new person. The productivity gap in between. The institutional knowledge that walked out the door. The relationships with clients or partners that now have to be rebuilt. The impact on the team that's left behind, who are now absorbing extra work and wondering if they should start looking too.
 
-Multiply that by the number of departures. Add the ones you're going to have over the next year if nothing changes. Add the cost of the people who are still there but have mentally checked out — the ones who are giving you seventy percent because they've concluded this place isn't worth a hundred.
+Multiply that by the number of departures. Add the ones you're going to have over the next year if nothing changes. Add the cost of the people who are still there but have mentally checked out: the ones who are giving you seventy percent because they've concluded this place isn't worth a hundred.
 
 Now compare that number to the cost of addressing whatever's actually causing the pattern.
 
@@ -92,7 +92,7 @@ When an organization tells us they have a retention problem, we don't start with
 
 *What would the people who left say if they were being completely honest about why they left?*
 
-Sometimes the leadership team knows. They've heard the real feedback through back channels. They know exactly what's driving people out — they've just been hoping they could fix it quietly, or that it would fix itself, or that maybe it wasn't as bad as the departures suggested.
+Sometimes the leadership team knows. They've heard the real feedback through back channels. They know exactly what's driving people out. They've just been hoping they could fix it quietly, or that it would fix itself, or that maybe it wasn't as bad as the departures suggested.
 
 Sometimes they don't know. The feedback loop is broken. The truth is being filtered out somewhere between the people who are leaving and the people who could do something about it.
 

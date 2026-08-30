@@ -22,7 +22,7 @@ That gap is the actual condition. Not a bad actor. A structural blindness to seq
 
 Right now, nothing has been filed. No claim, no charge, no outside counsel involved. That's not nothing, it's the most valuable thing currently true about this situation, and it's temporary.
 
-Every additional week this sequence runs unexamined is a week where the pattern gets longer, the explanations for each individual decision get relied on more heavily, and the eventual question — did anyone notice this was happening — gets harder to answer well. The correction available right now, while the pattern is still internal and still small, is categorically easier than the correction available after the fifth decision, or after the employee's own attorney lays out the same four-month timeline that's sitting in your HR file right now, just not yet read as a sequence.
+Every additional week this sequence runs unexamined is a week where the pattern gets longer, the explanations for each individual decision get relied on more heavily, and the eventual question, did anyone notice this was happening, gets harder to answer well. The correction available right now, while the pattern is still internal and still small, is categorically easier than the correction available after the fifth decision, or after the employee's own attorney lays out the same four-month timeline that's sitting in your HR file right now, just not yet read as a sequence.
 
 That should create urgency rather than dread: the fact that nobody has connected these decisions yet is not evidence that everything is fine. It's evidence that the correction window is still open, and that it's closing on a schedule the organization doesn't control.
 
@@ -40,7 +40,7 @@ That should create urgency rather than dread: the fact that nobody has connected
 
 ## Why This Doesn't Get Caught in the Normal Course
 
-Performance reviews check whether the rating is justified. Scheduling checks whether the business need is real. Project staffing checks whether the assignment makes sense. Every one of those reviews is built to ask "is this decision defensible on its own terms" — and every one of those reviews will answer yes, honestly, because each decision genuinely is defensible on its own terms.
+Performance reviews check whether the rating is justified. Scheduling checks whether the business need is real. Project staffing checks whether the assignment makes sense. Every one of those reviews is built to ask "is this decision defensible on its own terms," and every one of those reviews will answer yes, honestly, because each decision genuinely is defensible on its own terms.
 
 What none of those reviews are built to ask is the only question that actually matters here: regardless of whether this decision is defensible alone, does it belong to a pattern that started with a protected event. That question requires someone to hold the whole timeline at once, across multiple decision-makers and multiple systems, and nothing in a standard review process assigns that job to anyone. The blindness isn't a failure of any single review. It's the absence of the one review that would have to exist across all of them.
 

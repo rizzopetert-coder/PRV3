@@ -1,8 +1,8 @@
 # The Fracture
 
-Two leaders at the top of this organization are in open conflict, and everyone below them already knows it, even if nobody's said so in a meeting. You navigate meetings differently depending on who's in the room — what you bring up, how you phrase it, which version of an update you give. Decisions require political calculation before they require judgment, and you've gotten good enough at that calculation that you barely notice yourself doing it anymore.
+Two leaders at the top of this organization are in open conflict, and everyone below them already knows it, even if nobody's said so in a meeting. You navigate meetings differently depending on who's in the room: what you bring up, how you phrase it, which version of an update you give. Decisions require political calculation before they require judgment, and you've gotten good enough at that calculation that you barely notice yourself doing it anymore.
 
-People have chosen sides, largely because the leaders already have, whether or not either of them would describe it that way out loud. The work that requires both of them to function — and there's more of it than either would probably admit, if pressed — is exactly the work that isn't getting done, quarter after quarter, while everyone waits for something to resolve.
+People have chosen sides, largely because the leaders already have, whether or not either of them would describe it that way out loud. The work that requires both of them to function, and there's more of it than either would probably admit, if pressed, is exactly the work that isn't getting done, quarter after quarter, while everyone waits for something to resolve.
 
 ---
 
@@ -26,10 +26,10 @@ The people genuinely caught in the middle, whose work structurally requires enga
 
 ### A Handshake in the Mediator's Office
 
-Putting both leaders in a room with a mediator and securing an agreement to move forward professionally usually produces a genuinely sincere agreement in the moment — and one that doesn't hold past the next real disagreement, because it addressed the surface friction in the relationship without touching whatever structural condition keeps generating conflict between two people with overlapping authority and no clear tiebreaker above them. The agreement was never the hard part. Preventing the next version of the same conflict was, and a mediated conversation rarely reaches that layer.
+Putting both leaders in a room with a mediator and securing an agreement to move forward professionally usually produces a genuinely sincere agreement in the moment, and one that doesn't hold past the next real disagreement, because it addressed the surface friction in the relationship without touching whatever structural condition keeps generating conflict between two people with overlapping authority and no clear tiebreaker above them. The agreement was never the hard part. Preventing the next version of the same conflict was, and a mediated conversation rarely reaches that layer.
 
 ### The Question Underneath the Conflict
 
-Real resolution requires someone above both of them, or a board with the actual standing to act, to ask the structural question instead of continuing to treat this as a personal one: do these two roles genuinely need to share authority the way they currently do, given how consistently that shared authority has produced conflict rather than complementary strength? And if the conflict turns out to be genuinely irreconcilable at the personal level, which has to change — the relationship itself, through one or both leaders departing, or the structure that continues to force them together despite the evidence that it doesn't work?
+Real resolution requires someone above both of them, or a board with the actual standing to act, to ask the structural question instead of continuing to treat this as a personal one: do these two roles genuinely need to share authority the way they currently do, given how consistently that shared authority has produced conflict rather than complementary strength? And if the conflict turns out to be genuinely irreconcilable at the personal level, which has to change: the relationship itself, through one or both leaders departing, or the structure that continues to force them together despite the evidence that it doesn't work?
 
 That's a considerably harder conversation than arranging a mediated truce, because it usually means someone with real seniority loses scope, authority, or their role entirely. It's also the only version of resolution that doesn't simply reset the clock until the next disagreement arrives on schedule.

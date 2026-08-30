@@ -1,6 +1,6 @@
-Accountability rarely fails because people don't believe in it. It fails because it gets applied unevenly — enforced for some people, quietly waived for others — and in that unevenness, the whole concept stops meaning anything.
+Accountability rarely fails because people don't believe in it. It fails because it gets applied unevenly, enforced for some people, quietly waived for others, and in that unevenness, the whole concept stops meaning anything.
 
-The pattern is familiar: a meeting about accountability, real energy in the room, commitments made out loud. Then someone misses a deadline — the same someone who always does — and the conversation that should happen doesn't happen, again, while everyone quietly recalibrates what "accountability" actually means here.
+The pattern is familiar: a meeting about accountability, real energy in the room, commitments made out loud. Then someone misses a deadline, the same someone who always does, and the conversation that should happen doesn't happen, again, while everyone quietly recalibrates what "accountability" actually means here.
 
 ---
 
@@ -16,7 +16,7 @@ A founder's friend consistently underdelivers. But they're a founder's friend. T
 
 Each exception seems reasonable in isolation. But the exceptions accumulate. And people are watching. They're always watching.
 
-The message being sent isn't the one in the values statement. The message is: some people are subject to the standard, and some people aren't. The standard is not actually standard. And if the rules don't apply equally, they're not really rules — they're suggestions.
+The message being sent isn't the one in the values statement. The message is: some people are subject to the standard, and some people aren't. The standard is not actually standard. And if the rules don't apply equally, they're not really rules. They're suggestions.
 
 ---
 
@@ -54,7 +54,7 @@ It's not peace. It's debt. And the debt comes due eventually: in attrition, in p
 
 Let me name the specific version of this that causes the most damage.
 
-There's someone at your organization — you might already know who — who has been exempt from accountability for long enough that they've become structurally protected. Maybe it's tenure. Maybe it's leverage. Maybe it's a relationship with someone powerful. Maybe it's just the vague sense that addressing them would be "too hard."
+There's someone at your organization, you might already know who, who has been exempt from accountability for long enough that they've become structurally protected. Maybe it's tenure. Maybe it's leverage. Maybe it's a relationship with someone powerful. Maybe it's just the vague sense that addressing them would be "too hard."
 
 Everyone knows who this person is. Everyone has adjusted their behavior around them. The organization has shaped itself to their presence. Meetings are scheduled to work around their schedule. Decisions are made with their reaction in mind. Feedback is calibrated to what they can tolerate rather than what they need to hear.
 
@@ -72,11 +72,11 @@ Someone has to have the conversation. The specific conversation with the specifi
 
 And then the consequences have to be real. Not punitive necessarily: accountability isn't about punishment. But real. Connected to the standard. The same standard that applies to everyone else.
 
-The first time that happens, the organization changes. Not because the conversation was pleasant — it won't be. But because the conversation signals something: the rules are real now. The gap between the stated standard and the lived experience just got smaller.
+The first time that happens, the organization changes. Not because the conversation was pleasant. It won't be. But because the conversation signals something: the rules are real now. The gap between the stated standard and the lived experience just got smaller.
 
 That signal travels fast. People will talk about it. They'll wonder if it's a one-time thing or a new pattern. They'll watch to see if it sticks.
 
-And if it sticks — if the standard is actually enforced consistently from that point on — the culture starts to recover. Not overnight. But it starts.
+And if it sticks, if the standard is actually enforced consistently from that point on, the culture starts to recover. Not overnight. But it starts.
 
 ---
 
@@ -86,12 +86,12 @@ When an organization tells us they have an accountability problem, we don't star
 
 *Who in this organization is currently exempt from the standard that applies to everyone else, and what has made that exemption possible?*
 
-The answer usually comes quickly. People know. They've always known. They just haven't been willing — or haven't been able — to do anything about it.
+The answer usually comes quickly. People know. They've always known. They just haven't been willing, or haven't been able, to do anything about it.
 
 From there, the conversation becomes about what's protecting the exception and whether the organization is ready to change that. Sometimes it's leverage that can be addressed. Sometimes it's a relationship that needs to be renegotiated. Sometimes it's just a conversation that's been avoided for so long that nobody remembers they have the option to have it.
 
 Whatever it is, that's where the work starts. Not with the framework. Not with the speech. With the specific exception that everyone can see and no one has addressed.
 
-That one conversation — not the framework, not the speech — is what actually closes the gap between your stated standards and your lived reality.
+That one conversation, not the framework, not the speech, is what actually closes the gap between your stated standards and your lived reality.
 
 — Principal Resolution

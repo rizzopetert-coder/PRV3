@@ -1,6 +1,6 @@
 # What Nobody Says
 
-The meeting ends and everyone agreed. You walk out satisfied — the plan is sound, the team is aligned, this is going to work. Twenty minutes later, in the parking lot, two of your people are having the real conversation. The one with the actual concerns. The one that would have changed the plan if it had happened in the room.
+The meeting ends and everyone agreed. You walk out satisfied: the plan is sound, the team is aligned, this is going to work. Twenty minutes later, in the parking lot, two of your people are having the real conversation. The one with the actual concerns. The one that would have changed the plan if it had happened in the room.
 
 It didn't happen in the room because the room isn't where that conversation happens anymore. Somewhere along the way, without anyone deciding it, your organization learned that raising a real concern in front of you costs more than staying quiet. Nobody told them that directly. They figured it out from watching what happened to the last person who tried.
 
@@ -10,7 +10,7 @@ It didn't happen in the room because the room isn't where that conversation happ
 
 This is the hardest version of this problem to diagnose, because the evidence you'd normally look for is exactly what's missing. There's no incident to point to. No one filed a complaint. The meetings, by every visible measure, go well.
 
-That's the signature, not a sign of health. An organization with a real concern and a room willing to raise it produces friction — disagreement, pushback, the occasional uncomfortable silence while someone works up the nerve to say something hard. An organization that's stopped raising real concerns produces smooth meetings, because the concerns are still there, they're just not entering the room anymore. If your meetings feel unusually frictionless for an organization actually navigating real complexity, that ease is the symptom, not the absence of one.
+That's the signature, not a sign of health. An organization with a real concern and a room willing to raise it produces friction: disagreement, pushback, the occasional uncomfortable silence while someone works up the nerve to say something hard. An organization that's stopped raising real concerns produces smooth meetings, because the concerns are still there, they're just not entering the room anymore. If your meetings feel unusually frictionless for an organization actually navigating real complexity, that ease is the symptom, not the absence of one.
 
 ---
 
@@ -38,7 +38,7 @@ The risk nobody flagged because the last person who flagged something similar go
 
 **People are notably more candid one-on-one or in informal settings than in the room with leadership present.** That gap is the most reliable tell available. The information exists. It's just routed around the people who'd act on it.
 
-**Somewhere in recent memory, someone raised something real and the response taught the room a lesson.** It doesn't have to be dramatic. A defensive reaction, a subtle cooling toward the person who spoke up, a decision that proceeded anyway without acknowledging the concern — any of these registers, and rooms remember.
+**Somewhere in recent memory, someone raised something real and the response taught the room a lesson.** It doesn't have to be dramatic. A defensive reaction, a subtle cooling toward the person who spoke up, a decision that proceeded anyway without acknowledging the concern: any of these registers, and rooms remember.
 
 ---
 

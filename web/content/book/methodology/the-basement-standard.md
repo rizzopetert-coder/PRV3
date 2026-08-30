@@ -4,7 +4,7 @@ The underperformer who's been underperforming for two years. The meeting behavio
 
 It's all just... sitting there. Unaddressed. Getting worse.
 
-And you're part of it. I'm not judging — I've been part of it too. You've sat in the meeting where someone said something that needed to be challenged and you let it slide because you didn't want to be the one to make it weird. You've written the performance review that was softer than it should have been because delivering honest feedback felt like too much. You've watched a problem get worse because nobody wanted to be the person who named it.
+And you're part of it. I'm not judging. I've been part of it too. You've sat in the meeting where someone said something that needed to be challenged and you let it slide because you didn't want to be the one to make it weird. You've written the performance review that was softer than it should have been because delivering honest feedback felt like too much. You've watched a problem get worse because nobody wanted to be the person who named it.
 
 This is The Basement Standard. The organization has decided, collectively and without ever really deciding, that avoiding conflict is more important than solving problems. The cost is invisible until it isn't. By then, the people who would have benefited from honest feedback have either stagnated or left, and the people who were capable of giving it have concluded that nothing here ever changes.
 
@@ -28,13 +28,13 @@ The organization learns to manage around problems instead of through them. The n
 
 Organizations that avoid conflict don't lose people in blowups. They lose them quietly, over time, as the most capable employees conclude that nothing is ever going to change.
 
-You know this person. You've maybe been this person. They joined optimistic. They cared about doing good work. They saw things that needed to be fixed and tried to fix them. And then they hit the wall — the soft, padded, frustratingly polite wall where every attempt at directness got deflected, reframed, or acknowledged without action.
+You know this person. You've maybe been this person. They joined optimistic. They cared about doing good work. They saw things that needed to be fixed and tried to fix them. And then they hit the wall: the soft, padded, frustratingly polite wall where every attempt at directness got deflected, reframed, or acknowledged without action.
 
 They gave it time. They thought maybe they needed to earn more credibility. They tried different approaches. And eventually they did the math: the energy required to change this place is greater than the energy required to find a better job somewhere else.
 
 So they left. Their exit interview said something about "growth opportunities." The real reason was that they got tired of watching problems persist because nobody would name them.
 
-The people who stay longest in a Basement Standard culture are often the people most comfortable with low accountability. That's not a judgment — it's just selection pressure at work. Over time, the talent profile shifts. The organization becomes a place where the people who need honest feedback to grow leave, and the people who prefer comfort over challenge stay.
+The people who stay longest in a Basement Standard culture are often the people most comfortable with low accountability. That's not a judgment. It's just selection pressure at work. Over time, the talent profile shifts. The organization becomes a place where the people who need honest feedback to grow leave, and the people who prefer comfort over challenge stay.
 
 ---
 
@@ -48,7 +48,7 @@ The other trap is the founding relationship. A lot of Basement Standard cultures
 
 If the avoidance starts at the top, it flows down. Everyone learns from watching leadership. If the executives can't give each other honest feedback, nobody below them will either. If disagreement at the leadership level gets smoothed over instead of worked through, disagreement everywhere else becomes unsafe.
 
-Changing a Basement Standard culture means changing leadership behavior first. Not because leaders are the worst offenders — sometimes they're not — but because the culture follows what leadership models. The first executive who delivers genuinely direct feedback and doesn't die changes what's possible for everyone watching.
+Changing a Basement Standard culture means changing leadership behavior first. Not because leaders are the worst offenders (sometimes they're not), but because the culture follows what leadership models. The first executive who delivers genuinely direct feedback and doesn't die changes what's possible for everyone watching.
 
 ---
 
@@ -88,7 +88,7 @@ When someone tells us they have a culture problem or a communication problem, we
 
 *What's the specific conversation that everyone knows needs to happen but hasn't happened yet?*
 
-Usually they know. It comes out pretty quickly — "we need to address the situation with so-and-so" or "someone needs to tell the CEO that this strategy isn't working" or "the engineering team and the product team need to actually hash out their disagreement instead of just complaining about each other."
+Usually they know. It comes out pretty quickly: "we need to address the situation with so-and-so" or "someone needs to tell the CEO that this strategy isn't working" or "the engineering team and the product team need to actually hash out their disagreement instead of just complaining about each other."
 
 The conversation is usually already identified. What's missing is the willingness to have it.
 
