@@ -250,6 +250,19 @@
   }
 }
 
+/* Homepage restructure (this session) -- strict local-scope palette.
+   Named --home-* rather than bare --paper/--field-raise/--slate: those
+   bare names would shadow the real v2 tokens (:root's --slate, #5C6B66,
+   a different value) for any descendant that consumes them, which the
+   "isolation is not optional" instruction reads as ruling out even though
+   nothing inside the homepage tree consumes v2 --slate today. Deliberately
+   its own rule, not inside :root, so it only resolves under .home-scope. */
+.home-scope {
+  --home-paper: #F1F3F1;
+  --home-field-raise: #E6E9E7;
+  --home-slate: #2458A4;
+}
+
 @layer utilities {
   /* Gated inside prefers-reduced-motion: no-preference -- when reduced
      motion IS preferred, this class does nothing at all (stroke-dasharray
@@ -268,6 +281,19 @@
   }
   .animate-fade-up {
     animation: fade-up 300ms ease-out both;
+  }
+
+  /* Homepage restructure (this session) -- gated variant of .animate-fade-up
+     above. That existing class is bare (no reduced-motion gate) and already
+     has a live consumer (diagnostic/page.tsx), so it's left untouched rather
+     than retrofitted. This new class is additive only, for the homepage's
+     scroll-reveal (useScrollReveal.ts), and does nothing at all when reduced
+     motion is preferred -- content simply renders at its resting, visible
+     state (see useScrollReveal's own comment on the mounted-state fallback). */
+  @media (prefers-reduced-motion: no-preference) {
+    .animate-fade-up-gated {
+      animation: fade-up 300ms ease-out both;
+    }
   }
 
   /* Recede/resolve motion upgrade (Direction 1, Category E, this session).
