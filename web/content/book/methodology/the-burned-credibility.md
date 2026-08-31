@@ -16,9 +16,9 @@ Credibility works like a currency leadership spends every time it asks people to
 
 ## Why the Next Initiative Is in Trouble Before It Launches
 
-What makes the condition expensive in a very specific, very avoidable way is this: it's not that people will openly resist the next change effort. It's that they'll quietly decline to invest in it.
+What makes the condition expensive in a very specific, very avoidable way is this: People won't openly resist the next change effort. They'll quietly decline to invest in it.
 
-An initiative that needs belief to succeed, a culture push, a new strategic direction, a transformation effort that depends on people changing behavior because they trust it's going somewhere, runs on exactly the resource that's been depleted. People will show up. They'll nod in the all-hands. They will not give it the discretionary effort that separates a strong initiative from a failed one, because giving that effort requires believing it leads somewhere, and that belief is what's gone. The initiative isn't failing because the plan is bad. It's failing before it starts, because it's spending currency the organization doesn't have anymore.
+An initiative that needs belief to succeed, a culture push, a new strategic direction, a transformation effort that depends on people changing behavior because they trust it's going somewhere, runs on exactly the resource that's been depleted. People will show up. They'll nod in the all-hands. They will not give it the discretionary effort that separates a strong initiative from a failed one, because giving that effort requires believing it leads somewhere, and that belief is what's gone. A good plan can't fix this. The initiative is failing before it starts, because it's spending currency the organization no longer has.
 
 ---
 
@@ -28,7 +28,7 @@ An initiative that needs belief to succeed, a culture push, a new strategic dire
 
 **People have stopped reacting to new announcements.** Not opposing them. Not arguing. Just receiving them with a kind of practiced neutrality that wasn't there a few cycles ago: the absence of any visible belief that this one will be different.
 
-**Cynicism has become the default explanation, even for things that might genuinely be true.** When the workforce's first instinct about any new initiative is to assume it won't happen, that's not negativity. It's an accurate read of a pattern they've watched repeat.
+**Cynicism has become the default explanation, even for things that might genuinely be true.** When the workforce's first instinct about any new initiative is to assume it won't happen, that's an accurate read of a pattern they've watched repeat, not negativity.
 
 ---
 
@@ -46,6 +46,6 @@ Credibility isn't restored by an announcement, an apology, or a more sincere ver
 
 This usually means choosing something smaller and more certain than the kind of initiative that burned the credibility in the first place. A scaled-down commitment that gets kept completely, visibly, on the timeline that was promised, does more to start rebuilding trust than a more ambitious commitment that risks becoming the next entry on the list. The math is asymmetric: a few real, fully-kept commitments are worth more here than one impressive announcement, because what's being rebuilt isn't excitement. It's evidence.
 
-If your organization's next big initiative is met with polite attendance and no real investment, that's not a sign the idea is bad. It's a sign the well it needs to draw from has already run dry, and the order of operations has to change before the idea gets a fair test.
+If your organization's next big initiative is met with polite attendance and no real investment, the idea probably isn't the problem. The well it needs to draw from has already run dry, and the order of operations has to change before the idea gets a fair test.
 
 Rebuilding that well takes longer than launching the next initiative. Start there anyway.
