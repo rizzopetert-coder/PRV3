@@ -14,7 +14,7 @@ The instinct, once you've confirmed he genuinely understands what his people nee
 
 That instinct is the trap. A manager who can name the gap and doesn't close it isn't a partial success story. He's a more complete failure than one who simply doesn't know, because the absence of an excuse is itself diagnostic. You can develop someone's judgment. You can't develop someone into noticing what he's already noticing. The thing missing here isn't insight. It's the choice to spend his own time and standing on someone else's advancement instead of his own.
 
-That distinction is what separates this from a capability problem. He's not failing to see the work. He's choosing not to do it, consistently enough that it's no longer a one-off lapse. It's the actual shape of how he manages.
+That distinction is what separates this from a capability problem. He sees the work fine. He's choosing not to do it, consistently enough that it's no longer a one-off lapse. It's the actual shape of how he manages.
 
 ---
 

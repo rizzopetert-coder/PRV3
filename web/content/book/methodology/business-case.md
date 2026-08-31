@@ -70,7 +70,7 @@ When an organization is struggling with initiative execution, too many projects 
 
 *What was the last project that failed, and what did the original business case say would happen?*
 
-The gap between those two things is diagnostic. If the business case said one thing and reality delivered something completely different, the problem isn't execution. The problem is how the organization thinks about uncertainty before it commits resources.
+The gap between those two things is diagnostic. If the business case said one thing and reality delivered something completely different, the problem is how the organization thinks about uncertainty before it commits resources, not execution.
 
 Nobody sets out to build a fantasy. But if the system rewards optimism and punishes honesty, fantasies are what you'll get. Changing the system is hard. It requires leadership that's willing to fund uncertainty honestly and a culture that treats conservative estimates as rigorous rather than weak.
 

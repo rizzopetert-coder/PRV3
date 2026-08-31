@@ -1,6 +1,6 @@
 If your most critical leader left tomorrow, with no warning, could you say specifically who steps in, whether they're ready, and what the first ninety days look like?
 
-Most organizations can't. What exists instead is a list of names in a shared drive, dusted off once a year for the board meeting: a CEO with two names next to her role, a CFO with one, a VP of Engineering with a question mark because the internal candidate left eight months ago and nobody updated it. That's not a plan. It's a wish.
+Most organizations can't. What exists instead is a list of names in a shared drive, dusted off once a year for the board meeting: a CEO with two names next to her role, a CFO with one, a VP of Engineering with a question mark because the internal candidate left eight months ago and nobody updated it. That's a wish, not a plan.
 
 ---
 

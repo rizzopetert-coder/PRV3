@@ -30,7 +30,7 @@ Let's talk about what this is actually costing you. Not in theory. In practice.
 
 **The departure pattern.** You're losing people. Maybe not dramatically, no one's storming out, but steadily. And if you looked closely at who's leaving, you'd notice they're disproportionately the ones who had to work most closely with the protected person. The exit interviews say "better opportunity." The real story is that they got tired of watching nothing change.
 
-**The drag on everyone else.** The people who stay are adjusting their expectations. They're learning that this is a place where certain things don't get addressed. That realization changes how they show up. It's not that they stop caring. It's that they start conserving their energy for battles they might actually win.
+**The drag on everyone else.** The people who stay are adjusting their expectations. They're learning that this is a place where certain things don't get addressed. That realization changes how they show up. They don't stop caring. They start conserving their energy for battles they might actually win.
 
 Add it up. Put a dollar figure on it if you can. The number is probably bigger than whatever you think addressing the situation would cost.
 

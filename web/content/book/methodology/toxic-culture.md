@@ -16,7 +16,7 @@ The ones who can't tolerate it leave. Usually quietly. Usually with a two-week n
 
 The ones who stay either adapt or go internal. They learn to keep their head down. They learn the rules: the real ones, not the ones on the poster. They stop expecting things to change. And slowly, without anyone deciding it should happen, the culture becomes a machine that selects for people who can survive it and ejects people who can't.
 
-That's not a strategy. It's just what happens when nobody's willing to name the thing.
+That's just what happens when nobody's willing to name the thing, not a strategy.
 
 ---
 
@@ -24,7 +24,7 @@ That's not a strategy. It's just what happens when nobody's willing to name the 
 
 You can diagnose a toxic culture without a survey. You just have to know where to look.
 
-**Who's leaving.** Not the number: the pattern. Are you losing your best people at the eighteen-month mark? Are they all from the same team, or the same level, or the same profile? Do they leave and then quietly warn their friends not to apply? The exit interview won't tell you this. The exit interview is theater. What they say to their friends six months later: that's the real data.
+**Who's leaving.** Look at the pattern, not the number. Are you losing your best people at the eighteen-month mark? Are they all from the same team, or the same level, or the same profile? Do they leave and then quietly warn their friends not to apply? The exit interview won't tell you this. The exit interview is theater. What they say to their friends six months later: that's the real data.
 
 **Who's silent.** In a healthy culture, people push back. They ask hard questions. They say "I don't think that's going to work" in the meeting instead of in the parking lot afterward. In a toxic culture, the silence is loud. Nobody challenges the plan. Nobody flags the risk. Everyone nods, and then the thing fails exactly the way three people in the room knew it would fail, and nobody's surprised except the person who should have been told.
 
@@ -38,7 +38,7 @@ Here's the thing nobody wants to say out loud: toxic cultures are stable.
 
 Not healthy. Not productive. Not good for anyone long-term. But stable. The people who couldn't handle it are gone. The people who remain have learned the rules. The behaviors that created the toxicity are now load-bearing: they're attached to power, to tenure, to relationships that feel too important to disrupt. You'd have to blow something up to change it, and nobody wants to be the one holding the match.
 
-So instead, you get initiatives. A new values rollout. A culture committee. A leadership offsite where everyone talks about "how we want to show up" and then comes back Monday and shows up exactly the same way they always have. It's not that people are lying. It's that the system is stronger than the intention.
+So instead, you get initiatives. A new values rollout. A culture committee. A leadership offsite where everyone talks about "how we want to show up" and then comes back Monday and shows up exactly the same way they always have. People aren't lying. The system is just stronger than the intention.
 
 The CEO announces that things are going to be different. Everyone nods. The person who's the actual source of the toxicity sits in the front row, nodding hardest. Nothing changes. The people who've been waiting for change do the math one more time and decide this is the year they finally update their resume.
 

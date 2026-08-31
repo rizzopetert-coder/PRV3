@@ -8,7 +8,7 @@ It's not dramatic. Nobody told you to soften your updates. What happened is smal
 
 ## The Filter Isn't a Person. It's a Habit, Repeated at Every Layer.
 
-The instinct, once this gets noticed, is to look for who's doing the suppressing. Some manager softening reports before passing them up. Some executive who doesn't want to hear bad news. That search usually comes up empty, because the mechanism isn't one person's bad behavior. It's a habit that's been independently adopted at every layer of the hierarchy, for reasons that make sense from inside each individual layer.
+The instinct, once this gets noticed, is to look for who's doing the suppressing. Some manager softening reports before passing them up. Some executive who doesn't want to hear bad news. That search usually comes up empty, because no single person's bad behavior explains the mechanism. The habit gets independently adopted at every layer of the hierarchy, for reasons that make sense from inside each individual layer.
 
 Each person passing information upward is making a real, defensible calculation: deliver this exactly as received, with full severity intact, or soften it slightly so it lands better and doesn't make me look like I can't manage my own area. Make that calculation once, reasonably, and the information survives mostly intact. Make it at every layer between the original signal and the person who needs to act on it, and the cumulative effect is total. Nobody decided to build a filter. Everybody just made one reasonable adjustment, and the adjustments stacked.
 
@@ -18,7 +18,7 @@ Each person passing information upward is making a real, defensible calculation:
 
 What makes the condition so durable is that the filtered version isn't obviously wrong. It's coherent. It's plausible. It's consistent enough, report after report, that there's no internal signal telling leadership something's missing.
 
-Leadership at the top of a filtered organization isn't ignoring reality. They're seeing a real, internally consistent picture that happens to be a softened version of what's actually happening several layers down. Every individual report looks reasonable. The aggregate pattern, the thing that would reveal the filtering, is invisible from where they're sitting, because they have no way to compare what they received against what was originally reported at the source. They are managing the organization they believe exists. The gap between that and the organization that actually exists is the whole condition, and it's invisible from the only vantage point that could act on it.
+Leadership at the top of a filtered organization is seeing a real, internally consistent picture, one that happens to be a softened version of what's actually happening several layers down, not ignoring reality. Every individual report looks reasonable. The aggregate pattern, the thing that would reveal the filtering, is invisible from where they're sitting, because they have no way to compare what they received against what was originally reported at the source. They are managing the organization they believe exists. The gap between that and the organization that actually exists is the whole condition, and it's invisible from the only vantage point that could act on it.
 
 ---
 

@@ -24,7 +24,7 @@ That someone might be you. Or it might be the leadership team, or the cultural D
 
 Healthy organizations fail too. They just fail differently.
 
-The failure mode for an Anchor isn't the dramatic collapse. It's the slow drift. The imperceptible decay. The gradual erosion of the conditions that made the health possible, so slow that nobody notices until the health is gone.
+For an Anchor, the failure mode is slow drift, not dramatic collapse. The imperceptible decay. The gradual erosion of the conditions that made the health possible, so slow that nobody notices until the health is gone.
 
 Here's how it usually happens:
 
@@ -40,7 +40,7 @@ None of this is inevitable. But it's common. And it's more common in healthy org
 
 ## What Protection Looks Like
 
-The work for an Anchor organization isn't repair. It's protection. Prevention. The deliberate identification and maintenance of the conditions that made the health possible.
+The work for an Anchor organization is protection. Prevention. Not repair. The deliberate identification and maintenance of the conditions that made the health possible.
 
 That starts with seeing clearly what you have. Which processes are actually working versus which ones feel like they're working but are held together by specific individuals? What cultural norms are institutionalized versus which ones would disappear if the people who carry them left? Where are the single points of failure, the relationships, the roles, the assumptions, that the organization depends on without realizing it?
 

@@ -10,7 +10,7 @@ Sit with that for a second. You did try. It didn't work. The reflex from here is
 
 ## Not a Capability Ceiling
 
-This isn't a story about someone who can't be developed. It's a story about development that didn't target the actual gap.
+He can be developed. The first attempt just didn't target the actual gap.
 
 Generic management training teaches generic management. It covers delegation, feedback, conflict: useful material, delivered in a format that assumes the person already has some baseline instinct for *being* a manager rather than *doing* the work personally. For someone who built their entire professional identity around being the person who solves it himself, that baseline doesn't exist yet. The training adds vocabulary. It doesn't rebuild the reflex underneath it.
 
@@ -52,6 +52,6 @@ The fix here has one real lever, and it's development, but development aimed at 
 
 What that looks like in practice is targeted, not generic: direct observation of how he actually runs a one-on-one or hands off a problem, naming the specific moment he reverts to doing it himself instead of developing someone else to do it, and enough repetition for the new instinct to become as automatic as the old one currently is. It's slower than a training course and considerably more likely to work, because it's built around what's actually missing instead of what's usually missing in someone with no track record at all.
 
-If a strong individual contributor became a struggling manager, and a first round of development didn't change much, the answer usually isn't to give up on development. It's to ask why the first round missed, and try again with a sharper aim.
+If a strong individual contributor became a struggling manager, and a first round of development didn't change much, the better move is usually to ask why the first round missed and try again with a sharper aim, not to give up on development.
 
 That's a different conversation than the one most organizations have after a failed attempt.

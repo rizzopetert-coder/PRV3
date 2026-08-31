@@ -46,7 +46,7 @@ In earlier states, you can do assessments. You can build alignment. You can roll
 
 Endemic severity doesn't have that luxury. By the time you're here, you're in triage. What's the most critical thing that needs to be stabilized right now? What decisions have to be made this week, not next month? Who needs to be in the room, and who needs to be out of it?
 
-This isn't strategy. This is damage control. And it requires a different mindset than most leaders are comfortable with.
+This is damage control, not strategy. And it requires a different mindset than most leaders are comfortable with.
 
 You have to be willing to make decisions with incomplete information because waiting for complete information means not deciding at all. You have to be willing to cut things that are failing even if it means admitting you were wrong to start them. You have to be willing to have the conversation you've been avoiding, probably several of them, because the cost of continuing to avoid them just became higher than the cost of having them.
 
@@ -62,7 +62,7 @@ It's because you're too close. You're too deep in the history, the relationships
 
 An outside perspective can see the situation without the accumulated weight of all the conversations that led here. We can name the thing that everyone inside knows but nobody will say. We can be the bad guy in conversations where the internal leader can't afford to be the bad guy. We can move faster because we're not carrying the organizational baggage that slows everything down.
 
-That doesn't mean we have answers you don't have. It means we can help you act on answers you already have but haven't been able to move on.
+We don't have answers you don't already have. What we can do is help you act on the answers you already have but haven't been able to move on.
 
 ---
 

@@ -18,7 +18,7 @@ A recruiting misrepresentation problem looks different. New hires leave quickly,
 
 Drift doesn't have a moment. It has an accumulation, usually tied to growth, where a series of individually reasonable decisions stop adding up to the culture they were each made inside of.
 
-A leadership team triples in size, and the new VPs were hired for what they'd accomplished, not necessarily for whether they'd protect a specific way of disagreeing productively in a room. Each of them is good at their job. None of them was explicitly responsible for carrying the original culture forward, because nobody assigned that as anyone's job. Meetings start optimizing for consensus because consensus is faster and looks more functional than the friction the founding culture used to consider healthy. None of this is a betrayal. It's just what happens when growth outpaces anyone's attention to a thing that was never written down as a job description, only ever modeled by people who happened to be in the room.
+A leadership team triples in size, and the new VPs were hired for what they'd accomplished, not necessarily for whether they'd protect a specific way of disagreeing productively in a room. Each of them is good at their job. None of them was explicitly responsible for carrying the original culture forward, because nobody assigned that as anyone's job. Meetings start optimizing for consensus because consensus is faster and looks more functional than the friction the founding culture used to consider healthy. None of this is a betrayal. Growth outpaced anyone's attention to a thing that was never written down as a job description, only ever modeled by people who happened to be in the room.
 
 ---
 

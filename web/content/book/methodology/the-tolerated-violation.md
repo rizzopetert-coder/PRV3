@@ -1,6 +1,6 @@
 # The Tolerated Violation
 
-There's a practice that people know is wrong. Not unclear or debatable: known, ubiquitous. It's been known long enough that it is now a shoulder shrug. Just another fact about how things operate that everyone's aware of and nobody discusses very long.
+There's a practice that people know is wrong, clearly, and everyone knows it, not just a handful of people. It's been known long enough that it is now a shoulder shrug. Just another fact about how things operate that everyone's aware of and nobody discusses very long.
 
 It continues because the person at the center of it is protected or privileged, and because somewhere along the way it was calculated that the risk of letting it continue was smaller than the discomfort of confronting it. That calculation gets harder to defend with every additional day, but nobody revisits it.
 
@@ -14,7 +14,7 @@ What's missing isn't awareness. It's a mechanism that revisits that decision to 
 
 ## Why Protection Makes This Worse, Not Just Slower
 
-When the person at the center is protected, by seniority, by relationships, by revenue, what keeps the violation tolerated isn't really about the violation anymore. It's about what confronting it might cost the people who'd have to do the confronting.
+When the person at the center is protected, by seniority, by relationships, by revenue, what keeps the violation tolerated has stopped being about the violation itself, and started being about what confronting it might cost the people who'd have to do the confronting.
 
 That dynamic doesn't just delay the conversation. It teaches everyone watching that protection outranks the rule being violated. People don't need to be told this directly. They watch what gets tolerated and who it gets tolerated for, and they update their understanding of what actually governs this organization, as opposed to what the policy document says governs it. That lesson, once learned, is expensive to unlearn.
 
@@ -40,7 +40,7 @@ The cost that compounds faster is credibility. Every day the violation continues
 
 ## Why Waiting for the Right Moment Doesn't Work
 
-The logic that sustains toleration sounds like: now isn't the time, there's too much else going on, this would be too disruptive right now. That logic treats the cost of continuing as zero. It isn't. It's just not showing up on a line item anyone's tracking.
+The logic that sustains toleration sounds like: now isn't the time, there's too much else going on, this would be too disruptive right now. That logic treats the cost of continuing as zero. It's real cost, just not showing up on a line item anyone's tracking.
 
 There is rarely a genuinely better moment ahead. The conditions that made confrontation feel costly the first time tend to still be present the next time, and the next, which is exactly how a temporary deferral becomes a permanent toleration without anyone deciding that's what happened.
 

@@ -16,7 +16,7 @@ A founder's friend consistently underdelivers. But they're a founder's friend. T
 
 Each exception seems reasonable in isolation. But the exceptions accumulate. And people are watching. They're always watching.
 
-The message being sent isn't the one in the values statement. The message is: some people are subject to the standard, and some people aren't. The standard is not actually standard. And if the rules don't apply equally, they're not really rules. They're suggestions.
+The message being sent has drifted from the one in the values statement: some people are subject to the standard, and some people aren't. The standard is not actually standard. And if the rules don't apply equally, they're suggestions, not rules.
 
 ---
 
