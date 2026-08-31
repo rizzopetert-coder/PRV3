@@ -20,17 +20,17 @@ export function NavBar() {
   }, [aboutOpen]);
 
   return (
-    <nav className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-white">
+    <nav className="flex justify-between items-center px-6 py-4 border-b border-line bg-field">
       <Link
         href="/"
-        className="font-ui text-sm font-semibold text-charcoal hover:text-gray-600 transition-colors"
+        className="font-ui text-sm font-semibold text-ink hover:text-(--slate) transition-colors"
       >
         Principal Resolution
       </Link>
       <div className="flex items-center gap-6">
         <Link
           href="/book"
-          className="font-ui text-sm text-gray-600 hover:text-hover-ink transition-colors"
+          className="font-ui text-sm text-(--slate) hover:text-ink transition-colors"
         >
           The Book
         </Link>
@@ -42,13 +42,13 @@ export function NavBar() {
         >
           <Link
             href="/about"
-            className="font-ui text-sm text-gray-600 hover:text-hover-ink transition-colors"
+            className="font-ui text-sm text-(--slate) hover:text-ink transition-colors"
           >
             About
           </Link>
           <button
             type="button"
-            className="text-gray-400 hover:text-hover-ink transition-colors p-1"
+            className="text-(--slate) hover:text-ink transition-colors p-1"
             aria-haspopup="true"
             aria-expanded={aboutOpen}
             aria-label="Toggle About menu"
@@ -73,24 +73,24 @@ export function NavBar() {
           </button>
           {aboutOpen && (
             <div className="absolute right-0 top-full pt-2 z-50">
-              <div className="bg-white border border-gray-100 shadow-sm py-2 min-w-[160px]">
+              <div className="bg-field border border-line py-2 min-w-[160px]">
                 <Link
                   href="/about/story"
-                  className="block px-4 py-2 font-ui text-sm text-gray-600 hover:text-hover-ink hover:bg-paper transition-colors"
+                  className="block px-4 py-2 font-ui text-sm text-(--slate) hover:text-ink hover:bg-field-raise transition-colors"
                   onClick={() => setAboutOpen(false)}
                 >
                   The Story
                 </Link>
                 <Link
                   href="/about/services"
-                  className="block px-4 py-2 font-ui text-sm text-gray-600 hover:text-hover-ink hover:bg-paper transition-colors"
+                  className="block px-4 py-2 font-ui text-sm text-(--slate) hover:text-ink hover:bg-field-raise transition-colors"
                   onClick={() => setAboutOpen(false)}
                 >
                   The Services
                 </Link>
                 <Link
                   href="/about/method"
-                  className="block px-4 py-2 font-ui text-sm text-gray-600 hover:text-hover-ink hover:bg-paper transition-colors"
+                  className="block px-4 py-2 font-ui text-sm text-(--slate) hover:text-ink hover:bg-field-raise transition-colors"
                   onClick={() => setAboutOpen(false)}
                 >
                   The Method

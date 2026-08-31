@@ -55,7 +55,7 @@ export function MobileMenu() {
         aria-label="Open menu"
         aria-haspopup="true"
         aria-expanded={open}
-        className="fixed top-20 right-6 z-50 md:hidden p-2 bg-white border border-gray-100 shadow-sm"
+        className="fixed top-20 right-6 z-50 md:hidden p-2 bg-field border border-line shadow-sm"
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <line x1="3" y1="6" x2="17" y2="6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -65,13 +65,13 @@ export function MobileMenu() {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-white md:hidden flex flex-col">
+        <div className="fixed inset-0 z-50 bg-field md:hidden flex flex-col">
           <div className="flex justify-end p-6">
             <button
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Close menu"
-              className="p-2 text-charcoal"
+              className="p-2 text-ink"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                 <line x1="4" y1="4" x2="16" y2="16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -85,7 +85,7 @@ export function MobileMenu() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="font-display text-2xl text-charcoal hover:text-gray-600 transition-colors"
+                className="font-display text-2xl text-ink hover:text-(--slate) transition-colors"
               >
                 {link.label}
               </Link>

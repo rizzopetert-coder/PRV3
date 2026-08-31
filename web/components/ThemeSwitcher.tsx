@@ -23,10 +23,10 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 //
 // Mounted sitewide in NavBar.tsx (global chrome) as of this pass — no
 // longer /about/*-scoped. The popover reuses NavBar's own existing
-// About-dropdown pattern (useRef + mousedown-outside listener, same
-// bg-white/border-gray-100 flat treatment) rather than the reactive
-// --field tokens, since NavBar itself isn't theme-reactive chrome yet —
-// kept consistent with its immediate container, not a separate ask.
+// About-dropdown pattern (useRef + mousedown-outside listener). Both now
+// run on the reactive --field/--line/--ink/--slate tokens (global chrome
+// migration, Gemini-reviewed, two rounds), not the flat bg-white/
+// border-gray-100 treatment this comment used to describe.
 
 export type ThemeName = "warm" | "dark" | "neutral";
 
@@ -113,7 +113,7 @@ export function ThemeSwitcher() {
     <div ref={ref} className="relative flex items-center">
       <button
         type="button"
-        className="text-gray-400 hover:text-hover-ink transition-colors p-1.5"
+        className="text-(--slate) hover:text-ink transition-colors p-1.5"
         aria-haspopup="true"
         aria-expanded={open}
         aria-label="Change theme"
@@ -132,7 +132,7 @@ export function ThemeSwitcher() {
           <div
             role="radiogroup"
             aria-label="Theme"
-            className="bg-white border border-gray-100 shadow-sm py-2 min-w-30"
+            className="bg-field border border-line py-2 min-w-30"
           >
             {THEMES.map(({ value, label }) => {
               const active = theme === value;
@@ -147,7 +147,7 @@ export function ThemeSwitcher() {
                     setOpen(false);
                   }}
                   className={`flex items-center gap-2 w-full px-4 py-2 font-ui text-sm transition-colors ${
-                    active ? "text-oxide-text" : "text-gray-600 hover:text-hover-ink hover:bg-paper"
+                    active ? "text-oxide-text" : "text-(--slate) hover:text-ink hover:bg-field-raise"
                   }`}
                 >
                   <span
