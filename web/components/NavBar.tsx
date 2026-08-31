@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 export function NavBar() {
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -98,6 +99,7 @@ export function NavBar() {
             </div>
           )}
         </div>
+        <ThemeSwitcher />
       </div>
     </nav>
   );

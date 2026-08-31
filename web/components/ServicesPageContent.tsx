@@ -20,9 +20,12 @@ import { HEADING_ACCENT_CLASS } from "@/lib/theme-role-tokens";
 //     only LARGE/DECORATIVE-ONLY color, so headings use it by necessity,
 //     not choice; warm-gray is Pete's pick among four equally-valid
 //     TEXT-SAFE candidates for tags (amber/sage/warm-gray/dusty-blue).
-//   Neutral (tiers taken against paper, since this page uses bg-paper,
-//     not --field -- three of Neutral's seven colors change tier
-//     between the two): taupe is Pete's pick among three equally-valid
+//   Neutral (tiers originally taken against paper, back when this page
+//     used the flat bg-paper token; page now renders bg-background,
+//     which mirrors --field exactly in Neutral -- #FFFFFF, same value.
+//     Re-verified live post-fix: taupe (4.10:1) and oxide (5.62:1) both
+//     still clear WCAG AA against #FFFFFF, so the original picks hold):
+//     taupe is Pete's pick among three equally-valid
 //     LARGE/DECORATIVE-ONLY candidates (taupe/sage-gray/cool-gray) for
 //     headings; oxide is the only remaining TEXT-SAFE non-CTA color left
 //     for tags once oxide-text is spoken for by body copy (plum is
@@ -43,7 +46,7 @@ export default function ServicesPageContent() {
   const tag = `font-ui text-sm ${TAG_CLASS[theme]} italic mb-6`;
 
   return (
-    <main className="bg-paper min-h-screen">
+    <main className="bg-background min-h-screen">
       <div className="max-w-3xl mx-auto px-6 py-16 md:py-24">
 
         <p className="font-ui text-base text-oxide-text leading-relaxed mb-12">

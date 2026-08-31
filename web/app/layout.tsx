@@ -72,15 +72,11 @@ export default function RootLayout({
         {/*
           Visual identity v2 theme persistence (OD-07, Stage 1) — blocking
           script, runs before first paint, sets data-theme on <html> from
-          localStorage before React hydrates. ThemeSwitcher (OD-07) is not
-          currently mounted anywhere -- infrastructure left dormant after
-          the v1 rollback, commit b8860b5. This script may still fire for a
-          returning visitor with a stale prv3-theme value in localStorage,
-          but doing so has no visible effect today -- no live page consumes
-          the resulting data-theme-scoped CSS variables. suppressHydrationWarning
-          above is required because this attribute is set outside React's
-          render, after the server-rendered markup (which never has
-          data-theme) is sent.
+          localStorage before React hydrates. ThemeSwitcher (OD-07) is
+          mounted in NavBar.tsx, sitewide global chrome as of this pass --
+          no longer dormant. suppressHydrationWarning above is required
+          because this attribute is set outside React's render, after the
+          server-rendered markup (which never has data-theme) is sent.
         */}
         <script
           dangerouslySetInnerHTML={{

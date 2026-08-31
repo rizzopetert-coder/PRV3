@@ -11,7 +11,7 @@ export default function MethodPageContent() {
   const heading = `font-display text-2xl md:text-3xl ${HEADING_ACCENT_CLASS[theme]} mb-8`;
 
   return (
-    <main className="bg-paper min-h-screen">
+    <main className="bg-background min-h-screen">
       <div className="max-w-3xl mx-auto px-6 py-16 md:py-24">
         <div className="divide-y divide-gray-100">
 

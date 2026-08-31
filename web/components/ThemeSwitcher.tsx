@@ -1,12 +1,15 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-// Visual identity v2 theme switcher (OD-07, Stage 1). Three-way segmented
-// control — Warm (default, no data-theme attribute) / Dark / Neutral.
-// Active state is a 2px bottom border in --oxide-text, never
-// --urgency-text and never a background-color swatch (inconsistent
-// contrast across themes — already caught and fixed once per the brief).
+// Visual identity v2 theme switcher (OD-07). Icon button + popover —
+// redesigned from the original always-visible 3-tab row (Warm/Dark/
+// Neutral, underline on active) after that row shipped as a full-width
+// band competing with page content. Underlying mechanism is unchanged
+// from that original build: same data-theme attribute on
+// document.documentElement, same localStorage key, same
+// useSyncExternalStore wiring below. Only the trigger/popover shell
+// around it is new.
 //
 // No existing theme-persistence pattern in this repo (no next-themes or
 // similar, confirmed before building this) — hand-rolled, localStorage
@@ -18,11 +21,12 @@ import { useSyncExternalStore } from "react";
 // not useEffect+setState (avoids both the SSR/hydration mismatch and the
 // react-hooks/set-state-in-effect lint rule this repo enforces).
 //
-// Mounted /about/*-scoped only (web/app/about/layout.tsx), per Gemini's
-// cleared architecture review — see prompts/gemini-themeswitcher-review-
-// verification.md (commit 1ffb3e7). Not mounted in NavBar.tsx or the
-// root layout, and not on the homepage — that original Stage 1 plan was
-// superseded by the review before it was ever built.
+// Mounted sitewide in NavBar.tsx (global chrome) as of this pass — no
+// longer /about/*-scoped. The popover reuses NavBar's own existing
+// About-dropdown pattern (useRef + mousedown-outside listener, same
+// bg-white/border-gray-100 flat treatment) rather than the reactive
+// --field tokens, since NavBar itself isn't theme-reactive chrome yet —
+// kept consistent with its immediate container, not a separate ask.
 
 export type ThemeName = "warm" | "dark" | "neutral";
 
@@ -91,28 +95,72 @@ export function useTheme(): ThemeName {
 
 export function ThemeSwitcher() {
   const theme = useTheme();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
 
   return (
-    <div role="radiogroup" aria-label="Theme" className="flex w-full">
-      {THEMES.map(({ value, label }) => {
-        const active = theme === value;
-        return (
-          <button
-            key={value}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            onClick={() => selectTheme(value)}
-            className={`flex-1 py-2 text-sm font-medium border-b-2 transition-colors ${
-              active
-                ? "border-oxide-text"
-                : "border-transparent opacity-70 hover:opacity-100"
-            }`}
+    <div ref={ref} className="relative flex items-center">
+      <button
+        type="button"
+        className="text-gray-400 hover:text-hover-ink transition-colors p-1.5"
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-label="Change theme"
+        onClick={() => setOpen((o) => !o)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") setOpen(false);
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="6.25" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full pt-2 z-50">
+          <div
+            role="radiogroup"
+            aria-label="Theme"
+            className="bg-white border border-gray-100 shadow-sm py-2 min-w-30"
           >
-            {label}
-          </button>
-        );
-      })}
+            {THEMES.map(({ value, label }) => {
+              const active = theme === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => {
+                    selectTheme(value);
+                    setOpen(false);
+                  }}
+                  className={`flex items-center gap-2 w-full px-4 py-2 font-ui text-sm transition-colors ${
+                    active ? "text-oxide-text" : "text-gray-600 hover:text-hover-ink hover:bg-paper"
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${active ? "bg-oxide-text" : "bg-transparent"}`}
+                    aria-hidden="true"
+                  />
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
