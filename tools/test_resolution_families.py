@@ -183,9 +183,10 @@ for key, copy_str in RESOLUTION_FALLBACK_COPY.items():
 # Priority Queue item 2, Diagnostic Dimension Expansion follow-on. Real
 # grounding data: "culture_drift" (single-family default "Intervention"),
 # "decision_paralysis" (compound default "Roadmap + Intervention").
-# STATE_CAUSATION_OVERRIDES ships empty -- override-present cases save/
+# culture_drift itself carries no real entry -- override-present cases save/
 # mutate/restore the real module-level dict directly, since
-# apply_causation_override() reads it as module state, not a parameter.
+# apply_causation_override() reads it as module state, not a parameter. See
+# section 18 below for coverage of the 3 real authored entries.
 
 _SINGLE_DEFAULT = "Intervention"       # culture_drift's real default
 _COMPOUND_DEFAULT = "Roadmap + Intervention"  # decision_paralysis's real default
@@ -264,9 +265,56 @@ finally:
     STATE_CAUSATION_OVERRIDES.update(_saved_overrides)
 
 check(
-    "STATE_CAUSATION_OVERRIDES ships empty",
-    len(STATE_CAUSATION_OVERRIDES) == 0,
-    f"got {len(STATE_CAUSATION_OVERRIDES)} entries -- expected 0 on ship",
+    "STATE_CAUSATION_OVERRIDES carries exactly the 3 entries authored 2026-09-03",
+    set(STATE_CAUSATION_OVERRIDES.keys()) == {"paper_shield", "leadership_deafness", "the_broken_compass"},
+    f"got keys {sorted(STATE_CAUSATION_OVERRIDES.keys())!r}",
+)
+
+
+# ── 18. STATE_CAUSATION_OVERRIDES -- real authored entries (2026-09-03) ────────
+# First real content in the dict since it shipped empty (see the "ships empty"
+# check above, now retired since it's factually false). Real defaults, verified
+# directly against engine/data/states.py: paper_shield="Roadmap",
+# leadership_deafness="Executive Counsel", the_broken_compass="Executive Counsel".
+
+_PAPER_SHIELD_DEFAULT = "Roadmap"
+_LEADERSHIP_DEAFNESS_DEFAULT = "Executive Counsel"
+_THE_BROKEN_COMPASS_DEFAULT = "Executive Counsel"
+
+check(
+    "paper_shield single_point -- overrides to Intervention",
+    apply_causation_override("paper_shield", _PAPER_SHIELD_DEFAULT, "single_point") == "Intervention",
+    f"got {apply_causation_override('paper_shield', _PAPER_SHIELD_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "paper_shield diffuse -- overrides to Roadmap (explicit entry, matches default value)",
+    apply_causation_override("paper_shield", _PAPER_SHIELD_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('paper_shield', _PAPER_SHIELD_DEFAULT, 'diffuse')!r}",
+)
+
+check(
+    "leadership_deafness diffuse -- overrides to Roadmap",
+    apply_causation_override("leadership_deafness", _LEADERSHIP_DEAFNESS_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('leadership_deafness', _LEADERSHIP_DEAFNESS_DEFAULT, 'diffuse')!r}",
+)
+
+check(
+    "leadership_deafness single_point -- no key, falls through to Executive Counsel default",
+    apply_causation_override("leadership_deafness", _LEADERSHIP_DEAFNESS_DEFAULT, "single_point") == _LEADERSHIP_DEAFNESS_DEFAULT,
+    f"got {apply_causation_override('leadership_deafness', _LEADERSHIP_DEAFNESS_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "the_broken_compass diffuse -- overrides to Intervention",
+    apply_causation_override("the_broken_compass", _THE_BROKEN_COMPASS_DEFAULT, "diffuse") == "Intervention",
+    f"got {apply_causation_override('the_broken_compass', _THE_BROKEN_COMPASS_DEFAULT, 'diffuse')!r}",
+)
+
+check(
+    "the_broken_compass single_point -- no key, falls through to Executive Counsel default",
+    apply_causation_override("the_broken_compass", _THE_BROKEN_COMPASS_DEFAULT, "single_point") == _THE_BROKEN_COMPASS_DEFAULT,
+    f"got {apply_causation_override('the_broken_compass', _THE_BROKEN_COMPASS_DEFAULT, 'single_point')!r}",
 )
 
 
