@@ -265,8 +265,11 @@ finally:
     STATE_CAUSATION_OVERRIDES.update(_saved_overrides)
 
 check(
-    "STATE_CAUSATION_OVERRIDES carries exactly the 3 entries authored 2026-09-03",
-    set(STATE_CAUSATION_OVERRIDES.keys()) == {"paper_shield", "leadership_deafness", "the_broken_compass"},
+    "STATE_CAUSATION_OVERRIDES carries exactly the 5 entries authored 2026-09-03",
+    set(STATE_CAUSATION_OVERRIDES.keys()) == {
+        "paper_shield", "leadership_deafness", "the_broken_compass",
+        "the_unformed_leader", "silosolation",
+    },
     f"got keys {sorted(STATE_CAUSATION_OVERRIDES.keys())!r}",
 )
 
@@ -315,6 +318,49 @@ check(
     "the_broken_compass single_point -- no key, falls through to Executive Counsel default",
     apply_causation_override("the_broken_compass", _THE_BROKEN_COMPASS_DEFAULT, "single_point") == _THE_BROKEN_COMPASS_DEFAULT,
     f"got {apply_causation_override('the_broken_compass', _THE_BROKEN_COMPASS_DEFAULT, 'single_point')!r}",
+)
+
+
+# ── 19. STATE_CAUSATION_OVERRIDES -- Development group entries (2026-09-03) ────
+# Closes the Development group (2 of 2), companion to section 18's Executive
+# Counsel group. Real defaults, verified directly against engine/data/states.py:
+# the_unformed_leader="Development", silosolation="Development". silosolation
+# is the one entry so far that overrides BOTH patterns away from its own
+# shipped default -- "Development" is not reachable via causation_pattern for
+# this state at all, confirmed below.
+
+_THE_UNFORMED_LEADER_DEFAULT = "Development"
+_SILOSOLATION_DEFAULT = "Development"
+
+check(
+    "the_unformed_leader diffuse -- overrides to Roadmap",
+    apply_causation_override("the_unformed_leader", _THE_UNFORMED_LEADER_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('the_unformed_leader', _THE_UNFORMED_LEADER_DEFAULT, 'diffuse')!r}",
+)
+
+check(
+    "the_unformed_leader single_point -- no key, falls through to Development default",
+    apply_causation_override("the_unformed_leader", _THE_UNFORMED_LEADER_DEFAULT, "single_point") == _THE_UNFORMED_LEADER_DEFAULT,
+    f"got {apply_causation_override('the_unformed_leader', _THE_UNFORMED_LEADER_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "silosolation single_point -- overrides to Intervention",
+    apply_causation_override("silosolation", _SILOSOLATION_DEFAULT, "single_point") == "Intervention",
+    f"got {apply_causation_override('silosolation', _SILOSOLATION_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "silosolation diffuse -- overrides to Roadmap",
+    apply_causation_override("silosolation", _SILOSOLATION_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('silosolation', _SILOSOLATION_DEFAULT, 'diffuse')!r}",
+)
+
+check(
+    "silosolation -- Development (its own shipped default) is not reachable via either causation_pattern",
+    apply_causation_override("silosolation", _SILOSOLATION_DEFAULT, "single_point") != _SILOSOLATION_DEFAULT
+    and apply_causation_override("silosolation", _SILOSOLATION_DEFAULT, "diffuse") != _SILOSOLATION_DEFAULT,
+    "Development was reachable via causation_pattern -- expected both patterns to override away from it",
 )
 
 

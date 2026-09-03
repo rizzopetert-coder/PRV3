@@ -87,18 +87,30 @@ def translate_resolution_family(engine_family_str: str) -> str:
 # exactly once in the live pipeline, engine/main.py, for a separate
 # LLM-synthesis-input purpose, not for this field).
 #
-# First entries authored 2026-09-03, Pete's own clinical judgment. All three
-# defaults confirmed single-family (non-compound) in engine/data/states.py:
-# paper_shield="Roadmap", leadership_deafness="Executive Counsel",
-# the_broken_compass="Executive Counsel". leadership_deafness and
-# the_broken_compass intentionally carry only a "diffuse" key each -- their
-# single_point causation_pattern is meant to fall through to the existing
-# "Executive Counsel" default via apply_causation_override()'s own dict.get()
-# fallback, sparse by design, not an oversight.
+# First entries authored 2026-09-03, Pete's own clinical judgment. Executive
+# Counsel group (paper_shield, leadership_deafness, the_broken_compass) and
+# Development group (the_unformed_leader, silosolation) both closed this
+# session. All five defaults confirmed single-family (non-compound) in
+# engine/data/states.py: paper_shield="Roadmap", leadership_deafness=
+# "Executive Counsel", the_broken_compass="Executive Counsel",
+# the_unformed_leader="Development", silosolation="Development".
+# leadership_deafness, the_broken_compass, and the_unformed_leader
+# intentionally carry only a "diffuse" key each -- their single_point
+# causation_pattern is meant to fall through to the existing default via
+# apply_causation_override()'s own dict.get() fallback, sparse by design,
+# not an oversight. silosolation carries both keys, and deliberately routes
+# neither pattern to its own shipped "Development" default -- its
+# descriptive_prose ("the isolation isn't hostile. It's structural") sits in
+# tension with that default, addressed here at the override level (single_point
+# to Intervention, diffuse to Roadmap) rather than by changing the default
+# itself, which is out of scope for this pass. See tools/_mob.txt for the
+# standalone open item tracking whether the default itself should change.
 STATE_CAUSATION_OVERRIDES: dict[str, dict[str, str]] = {
     "paper_shield": {"single_point": "Intervention", "diffuse": "Roadmap"},
     "leadership_deafness": {"diffuse": "Roadmap"},
     "the_broken_compass": {"diffuse": "Intervention"},
+    "the_unformed_leader": {"diffuse": "Roadmap"},
+    "silosolation": {"single_point": "Intervention", "diffuse": "Roadmap"},
 }
 
 
