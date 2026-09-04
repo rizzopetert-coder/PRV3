@@ -251,7 +251,7 @@ export const BOOK_STATE_INDEX: BookStateEntry[] = [
   },
   {
     id: "silosolation",
-    resolutionFamily: "Development",
+    resolutionFamily: "Roadmap",
     name: "Silosolation",
     dimension: "alliance",
     descriptiveProse: "Teams that need each other's information to do their jobs well are operating as if they don't, each optimizing for its own metrics without visibility into how that affects anyone else. The isolation isn't hostile. It's structural, and it produces the same friction hostility would.",

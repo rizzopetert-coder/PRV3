@@ -33,7 +33,7 @@ const REAL_STATE_TRANSLATIONS: Array<{ state_id: string; raw: string; translated
   { state_id: "pay_exposure", raw: "Roadmap", translated: "People Tactics and Strategy" },
   { state_id: "planning_authority_gap", raw: "Roadmap + Executive Counsel", translated: "People Tactics and Strategy + Executive Advisory" },
   { state_id: "sequential_decision_blindness", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "silosolation", raw: "Development", translated: "Training & Development" },
+  { state_id: "silosolation", raw: "Roadmap", translated: "People Tactics and Strategy" },
   { state_id: "the_arbitrary_standard", raw: "Intervention + Roadmap", translated: "Intervention + People Tactics and Strategy" },
   { state_id: "the_basement_standard", raw: "Intervention + Roadmap", translated: "Intervention + People Tactics and Strategy" },
   { state_id: "the_broken_compass", raw: "Executive Counsel", translated: "Executive Advisory" },
