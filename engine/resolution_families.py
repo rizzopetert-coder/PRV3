@@ -87,37 +87,59 @@ def translate_resolution_family(engine_family_str: str) -> str:
 # exactly once in the live pipeline, engine/main.py, for a separate
 # LLM-synthesis-input purpose, not for this field).
 #
-# First entries authored 2026-09-03, Pete's own clinical judgment. Groups
-# closed this session, by their real shipped resolution_family default (not
-# a task-header label -- see the 2026-09-03 Section 16 entries in
+# CLOSED, 2026-09-03/04: all 19 mechanically-reachable states (every state
+# with a single, non-compound default resolution_family) have now been
+# explicitly reviewed and decided, Pete's own clinical judgment throughout.
+# 15 carry real entries below; 4 were deliberately excluded with documented
+# reasoning (see below) -- zero silent decisions either way. Authored across
+# 4 groups, by each state's real shipped resolution_family default (not a
+# task-header label -- see the 2026-09-03 Section 16 entries in
 # tools/_mob.txt for the "Executive Counsel group" naming correction):
 # leadership_deafness/the_broken_compass ("Executive Counsel"),
-# the_unformed_leader/silosolation ("Development"), and 8 of 9
+# the_unformed_leader/silosolation ("Development"), 8 of 9
 # "Intervention"-default states (the_uninitiated, what_nobody_says,
 # the_diversity_ceiling, identity_erosion, the_culture_that_wasnt,
-# the_burned_credibility, the_unreported_hazard, wellbeing_theater).
-# paper_shield ("Roadmap" default) was a standalone worked example, not a
-# group member. All defaults confirmed single-family (non-compound) directly
-# against engine/data/states.py before authoring.
+# the_burned_credibility, the_unreported_hazard, wellbeing_theater), and
+# pay_exposure/compression_crisis plus paper_shield ("Roadmap"-default
+# states -- paper_shield itself was a standalone worked example decided
+# earlier, not a group member). All defaults confirmed single-family
+# (non-compound) directly against engine/data/states.py before authoring.
 #
-# Most entries carry only a "diffuse" key -- their single_point
-# causation_pattern is meant to fall through to the existing default via
-# apply_causation_override()'s own dict.get() fallback, sparse by design,
-# not an oversight. silosolation is the one exception carrying both keys,
-# deliberately routing neither pattern to its own shipped "Development"
-# default -- its descriptive_prose ("the isolation isn't hostile. It's
-# structural") sits in tension with that default, addressed here at the
-# override level rather than by changing the default itself, out of scope
-# for this pass. See tools/_mob.txt for that standalone open item.
+# Most entries carry only one key -- diffuse-default states carry a
+# "diffuse" key, single_point-default states carry a "single_point" key --
+# the other causation_pattern is meant to fall through to the existing
+# default via apply_causation_override()'s own dict.get() fallback, sparse
+# by design, not an oversight. silosolation is the one exception carrying
+# both keys, deliberately routing neither pattern to its own shipped
+# "Development" default -- its descriptive_prose ("the isolation isn't
+# hostile. It's structural") sits in tension with that default, addressed
+# here at the override level rather than by changing the default itself,
+# out of scope for this workstream entirely. See tools/_mob.txt for that
+# standalone open item, unresolved by this closure.
 #
-# culture_drift is the 9th "Intervention"-default state in this reviewed
-# group and is DELIBERATELY EXCLUDED -- do not add an entry for it. Two
-# reasons: (1) its descriptive_prose ("drifted apart gradually enough that
-# no single moment marks the change... nobody decided") is definitionally
-# diffuse-only, no coherent single_point reading exists; (2) it is this test
-# suite's synthetic grounding fixture for the no-override-entry fallback
-# path (tools/test_resolution_families.py's _SINGLE_DEFAULT tests) -- those
-# assertions depend on it having no real entry here.
+# 4 states are DELIBERATELY EXCLUDED from any override -- do not add
+# entries for any of them:
+#   culture_drift ("Intervention" default) -- (1) descriptive_prose
+#     ("drifted apart gradually enough that no single moment marks the
+#     change... nobody decided") is definitionally diffuse-only, no
+#     coherent single_point reading exists; (2) it is this test suite's
+#     synthetic grounding fixture for the no-override-entry fallback path
+#     (tools/test_resolution_families.py's _SINGLE_DEFAULT tests) -- those
+#     assertions depend on it having no real entry here.
+#   the_undefined_role ("Roadmap" default) -- chronic/structural drag
+#     language ("duplicates... unclaimed... paying for a function that
+#     isn't reliably producing"), no acute-crisis framing. One role or
+#     many, the fix is the same kind of work (define the boundaries) --
+#     Roadmap already absorbs scope differences, no distinct single_point
+#     resolution exists.
+#   the_policy_lag ("Roadmap" default) -- same reasoning: "quietly
+#     diverged" is passive/chronic, not urgent. One stale policy or many,
+#     same kind of fix.
+#   the_pay_fog ("Roadmap" default) -- definitionally diffuse-only, same
+#     category as culture_drift: its own prose ("hard to see from inside
+#     any one decision, impossible to miss once someone lines them all up")
+#     means the concept only exists as a cross-decision pattern -- a
+#     "single_point" pay fog isn't a coherent state.
 STATE_CAUSATION_OVERRIDES: dict[str, dict[str, str]] = {
     "paper_shield": {"single_point": "Intervention", "diffuse": "Roadmap"},
     "leadership_deafness": {"diffuse": "Roadmap"},
@@ -130,6 +152,8 @@ STATE_CAUSATION_OVERRIDES: dict[str, dict[str, str]] = {
     "identity_erosion": {"diffuse": "Roadmap"},
     "the_culture_that_wasnt": {"diffuse": "Roadmap"},
     "the_burned_credibility": {"diffuse": "Roadmap"},
+    "pay_exposure": {"single_point": "Intervention"},
+    "compression_crisis": {"single_point": "Intervention"},
     "the_unreported_hazard": {"diffuse": "Roadmap"},
     "wellbeing_theater": {"diffuse": "Roadmap"},
 }

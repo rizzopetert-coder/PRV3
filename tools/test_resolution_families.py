@@ -265,13 +265,14 @@ finally:
     STATE_CAUSATION_OVERRIDES.update(_saved_overrides)
 
 check(
-    "STATE_CAUSATION_OVERRIDES carries exactly the 13 entries authored 2026-09-03",
+    "STATE_CAUSATION_OVERRIDES carries exactly the 15 entries authored 2026-09-03/04",
     set(STATE_CAUSATION_OVERRIDES.keys()) == {
         "paper_shield", "leadership_deafness", "the_broken_compass",
         "the_unformed_leader", "silosolation",
         "the_uninitiated", "what_nobody_says", "the_diversity_ceiling",
         "identity_erosion", "the_culture_that_wasnt", "the_burned_credibility",
         "the_unreported_hazard", "wellbeing_theater",
+        "pay_exposure", "compression_crisis",
     },
     f"got keys {sorted(STATE_CAUSATION_OVERRIDES.keys())!r}",
 )
@@ -280,6 +281,33 @@ check(
     "culture_drift has NO entry -- deliberately excluded, guard against future accidental addition",
     "culture_drift" not in STATE_CAUSATION_OVERRIDES,
     f"culture_drift found in STATE_CAUSATION_OVERRIDES: {STATE_CAUSATION_OVERRIDES.get('culture_drift')!r}",
+)
+
+check(
+    "the_undefined_role has NO entry -- deliberately excluded, guard against future accidental addition",
+    "the_undefined_role" not in STATE_CAUSATION_OVERRIDES,
+    f"the_undefined_role found in STATE_CAUSATION_OVERRIDES: {STATE_CAUSATION_OVERRIDES.get('the_undefined_role')!r}",
+)
+
+check(
+    "the_policy_lag has NO entry -- deliberately excluded, guard against future accidental addition",
+    "the_policy_lag" not in STATE_CAUSATION_OVERRIDES,
+    f"the_policy_lag found in STATE_CAUSATION_OVERRIDES: {STATE_CAUSATION_OVERRIDES.get('the_policy_lag')!r}",
+)
+
+check(
+    "the_pay_fog has NO entry -- deliberately excluded, guard against future accidental addition",
+    "the_pay_fog" not in STATE_CAUSATION_OVERRIDES,
+    f"the_pay_fog found in STATE_CAUSATION_OVERRIDES: {STATE_CAUSATION_OVERRIDES.get('the_pay_fog')!r}",
+)
+
+check(
+    "STATE_CAUSATION_OVERRIDES workstream CLOSED -- all 19 mechanically-reachable states "
+    "reviewed and decided (15 real entries + 4 deliberately excluded: culture_drift, "
+    "the_undefined_role, the_policy_lag, the_pay_fog)",
+    len(STATE_CAUSATION_OVERRIDES) + 4 == 19,
+    f"got {len(STATE_CAUSATION_OVERRIDES)} real entries + 4 excluded = "
+    f"{len(STATE_CAUSATION_OVERRIDES) + 4}, expected 19",
 )
 
 
@@ -469,6 +497,41 @@ check(
     "wellbeing_theater single_point -- no key, falls through to Intervention default",
     apply_causation_override("wellbeing_theater", _INTERVENTION_GROUP_DEFAULT, "single_point") == _INTERVENTION_GROUP_DEFAULT,
     f"got {apply_causation_override('wellbeing_theater', _INTERVENTION_GROUP_DEFAULT, 'single_point')!r}",
+)
+
+
+# ── 21. STATE_CAUSATION_OVERRIDES -- Roadmap group entries, closes the whole
+# workstream (2026-09-03/04) ────────────────────────────────────────────────
+# Closes the Roadmap group (pay_exposure, compression_crisis -- paper_shield,
+# also Roadmap-default, was decided earlier as a standalone worked example).
+# Real defaults, verified directly against engine/data/states.py, both
+# "Roadmap". Both single_point-only by design; diffuse falls through to the
+# Roadmap default for each. This closes STATE_CAUSATION_OVERRIDES as a
+# workstream -- all 19 mechanically-reachable states now reviewed, see the
+# closure check in section 17 above.
+
+_ROADMAP_GROUP_DEFAULT = "Roadmap"
+
+check(
+    "pay_exposure single_point -- overrides to Intervention",
+    apply_causation_override("pay_exposure", _ROADMAP_GROUP_DEFAULT, "single_point") == "Intervention",
+    f"got {apply_causation_override('pay_exposure', _ROADMAP_GROUP_DEFAULT, 'single_point')!r}",
+)
+check(
+    "pay_exposure diffuse -- no key, falls through to Roadmap default",
+    apply_causation_override("pay_exposure", _ROADMAP_GROUP_DEFAULT, "diffuse") == _ROADMAP_GROUP_DEFAULT,
+    f"got {apply_causation_override('pay_exposure', _ROADMAP_GROUP_DEFAULT, 'diffuse')!r}",
+)
+
+check(
+    "compression_crisis single_point -- overrides to Intervention",
+    apply_causation_override("compression_crisis", _ROADMAP_GROUP_DEFAULT, "single_point") == "Intervention",
+    f"got {apply_causation_override('compression_crisis', _ROADMAP_GROUP_DEFAULT, 'single_point')!r}",
+)
+check(
+    "compression_crisis diffuse -- no key, falls through to Roadmap default",
+    apply_causation_override("compression_crisis", _ROADMAP_GROUP_DEFAULT, "diffuse") == _ROADMAP_GROUP_DEFAULT,
+    f"got {apply_causation_override('compression_crisis', _ROADMAP_GROUP_DEFAULT, 'diffuse')!r}",
 )
 
 
