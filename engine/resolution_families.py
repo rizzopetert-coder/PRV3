@@ -87,30 +87,51 @@ def translate_resolution_family(engine_family_str: str) -> str:
 # exactly once in the live pipeline, engine/main.py, for a separate
 # LLM-synthesis-input purpose, not for this field).
 #
-# First entries authored 2026-09-03, Pete's own clinical judgment. Executive
-# Counsel group (paper_shield, leadership_deafness, the_broken_compass) and
-# Development group (the_unformed_leader, silosolation) both closed this
-# session. All five defaults confirmed single-family (non-compound) in
-# engine/data/states.py: paper_shield="Roadmap", leadership_deafness=
-# "Executive Counsel", the_broken_compass="Executive Counsel",
-# the_unformed_leader="Development", silosolation="Development".
-# leadership_deafness, the_broken_compass, and the_unformed_leader
-# intentionally carry only a "diffuse" key each -- their single_point
+# First entries authored 2026-09-03, Pete's own clinical judgment. Groups
+# closed this session, by their real shipped resolution_family default (not
+# a task-header label -- see the 2026-09-03 Section 16 entries in
+# tools/_mob.txt for the "Executive Counsel group" naming correction):
+# leadership_deafness/the_broken_compass ("Executive Counsel"),
+# the_unformed_leader/silosolation ("Development"), and 8 of 9
+# "Intervention"-default states (the_uninitiated, what_nobody_says,
+# the_diversity_ceiling, identity_erosion, the_culture_that_wasnt,
+# the_burned_credibility, the_unreported_hazard, wellbeing_theater).
+# paper_shield ("Roadmap" default) was a standalone worked example, not a
+# group member. All defaults confirmed single-family (non-compound) directly
+# against engine/data/states.py before authoring.
+#
+# Most entries carry only a "diffuse" key -- their single_point
 # causation_pattern is meant to fall through to the existing default via
 # apply_causation_override()'s own dict.get() fallback, sparse by design,
-# not an oversight. silosolation carries both keys, and deliberately routes
-# neither pattern to its own shipped "Development" default -- its
-# descriptive_prose ("the isolation isn't hostile. It's structural") sits in
-# tension with that default, addressed here at the override level (single_point
-# to Intervention, diffuse to Roadmap) rather than by changing the default
-# itself, which is out of scope for this pass. See tools/_mob.txt for the
-# standalone open item tracking whether the default itself should change.
+# not an oversight. silosolation is the one exception carrying both keys,
+# deliberately routing neither pattern to its own shipped "Development"
+# default -- its descriptive_prose ("the isolation isn't hostile. It's
+# structural") sits in tension with that default, addressed here at the
+# override level rather than by changing the default itself, out of scope
+# for this pass. See tools/_mob.txt for that standalone open item.
+#
+# culture_drift is the 9th "Intervention"-default state in this reviewed
+# group and is DELIBERATELY EXCLUDED -- do not add an entry for it. Two
+# reasons: (1) its descriptive_prose ("drifted apart gradually enough that
+# no single moment marks the change... nobody decided") is definitionally
+# diffuse-only, no coherent single_point reading exists; (2) it is this test
+# suite's synthetic grounding fixture for the no-override-entry fallback
+# path (tools/test_resolution_families.py's _SINGLE_DEFAULT tests) -- those
+# assertions depend on it having no real entry here.
 STATE_CAUSATION_OVERRIDES: dict[str, dict[str, str]] = {
     "paper_shield": {"single_point": "Intervention", "diffuse": "Roadmap"},
     "leadership_deafness": {"diffuse": "Roadmap"},
     "the_broken_compass": {"diffuse": "Intervention"},
     "the_unformed_leader": {"diffuse": "Roadmap"},
     "silosolation": {"single_point": "Intervention", "diffuse": "Roadmap"},
+    "the_uninitiated": {"diffuse": "Development"},
+    "what_nobody_says": {"diffuse": "Roadmap"},
+    "the_diversity_ceiling": {"diffuse": "Roadmap"},
+    "identity_erosion": {"diffuse": "Roadmap"},
+    "the_culture_that_wasnt": {"diffuse": "Roadmap"},
+    "the_burned_credibility": {"diffuse": "Roadmap"},
+    "the_unreported_hazard": {"diffuse": "Roadmap"},
+    "wellbeing_theater": {"diffuse": "Roadmap"},
 }
 
 

@@ -265,12 +265,21 @@ finally:
     STATE_CAUSATION_OVERRIDES.update(_saved_overrides)
 
 check(
-    "STATE_CAUSATION_OVERRIDES carries exactly the 5 entries authored 2026-09-03",
+    "STATE_CAUSATION_OVERRIDES carries exactly the 13 entries authored 2026-09-03",
     set(STATE_CAUSATION_OVERRIDES.keys()) == {
         "paper_shield", "leadership_deafness", "the_broken_compass",
         "the_unformed_leader", "silosolation",
+        "the_uninitiated", "what_nobody_says", "the_diversity_ceiling",
+        "identity_erosion", "the_culture_that_wasnt", "the_burned_credibility",
+        "the_unreported_hazard", "wellbeing_theater",
     },
     f"got keys {sorted(STATE_CAUSATION_OVERRIDES.keys())!r}",
+)
+
+check(
+    "culture_drift has NO entry -- deliberately excluded, guard against future accidental addition",
+    "culture_drift" not in STATE_CAUSATION_OVERRIDES,
+    f"culture_drift found in STATE_CAUSATION_OVERRIDES: {STATE_CAUSATION_OVERRIDES.get('culture_drift')!r}",
 )
 
 
@@ -361,6 +370,105 @@ check(
     apply_causation_override("silosolation", _SILOSOLATION_DEFAULT, "single_point") != _SILOSOLATION_DEFAULT
     and apply_causation_override("silosolation", _SILOSOLATION_DEFAULT, "diffuse") != _SILOSOLATION_DEFAULT,
     "Development was reachable via causation_pattern -- expected both patterns to override away from it",
+)
+
+
+# ── 20. STATE_CAUSATION_OVERRIDES -- Intervention group, 8 of 9 (2026-09-03) ───
+# Closes the Intervention group at 8 of 9 -- real defaults, verified directly
+# against engine/data/states.py, all "Intervention". All 8 are diffuse-only by
+# design; single_point falls through to the Intervention default for each.
+# culture_drift, the 9th "Intervention"-default state in this reviewed group,
+# is deliberately excluded -- see the guard check above and the header comment
+# in engine/resolution_families.py for the two reasons.
+
+_INTERVENTION_GROUP_DEFAULT = "Intervention"
+
+check(
+    "the_uninitiated diffuse -- overrides to Development",
+    apply_causation_override("the_uninitiated", _INTERVENTION_GROUP_DEFAULT, "diffuse") == "Development",
+    f"got {apply_causation_override('the_uninitiated', _INTERVENTION_GROUP_DEFAULT, 'diffuse')!r}",
+)
+check(
+    "the_uninitiated single_point -- no key, falls through to Intervention default",
+    apply_causation_override("the_uninitiated", _INTERVENTION_GROUP_DEFAULT, "single_point") == _INTERVENTION_GROUP_DEFAULT,
+    f"got {apply_causation_override('the_uninitiated', _INTERVENTION_GROUP_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "what_nobody_says diffuse -- overrides to Roadmap",
+    apply_causation_override("what_nobody_says", _INTERVENTION_GROUP_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('what_nobody_says', _INTERVENTION_GROUP_DEFAULT, 'diffuse')!r}",
+)
+check(
+    "what_nobody_says single_point -- no key, falls through to Intervention default",
+    apply_causation_override("what_nobody_says", _INTERVENTION_GROUP_DEFAULT, "single_point") == _INTERVENTION_GROUP_DEFAULT,
+    f"got {apply_causation_override('what_nobody_says', _INTERVENTION_GROUP_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "the_diversity_ceiling diffuse -- overrides to Roadmap",
+    apply_causation_override("the_diversity_ceiling", _INTERVENTION_GROUP_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('the_diversity_ceiling', _INTERVENTION_GROUP_DEFAULT, 'diffuse')!r}",
+)
+check(
+    "the_diversity_ceiling single_point -- no key, falls through to Intervention default",
+    apply_causation_override("the_diversity_ceiling", _INTERVENTION_GROUP_DEFAULT, "single_point") == _INTERVENTION_GROUP_DEFAULT,
+    f"got {apply_causation_override('the_diversity_ceiling', _INTERVENTION_GROUP_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "identity_erosion diffuse -- overrides to Roadmap",
+    apply_causation_override("identity_erosion", _INTERVENTION_GROUP_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('identity_erosion', _INTERVENTION_GROUP_DEFAULT, 'diffuse')!r}",
+)
+check(
+    "identity_erosion single_point -- no key, falls through to Intervention default",
+    apply_causation_override("identity_erosion", _INTERVENTION_GROUP_DEFAULT, "single_point") == _INTERVENTION_GROUP_DEFAULT,
+    f"got {apply_causation_override('identity_erosion', _INTERVENTION_GROUP_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "the_culture_that_wasnt diffuse -- overrides to Roadmap",
+    apply_causation_override("the_culture_that_wasnt", _INTERVENTION_GROUP_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('the_culture_that_wasnt', _INTERVENTION_GROUP_DEFAULT, 'diffuse')!r}",
+)
+check(
+    "the_culture_that_wasnt single_point -- no key, falls through to Intervention default",
+    apply_causation_override("the_culture_that_wasnt", _INTERVENTION_GROUP_DEFAULT, "single_point") == _INTERVENTION_GROUP_DEFAULT,
+    f"got {apply_causation_override('the_culture_that_wasnt', _INTERVENTION_GROUP_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "the_burned_credibility diffuse -- overrides to Roadmap",
+    apply_causation_override("the_burned_credibility", _INTERVENTION_GROUP_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('the_burned_credibility', _INTERVENTION_GROUP_DEFAULT, 'diffuse')!r}",
+)
+check(
+    "the_burned_credibility single_point -- no key, falls through to Intervention default",
+    apply_causation_override("the_burned_credibility", _INTERVENTION_GROUP_DEFAULT, "single_point") == _INTERVENTION_GROUP_DEFAULT,
+    f"got {apply_causation_override('the_burned_credibility', _INTERVENTION_GROUP_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "the_unreported_hazard diffuse -- overrides to Roadmap",
+    apply_causation_override("the_unreported_hazard", _INTERVENTION_GROUP_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('the_unreported_hazard', _INTERVENTION_GROUP_DEFAULT, 'diffuse')!r}",
+)
+check(
+    "the_unreported_hazard single_point -- no key, falls through to Intervention default",
+    apply_causation_override("the_unreported_hazard", _INTERVENTION_GROUP_DEFAULT, "single_point") == _INTERVENTION_GROUP_DEFAULT,
+    f"got {apply_causation_override('the_unreported_hazard', _INTERVENTION_GROUP_DEFAULT, 'single_point')!r}",
+)
+
+check(
+    "wellbeing_theater diffuse -- overrides to Roadmap",
+    apply_causation_override("wellbeing_theater", _INTERVENTION_GROUP_DEFAULT, "diffuse") == "Roadmap",
+    f"got {apply_causation_override('wellbeing_theater', _INTERVENTION_GROUP_DEFAULT, 'diffuse')!r}",
+)
+check(
+    "wellbeing_theater single_point -- no key, falls through to Intervention default",
+    apply_causation_override("wellbeing_theater", _INTERVENTION_GROUP_DEFAULT, "single_point") == _INTERVENTION_GROUP_DEFAULT,
+    f"got {apply_causation_override('wellbeing_theater', _INTERVENTION_GROUP_DEFAULT, 'single_point')!r}",
 )
 
 
