@@ -358,16 +358,26 @@ check(
 )
 
 
-# ── 19. STATE_CAUSATION_OVERRIDES -- Development group entries (2026-09-03) ────
-# Closes the Development group (2 of 2), companion to section 18's Executive
-# Counsel group. Real defaults, verified directly against engine/data/states.py:
-# the_unformed_leader="Development", silosolation="Development". silosolation
-# is the one entry so far that overrides BOTH patterns away from its own
-# shipped default -- "Development" is not reachable via causation_pattern for
-# this state at all, confirmed below.
+# ── 19. STATE_CAUSATION_OVERRIDES -- Development group entries (2026-09-03),
+# silosolation entry simplified 2026-09-04 ──────────────────────────────────
+# the_unformed_leader closes the Development group (1 of 1 remaining real
+# Development-default state) -- real default, verified directly against
+# engine/data/states.py: the_unformed_leader="Development".
+#
+# silosolation shipped 2026-09-03 as a 2-key override on a "Development"
+# default (the one entry overriding both patterns away from its own shipped
+# default). RESOLVED 2026-09-04, Pete's confirmed decision: the base default
+# itself was corrected to "Roadmap" (engine/data/states.py), not just
+# overridden -- its descriptive_prose ("the isolation isn't hostile. It's
+# structural") was a structural read, not a capability-gap one, so the
+# tension was in the default, not the override. The "diffuse" key became
+# redundant once the default matched what it would fall through to anyway,
+# and was removed -- silosolation is now a 1-key single_point-only entry,
+# same pattern as every other entry in this dict. Real default, verified
+# directly against engine/data/states.py: silosolation="Roadmap".
 
 _THE_UNFORMED_LEADER_DEFAULT = "Development"
-_SILOSOLATION_DEFAULT = "Development"
+_SILOSOLATION_DEFAULT = "Roadmap"
 
 check(
     "the_unformed_leader diffuse -- overrides to Roadmap",
@@ -388,16 +398,9 @@ check(
 )
 
 check(
-    "silosolation diffuse -- overrides to Roadmap",
-    apply_causation_override("silosolation", _SILOSOLATION_DEFAULT, "diffuse") == "Roadmap",
+    "silosolation diffuse -- no key, falls through to Roadmap default",
+    apply_causation_override("silosolation", _SILOSOLATION_DEFAULT, "diffuse") == _SILOSOLATION_DEFAULT,
     f"got {apply_causation_override('silosolation', _SILOSOLATION_DEFAULT, 'diffuse')!r}",
-)
-
-check(
-    "silosolation -- Development (its own shipped default) is not reachable via either causation_pattern",
-    apply_causation_override("silosolation", _SILOSOLATION_DEFAULT, "single_point") != _SILOSOLATION_DEFAULT
-    and apply_causation_override("silosolation", _SILOSOLATION_DEFAULT, "diffuse") != _SILOSOLATION_DEFAULT,
-    "Development was reachable via causation_pattern -- expected both patterns to override away from it",
 )
 
 

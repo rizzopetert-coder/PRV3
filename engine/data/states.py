@@ -1114,7 +1114,14 @@ _reg(_profile(
     liability_axes=["Operational & Structural", "Financial & Economic", "Cultural & Behavioral"],
     asset_axes=["Governance Discipline", "Relational Trust"],
     sev_min="Entrenched", sev_max="Endemic",
-    resolution_family="Development",
+    # Corrected 2026-09-04, Pete's confirmed decision: "Development" -> "Roadmap".
+    # descriptive_prose ("the isolation isn't hostile. It's structural") is a
+    # structural/design-pattern read, not a capability-gap one -- RESOLUTION_FALLBACK_COPY
+    # (engine/resolution_families.py) defines Roadmap as "in how your organization is
+    # designed, not in the people navigating it" vs. Development's "capability gap"
+    # framing. Resolves the default/prose tension flagged during the
+    # STATE_CAUSATION_OVERRIDES Development-group override work (tools/_mob.txt).
+    resolution_family="Roadmap",
 ))
 STATE_PROFILES["silosolation"].dimensional_vector = DimensionalVector(
     # SCD-WCS full re-authoring, Phase 2 Batch 2 (2026-08-24), staged

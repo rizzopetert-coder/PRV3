@@ -92,30 +92,38 @@ def translate_resolution_family(engine_family_str: str) -> str:
 # explicitly reviewed and decided, Pete's own clinical judgment throughout.
 # 15 carry real entries below; 4 were deliberately excluded with documented
 # reasoning (see below) -- zero silent decisions either way. Authored across
-# 4 groups, by each state's real shipped resolution_family default (not a
-# task-header label -- see the 2026-09-03 Section 16 entries in
+# 4 groups, by each state's real shipped resolution_family default at the
+# time (not a task-header label -- see the 2026-09-03 Section 16 entries in
 # tools/_mob.txt for the "Executive Counsel group" naming correction):
 # leadership_deafness/the_broken_compass ("Executive Counsel"),
-# the_unformed_leader/silosolation ("Development"), 8 of 9
-# "Intervention"-default states (the_uninitiated, what_nobody_says,
-# the_diversity_ceiling, identity_erosion, the_culture_that_wasnt,
-# the_burned_credibility, the_unreported_hazard, wellbeing_theater), and
-# pay_exposure/compression_crisis plus paper_shield ("Roadmap"-default
+# the_unformed_leader ("Development"), 8 of 9 "Intervention"-default states
+# (the_uninitiated, what_nobody_says, the_diversity_ceiling,
+# identity_erosion, the_culture_that_wasnt, the_burned_credibility,
+# the_unreported_hazard, wellbeing_theater), and pay_exposure/
+# compression_crisis/silosolation plus paper_shield ("Roadmap"-default
 # states -- paper_shield itself was a standalone worked example decided
 # earlier, not a group member). All defaults confirmed single-family
 # (non-compound) directly against engine/data/states.py before authoring.
 #
-# Most entries carry only one key -- diffuse-default states carry a
+# Every entry below carries only one key -- diffuse-default states carry a
 # "diffuse" key, single_point-default states carry a "single_point" key --
 # the other causation_pattern is meant to fall through to the existing
 # default via apply_causation_override()'s own dict.get() fallback, sparse
-# by design, not an oversight. silosolation is the one exception carrying
-# both keys, deliberately routing neither pattern to its own shipped
-# "Development" default -- its descriptive_prose ("the isolation isn't
-# hostile. It's structural") sits in tension with that default, addressed
-# here at the override level rather than by changing the default itself,
-# out of scope for this workstream entirely. See tools/_mob.txt for that
-# standalone open item, unresolved by this closure.
+# by design, not an oversight. silosolation was the one exception carrying
+# both keys through 2026-09-04, deliberately routing neither pattern to its
+# then-shipped "Development" default -- its descriptive_prose ("the
+# isolation isn't hostile. It's structural") sat in tension with that
+# default. RESOLVED 2026-09-04, Pete's confirmed decision: the base default
+# itself corrected to "Roadmap" in engine/data/states.py (not just an
+# override), so the "diffuse" key became redundant (it now matches what
+# diffuse would fall through to anyway) and was removed -- silosolation now
+# follows the same single-key pattern as every other entry. Independent
+# Gemini architecture review of this correction disputed the real vector
+# values cited above and asserted a fabricated alternative -- see
+# tools/_mob.txt's Key Learnings fabrication-pattern record for the full
+# instance; the substantive recommendation (change the default, simplify
+# the entry) was correct and was acted on based on independent verification,
+# not the disputed claim.
 #
 # 4 states are DELIBERATELY EXCLUDED from any override -- do not add
 # entries for any of them:
@@ -145,7 +153,7 @@ STATE_CAUSATION_OVERRIDES: dict[str, dict[str, str]] = {
     "leadership_deafness": {"diffuse": "Roadmap"},
     "the_broken_compass": {"diffuse": "Intervention"},
     "the_unformed_leader": {"diffuse": "Roadmap"},
-    "silosolation": {"single_point": "Intervention", "diffuse": "Roadmap"},
+    "silosolation": {"single_point": "Intervention"},
     "the_uninitiated": {"diffuse": "Development"},
     "what_nobody_says": {"diffuse": "Roadmap"},
     "the_diversity_ceiling": {"diffuse": "Roadmap"},
