@@ -65,6 +65,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
+from engine.data.jurisdiction import JURISDICTION_TABLE
+
 _logger = logging.getLogger(__name__)
 
 
@@ -2227,8 +2229,591 @@ _CLUSTER_4B_CEILING_BY_HEADCOUNT: dict[str, float] = {
 _CLUSTER_5_CURVE = LegalDollarCurve(floor=16_550.0, ceiling=165_514.0)
 
 
+# -- State-aware coverage-threshold gate (Clusters 1, 2, 4b) --------------------
+# prompts/state-coverage-threshold-design.md. Gemini-reviewed design,
+# revised from an original harassment_any_size boolean into the
+# extensible per-claim-type thresholds dict below. Separate mechanism
+# from engine/data/jurisdiction.py's JURISDICTION_TABLE/
+# resolve_jurisdiction_flags() (transparency/retaliation/procedural
+# policy flags) -- zero overlap, that module is untouched by this
+# design. JURISDICTION_TABLE is imported here only as the authoritative
+# 50-states-plus-DC key set the PARTIAL fill-in below iterates over.
+
+@dataclass(frozen=True)
+class StateCoverageThreshold:
+    """
+    One state's employer-size coverage threshold(s) for anti-discrimination
+    claim applicability (ADA/Title VII-type; FMLA is a distinct federal
+    threshold, see _FEDERAL_THRESHOLD_BY_CLAIM_TYPE below).
+
+    thresholds:      claim_type -> minimum headcount for coverage to apply.
+                      "general" must always be present -- resolve_coverage_gate()
+                      falls through to it via thresholds.get(claim_type,
+                      thresholds["general"]) for any claim_type without its
+                      own override key. Extensible to future claim-type
+                      carve-outs (retaliation, pregnancy, etc.) without a
+                      schema change -- a claim type with no override simply
+                      isn't a key here.
+    damages_cap_treatment: "uncapped" | "state_specific_tiers" |
+                      "federal_cap_applies". Captured for a future pricing
+                      extension (adjusting Cluster 1/2/4b's dollar ceiling
+                      by state) -- NOT yet consumed by resolve_coverage_gate()
+                      or the Cluster 1/2/4b integration below, which only
+                      gates applicability, not dollar amount. See the design
+                      doc's "Next steps."
+    confidence:       "CONFIRMED" (independently verified against primary
+                      statute text this session) | "PARTIAL" (not verified
+                      this session -- see citation for what the entry
+                      actually represents). resolve_coverage_gate() never
+                      lets a PARTIAL entry drive a dollar-affecting
+                      determination -- see that function's docstring.
+    citation:         Primary source, or an explicit note when the entry is
+                      an unverified placeholder rather than a researched
+                      finding.
+    """
+    thresholds: dict[str, int]
+    damages_cap_treatment: str
+    confidence: str
+    citation: str
+
+
+# CONFIRMED states -- independently verified against primary statute text
+# this session (not aggregator-only), per prompts/state-coverage-threshold-
+# design.md.
+STATE_COVERAGE_THRESHOLDS: dict[str, StateCoverageThreshold] = {
+    "CA": StateCoverageThreshold(
+        thresholds={"general": 5, "harassment": 1},
+        damages_cap_treatment="uncapped",
+        confidence="CONFIRMED",
+        citation="Cal. Gov. Code §12926(d), §12940(a)",
+    ),
+    "NY": StateCoverageThreshold(
+        thresholds={"general": 4, "harassment": 1},
+        damages_cap_treatment="uncapped",
+        confidence="CONFIRMED",
+        citation=(
+            "NYSHRL, N.Y. Exec. Law §§292, 296, 297; 2019 amendments "
+            "S.6577/A.8421 (uncapped incl. punitive, corrects a common but "
+            "wrong '$10,000 cap' claim which is housing-only/pre-2019)"
+        ),
+    ),
+    "MA": StateCoverageThreshold(
+        thresholds={"general": 6},
+        damages_cap_treatment="uncapped",
+        confidence="CONFIRMED",
+        # Fontaine v. Philip Morris (argued Nov 5, 2025) is a PENDING case
+        # that could affect punitive-damages doctrine here -- flag for
+        # future revisit when decided. "uncapped" above reflects current
+        # law only, not a prediction of that case's outcome.
+        citation="M.G.L. c. 151B §4; Haddad v. Wal-Mart Stores, Inc., 455 Mass. 91 (2009)",
+    ),
+    "IL": StateCoverageThreshold(
+        thresholds={"general": 1},
+        # IHRA allows uncapped compensatory damages but NO punitive
+        # damages -- a real nuance distinct from CA/NY/MA/WA's genuine
+        # "uncapped" (which includes punitive). Modeled as
+        # "federal_cap_applies" here as the closer of the two enum values,
+        # not a perfect fit -- flagged rather than silently rounded.
+        damages_cap_treatment="federal_cap_applies",
+        confidence="CONFIRMED",
+        citation=(
+            "775 ILCS 5/2-101(B)(1)(a), P.A. 101-0430 eff. July 1 2020 -- "
+            "applies to ALL protected categories including race, confirmed "
+            "via current statute text correcting an aggregator source that "
+            "incorrectly claimed race-discrimination still required 15+ "
+            "under stale pre-2020 law"
+        ),
+    ),
+    "WA": StateCoverageThreshold(
+        thresholds={"general": 8},
+        damages_cap_treatment="uncapped",  # compensatory; no state-specific punitive cap identified
+        confidence="CONFIRMED",
+        citation="RCW 49.60.040; Blakely v. City of Vancouver",
+    ),
+    "AK": StateCoverageThreshold(
+        thresholds={"general": 1},
+        # damages_cap_treatment NOT independently verified this session --
+        # confidence="CONFIRMED" above covers the threshold only. Defaulted
+        # conservatively per explicit instruction rather than left unset.
+        damages_cap_treatment="federal_cap_applies",
+        confidence="CONFIRMED",
+        citation="AS 18.80.300(5): 'employer means a person...who has one or more employees'",
+    ),
+    "WV": StateCoverageThreshold(
+        thresholds={"general": 12},
+        # Same caveat as AK immediately above -- damages_cap_treatment
+        # unverified this session, defaulted conservatively.
+        damages_cap_treatment="federal_cap_applies",
+        confidence="CONFIRMED",
+        citation="W. Va. Code §5-11-3(d); WV CSR 77-7-2",
+    ),
+}
+
+# All remaining jurisdictions (50 states + DC minus the 7 CONFIRMED above) --
+# PARTIAL confidence throughout. Sourced from research/jurisdiction-research-
+# headcount.md, a 50-state survey produced this same session via secondary
+# aggregators (Justia, Blanchard & Walker) and law-firm summaries -- real,
+# specific per-state figures, genuinely more informative than a uniform
+# placeholder, but explicitly NOT independently verified against primary
+# statute text the way the 7 CONFIRMED states above were. That source
+# document's own Caveats section says outright: "these should be
+# statute-verified before use in a paid product" -- confidence="PARTIAL"
+# here is not a formality, resolve_coverage_gate() structurally prevents any
+# of these numbers from driving a dollar-affecting determination on their
+# own (see that function's docstring). Several rows carry a real internal
+# conflict flagged in the source doc itself (Alaska 1 vs 2, West Virginia 12
+# vs 15 -- both cross-validate against the CONFIRMED AK/WV entries above,
+# which independently landed on the same lower figures via primary
+# statute text) -- not resolved further here.
+STATE_COVERAGE_THRESHOLDS.update({
+    "AL": StateCoverageThreshold(
+        thresholds={"general": 15},  # no general state anti-discrimination law -- federal governs
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="No general state law (age-only state law is 20+, Code of Ala. §25-1-21); federal 15+ governs other traits. research/jurisdiction-research-headcount.md.",
+    ),
+    "AZ": StateCoverageThreshold(
+        thresholds={"general": 15, "harassment": 1},  # sexual harassment covers all employers
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Arizona Civil Rights Act, A.R.S. §41-1461 et seq., §41-1463. research/jurisdiction-research-headcount.md.",
+    ),
+    "AR": StateCoverageThreshold(
+        thresholds={"general": 9},
+        damages_cap_treatment="state_specific_tiers",  # capped based on employer size
+        confidence="PARTIAL",
+        citation="Arkansas Civil Rights Act, Ark. Code §16-123-107. research/jurisdiction-research-headcount.md.",
+    ),
+    "CO": StateCoverageThreshold(
+        thresholds={"general": 1},  # all sizes / no minimum
+        damages_cap_treatment="state_specific_tiers",  # capped by employer size, federal-style shape
+        confidence="PARTIAL",
+        citation="CADA, C.R.S. §24-34-402; POWR Act (SB 23-172) eff. Aug. 7, 2023. research/jurisdiction-research-headcount.md.",
+    ),
+    "CT": StateCoverageThreshold(
+        thresholds={"general": 1},  # lowered from 3+ eff. Oct. 1, 2022
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="CFEPA, Conn. Gen. Stat. §46a-51(10); P.A. 22-82. research/jurisdiction-research-headcount.md.",
+    ),
+    "DE": StateCoverageThreshold(
+        thresholds={"general": 4},  # 15+ for disability specifically -- general figure used here
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="19 Del. C. §711; §724 (disability, 15+). research/jurisdiction-research-headcount.md.",
+    ),
+    "DC": StateCoverageThreshold(
+        thresholds={"general": 1},
+        damages_cap_treatment="uncapped",  # compensatory AND punitive, no statutory ceiling
+        confidence="PARTIAL",
+        citation="DC Human Rights Act, D.C. Code §2-1401 et seq. research/jurisdiction-research-headcount.md.",
+    ),
+    "FL": StateCoverageThreshold(
+        thresholds={"general": 15},
+        damages_cap_treatment="state_specific_tiers",  # punitive capped at $100,000 under FCRA
+        confidence="PARTIAL",
+        citation="Florida Civil Rights Act, Fla. Stat. §760.10. research/jurisdiction-research-headcount.md.",
+    ),
+    "GA": StateCoverageThreshold(
+        thresholds={"general": 15},  # no general private-sector state law -- federal governs
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="No general private-sector state law; disability 15+ (§34-6A-4). research/jurisdiction-research-headcount.md.",
+    ),
+    "HI": StateCoverageThreshold(
+        thresholds={"general": 1},  # all sizes
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="HRS §378-2. research/jurisdiction-research-headcount.md.",
+    ),
+    "ID": StateCoverageThreshold(
+        thresholds={"general": 5},
+        damages_cap_treatment="state_specific_tiers",  # punitive capped at $1,000 per willful violation
+        confidence="PARTIAL",
+        citation="Idaho Human Rights Act, Idaho Code §67-5909. research/jurisdiction-research-headcount.md.",
+    ),
+    "IN": StateCoverageThreshold(
+        thresholds={"general": 6},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Indiana Civil Rights Law, Ind. Code §22-9-1-2. research/jurisdiction-research-headcount.md.",
+    ),
+    "IA": StateCoverageThreshold(
+        thresholds={"general": 4},
+        damages_cap_treatment="state_specific_tiers",  # compensatory available, but NO punitive damages
+        confidence="PARTIAL",
+        citation="Iowa Civil Rights Act, Iowa Code §216.6. research/jurisdiction-research-headcount.md.",
+    ),
+    "KS": StateCoverageThreshold(
+        thresholds={"general": 4},
+        damages_cap_treatment="state_specific_tiers",  # $2,000 cap on pain/suffering/humiliation
+        confidence="PARTIAL",
+        citation="Kansas Act Against Discrimination, K.S.A. §44-1009. research/jurisdiction-research-headcount.md.",
+    ),
+    "KY": StateCoverageThreshold(
+        thresholds={"general": 8},  # 15+ for disability & pregnancy accommodation specifically
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="KRS §344.040. research/jurisdiction-research-headcount.md.",
+    ),
+    "LA": StateCoverageThreshold(
+        thresholds={"general": 20},  # pregnancy 25+; federal 15+ is effectively lower either way
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="La. R.S. §23:332; §23:342 (pregnancy). research/jurisdiction-research-headcount.md.",
+    ),
+    "ME": StateCoverageThreshold(
+        thresholds={"general": 1},  # all sizes; federal-style damages caps apply only at 15+
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Maine Human Rights Act, 5 M.R.S. §4572. research/jurisdiction-research-headcount.md.",
+    ),
+    "MD": StateCoverageThreshold(
+        thresholds={"general": 15, "harassment": 1},  # confirmed harassment carve-out, HB 679 (2019)
+        damages_cap_treatment="state_specific_tiers",  # own tiered cap $50k/$100k/$200k/$300k by size
+        confidence="PARTIAL",
+        citation="Md. State Gov't Code §20-601(d), §20-611, §20-1009(b)(3), §20-1013. research/jurisdiction-research-headcount.md.",
+    ),
+    "MI": StateCoverageThreshold(
+        thresholds={"general": 1},  # all sizes
+        damages_cap_treatment="uncapped",  # compensatory uncapped; note NO punitive damages available at all
+        confidence="PARTIAL",
+        citation="Elliott-Larsen Civil Rights Act, MCL §37.2201. research/jurisdiction-research-headcount.md.",
+    ),
+    "MN": StateCoverageThreshold(
+        thresholds={"general": 1},  # all sizes
+        damages_cap_treatment="uncapped",  # treble damages available; $25k punitive cap removed 2024 (HF4109)
+        confidence="PARTIAL",
+        citation="Minnesota Human Rights Act, Minn. Stat. ch. 363A. research/jurisdiction-research-headcount.md.",
+    ),
+    "MS": StateCoverageThreshold(
+        thresholds={"general": 15},  # no state anti-discrimination law -- federal governs
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="No state anti-discrimination law; federal 15+ governs. research/jurisdiction-research-headcount.md.",
+    ),
+    "MO": StateCoverageThreshold(
+        thresholds={"general": 6},
+        damages_cap_treatment="state_specific_tiers",  # own tiered cap, SB 43 (2017)
+        confidence="PARTIAL",
+        citation="Missouri Human Rights Act, RSMo §213.010; SB 43 eff. Aug. 28, 2017. research/jurisdiction-research-headcount.md.",
+    ),
+    "MT": StateCoverageThreshold(
+        thresholds={"general": 1},  # no minimum / all sizes
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Montana Human Rights Act; Wrongful Discharge from Employment Act. research/jurisdiction-research-headcount.md.",
+    ),
+    "NE": StateCoverageThreshold(
+        thresholds={"general": 15},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Nebraska Fair Employment Practice Act (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "NV": StateCoverageThreshold(
+        thresholds={"general": 15},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Nev. Rev. Stat. ch. 613 (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "NH": StateCoverageThreshold(
+        thresholds={"general": 6},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="RSA ch. 354-A (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "NJ": StateCoverageThreshold(
+        thresholds={"general": 1},  # all sizes
+        # UNCAPPED compensatory + punitive under NJLAD itself, but the
+        # general NJ Punitive Damages Act cap (greater of 5x compensatory or
+        # $350,000) may apply to the punitive component -- flagged, not
+        # resolved, in the source document too.
+        damages_cap_treatment="uncapped",
+        confidence="PARTIAL",
+        citation="NJLAD, N.J.S.A. §10:5-5, §10:5-3. research/jurisdiction-research-headcount.md.",
+    ),
+    "NM": StateCoverageThreshold(
+        thresholds={"general": 4},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="New Mexico Human Rights Act, NMSA §28-1-2 (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "NC": StateCoverageThreshold(
+        # No private right of action under NC's state anti-discrimination
+        # statute at all -- only a common-law wrongful-discharge claim
+        # exists, which isn't headcount-gated the way this table models.
+        # Federal threshold used here since that's the applicable
+        # statutory framework for an actual discrimination claim.
+        thresholds={"general": 15},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="No private right of action under state statute; common-law wrongful-discharge available regardless of size. research/jurisdiction-research-headcount.md.",
+    ),
+    "ND": StateCoverageThreshold(
+        thresholds={"general": 1},  # no minimum
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="North Dakota Human Rights Act, N.D.C.C. ch. 14-02.4 (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "OH": StateCoverageThreshold(
+        thresholds={"general": 4},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Ohio Civil Rights Act, R.C. ch. 4112. research/jurisdiction-research-headcount.md.",
+    ),
+    "OK": StateCoverageThreshold(
+        thresholds={"general": 15},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Oklahoma Anti-Discrimination Act, 25 O.S. §1301 (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "OR": StateCoverageThreshold(
+        thresholds={"general": 1},  # no minimum
+        damages_cap_treatment="uncapped",  # noneconomic damages, per Oregon Sup. Ct. 2021
+        confidence="PARTIAL",
+        citation="ORS §659A.030. research/jurisdiction-research-headcount.md.",
+    ),
+    "PA": StateCoverageThreshold(
+        thresholds={"general": 4},
+        damages_cap_treatment="state_specific_tiers",  # compensatory available, but PHRA bars punitive entirely
+        confidence="PARTIAL",
+        citation="Pennsylvania Human Relations Act, 43 P.S. §954. research/jurisdiction-research-headcount.md.",
+    ),
+    "RI": StateCoverageThreshold(
+        thresholds={"general": 4},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="RI Fair Employment Practices Act, R.I. Gen. Laws §28-5-6 (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "SC": StateCoverageThreshold(
+        thresholds={"general": 15},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="SC Human Affairs Law, S.C. Code §1-13-30 (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "SD": StateCoverageThreshold(
+        thresholds={"general": 1},  # no minimum
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="SD Human Relations Act, SDCL ch. 20-13 (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "TN": StateCoverageThreshold(
+        thresholds={"general": 8},
+        damages_cap_treatment="state_specific_tiers",  # caps compensatory/punitive by employer size
+        confidence="PARTIAL",
+        citation="Tennessee Human Rights Act, T.C.A. §4-21-102 (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "TX": StateCoverageThreshold(
+        thresholds={"general": 15},
+        damages_cap_treatment="state_specific_tiers",  # own tiered caps mirroring federal, Tex. Lab. Code §21.2585
+        confidence="PARTIAL",
+        citation="Texas Labor Code ch. 21 / Texas Commission on Human Rights Act. research/jurisdiction-research-headcount.md.",
+    ),
+    "UT": StateCoverageThreshold(
+        thresholds={"general": 15},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Utah Antidiscrimination Act, Utah Code §34A-5-106 (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+    "VT": StateCoverageThreshold(
+        thresholds={"general": 1},  # no minimum / all sizes
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Vermont Fair Employment Practices Act, 21 V.S.A. §495. research/jurisdiction-research-headcount.md.",
+    ),
+    "VA": StateCoverageThreshold(
+        # Source flags this row itself as "nuanced/conflicting": 6+ for most
+        # discrimination, 5+ for unlawful-discharge claims specifically.
+        # General figure (6) used here.
+        thresholds={"general": 6},
+        damages_cap_treatment="state_specific_tiers",  # punitive subject to Virginia's general $350,000 cap
+        confidence="PARTIAL",
+        citation="Virginia Human Rights Act, as amended by the Virginia Values Act 2020, Va. Code §2.2-3905. research/jurisdiction-research-headcount.md.",
+    ),
+    "WI": StateCoverageThreshold(
+        thresholds={"general": 1},  # all sizes
+        damages_cap_treatment="state_specific_tiers",  # historically limited remedies, compensatory/punitive both restricted
+        confidence="PARTIAL",
+        citation="Wisconsin Fair Employment Act, Wis. Stat. §111.31 et seq. research/jurisdiction-research-headcount.md.",
+    ),
+    "WY": StateCoverageThreshold(
+        thresholds={"general": 2},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Wyoming Fair Employment Practices Act, Wyo. Stat. §27-9-102 (secondary source). research/jurisdiction-research-headcount.md.",
+    ),
+})
+
+# Defensive fallback only -- every jurisdiction is expected to be covered by
+# either the CONFIRMED block above or the PARTIAL block immediately above;
+# this loop should be a no-op in practice (asserted below) and exists only
+# so a future JURISDICTION_TABLE addition can't silently produce a KeyError
+# deep inside resolve_coverage_gate() instead of a clear signal here.
+for _jid in JURISDICTION_TABLE:
+    if _jid not in STATE_COVERAGE_THRESHOLDS:
+        _logger.warning(
+            "STATE_COVERAGE_THRESHOLDS has no entry for jurisdiction %r -- "
+            "added via fallback default, needs real research", _jid,
+        )
+        STATE_COVERAGE_THRESHOLDS[_jid] = StateCoverageThreshold(
+            thresholds={"general": 15},
+            damages_cap_treatment="federal_cap_applies",
+            confidence="PARTIAL",
+            citation="No entry authored -- fallback default, needs research.",
+        )
+del _jid
+
+assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), (
+    "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
+    "key set as JURISDICTION_TABLE"
+)
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 7, (
+    "Expected exactly 7 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV)"
+)
+
+
+# Federal ADA/Title VII employer-count threshold (15) applies to any
+# claim_type that isn't an explicit FMLA-type claim (50-employee federal
+# threshold). Harassment claims are still governed by the federal
+# 15-employee threshold at the FEDERAL level -- only specific STATE laws
+# (e.g. California, at any size) lower or remove it for harassment
+# specifically, which is why "harassment" is a key inside a CONFIRMED
+# state's own thresholds dict above, not a second federal number here.
+_FEDERAL_THRESHOLD_BY_CLAIM_TYPE: dict[str, int] = {
+    "fmla": 50,
+}
+_FEDERAL_DEFAULT_THRESHOLD = 15  # ADA / Title VII, and the default for any other claim_type
+
+
+def _federal_threshold(claim_type: str) -> int:
+    return _FEDERAL_THRESHOLD_BY_CLAIM_TYPE.get(claim_type, _FEDERAL_DEFAULT_THRESHOLD)
+
+
+@dataclass(frozen=True)
+class CoverageResult:
+    """
+    Result of resolve_coverage_gate(). driving_jurisdiction is populated
+    only when confidence == "CONFIRMED" -- None means the federal fallback
+    threshold was used (no CONFIRMED jurisdiction in the input list).
+
+    partial_state_flag is True in two distinct situations, both signaled
+    the same way (Gate steps 5 and 6 of the design doc) since either one
+    means "do not present this determination with full confidence":
+      - confidence == "CONFIRMED" but a PARTIAL-confidence jurisdiction was
+        also present in the input, AND that PARTIAL jurisdiction's own
+        threshold would have flipped `applies` if it had been counted
+        alongside the CONFIRMED jurisdictions (step 5) -- i.e. a real,
+        unverified possibility that the true legal answer differs from
+        what PRV3 is confident enough to state.
+      - confidence == "FEDERAL_FALLBACK" because no CONFIRMED jurisdiction
+        was present at all (jurisdictions was empty, or contained only
+        PARTIAL-confidence states) -- the federal number is used for the
+        numeric gate, but state law in the client's actual jurisdiction(s)
+        was never independently verified and may lower the real threshold
+        (step 6). This case fires even when partial_jurisdictions_considered
+        is empty (a genuinely empty jurisdictions list carries the same
+        "unverified" caveat, just with no specific state to name).
+
+    partial_jurisdictions_considered lists the PARTIAL-confidence
+    jurisdiction codes actually found in the input (empty tuple if none) --
+    lets a caller compose a specific message ("state law in NJ was not
+    independently verified") rather than a generic one.
+    """
+    applies: bool
+    threshold: int
+    claim_type: str
+    driving_jurisdiction: Optional[str]
+    confidence: str  # "CONFIRMED" | "FEDERAL_FALLBACK"
+    partial_state_flag: bool
+    partial_jurisdictions_considered: tuple[str, ...]
+
+
+def resolve_coverage_gate(
+    headcount: int,
+    jurisdictions: list[str],
+    claim_type: str = "general",
+) -> CoverageResult:
+    """
+    Determines whether ADA/Title VII/FMLA-type coverage applies for a given
+    headcount and set of operating jurisdictions, using the most-protective
+    (lowest) threshold across every CONFIRMED-confidence jurisdiction in the
+    input -- mirrors engine/data/jurisdiction.py's existing
+    highest-restriction pattern (same shape, a different table; that module
+    is not touched by this function).
+
+    Resolution order:
+      1. For each jurisdiction in the input with confidence == "CONFIRMED",
+         look up thresholds.get(claim_type, thresholds["general"]).
+      2. Take the MINIMUM threshold across all CONFIRMED jurisdictions found.
+      3-6. If no CONFIRMED jurisdiction is present (input empty, contains
+         only unrecognized codes, or contains only PARTIAL-confidence
+         states), fall back to the federal threshold for `claim_type`
+         (_federal_threshold()) and report confidence="FEDERAL_FALLBACK".
+         PARTIAL-confidence thresholds are NEVER used to compute the
+         numeric gate directly -- only to populate partial_state_flag /
+         partial_jurisdictions_considered so a caller can add a qualitative
+         caveat. See CoverageResult's docstring for the two distinct cases
+         this flag covers.
+
+    Aggregate-headcount limitation (explicit, not silently assumed away):
+    PRV3 collects only aggregate national headcount, not per-state employee
+    counts (IntakeData.headcount is a single org-wide int). This gate
+    necessarily compares that aggregate against the most-protective
+    threshold across selected jurisdictions -- this can overstate coverage
+    if a specific claim would legally arise from a single low-count
+    location rather than the org's total headcount. Whether state coverage
+    thresholds count aggregate or in-state-only headcount is itself
+    state-specific and UNRESEARCHED this session -- do not assume either
+    counting method is correct. Tracked as an explicit open item in
+    prompts/friction-tax-legal-compliance-methodology.md's Next Steps and
+    prompts/state-coverage-threshold-design.md.
+    """
+    confirmed_entries: list[tuple[str, int]] = []
+    partial_entries: list[tuple[str, int]] = []
+    for jid in jurisdictions:
+        entry = STATE_COVERAGE_THRESHOLDS.get(jid)
+        if entry is None:
+            continue
+        threshold = entry.thresholds.get(claim_type, entry.thresholds["general"])
+        if entry.confidence == "CONFIRMED":
+            confirmed_entries.append((jid, threshold))
+        else:
+            partial_entries.append((jid, threshold))
+
+    partial_jids = tuple(jid for jid, _t in partial_entries)
+
+    if confirmed_entries:
+        driving_jurisdiction, threshold = min(confirmed_entries, key=lambda pair: pair[1])
+        applies = headcount >= threshold
+        partial_state_flag = False
+        if partial_entries:
+            combined_threshold = min([threshold] + [t for _jid, t in partial_entries])
+            if (headcount >= combined_threshold) != applies:
+                partial_state_flag = True
+        return CoverageResult(
+            applies=applies,
+            threshold=threshold,
+            claim_type=claim_type,
+            driving_jurisdiction=driving_jurisdiction,
+            confidence="CONFIRMED",
+            partial_state_flag=partial_state_flag,
+            partial_jurisdictions_considered=partial_jids,
+        )
+
+    threshold = _federal_threshold(claim_type)
+    return CoverageResult(
+        applies=headcount >= threshold,
+        threshold=threshold,
+        claim_type=claim_type,
+        driving_jurisdiction=None,
+        confidence="FEDERAL_FALLBACK",
+        partial_state_flag=bool(partial_entries),
+        partial_jurisdictions_considered=partial_jids,
+    )
+
+
 def _cluster_4_curve_for_org_type(
-    org_type: str, org_size: str
+    org_type: str, org_size: str, headcount: int, jurisdictions: list[str]
 ) -> LegalCurveLookup:
     """
     Addendum 5's three org_type-gated sub-tracks. Status is
@@ -2240,11 +2825,22 @@ def _cluster_4_curve_for_org_type(
     case. "PE or VC-backed" defaults to 4b -- the possible 4a edge case
     (a registered investment adviser/broker-dealer) isn't determinable
     from org_type alone, per Addendum 5, and isn't resolved here.
+
+    Coverage gate (state-coverage-threshold-design.md) applies only to
+    4b -- 4a (Publicly traded, SEC-anchored) and 4c (Government) are out
+    of scope for the ADA/Title VII/FMLA coverage question entirely, so
+    the gate runs after those two are ruled out, not before. Status is
+    NOT_APPLICABLE (not DATA_INTEGRITY_GAP) when the org's headcount
+    falls below the resolved coverage threshold -- this is a real,
+    expected "genuinely not covered" outcome, not a data problem.
     """
     if org_type == "Publicly traded":
         return LegalCurveLookup(curve=_CLUSTER_4A_CURVE, status=LegalPricingStatus.PRICED)
     if org_type == "Government":
         return LegalCurveLookup(curve=None, status=LegalPricingStatus.QUALITATIVE_ONLY)
+    coverage = resolve_coverage_gate(headcount, jurisdictions, claim_type="general")
+    if not coverage.applies:
+        return LegalCurveLookup(curve=None, status=LegalPricingStatus.NOT_APPLICABLE)
     ceiling = _CLUSTER_4B_CEILING_BY_HEADCOUNT.get(org_size)
     if ceiling is None:
         return LegalCurveLookup(curve=None, status=LegalPricingStatus.DATA_INTEGRITY_GAP)
@@ -2276,17 +2872,30 @@ def _single_state_legal_pricing(
     org_size: str,
     industry: str,
     org_type: str,
+    headcount: int,
+    jurisdictions: list[str],
 ) -> LegalPricingResult:
     """
     One Legal-scoring state's pricing outcome in isolation. status is
     NOT_APPLICABLE (dollar_range=None) if the state isn't Legal-scoring
-    at all or its "legal" score is 0 (no exposure) -- both silent,
-    unchanged from the prior bare-None behavior. For Cluster 4, status
-    is forwarded directly from _cluster_4_curve_for_org_type()
+    at all, its "legal" score is 0 (no exposure), or (Clusters 1, 2, 4b
+    only) the state-coverage-threshold gate determines the org's
+    headcount doesn't meet the applicable ADA/Title VII coverage
+    threshold for its operating jurisdiction(s) -- all silently
+    collapsed to the same status, matching the existing "not applicable
+    at all" semantics rather than inventing a new one. For Cluster 4,
+    status is forwarded directly from _cluster_4_curve_for_org_type()
     (QUALITATIVE_ONLY for Government, DATA_INTEGRITY_GAP for an
-    unrecognized org_size), distinguishing real-but-unpriced exposure
-    from a genuine data gap -- previously both collapsed to None here
-    too.
+    unrecognized org_size, NOT_APPLICABLE for the 4b coverage gate),
+    distinguishing real-but-unpriced exposure from a genuine data gap
+    from genuinely-not-covered.
+
+    Coverage gate uses claim_type="general" for Clusters 1 and 2 --
+    per-state claim-type mapping (e.g. which of these 30 states
+    represents a harassment claim specifically, which could resolve to
+    a lower threshold in a CONFIRMED state) is not resolved here; that
+    would be new clinical judgment beyond this build's scope, not
+    inferred from the taxonomy. See state-coverage-threshold-design.md.
     """
     cluster = LEGAL_COMPLIANCE_CLUSTER.get(state_id)
     if cluster is None:
@@ -2299,9 +2908,15 @@ def _single_state_legal_pricing(
         return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
 
     if cluster == 1:
+        coverage = resolve_coverage_gate(headcount, jurisdictions, claim_type="general")
+        if not coverage.applies:
+            return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
         v = _legal_score_fraction(_CLUSTER_1_CURVE, score)
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v))
     if cluster == 2:
+        coverage = resolve_coverage_gate(headcount, jurisdictions, claim_type="general")
+        if not coverage.applies:
+            return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
         r = _CLUSTER_2_TIER_2A if score == 1 else _CLUSTER_2_TIER_2B
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r)
     if cluster == 3:
@@ -2312,7 +2927,7 @@ def _single_state_legal_pricing(
         )
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r)
     if cluster == 4:
-        lookup = _cluster_4_curve_for_org_type(org_type, org_size)
+        lookup = _cluster_4_curve_for_org_type(org_type, org_size, headcount, jurisdictions)
         if lookup.curve is None:
             return LegalPricingResult(status=lookup.status, dollar_range=None)
         v = _legal_score_fraction(lookup.curve, score)
@@ -2371,6 +2986,7 @@ def compute_legal_compliance_exposure(
     org_size: int,
     industry: str,
     org_type: str,
+    jurisdictions: Optional[list[str]] = None,
 ) -> dict:
     """
     Cross-state aggregation (Addendum 3): within-cluster geometric decay
@@ -2381,10 +2997,25 @@ def compute_legal_compliance_exposure(
     one Legal-scoring state in the profile collapses the output to that
     state's own individual range, no aggregation logic engaged.
 
-    Jurisdictional multipliers (California FEHA/PAGA overrides, OSHA
-    State Plan variation, Addenda 6-9) are NOT applied here -- deferred,
-    per Addendum 9. Cluster 5 uses the statutory-max curve only (Addendum
-    10) -- actual-average deferred alongside that same paused research.
+    jurisdictions (IntakeData.jurisdictions -- a list of 2-letter state
+    codes, defaults to None/treated as []) feeds the state-coverage-
+    threshold gate (state-coverage-threshold-design.md) for Clusters 1,
+    2, and 4b only -- see resolve_coverage_gate() and
+    _single_state_legal_pricing(). Defaulting to None/[] rather than
+    requiring the caller to always pass it keeps every pre-existing call
+    site (tests, calibration_runner.py) working unchanged: an empty
+    jurisdictions list falls through to the federal threshold (15),
+    identical behavior to "coverage always applies" for any org_size
+    used anywhere in this project's real test/calibration data (all well
+    above 15).
+
+    California FEHA/PAGA-specific damages-cap treatment and OSHA State
+    Plan variation (Addenda 6-9) are still NOT applied here -- deferred,
+    per Addendum 9, unaffected by the coverage-threshold gate above
+    (a distinct question: whether coverage applies at all, not how much
+    a covered claim is worth). Cluster 5 uses the statutory-max curve
+    only (Addendum 10) -- actual-average deferred alongside that same
+    paused research.
 
     NOT_APPLICABLE states (not Legal-scoring, or a "legal" score of 0)
     are silently excluded, unchanged from before this status system
@@ -2404,11 +3035,15 @@ def compute_legal_compliance_exposure(
     True in that case if every identified Legal-scoring state was
     QUALITATIVE_ONLY/DATA_INTEGRITY_GAP.
     """
+    headcount = org_size
+    jurisdictions = jurisdictions or []
     org_size = resolve_headcount_bucket(org_size)
     per_state_ranges: dict[str, tuple[float, float]] = {}
     unpriced_state_ids: list[str] = []
     for sid in state_ids:
-        result = _single_state_legal_pricing(sid, org_size, industry, org_type)
+        result = _single_state_legal_pricing(
+            sid, org_size, industry, org_type, headcount, jurisdictions
+        )
         if result.status == LegalPricingStatus.PRICED:
             per_state_ranges[sid] = result.dollar_range
         elif result.status == LegalPricingStatus.QUALITATIVE_ONLY:

@@ -111,6 +111,11 @@ from engine.friction_tax import (
     INDUSTRY_NON_EXEMPT_RATIO,
     LEGAL_COMPLIANCE_CLUSTER,
     compute_legal_compliance_exposure,
+    STATE_COVERAGE_THRESHOLDS,
+    StateCoverageThreshold,
+    CoverageResult,
+    resolve_coverage_gate,
+    LegalPricingStatus,
 )
 from engine.data.states import STATE_PROFILES
 from engine.data.intake import INTAKE_FIELDS
@@ -1141,6 +1146,312 @@ for _hc, _expected in [
         resolve_headcount_bucket(_hc) == _expected,
         f"got {resolve_headcount_bucket(_hc)!r}",
     )
+
+
+# -- 33. STATE_COVERAGE_THRESHOLDS -- structural checks --------------------------
+# Independently re-verified here, not just trusted from friction_tax.py's own
+# import-time assertions -- same standing convention as test 23 for
+# LEGAL_COMPLIANCE_CLUSTER.
+
+from engine.data.jurisdiction import JURISDICTION_TABLE as _JURISDICTION_TABLE_CHECK
+
+check(
+    "STATE_COVERAGE_THRESHOLDS covers exactly the same 50-states-plus-DC key set as JURISDICTION_TABLE",
+    set(STATE_COVERAGE_THRESHOLDS.keys()) == set(_JURISDICTION_TABLE_CHECK.keys()),
+    f"symmetric difference: {set(STATE_COVERAGE_THRESHOLDS.keys()) ^ set(_JURISDICTION_TABLE_CHECK.keys())}",
+)
+check(
+    "STATE_COVERAGE_THRESHOLDS has exactly 7 CONFIRMED entries (CA, NY, MA, IL, WA, AK, WV)",
+    {jid for jid, v in STATE_COVERAGE_THRESHOLDS.items() if v.confidence == "CONFIRMED"}
+    == {"CA", "NY", "MA", "IL", "WA", "AK", "WV"},
+    f"got {sorted(jid for jid, v in STATE_COVERAGE_THRESHOLDS.items() if v.confidence == 'CONFIRMED')}",
+)
+check(
+    "every non-CONFIRMED entry is confidence='PARTIAL' (no third confidence value exists)",
+    all(v.confidence in ("CONFIRMED", "PARTIAL") for v in STATE_COVERAGE_THRESHOLDS.values()),
+    "found an entry with an unexpected confidence value",
+)
+check(
+    "every entry's thresholds dict has a 'general' key -- resolve_coverage_gate()'s fallback depends on it existing everywhere",
+    all("general" in v.thresholds for v in STATE_COVERAGE_THRESHOLDS.values()),
+    "found an entry missing the required 'general' threshold key",
+)
+check(
+    "CA carries both 'general' (5) and 'harassment' (1) thresholds, distinct values",
+    STATE_COVERAGE_THRESHOLDS["CA"].thresholds == {"general": 5, "harassment": 1},
+    f"got {STATE_COVERAGE_THRESHOLDS['CA'].thresholds}",
+)
+check(
+    "every entry has a non-empty citation string",
+    all(v.citation.strip() != "" for v in STATE_COVERAGE_THRESHOLDS.values()),
+    "found an entry with an empty citation",
+)
+
+
+# -- 34. resolve_coverage_gate() -- single CONFIRMED-state resolution ------------
+
+_gate_ny_covered = resolve_coverage_gate(headcount=6, jurisdictions=["NY"], claim_type="general")
+check(
+    "resolve_coverage_gate: NY general threshold=4, headcount=6 -> applies=True, driven by NY",
+    _gate_ny_covered == CoverageResult(
+        applies=True, threshold=4, claim_type="general",
+        driving_jurisdiction="NY", confidence="CONFIRMED",
+        partial_state_flag=False, partial_jurisdictions_considered=(),
+    ),
+    f"got {_gate_ny_covered}",
+)
+_gate_ny_not_covered = resolve_coverage_gate(headcount=3, jurisdictions=["NY"], claim_type="general")
+check(
+    "resolve_coverage_gate: NY general threshold=4, headcount=3 -> applies=False",
+    _gate_ny_not_covered.applies is False and _gate_ny_not_covered.threshold == 4,
+    f"got {_gate_ny_not_covered}",
+)
+
+
+# -- 35. resolve_coverage_gate() -- multi-state most-protective-wins -------------
+# CA=5, MA=6, WV=12 (general) -- minimum is CA's 5, regardless of list order.
+
+_gate_multi_a = resolve_coverage_gate(headcount=5, jurisdictions=["CA", "MA", "WV"], claim_type="general")
+check(
+    "resolve_coverage_gate: multi-state most-protective-wins picks CA (threshold=5), lowest of {5,6,12}",
+    _gate_multi_a.threshold == 5 and _gate_multi_a.driving_jurisdiction == "CA" and _gate_multi_a.applies is True,
+    f"got {_gate_multi_a}",
+)
+_gate_multi_b = resolve_coverage_gate(headcount=5, jurisdictions=["WV", "MA", "CA"], claim_type="general")
+check(
+    "resolve_coverage_gate: most-protective-wins result is order-independent (same 3 states, reversed order)",
+    _gate_multi_b == _gate_multi_a,
+    f"got {_gate_multi_b}, expected {_gate_multi_a}",
+)
+
+
+# -- 36. resolve_coverage_gate() -- federal fallback when no CONFIRMED state present, incl. empty input --
+
+_gate_federal_uncovered = resolve_coverage_gate(headcount=10, jurisdictions=[], claim_type="general")
+check(
+    "resolve_coverage_gate: empty jurisdictions -> federal threshold=15, headcount=10 -> applies=False",
+    _gate_federal_uncovered == CoverageResult(
+        applies=False, threshold=15, claim_type="general",
+        driving_jurisdiction=None, confidence="FEDERAL_FALLBACK",
+        partial_state_flag=False, partial_jurisdictions_considered=(),
+    ),
+    f"got {_gate_federal_uncovered}",
+)
+_gate_federal_covered = resolve_coverage_gate(headcount=20, jurisdictions=[], claim_type="general")
+check(
+    "resolve_coverage_gate: empty jurisdictions -> federal threshold=15, headcount=20 -> applies=True",
+    _gate_federal_covered.applies is True and _gate_federal_covered.confidence == "FEDERAL_FALLBACK",
+    f"got {_gate_federal_covered}",
+)
+_gate_fmla = resolve_coverage_gate(headcount=40, jurisdictions=[], claim_type="fmla")
+check(
+    "resolve_coverage_gate: claim_type='fmla' federal fallback is 50, not 15 -- headcount=40 -> applies=False",
+    _gate_fmla.threshold == 50 and _gate_fmla.applies is False,
+    f"got {_gate_fmla}",
+)
+
+
+# -- 37. resolve_coverage_gate() -- claim_type changes the resolved threshold ----
+# CA: general=5, harassment=1. Same headcount (3), different claim_type ->
+# different applies outcome.
+
+_gate_ca_general = resolve_coverage_gate(headcount=3, jurisdictions=["CA"], claim_type="general")
+_gate_ca_harassment = resolve_coverage_gate(headcount=3, jurisdictions=["CA"], claim_type="harassment")
+check(
+    "resolve_coverage_gate: CA headcount=3, claim_type='general' (threshold=5) -> applies=False",
+    _gate_ca_general.threshold == 5 and _gate_ca_general.applies is False,
+    f"got {_gate_ca_general}",
+)
+check(
+    "resolve_coverage_gate: CA headcount=3, claim_type='harassment' (threshold=1) -> applies=True -- "
+    "same state, same headcount, different claim_type flips the outcome",
+    _gate_ca_harassment.threshold == 1 and _gate_ca_harassment.applies is True,
+    f"got {_gate_ca_harassment}",
+)
+
+
+# -- 38. resolve_coverage_gate() -- PARTIAL-only jurisdiction never drives the answer --
+# TX is PARTIAL (not one of the 7 CONFIRMED states). Confirms PARTIAL data
+# never produces confidence="CONFIRMED" or a driving_jurisdiction, even
+# though it's present in the input and does surface as a qualitative flag.
+
+check(
+    "sanity: TX is PARTIAL confidence, not CONFIRMED, needed for the check below",
+    STATE_COVERAGE_THRESHOLDS["TX"].confidence == "PARTIAL",
+    f"got {STATE_COVERAGE_THRESHOLDS['TX'].confidence!r}",
+)
+_gate_partial_only = resolve_coverage_gate(headcount=20, jurisdictions=["TX"], claim_type="general")
+check(
+    "resolve_coverage_gate: PARTIAL-only jurisdiction list -> confidence='FEDERAL_FALLBACK', "
+    "NOT 'CONFIRMED' -- a PARTIAL state's own number never drives the determination",
+    _gate_partial_only.confidence == "FEDERAL_FALLBACK" and _gate_partial_only.driving_jurisdiction is None,
+    f"got {_gate_partial_only}",
+)
+check(
+    "resolve_coverage_gate: PARTIAL-only jurisdiction list still raises the qualitative flag, "
+    "naming TX specifically, rather than silently using its unverified threshold",
+    _gate_partial_only.partial_state_flag is True
+    and _gate_partial_only.partial_jurisdictions_considered == ("TX",),
+    f"got {_gate_partial_only}",
+)
+
+
+# -- 39. resolve_coverage_gate() -- PARTIAL state present but NOT the deciding factor --
+# Real seed data can't exercise this (every PARTIAL placeholder defaults to
+# 15, which can never be lower than a CONFIRMED state's own threshold, so it
+# can never flip a CONFIRMED-driven outcome) -- temporarily monkey-patches
+# TX's entry to a synthetic lower threshold, same save/mutate/restore
+# convention already used elsewhere in this file for STATE_MULTIPLIERS.
+
+_original_tx_entry = STATE_COVERAGE_THRESHOLDS["TX"]
+try:
+    _ft.STATE_COVERAGE_THRESHOLDS["TX"] = StateCoverageThreshold(
+        thresholds={"general": 3},
+        damages_cap_treatment="federal_cap_applies",
+        confidence="PARTIAL",
+        citation="Synthetic test fixture -- not real data, restored after this check.",
+    )
+    # WV (CONFIRMED, threshold=12) alone: headcount=10 -> applies=False.
+    # If TX's synthetic threshold=3 had been trusted too: min(12,3)=3 ->
+    # headcount=10 -> applies=True. The two disagree -> partial_state_flag
+    # must be True, while the RETURNED applies/threshold/driving_jurisdiction
+    # still reflect WV/CONFIRMED-only (12/False), never TX's number.
+    _gate_flip_candidate = resolve_coverage_gate(headcount=10, jurisdictions=["WV", "TX"], claim_type="general")
+    check(
+        "resolve_coverage_gate: CONFIRMED-driven answer (WV, threshold=12, applies=False) is unaffected by "
+        "the PARTIAL state's own (synthetic, lower) threshold",
+        _gate_flip_candidate.applies is False
+        and _gate_flip_candidate.threshold == 12
+        and _gate_flip_candidate.driving_jurisdiction == "WV"
+        and _gate_flip_candidate.confidence == "CONFIRMED",
+        f"got {_gate_flip_candidate}",
+    )
+    check(
+        "resolve_coverage_gate: partial_state_flag=True -- TX's (synthetic) threshold, if counted, "
+        "would have flipped applies from False to True, even though WV's real CONFIRMED answer is what's returned",
+        _gate_flip_candidate.partial_state_flag is True
+        and _gate_flip_candidate.partial_jurisdictions_considered == ("TX",),
+        f"got {_gate_flip_candidate}",
+    )
+finally:
+    _ft.STATE_COVERAGE_THRESHOLDS["TX"] = _original_tx_entry
+
+check(
+    "TX's real entry was restored cleanly after the monkey-patch above",
+    STATE_COVERAGE_THRESHOLDS["TX"] == _original_tx_entry,
+    f"got {STATE_COVERAGE_THRESHOLDS['TX']}",
+)
+
+
+# -- 40. Integration -- coverage gate actually wired into Clusters 1, 2, 4b ------
+# Confirms the end-to-end wiring through compute_legal_compliance_exposure(),
+# not just the standalone resolve_coverage_gate() function in isolation.
+
+_r_c1_blocked = compute_legal_compliance_exposure(
+    state_ids=["built_to_fail"],  # Cluster 1
+    org_size=10,  # below the federal threshold (15), no jurisdictions given
+    industry="Professional Services",
+    org_type="Founder-led",
+)
+check(
+    "Integration, Cluster 1: built_to_fail at headcount=10 with no jurisdictions (federal fallback=15) "
+    "-> genuinely None/None, not a reduced figure -- coverage gate blocks it before pricing",
+    _r_c1_blocked == {
+        "low": None, "high": None, "currency": "USD", "band": None,
+        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+    },
+    f"got {_r_c1_blocked}",
+)
+_r_c1_covered = compute_legal_compliance_exposure(
+    state_ids=["built_to_fail"],
+    org_size=20,  # above the federal threshold
+    industry="Professional Services",
+    org_type="Founder-led",
+)
+check(
+    "Integration, Cluster 1 positive control: same state at headcount=20 (covered) prices normally "
+    "at its real floor ($50,000) -- the gate blocks only genuinely uncovered orgs, not everyone",
+    _r_c1_covered == {
+        "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
+        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+    },
+    f"got {_r_c1_covered}",
+)
+_r_c2_blocked = compute_legal_compliance_exposure(
+    state_ids=["pay_exposure"],  # Cluster 2
+    org_size=10,
+    industry="Professional Services",
+    org_type="Founder-led",
+)
+check(
+    "Integration, Cluster 2: pay_exposure at headcount=10 with no jurisdictions -> None/None",
+    _r_c2_blocked == {
+        "low": None, "high": None, "currency": "USD", "band": None,
+        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+    },
+    f"got {_r_c2_blocked}",
+)
+_r_c4b_blocked = compute_legal_compliance_exposure(
+    state_ids=["hr_capture"],  # Cluster 4, Founder-led -> 4b
+    org_size=10,
+    industry="Professional Services",
+    org_type="Founder-led",
+)
+check(
+    "Integration, Cluster 4b: hr_capture at headcount=10 with no jurisdictions -> None/None -- coverage "
+    "gate runs before the existing headcount-bucket pricing-ceiling lookup, per the spec",
+    _r_c4b_blocked == {
+        "low": None, "high": None, "currency": "USD", "band": None,
+        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+    },
+    f"got {_r_c4b_blocked}",
+)
+_r_c4a_unaffected = compute_legal_compliance_exposure(
+    state_ids=["hr_capture"],
+    org_size=10,  # same tiny headcount
+    industry="Professional Services",
+    org_type="Publicly traded",  # 4a -- coverage gate does not apply here
+)
+check(
+    "Integration, Cluster 4a unaffected: 'Publicly traded' routes to 4a regardless of headcount -- "
+    "the coverage gate is scoped to 4b only, confirmed by this still pricing at the real $33M ceiling",
+    _r_c4a_unaffected == {
+        "low": 33_000_000.0, "high": 33_000_000.0, "currency": "USD", "band": "Significant",
+        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+    },
+    f"got {_r_c4a_unaffected}",
+)
+_r_c4c_unaffected = compute_legal_compliance_exposure(
+    state_ids=["hr_capture"],
+    org_size=10,
+    industry="Professional Services",
+    org_type="Government",  # 4c -- coverage gate does not apply here either
+)
+check(
+    "Integration, Cluster 4c unaffected: 'Government' still routes to QUALITATIVE_ONLY regardless of "
+    "headcount -- the coverage gate is scoped to 4b only, not the whole of Cluster 4",
+    _r_c4c_unaffected == {
+        "low": None, "high": None, "currency": "USD", "band": None,
+        "has_unpriced_conditions": True, "unpriced_state_ids": ["hr_capture"],
+    },
+    f"got {_r_c4c_unaffected}",
+)
+_r_c1_ny_covered = compute_legal_compliance_exposure(
+    state_ids=["built_to_fail"],
+    org_size=5,  # below federal 15, but NY's own general threshold is 4
+    industry="Professional Services",
+    org_type="Founder-led",
+    jurisdictions=["NY"],
+)
+check(
+    "Integration: headcount=5 fails the federal threshold (15) but clears NY's real threshold (4) when "
+    "jurisdictions=['NY'] is actually passed through from intake -- prices normally",
+    _r_c1_ny_covered == {
+        "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
+        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+    },
+    f"got {_r_c1_ny_covered}",
+)
 
 
 # -- Results ---------------------------------------------------------------------

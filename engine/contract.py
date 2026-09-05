@@ -557,6 +557,7 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
         org_size=session.intake.headcount,
         industry=session.intake.industry,
         org_type=session.intake.org_type,
+        jurisdictions=session.intake.jurisdictions,
     )
     legal_tail_risk_exposure = (
         {

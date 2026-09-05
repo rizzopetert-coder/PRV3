@@ -568,8 +568,12 @@ the same regardless of org_type).
 
 **Coverage-threshold caveat:** Title VII/ADA apply at 15+ employees (ADA) and generally 15+
 (Title VII). The "Under 25" bucket may include employers below this threshold who aren't
-covered by this track at all — mirrors the same threshold issue flagged for Clusters 1 and 2,
-not yet resolved, part of the systematic pass.
+covered by this track at all — mirrors the same threshold issue flagged for Clusters 1 and 2.
+**RESOLVED 2026-09-05** — see `prompts/state-coverage-threshold-design.md` and
+`resolve_coverage_gate()` (`engine/friction_tax.py`): Clusters 1, 2, and 4b (this track) now
+gate on the exact intake headcount against a state-aware threshold (federal 15 by default,
+lower in CONFIRMED states like NY at 4 or CA at 5) rather than the bucket, before any dollar
+figure is computed.
 
 ### 4c — Government (org_type = "Government")
 
@@ -1661,3 +1665,12 @@ touching `contract.py` and `web/lib/types.ts`. Not a small addendum to the exist
 6. Only after this design locks: revisit whether Option A's attritional range (5%–25%) needs
    any adjustment now that Legal/Compliance has its own separate treatment rather than being
    blended into the same rubric score.
+7. ~~Build the state-aware coverage-threshold gate for Clusters 1, 2, and 4b~~ **DONE
+   2026-09-05 — see `prompts/state-coverage-threshold-design.md` and `resolve_coverage_gate()`
+   (`engine/friction_tax.py`).** One explicitly-scoped item from that build remains open:
+   **per-state employee-counting method (aggregate vs. in-state-only) for coverage-threshold
+   purposes — not yet researched, currently defaults to aggregate headcount as a conservative
+   simplification.** PRV3 collects only aggregate national headcount, not per-state employee
+   counts, and whether a given state's own coverage threshold counts aggregate or in-state-only
+   headcount is itself state-specific and unresearched — neither counting method should be
+   assumed correct until this is checked.
