@@ -33,7 +33,7 @@ function VoiceSection() {
       <p className="font-mono text-xs tracking-widest text-(--home-slate) mb-6">
         THE PERSPECTIVE
       </p>
-      <p className="font-display text-2xl md:text-3xl leading-relaxed text-charcoal mb-6">
+      <p className="font-display text-2xl md:text-3xl leading-relaxed text-(--home-ink) mb-6">
         Many of the &quot;people problems&quot; leaders describe are the
         symptoms of deeper conditions that are more challenging to work
         through. Because they&apos;re more challenging, and often require
@@ -46,7 +46,7 @@ function VoiceSection() {
         leadership behaviors result in more consistent employee behaviors,
         and more consistent, more predictable results.
       </p>
-      <p className="font-ui text-base leading-relaxed text-charcoal opacity-80 mb-4">
+      <p className="font-ui text-base leading-relaxed text-(--home-ink) opacity-80 mb-4">
         Clients don&apos;t need another framework or slide deck. They want a
         confidant and advisor with a perspective they know they can trust. A
         partner with a genuine understanding of their business, their
@@ -54,7 +54,7 @@ function VoiceSection() {
         build. And given all that, someone who can filter out the noise and
         give the objective truth.
       </p>
-      <p className="font-ui text-base leading-relaxed text-charcoal opacity-80 mb-10">
+      <p className="font-ui text-base leading-relaxed text-(--home-ink) opacity-80 mb-10">
         I don&apos;t tell you what decision to make. Decide what&apos;s best
         for your business, and give me the marching orders. We&apos;ll help
         you get there.
@@ -63,7 +63,7 @@ function VoiceSection() {
         <div className="w-10 h-10 rounded-full bg-(--home-slate) text-white flex items-center justify-center font-display text-lg shrink-0">
           P
         </div>
-        <p className="font-ui text-sm text-charcoal opacity-70">
+        <p className="font-ui text-sm text-(--home-ink) opacity-70">
           Founder, Principal Resolution
         </p>
       </div>
@@ -76,10 +76,10 @@ function CloserSection() {
 
   return (
     <section ref={ref} className={`text-center max-w-xl mx-auto ${className}`}>
-      <h2 className="font-display text-3xl text-charcoal mb-4">
+      <h2 className="font-display text-3xl text-(--home-ink) mb-4">
         Give the Diagnostic a try.
       </h2>
-      <p className="font-ui text-base text-charcoal opacity-70 mb-8">
+      <p className="font-ui text-base text-(--home-ink) opacity-70 mb-8">
         No pitch, no pressure. If anything sounds familiar, reach out.
       </p>
       <Link
@@ -103,7 +103,7 @@ export default function Home() {
             <p className="font-mono text-xs tracking-widest text-(--home-slate) mb-4">
               PRINCIPAL RESOLUTION
             </p>
-            <h1 className="font-display text-4xl md:text-5xl leading-tight text-charcoal mb-6">
+            <h1 className="font-display text-4xl md:text-5xl leading-tight text-(--home-ink) mb-6">
               What looks like a people problem is usually{" "}
               <em className="not-italic font-semibold text-(--home-slate)">
                 structural
@@ -120,7 +120,7 @@ export default function Home() {
                 </span>
               ))}
             </div>
-            <p className="font-ui text-base text-charcoal opacity-80 leading-relaxed">
+            <p className="font-ui text-base text-(--home-ink) opacity-80 leading-relaxed">
               Issues and inconsistencies with these things often produce
               &quot;people problems&quot; while masking the deeper
               fundamentals underneath. I help leaders find the real

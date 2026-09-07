@@ -283,6 +283,67 @@
   --home-paper: #F1F3F1;
   --home-field-raise: #E6E9E7;
   --home-slate: #2458A4;
+  /* --home-ink (2026-09-07): closes the second half of the homepage
+     dark-theme bug -- page.tsx/WayfindingGrid.tsx use the hardcoded
+     text-charcoal class (--color-charcoal, a separate Session 58-era
+     token, confirmed distinct from --ink) for headline/body text.
+     #26241F here is a zero-visual-change copy of that existing value
+     -- Warm/Neutral render identically to before. Dark's value (below)
+     is the one that matters: charcoal-on-the-new-correct-dark-paper
+     computed at 1.18:1, a severe WCAG failure, confirmed live in
+     browser once the paper fix (above) actually started working. */
+  --home-ink: #26241F;
+}
+
+/* .home-scope dark/neutral variants (2026-09-06) -- closes the gap where
+   <main class="home-scope"> stayed locked in this fixed light palette
+   across all three themes: data-theme switched correctly on the NavBar
+   and body, but homepage content never inherited it, confirmed live via
+   browser instrumentation (glaring in Dark, near-invisible but
+   structurally identical in Neutral, since #F1F3F1 sits close to
+   Neutral's own #FFFFFF). Pre-existing since the homepage restructure
+   session (~2026-08-29), unrelated to any later work.
+
+   --home-paper/--home-field-raise mirror --field/--field-raise exactly --
+   pure surface tones with no brand-color meaning, so reusing the
+   already-reviewed values carries no new judgment. --home-slate is the
+   one new color: Warm's #2458A4 already clears AA against Neutral's
+   #FFFFFF (6.98:1, computed), so Neutral needs no override here. Dark
+   needs a lightened blue for legibility against #171512 -- #5B9BD9
+   computed at 6.19:1 vs #171512 and 5.65:1 vs #201E1A (AA requires
+   4.5:1), same hue family as Warm's value, same lighten-for-dark
+   approach already used for --slate's own Warm->Dark shift above.
+
+   No existing token covers this: --dusty-blue is Dark-only (line ~113)
+   and explicitly tagged LARGE/DECORATIVE-ONLY -- never small text, which
+   is what these chart-axis labels are; --slate exists in all three
+   themes but is gray-green, not blue, in every one of them. Confirmed
+   directly against source, not assumed -- a proposed alternative citing
+   a "v3 Palette Infrastructure" and a specific P-12 scope-discipline
+   rule did not survive independent verification: the real palette is 16
+   tokens in an inconsistent 6/5/5 split, not a uniform 21-color grid,
+   and P-12's actual text (tools/_mob.txt) is a generic design question
+   with nothing about token architecture. */
+[data-theme="dark"] .home-scope {
+  --home-paper: #171512;
+  --home-field-raise: #201E1A;
+  --home-slate: #5B9BD9;
+  /* = global --ink dark exactly, not a new color -- computed 15.17:1
+     vs --home-paper, 13.85:1 vs --home-field-raise, 9.93:1 / 7.86:1 at
+     the opacity-80/70 blends the actual body-copy <p> elements use.
+     A "swap text-charcoal for text-(--ink) everywhere" alternative was
+     considered and rejected: --ink and --color-charcoal are genuinely
+     distinct tokens (confirmed, not the same value under two names),
+     and text-(--ink) has zero precedent anywhere in this codebase --
+     adopting it here would shift Warm's homepage text color as an
+     unreviewed side effect of a Dark-theme fix, not match an existing
+     pattern. */
+  --home-ink: #EDEAE3;
+}
+
+[data-theme="neutral"] .home-scope {
+  --home-paper: #FFFFFF;
+  --home-field-raise: #EFE6D0;
 }
 
 @layer utilities {

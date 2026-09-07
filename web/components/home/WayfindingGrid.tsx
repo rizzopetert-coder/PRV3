@@ -141,8 +141,8 @@ export function WayfindingGrid() {
               <card.Icon />
             </span>
           </div>
-          <h3 className="font-display text-lg font-semibold text-charcoal mb-2">{card.title}</h3>
-          <p className="font-ui text-sm text-charcoal opacity-70 mb-4">{card.desc}</p>
+          <h3 className="font-display text-lg font-semibold text-(--home-ink) mb-2">{card.title}</h3>
+          <p className="font-ui text-sm text-(--home-ink) opacity-70 mb-4">{card.desc}</p>
           <span className="font-ui text-sm font-medium text-(--home-slate) group-hover:underline">
             {card.arrowLabel}
           </span>
