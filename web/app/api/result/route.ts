@@ -84,7 +84,9 @@ function mapIntake(engineIntake: Record<string, unknown>): PrivateIntakeEcho {
 interface ResultRequest {
   selectedStateIds: string[];
   intake: {
-    headcount: string;
+    // number | string -- see the matching EnginePayload["intake"]
+    // change in web/lib/engine-client.ts for the full rationale.
+    headcount: number | string;
     industry: string;
     orgType: string;
     jurisdictions: string[];
