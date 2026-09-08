@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { PrivateOutputPayload, SeverityTier, StateRef } from "@/lib/types";
+import type { PrivateOutputPayload, SeverityTier, StateRef, LegalTailRiskBand } from "@/lib/types";
 import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
@@ -74,6 +74,31 @@ function tierFillPercent(tier: SeverityTier, score: number): number {
   return Math.max(0, Math.min(1, fraction)) * 100;
 }
 
+// Legal/Compliance tail-risk exposure -- Block 4d. Typographic
+// differentiation only (font-weight/size) by band, no color ramp --
+// --color-rust is reserved for genuine Endemic severity signaling
+// (ConstellationField.tsx, severityAccentTokens()) and must never be
+// reused here. band is guaranteed non-null whenever low is non-null
+// (engine/friction_tax.py's _legal_exposure_band() returns null only
+// when low is null) -- Record typed on the non-null union for that
+// reason, with a defensive fallback at the render call site.
+const LEGAL_BAND_WEIGHT: Record<LegalTailRiskBand, string> = {
+  Minor: "font-normal",
+  Moderate: "font-medium",
+  Elevated: "font-semibold",
+  Significant: "font-semibold text-sm",
+};
+
+// Oxford-comma join for unpriced_state_ids names -- the only inline
+// text-list formatting need in this component (observable indicators
+// render as a bullet list, not inline text).
+function joinNames(names: string[]): string {
+  if (names.length === 0) return "";
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} and ${names[1]}`;
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+}
+
 function Rule() {
   return (
     <div style={{ height: 0, borderTop: "0.5px solid #e5e7eb" }} />
@@ -138,6 +163,22 @@ export default function PrivateOutput({
     [payload.primary_state.id, payload.primary_state.name],
     ...payload.secondary_states.map((s): [string, string] => [s.id, s.name]),
   ]);
+
+  // Block 4d -- Legal/Compliance tail-risk exposure derived values.
+  // coverage_basis/has_partial_jurisdictions caveats only apply when a
+  // priced range exists (legal.low !== null) -- coverage_basis is
+  // meaningless without one, per the spec this block was built from.
+  const legal = payload.legal_tail_risk_exposure;
+  const legalHasPrice = legal !== null && legal.low !== null && legal.high !== null;
+  const legalCoverageCaveat =
+    legalHasPrice && legal!.coverage_basis === "federal_baseline"
+      ? "This range applies a federal coverage threshold, since no confirmed state-specific threshold applied to the jurisdictions on file. Actual state law in those jurisdictions could set a materially lower bar than what's reflected here."
+      : legalHasPrice && legal!.coverage_basis === "mixed"
+      ? "This range blends a confirmed state-specific threshold with a federal coverage threshold used where no confirmed state-specific one applied. In the jurisdictions relying on the federal threshold, actual state law could set a materially lower bar than what's reflected here."
+      : null;
+  const unpricedStateNames = legal
+    ? legal.unpriced_state_ids.map((id) => stateNameById.get(id) ?? id)
+    : [];
 
   return (
     <div className="max-w-2xl">
@@ -380,6 +421,62 @@ export default function PrivateOutput({
             A short bar at Emerging reflects a real finding, not a
             partial or uncertain one — Emerging is the floor of the
             severity scale.
+          </p>
+        </div>
+      )}
+
+      {/* Block 4d — Legal/Compliance tail-risk exposure (Addendum 11).
+          Omitted entirely when legal_tail_risk_exposure is null, same
+          idiom as every other optional block in this component.
+          coverage_basis/has_partial_jurisdictions caveats only apply
+          when a priced range exists (low !== null) -- coverage_basis
+          is meaningless without one. Band gets typographic
+          differentiation only via LEGAL_BAND_WEIGHT -- see that
+          const's own comment for why --color-rust is off-limits here.
+          unpriced_state_ids resolved to names via stateNameById
+          (Block 4c's own map) -- never rendered as raw state_ids, and
+          the PRICED/QUALITATIVE_ONLY/DATA_INTEGRITY_GAP distinction
+          behind them is never surfaced to the user. */}
+      {legal && (
+        <div className="py-4">
+          <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+            Legal/Compliance exposure
+          </p>
+
+          {legalHasPrice && (
+            <p
+              className={`text-[13px] text-charcoal mb-2 ${
+                LEGAL_BAND_WEIGHT[legal.band ?? "Minor"]
+              }`}
+            >
+              {legal.currency === "USD" ? "$" : ""}
+              {legal.low!.toLocaleString()} – {legal.currency === "USD" ? "$" : ""}
+              {legal.high!.toLocaleString()}
+            </p>
+          )}
+
+          {legalCoverageCaveat && (
+            <p className="text-[12px] font-medium text-charcoal leading-relaxed mb-2">
+              {legalCoverageCaveat}
+            </p>
+          )}
+
+          {legalHasPrice && legal.has_partial_jurisdictions && (
+            <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">
+              An unverified-confidence jurisdiction is present alongside a
+              confirmed one here and could change this determination.
+            </p>
+          )}
+
+          {legal.unpriced_state_ids.length > 0 && (
+            <p className="text-[12px] text-gray-500 leading-relaxed mb-2">
+              Real exposure current data can&apos;t price precisely for:{" "}
+              {joinNames(unpricedStateNames)}.
+            </p>
+          )}
+
+          <p className="text-[11px] text-gray-400 mt-1 leading-relaxed">
+            {legal.caveat}
           </p>
         </div>
       )}
