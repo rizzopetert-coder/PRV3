@@ -70,7 +70,14 @@ function resolveEnginePath(path: string): string {
 export interface EnginePayload {
   selectedStateIds: string[];
   intake: {
-    headcount: string;
+    // number | string: a real headcount (SelfSelectIntakeModal) must
+    // arrive as a genuine JS number -- resolve_headcount_bucket()'s
+    // isinstance(headcount, (int, float)) guard (engine/friction_tax.py)
+    // cannot tell a valid numeric string from garbage, and silently
+    // degrades both to null/NOT_APPLICABLE. string is kept for the
+    // existing blank-intake sentinel ("") used where no real headcount
+    // was ever collected.
+    headcount: number | string;
     industry: string;
     orgType: string;
     jurisdictions: string[];
