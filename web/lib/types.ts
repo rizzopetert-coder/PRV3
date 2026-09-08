@@ -150,8 +150,11 @@ export interface FrictionTaxEstimate {
  * engineResult.private_output without a separate computation.
  */
 export interface LegalTailRiskExposure {
-  low: number;
-  high: number;
+  // null when every identified Legal-scoring state is QUALITATIVE_ONLY
+  // or DATA_INTEGRITY_GAP -- no PRICED state at all -- while
+  // has_unpriced_conditions is still true. See unpriced_state_ids below.
+  low: number | null;
+  high: number | null;
   currency: string;
   band: LegalTailRiskBand | null;
   caveat: string;
