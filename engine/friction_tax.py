@@ -358,7 +358,7 @@ def get_industry_wage(industry: str) -> Optional[float]:
     return entry[0] if entry is not None else None
 
 
-def resolve_headcount_bucket(headcount: int) -> str:
+def resolve_headcount_bucket(headcount) -> Optional[str]:
     """
     Map a precise headcount int (engine/data/intake.py's
     HEADCOUNT_FIELD_SPEC) to its HEADCOUNT_BUCKETS bucket string.
@@ -366,9 +366,28 @@ def resolve_headcount_bucket(headcount: int) -> str:
 
     Legacy string-headcount tolerance (organization_size string|number
     collapse, 2026-08-29) removed -- Redis confirmed clear of legacy
-    string-bucket records before this ran, and the web layer now
-    guarantees a real number end to end.
+    string-bucket records before this ran, and the web layer was
+    believed at the time to guarantee a real number end to end. That
+    guarantee proved false: confirmed live, 2026-09-08, the self-select
+    "Take the diagnostic" CTA (web/app/diagnostic/page.tsx) sends
+    headcount="" unconditionally, causing a production 500 for every
+    request through that path, not just ones touching Legal/Compliance
+    clusters -- this function is called at the top of both
+    compute_friction_tax() and compute_legal_compliance_exposure(),
+    unconditionally, before any per-state logic runs.
+
+    Returns None -- rather than raising -- when headcount isn't a real,
+    comparable number (empty string, other non-numeric string, None).
+    This does NOT reintroduce the removed string-to-number coercion
+    above; a numeric string like "152" is still treated as
+    unclassifiable, not parsed. Callers treat None as "cannot classify
+    this headcount" and degrade to their own existing no-result shape
+    -- see compute_friction_tax()'s calibration_complete=False branch
+    and compute_legal_compliance_exposure()'s per-cluster handling,
+    immediately after each of their own calls to this function.
     """
+    if not isinstance(headcount, (int, float)):
+        return None
     if headcount < 25:
         return "Under 25"
     if headcount < 100:
@@ -2794,6 +2813,27 @@ def resolve_coverage_gate(
     prompts/friction-tax-legal-compliance-methodology.md's Next Steps and
     prompts/state-coverage-threshold-design.md.
     """
+    # Guard: an unusable headcount (empty string, other non-numeric
+    # string, None) can't drive either comparison branch below. Rather
+    # than let a raw `>=` against a non-number raise, short-circuit to
+    # "coverage cannot be determined" -- applies=False, same as a
+    # real headcount that doesn't clear the threshold. Every caller
+    # (clusters 1, 2, 4b) already turns applies=False into
+    # LegalPricingStatus.NOT_APPLICABLE. Confirmed live, 2026-09-08:
+    # this is what the self-select "Take the diagnostic" CTA
+    # (web/app/diagnostic/page.tsx) sends today for any request.
+    if not isinstance(headcount, (int, float)):
+        threshold = _federal_threshold(claim_type)
+        return CoverageResult(
+            applies=False,
+            threshold=threshold,
+            claim_type=claim_type,
+            driving_jurisdiction=None,
+            confidence="FEDERAL_FALLBACK",
+            partial_state_flag=False,
+            partial_jurisdictions_considered=(),
+        )
+
     confirmed_entries: list[tuple[str, int]] = []
     partial_entries: list[tuple[str, int]] = []
     for jid in jurisdictions:
@@ -2966,6 +3006,18 @@ def _single_state_legal_pricing(
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r,
             coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag)
     if cluster == 3:
+        # org_size is None when resolve_headcount_bucket() couldn't
+        # classify the request's headcount. Real, non-zero exposure
+        # still applies (this state's Cluster 3 condition is real) --
+        # QUALITATIVE_ONLY, not NOT_APPLICABLE, so it's still named
+        # for the Principal rather than silently hidden. Checked here,
+        # before _cluster_3_affected_workers() -- that function's own
+        # midpoint_entry-is-None fallback returns 0.0, which would
+        # otherwise produce a fabricated dollar_range=(0.0, 0.0)
+        # PRICED result, indistinguishable from genuinely-zero risk.
+        if org_size is None:
+            return LegalPricingResult(status=LegalPricingStatus.QUALITATIVE_ONLY, dollar_range=None,
+                coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
         affected = _cluster_3_affected_workers(org_size, industry, score)
         r = (
             affected * _CLUSTER_3_ADMIN_RATE_PER_WORKER,
