@@ -840,7 +840,7 @@ check(
     "N=1 guard: single Legal-scoring state (built_to_fail, Cluster 1, score=1) collapses to its own floor exactly",
     _r_n1 == {
         "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
     },
     f"got {_r_n1}",
 )
@@ -863,7 +863,7 @@ check(
     "Cross-cluster addition: built_to_fail (C1, $50,000) + the_unreported_hazard (C5, $165,514) sums directly, no breadth premium",
     _r_cross == {
         "low": _expected_cross, "high": _expected_cross, "currency": "USD", "band": "Moderate",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
     },
     f"expected low=high={_expected_cross}, got {_r_cross}",
 )
@@ -885,7 +885,7 @@ check(
     "Within-cluster decay: the_paper_tiger ($450,000) full weight + built_to_fail ($50,000) at 0.5x, both Cluster 1",
     _r_decay == {
         "low": _expected_decay, "high": _expected_decay, "currency": "USD", "band": "Moderate",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
     },
     f"expected low=high={_expected_decay}, got {_r_decay}",
 )
@@ -903,7 +903,7 @@ check(
     "Cluster 2: disparate_impact_architecture (score=2) selects Tier 2b ($25,000-31,000), not the log-scale formula",
     _r_tier_2b == {
         "low": 25_000.0, "high": 31_000.0, "currency": "USD", "band": "Minor",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
     },
     f"got {_r_tier_2b}",
 )
@@ -917,7 +917,7 @@ check(
     "Cluster 2: pay_exposure (score=1) selects Tier 2a ($1,800-2,500)",
     _r_tier_2a == {
         "low": 1_800.0, "high": 2_500.0, "currency": "USD", "band": "Minor",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
     },
     f"got {_r_tier_2a}",
 )
@@ -946,7 +946,7 @@ check(
     "headcount_midpoint x non_exempt_ratio x scope_fraction x per-worker rate",
     _r_cluster3 == {
         "low": _co_expected_low, "high": _co_expected_high, "currency": "USD", "band": "Moderate",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     f"expected low={_co_expected_low}, high={_co_expected_high}, got {_r_cluster3}",
 )
@@ -964,7 +964,7 @@ check(
     "Cluster 4, org_type='Publicly traded' routes to 4a: hr_capture (score=2) -> ceiling $33,000,000",
     _r_4a == {
         "low": 33_000_000.0, "high": 33_000_000.0, "currency": "USD", "band": "Significant",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     f"got {_r_4a}",
 )
@@ -978,7 +978,7 @@ check(
     "Cluster 4, org_type='Founder-led' routes to 4b: hr_capture (score=2), 250-499 bucket -> $200,000 statutory cap",
     _r_4b == {
         "low": 200_000.0, "high": 200_000.0, "currency": "USD", "band": "Moderate",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
     },
     f"got {_r_4b}",
 )
@@ -998,7 +998,7 @@ check(
     "Cluster 4b floor: dueling_narratives (score=1) -> $25,000 EEOC mediation floor, regardless of headcount bucket",
     _r_4b_floor == {
         "low": 25_000.0, "high": 25_000.0, "currency": "USD", "band": "Minor",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
     },
     f"got {_r_4b_floor}",
 )
@@ -1013,7 +1013,7 @@ check(
     "and now surfaced via has_unpriced_conditions/unpriced_state_ids rather than silently vanishing",
     _r_4c == {
         "low": None, "high": None, "currency": "USD", "band": None,
-        "has_unpriced_conditions": True, "unpriced_state_ids": ["hr_capture"],
+        "has_unpriced_conditions": True, "unpriced_state_ids": ["hr_capture"], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     f"got {_r_4c}",
 )
@@ -1031,7 +1031,7 @@ check(
     "the_dormant_talent (never classified into any Legal/Compliance cluster) -> None/None",
     _r_never_classified == {
         "low": None, "high": None, "currency": "USD", "band": None,
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     f"got {_r_never_classified}",
 )
@@ -1053,7 +1053,7 @@ check(
     "built_to_fail classified into Cluster 1 but monkey-patched to legal score=0 -> None/None, not a floor value",
     _r_zero_score == {
         "low": None, "high": None, "currency": "USD", "band": None,
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     f"got {_r_zero_score}",
 )
@@ -1064,7 +1064,7 @@ check(
     compute_legal_compliance_exposure([], 152, "Professional Services", "Founder-led")
     == {
         "low": None, "high": None, "currency": "USD", "band": None,
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     "expected None/None for empty state_ids",
 )
@@ -1358,7 +1358,7 @@ check(
     "-> genuinely None/None, not a reduced figure -- coverage gate blocks it before pricing",
     _r_c1_blocked == {
         "low": None, "high": None, "currency": "USD", "band": None,
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     f"got {_r_c1_blocked}",
 )
@@ -1373,7 +1373,7 @@ check(
     "at its real floor ($50,000) -- the gate blocks only genuinely uncovered orgs, not everyone",
     _r_c1_covered == {
         "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
     },
     f"got {_r_c1_covered}",
 )
@@ -1387,7 +1387,7 @@ check(
     "Integration, Cluster 2: pay_exposure at headcount=10 with no jurisdictions -> None/None",
     _r_c2_blocked == {
         "low": None, "high": None, "currency": "USD", "band": None,
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     f"got {_r_c2_blocked}",
 )
@@ -1402,7 +1402,7 @@ check(
     "gate runs before the existing headcount-bucket pricing-ceiling lookup, per the spec",
     _r_c4b_blocked == {
         "low": None, "high": None, "currency": "USD", "band": None,
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     f"got {_r_c4b_blocked}",
 )
@@ -1417,7 +1417,7 @@ check(
     "the coverage gate is scoped to 4b only, confirmed by this still pricing at the real $33M ceiling",
     _r_c4a_unaffected == {
         "low": 33_000_000.0, "high": 33_000_000.0, "currency": "USD", "band": "Significant",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     f"got {_r_c4a_unaffected}",
 )
@@ -1432,7 +1432,7 @@ check(
     "headcount -- the coverage gate is scoped to 4b only, not the whole of Cluster 4",
     _r_c4c_unaffected == {
         "low": None, "high": None, "currency": "USD", "band": None,
-        "has_unpriced_conditions": True, "unpriced_state_ids": ["hr_capture"],
+        "has_unpriced_conditions": True, "unpriced_state_ids": ["hr_capture"], "coverage_basis": None, "has_partial_jurisdictions": False,
     },
     f"got {_r_c4c_unaffected}",
 )
@@ -1448,7 +1448,7 @@ check(
     "jurisdictions=['NY'] is actually passed through from intake -- prices normally",
     _r_c1_ny_covered == {
         "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
-        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "state_specific", "has_partial_jurisdictions": False,
     },
     f"got {_r_c1_ny_covered}",
 )
