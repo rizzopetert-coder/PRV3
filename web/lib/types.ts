@@ -156,6 +156,24 @@ export interface LegalTailRiskExposure {
   band: LegalTailRiskBand | null;
   caveat: string;
   has_unpriced_conditions: boolean;
+  // Restored (was present in the engine's own return dict, dropped at
+  // this mapping boundary until this session). State ids contributing
+  // real-but-unpriced exposure -- QUALITATIVE_ONLY or DATA_INTEGRITY_GAP
+  // in engine/friction_tax.py's LegalPricingStatus.
+  unpriced_state_ids: string[];
+  // Whether the underlying coverage-threshold determination (Clusters
+  // 1, 2, 4b only -- see resolve_coverage_gate() in
+  // engine/friction_tax.py) was resolved against a CONFIRMED-confidence
+  // jurisdiction ("state_specific"), fell back to a federal statutory
+  // threshold with no CONFIRMED jurisdiction present ("federal_baseline"),
+  // combined both across a multi-state aggregate ("mixed"), or never
+  // asked the coverage question at all -- every priced cluster was 3,
+  // 4a, or 4c, or 5, none of which consult jurisdiction (null).
+  coverage_basis: "state_specific" | "federal_baseline" | "mixed" | null;
+  // True if a PARTIAL-confidence jurisdiction was present alongside a
+  // CONFIRMED one and could have changed the coverage determination --
+  // see CoverageResult.partial_state_flag in engine/friction_tax.py.
+  has_partial_jurisdictions: boolean;
 }
 
 /**
