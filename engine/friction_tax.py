@@ -63,7 +63,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import Literal, Optional
 
 from engine.data.jurisdiction import JURISDICTION_TABLE
 
@@ -1987,11 +1987,19 @@ def compute_friction_tax(
 # prompts/friction-tax-legal-compliance-methodology.md. Separate from the
 # attritional compute_friction_tax() above -- Legal/Compliance scales by
 # mechanism (and for Cluster 4, org_type/headcount), not by payroll
-# baseline. Standalone function, NOT wired into compute_friction_tax()'s
-# return dict, engine/contract.py, or web/lib/types.ts -- that
-# integration is separately scoped. Jurisdictional multiplier logic
-# (California FEHA/PAGA overrides, OSHA State Plan variation, Addenda
-# 6-9) is explicitly NOT implemented here -- deferred per Addendum 9.
+# baseline. WIRED into engine/contract.py's private_output as of commit
+# 46c1e0c (2026-08-04, "wire Legal/Compliance tail-risk exposure into
+# private output") -- the comment here previously claimed the opposite
+# ("NOT wired... that integration is separately scoped") for over a
+# month after it stopped being true, and caused the 2026-09-05 Quarterly
+# Step-Back to wrongly conclude the module was unwired; corrected here
+# after independent verification against live source. As of this
+# session, the returned dict also carries coverage_basis and
+# has_partial_jurisdictions (see compute_legal_compliance_exposure()'s
+# own docstring), distinguishing state-confirmed from federal-fallback
+# coverage determinations. Jurisdictional multiplier logic (California
+# FEHA/PAGA overrides, OSHA State Plan variation, Addenda 6-9) is
+# explicitly NOT implemented here -- deferred per Addendum 9.
 
 # -- Industry non-exempt ratio ----------------------------------------------------
 # KNOWN CITATION-ACCURACY GAP, not a resolved sourcing question. The 9
@@ -2174,17 +2182,35 @@ class LegalPricingStatus(Enum):
 @dataclass(frozen=True)
 class LegalPricingResult:
     """One state's pricing outcome. dollar_range is populated only when
-    status is PRICED."""
+    status is PRICED. coverage_confidence reflects whether/how the
+    state-coverage-threshold gate resolved for this specific cluster --
+    "NOT_APPLICABLE" when no coverage question was ever asked (Clusters
+    3, 4a, 4c, 5, and every early NOT_APPLICABLE return that doesn't
+    consult jurisdiction), never None/null. partial_state_flag mirrors
+    CoverageResult.partial_state_flag when the gate actually ran; False
+    when coverage_confidence is "NOT_APPLICABLE", since a
+    partial-jurisdiction caveat cannot apply to a determination that
+    never consulted jurisdictions at all."""
     status: LegalPricingStatus
     dollar_range: Optional[tuple[float, float]]
+    coverage_confidence: Literal["CONFIRMED", "FEDERAL_FALLBACK", "NOT_APPLICABLE"]
+    partial_state_flag: bool
 
 
 @dataclass(frozen=True)
 class LegalCurveLookup:
     """Result of resolving a Cluster 4 sub-track curve. curve is
-    populated only when status is PRICED."""
+    populated only when status is PRICED. coverage_confidence/
+    partial_state_flag carry the same meaning as LegalPricingResult's
+    fields of the same name -- "NOT_APPLICABLE"/False for the 4a
+    (Publicly traded) and 4c (Government) early-return branches, which
+    never call resolve_coverage_gate(); the real CoverageResult values
+    for every 4b fallthrough branch (not-applies, DATA_INTEGRITY_GAP,
+    and PRICED alike), since the gate genuinely runs for all three."""
     curve: Optional[LegalDollarCurve]
     status: LegalPricingStatus
+    coverage_confidence: Literal["CONFIRMED", "FEDERAL_FALLBACK", "NOT_APPLICABLE"]
+    partial_state_flag: bool
 
 
 # Cluster 1 -- Individual/isolated claim (Addendum 1).
@@ -2835,18 +2861,31 @@ def _cluster_4_curve_for_org_type(
     expected "genuinely not covered" outcome, not a data problem.
     """
     if org_type == "Publicly traded":
-        return LegalCurveLookup(curve=_CLUSTER_4A_CURVE, status=LegalPricingStatus.PRICED)
+        return LegalCurveLookup(
+            curve=_CLUSTER_4A_CURVE, status=LegalPricingStatus.PRICED,
+            coverage_confidence="NOT_APPLICABLE", partial_state_flag=False,
+        )
     if org_type == "Government":
-        return LegalCurveLookup(curve=None, status=LegalPricingStatus.QUALITATIVE_ONLY)
+        return LegalCurveLookup(
+            curve=None, status=LegalPricingStatus.QUALITATIVE_ONLY,
+            coverage_confidence="NOT_APPLICABLE", partial_state_flag=False,
+        )
     coverage = resolve_coverage_gate(headcount, jurisdictions, claim_type="general")
     if not coverage.applies:
-        return LegalCurveLookup(curve=None, status=LegalPricingStatus.NOT_APPLICABLE)
+        return LegalCurveLookup(
+            curve=None, status=LegalPricingStatus.NOT_APPLICABLE,
+            coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag,
+        )
     ceiling = _CLUSTER_4B_CEILING_BY_HEADCOUNT.get(org_size)
     if ceiling is None:
-        return LegalCurveLookup(curve=None, status=LegalPricingStatus.DATA_INTEGRITY_GAP)
+        return LegalCurveLookup(
+            curve=None, status=LegalPricingStatus.DATA_INTEGRITY_GAP,
+            coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag,
+        )
     return LegalCurveLookup(
         curve=LegalDollarCurve(floor=_CLUSTER_4B_FLOOR, ceiling=ceiling),
         status=LegalPricingStatus.PRICED,
+        coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag,
     )
 
 
@@ -2899,43 +2938,55 @@ def _single_state_legal_pricing(
     """
     cluster = LEGAL_COMPLIANCE_CLUSTER.get(state_id)
     if cluster is None:
-        return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
+        return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
+            coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
     entry = STATE_MULTIPLIERS.get(state_id)
     if entry is None:
-        return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
+        return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
+            coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
     score = entry.criteria["legal"].score
     if score == 0:
-        return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
+        return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
+            coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
 
     if cluster == 1:
         coverage = resolve_coverage_gate(headcount, jurisdictions, claim_type="general")
         if not coverage.applies:
-            return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
+            return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
+                coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag)
         v = _legal_score_fraction(_CLUSTER_1_CURVE, score)
-        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v))
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v),
+            coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag)
     if cluster == 2:
         coverage = resolve_coverage_gate(headcount, jurisdictions, claim_type="general")
         if not coverage.applies:
-            return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
+            return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
+                coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag)
         r = _CLUSTER_2_TIER_2A if score == 1 else _CLUSTER_2_TIER_2B
-        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r)
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r,
+            coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag)
     if cluster == 3:
         affected = _cluster_3_affected_workers(org_size, industry, score)
         r = (
             affected * _CLUSTER_3_ADMIN_RATE_PER_WORKER,
             affected * _CLUSTER_3_LITIGATION_RATE_PER_WORKER,
         )
-        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r)
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r,
+            coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
     if cluster == 4:
         lookup = _cluster_4_curve_for_org_type(org_type, org_size, headcount, jurisdictions)
         if lookup.curve is None:
-            return LegalPricingResult(status=lookup.status, dollar_range=None)
+            return LegalPricingResult(status=lookup.status, dollar_range=None,
+                coverage_confidence=lookup.coverage_confidence, partial_state_flag=lookup.partial_state_flag)
         v = _legal_score_fraction(lookup.curve, score)
-        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v))
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v),
+            coverage_confidence=lookup.coverage_confidence, partial_state_flag=lookup.partial_state_flag)
     if cluster == 5:
         v = _legal_score_fraction(_CLUSTER_5_CURVE, score)
-        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v))
-    return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None)
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v),
+            coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
+    return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
+        coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
 
 
 def _legal_exposure_band(low: Optional[float]) -> Optional[str]:
@@ -3040,12 +3091,18 @@ def compute_legal_compliance_exposure(
     org_size = resolve_headcount_bucket(org_size)
     per_state_ranges: dict[str, tuple[float, float]] = {}
     unpriced_state_ids: list[str] = []
+    coverage_confidences: set[str] = set()
+    has_partial_jurisdictions = False
     for sid in state_ids:
         result = _single_state_legal_pricing(
             sid, org_size, industry, org_type, headcount, jurisdictions
         )
         if result.status == LegalPricingStatus.PRICED:
             per_state_ranges[sid] = result.dollar_range
+            if result.coverage_confidence != "NOT_APPLICABLE":
+                coverage_confidences.add(result.coverage_confidence)
+                if result.partial_state_flag:
+                    has_partial_jurisdictions = True
         elif result.status == LegalPricingStatus.QUALITATIVE_ONLY:
             unpriced_state_ids.append(sid)
         elif result.status == LegalPricingStatus.DATA_INTEGRITY_GAP:
@@ -3060,6 +3117,19 @@ def compute_legal_compliance_exposure(
 
     has_unpriced_conditions = bool(unpriced_state_ids)
 
+    # coverage_basis: excludes NOT_APPLICABLE entirely (a state priced only
+    # via Clusters 3/4a/4c/5 never asked the coverage question, so it
+    # contributes nothing to this determination). None when no PRICED
+    # result ever consulted the coverage gate at all.
+    if not coverage_confidences:
+        coverage_basis = None
+    elif coverage_confidences == {"CONFIRMED"}:
+        coverage_basis = "state_specific"
+    elif coverage_confidences == {"FEDERAL_FALLBACK"}:
+        coverage_basis = "federal_baseline"
+    else:
+        coverage_basis = "mixed"
+
     if not per_state_ranges:
         return {
             "low": None,
@@ -3068,6 +3138,8 @@ def compute_legal_compliance_exposure(
             "band": _legal_exposure_band(None),
             "has_unpriced_conditions": has_unpriced_conditions,
             "unpriced_state_ids": unpriced_state_ids,
+            "coverage_basis": coverage_basis,
+            "has_partial_jurisdictions": has_partial_jurisdictions,
         }
 
     if len(per_state_ranges) == 1:
@@ -3080,6 +3152,8 @@ def compute_legal_compliance_exposure(
             "band": _legal_exposure_band(rounded_low),
             "has_unpriced_conditions": has_unpriced_conditions,
             "unpriced_state_ids": unpriced_state_ids,
+            "coverage_basis": coverage_basis,
+            "has_partial_jurisdictions": has_partial_jurisdictions,
         }
 
     by_cluster: dict[int, list[tuple[float, float]]] = {}
@@ -3101,4 +3175,6 @@ def compute_legal_compliance_exposure(
         "band": _legal_exposure_band(rounded_total_low),
         "has_unpriced_conditions": has_unpriced_conditions,
         "unpriced_state_ids": unpriced_state_ids,
+        "coverage_basis": coverage_basis,
+        "has_partial_jurisdictions": has_partial_jurisdictions,
     }
