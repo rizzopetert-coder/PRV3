@@ -61,7 +61,11 @@ function stepHeadcount(value: number, direction: 1 | -1): number {
 // handling. Closes over nothing from IntakeForm's scope (HEADCOUNT_MAX
 // and stepHeadcount are already module-level), so hoisting is a pure
 // move, zero logic change.
-function HeadcountStepper({
+//
+// Exported for reuse by SelfSelectIntakeModal.tsx (self-select flow
+// headcount collection) -- the exact same increment schedule and input
+// handling, not a second hand-maintained stepper.
+export function HeadcountStepper({
   value,
   onChange,
 }: {
@@ -135,7 +139,11 @@ const TENURE_OPTIONS = [
   "Under 1 year", "1-3 years", "3-5 years", "5-10 years", "10+ years",
 ];
 const DIRECT_REPORTS_OPTIONS = ["0", "1-5", "6-15", "16-50", "50+"];
-const JURISDICTION_OPTIONS = [
+// Exported for reuse by SelfSelectIntakeModal.tsx -- same rationale as
+// INDUSTRY_OPTIONS's own export comment above: the exact same 51 real
+// jurisdiction codes a respondent already sees here, not a second
+// hand-maintained list that could drift.
+export const JURISDICTION_OPTIONS = [
   "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA", "HI",
   "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN",
   "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH",
