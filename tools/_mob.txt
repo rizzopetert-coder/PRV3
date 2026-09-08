@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.287
+\\\#\\\# MOB v4.288
 
   
 
@@ -2430,3 +2430,129 @@ Transitional (sync now, retire when engine data complete): PRV3\\\_Signal\\\_Map
 Files changed: `prompts/prv3-quarterly-step-back-2026-09-05.md` (new, the full durable record), `tools/_mob.txt` (this entry, 3 new Section 13a Decision Register rows, Section 13b items 1/3/7 corrected, new item 9), `CLAUDE.md` (MOB version reference, Quarterly Step-Back cadence dates), `prompts/session-handoff-v4.280.md` (new, supersedes v4.279's). | This session (Claude Code), 2026-09-05 | Next Quarterly Step-Back due on or near September 19, 2026. The three new Section 13a decision items: no forced check-in on any, all Pete's call on sequencing. `extreme_high_confidence` 0/1: worth a dedicated investigation pass, not urgent. |
 
 | **SESSION CLOSEOUT (2026-09-07, terminal Claude Code) -- three Quarterly Step-Back items closed (Redis Sensitive-masking, ssoProtection root-cause, domain reassignment), a net-new homepage dark/neutral theme bug found and fixed, Redis token rotation confirmed, Priority Queue resequenced -- MOB v4.280 -> v4.286** | Four closed items plus one resequencing action, all live-verified, not just source-reviewed. (1) Preview Redis credential exposure: Pete ran `vercel env update UPSTASH_REDIS_REST_URL/TOKEN preview --sensitive` himself after this session's sandbox correctly refused to handle the plaintext value directly -- both vars confirmed `[SENSITIVE]` via a redacted `vercel env pull`, matching Production. A plaintext token value that landed in the session transcript during troubleshooting was flagged immediately; Pete separately regenerated it at Upstash and confirmed app reconnection -- fully closed, not just the masking fix (Section 13a Redis row updated to reflect this). (2) `ssoProtection` discrepancy resolved via direct unauthenticated `curl` A/B testing (production vs. an actual preview deployment URL, which correctly returned a real `302` to `vercel.com/sso-api`) plus Vercel's own live docs: root cause is Hobby-plan Standard Protection scope, which by design exempts the production domain -- not a misconfiguration. Corrects an earlier MOB entry (~2026-08-27) that had this exactly backwards. (3) `principalresolution.com` (+ `www`) reassigned from `prv-2` to `prv-3` via `vercel domains add --force`, after confirming real dependencies first (live Google Workspace email via MX/SPF/TXT; prv-2's own genuinely distinct, if 4-months-stale, marketing site) -- live-verified post-cutover on the real domain, email confirmed untouched via fresh `nslookup`. (4) Net-new, not part of the original Step-Back scope: investigating Pete's own report of a homepage dark-theme bug found two independent, pre-existing issues. `.home-scope`'s `--home-paper`/`--home-field-raise`/`--home-slate` tokens (introduced during the ~2026-08-29 homepage restructure) never got `[data-theme="dark"]`/`[data-theme="neutral"]` variants at all -- confirmed live via browser instrumentation (`body`'s background genuinely switched, `<main>`'s never did). Fixing that exposed a second bug: `page.tsx`/`WayfindingGrid.tsx`'s hardcoded `text-charcoal` computed at 1.18:1 contrast once the background actually went dark -- invisible until the first fix made it live. Both fixed (`--home-slate` a new, computed-and-verified value; `--home-ink` mirroring the existing global `--ink` Dark value exactly, zero new color judgment there). Two Gemini review rounds, both independently verified rather than trusted: round 1 cited a fabricated "v3 Palette Infrastructure" (a claimed uniform 21-color grid; the real palette is 16 tokens in an inconsistent 6/5/5 split) and misquoted P-12's actual text; round 2's underlying facts (`--ink`/`--color-charcoal` are genuinely distinct tokens) checked out but mischaracterized what had actually been proposed -- a one-line misreading, not a fabrication, corrected for the record. Live-verified on production `principalresolution.com` across all three themes via `getComputedStyle`, not just screenshots: Warm unchanged (`#F1F3F1`/`#26241F`), Dark fixed (`#171512`/`#EDEAE3`/`#5B9BD9`), Neutral unaffected (`#FFFFFF`/`#26241F`). A real architectural question the fix surfaced but did not act on -- a `globals.css` comment implying the homepage was meant to be the first route to fully adopt v2 tokens -- logged as its own parked Section 13a row, not resolved. (5) Section 13b Priority Queue rewritten wholesale per Pete's explicit 4-item order (Legal/Compliance friction-tax wiring, ~30 remaining PARTIAL coverage-threshold states, `extreme_high_confidence` at 0/1, v2 token migration) -- previously-tracked items not in that list (Service Expectations page, SEVER-09, `diagnostic_fast_forward.py`, OSHA backfill, ADA/FMLA/OSHA gating) explicitly carried forward, not dropped. A recurring dev-server file-watcher/build-cache staleness issue surfaced twice mid-session (Turbopack not picking up edits to an already-running server even after a plain restart, confirmed via raw network fetch of the served CSS both times, not assumed from a process restart alone) -- the reliable fix each time was kill process + clear `.next/` + restart fresh. Files changed: `CLAUDE.md`, `tools/_mob.txt` (updated at every version step, v4.280 through v4.286); `web/app/globals.css`, `web/app/page.tsx`, `web/components/home/WayfindingGrid.tsx` (the two-part homepage fix); six new `tools/patch_mob_*.py`/`tools/patch_home_scope_*.py` scripts (dry-run-then-write throughout, zero blind writes); `.claude/launch.json` (new, genuinely reusable dev-server launch config). Two separate pushes to production: `b527004` (infra/docs only) and `3a87611` (the homepage fix, real production-facing change, live-verified post-deploy both times). Diary write confirmed successful this session (topic `session-2026-09-07-homepage-dark-theme-fix-redis-rotation-vercel-infra`). | This session (Claude Code), 2026-09-07 | Next Quarterly Step-Back due on or near September 19, 2026, unchanged. Next session should open per the resequenced Section 13b Priority Queue: (1) Legal/Compliance friction-tax module wiring -- Pete's call, code ready either way; (2) PARTIAL coverage-threshold state verification; (3) `extreme_high_confidence` calibration investigation; (4) v2 token migration for the homepage, architectural only, no urgency. `session-handoff-v4.287.md` has the full files-to-attach breakdown by likely next task. |
+
+## SESSION CLOSEOUT (2026-09-07, continuation session)
+
+### One-line summary
+
+Legal/Compliance coverage-sourcing signal (coverage_basis,
+has_partial_jurisdictions, restored unpriced_state_ids) designed,
+architecture-reviewed, built, and live-verified end-to-end -- plus a
+significant correction to the Sept 5 Quarterly Step-Back's central
+finding on this module, and one Gemini fabrication caught before it
+reached code.
+
+### Shipped and closed this session
+
+1. **Gemini fabrication caught pre-build.** Asked to propose wiring
+   architecture for the Legal/Compliance module, Gemini fabricated
+   nonexistent files (`engine/contract_2.py`, `engine/friction_tax_2.py`)
+   to support its claim that wiring already existed. Filenames confirmed
+   fabricated via direct repo check. Per standing verification discipline,
+   nothing was built on this response until independently confirmed.
+
+2. **Major correction to the Sept 5 Quarterly Step-Back's Legal/Compliance
+   finding -- CORRECTED.** That session's "cold pass" concluded
+   `compute_legal_compliance_exposure()` had zero client-facing wiring.
+   This was wrong. The engine -> `contract.py` -> `types.ts` chain has been
+   fully wired since **commit `46c1e0c`, 2026-08-04** -- over a month
+   before the Sept 5 finding. Root cause: a stale section-header comment
+   in `friction_tax.py` (~lines 1986-1994) still claimed "NOT wired,"
+   and the Sept 5 verification pass trusted that comment instead of
+   tracing the actual call graph, despite claiming to have done so. The
+   real gap was narrower than tracked: `contract.py` and `types.ts` were
+   already correct; `PrivateOutput.tsx` simply never rendered the field
+   (zero references, confirmed by grep). The stale comment has now been
+   corrected in the same commit that extends the wiring (see below).
+
+3. **coverage_basis / has_partial_jurisdictions / unpriced_state_ids
+   wiring -- DESIGNED, ARCHITECTURE-REVIEWED, BUILT, LIVE-VERIFIED, CLOSED.**
+   Product decision (Pete): the UI must eventually distinguish
+   federal-penalty exposure from state-penalty exposure. Data-layer work
+   to support that is complete; UI rendering explicitly deferred to a
+   separate follow-on spec (not scoped this session).
+   - Gemini proposed the original architecture (aggregate flags over
+     per-state array; correct call given aggregation happens before any
+     sourcing signal could attach).
+   - Claude Code verified the proposal against live source and caught a
+     real domain error: Gemini's proposal hardcoded
+     `coverage_confidence="FEDERAL_FALLBACK"` for Clusters 3, 4a, 4c, and
+     5, none of which ever call `resolve_coverage_gate()` at all -- no
+     coverage question is asked for them, so `FEDERAL_FALLBACK` would
+     have falsely implied a coverage check occurred and defaulted to
+     federal. Corrected to an explicit third value, `"NOT_APPLICABLE"`
+     (Pete's call -- explicit signal over a bare `None`, so the UI can
+     later distinguish "no jurisdiction question applies" from "unknown").
+   - Claude Code drafted the corrected design (three-value
+     `coverage_confidence`, `NOT_APPLICABLE`-filtering in aggregation,
+     `coverage_basis: null` at the aggregate level rather than a 4th enum
+     value, `LegalCurveLookup` field-threading for Cluster 4's early
+     4a/4c returns vs. the real gate-touching 4b fallthrough) -- correctly
+     flagged by CC itself as a draft requiring Gemini's actual review, not
+     a decided architecture. Sent back through Gemini, confirmed clean on
+     all four review points, including an alternative-design question
+     (hoisting the gate call vs. field-threading) resolved in favor of
+     the threaded approach to preserve lazy execution for 4a/4c.
+   - Built in 4 per-file commits: `5a08052` (`engine/friction_tax.py` --
+     dataclasses, all construction sites, aggregation logic, stale
+     comment fix), `fcc20f3` (`engine/contract.py` -- mapping, including
+     restored `unpriced_state_ids`), `b3c011e` (`web/lib/types.ts` --
+     interface), `6bdbb83` (`tools/test_friction_tax.py` -- 20 fixture
+     updates for the two new keys; mechanical, no logic changes).
+   - Engine test suite: 838/838 assertions, 0 failures, exact match to
+     pre-session baseline. `tsc --noEmit`: clean, 0 errors.
+   - **Live-verified in production**, 3 of 4 target branches with real
+     200s and exact expected values: CONFIRMED (`coverage_basis:
+     "state_specific"`), FEDERAL_FALLBACK (`"federal_baseline"`),
+     NOT_APPLICABLE-only (`coverage_basis: null`), and a cross-cluster
+     case (CONFIRMED + NOT_APPLICABLE together) confirming the exclusion
+     logic holds in practice, not just in the test suite.
+   - One test-input error during live verification (`headcount` sent as
+     a JSON string) produced a 500/400; correctly diagnosed via Vercel
+     runtime logs as CC's own test payload, not a regression, before any
+     assumption was made. Corrected and retested clean.
+
+### Named exception to live-verification practice -- do not silently fold
+    into "done"
+
+- **True "mixed" `coverage_basis` (CONFIRMED + FEDERAL_FALLBACK together)
+  is structurally unreachable from a single live request today.**
+  `resolve_coverage_gate()` runs with identical `(headcount, jurisdictions,
+  claim_type="general")` for every Cluster 1/2/4b state in one call, so
+  every gate call in a request shares one outcome. This is not a bug in
+  what shipped -- the `"mixed"` branch is correct logic for whenever
+  per-state gate resolution exists -- but this session's live testing
+  could only exercise 3 of the 4 possible `coverage_basis` outcomes.
+  Tracked in Decision Register: `"mixed"` remains logic-verified via the
+  test suite but not live-verified, pending either a genuinely
+  multi-jurisdiction-confidence test profile or per-state gate resolution
+  work that doesn't exist yet.
+- **`PrivateOutput.tsx` runtime safety (item 4 of the live round-trip) --
+  code-level guarantee only, not a literal "loaded the page, watched it
+  render" confirmation.** CC could not locate a live UI path that
+  actually invokes `/api/result` and renders results this session (the
+  two terminal CTAs found were a different diagnostic path and a
+  contact/sales link; neither called the engine). CC stopped rather than
+  keep guessing at production CTA behavior, correctly avoiding an
+  unintended production side effect. Substitute evidence accepted as
+  sufficient: `PrivateOutput.tsx` has zero references to
+  `legal_tail_risk_exposure` (confirmed by grep this session and last),
+  so a component that never reads the field cannot be broken by its
+  shape changing; `tsc --noEmit` passes clean end-to-end both before and
+  after. This is a deliberate, named exception, not a gap to be
+  rediscovered later as an oversight.
+
+### On the horizon -- updated
+
+- **New Priority Queue item (UI rendering follow-on):** `PrivateOutput.tsx`
+  needs a rendering block for `legal_tail_risk_exposure`, now including
+  `coverage_basis`/`has_partial_jurisdictions`/`unpriced_state_ids`. UX
+  decisions needed (how `coverage_basis` affects visual hierarchy, caveat
+  copy for `has_partial_jurisdictions`, how to name unpriced clusters via
+  `unpriced_state_ids`). Explicitly out of scope this session by design.
+  This is now the actual remaining piece of what Priority Queue item 1
+  originally meant -- not "wire the module" (already true since 2026-08-04,
+  previously mistracked) but "render what's already computed."
+- Prior Priority Queue items 2-4 (PARTIAL state verification,
+  `extreme_high_confidence` investigation, v2 token migration) unchanged,
+  not touched this session.
