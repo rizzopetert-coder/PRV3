@@ -561,12 +561,15 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
     )
     legal_tail_risk_exposure = (
         {
-            "low":                     legal_result["low"],
-            "high":                    legal_result["high"],
-            "currency":                legal_result["currency"],
-            "band":                    legal_result["band"],
-            "caveat":                  LEGAL_TAIL_RISK_CAVEAT_TEXT,
-            "has_unpriced_conditions": legal_result["has_unpriced_conditions"],
+            "low":                       legal_result["low"],
+            "high":                      legal_result["high"],
+            "currency":                  legal_result["currency"],
+            "band":                      legal_result["band"],
+            "caveat":                    LEGAL_TAIL_RISK_CAVEAT_TEXT,
+            "has_unpriced_conditions":   legal_result["has_unpriced_conditions"],
+            "unpriced_state_ids":        legal_result["unpriced_state_ids"],
+            "coverage_basis":            legal_result["coverage_basis"],
+            "has_partial_jurisdictions": legal_result["has_partial_jurisdictions"],
         }
         if legal_result["low"] is not None or legal_result["has_unpriced_conditions"]
         else None
