@@ -463,8 +463,9 @@ export default function PrivateOutput({
 
           {legalHasPrice && legal.has_partial_jurisdictions && (
             <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">
-              An unverified-confidence jurisdiction is present alongside a
-              confirmed one here and could change this determination.
+              State law in this jurisdiction was not independently
+              verified and may set a different threshold than what's
+              reflected here.
             </p>
           )}
 
