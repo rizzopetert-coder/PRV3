@@ -17,6 +17,7 @@ import PrivateOutput from "@/components/PrivateOutput";
 import { StateDrawer } from "@/components/StateDrawer";
 import { SelfSelectionProvider, useSelfSelection } from "@/context/SelfSelectionContext";
 import DiagnosticFlow from "@/components/DiagnosticFlow";
+import SelfSelectIntakeModal from "@/components/SelfSelectIntakeModal";
 
 type DiagnosticPath = "diagnostic" | "self-select" | null;
 
@@ -81,6 +82,7 @@ function SelfSelectionInterface({
   const [resultPayload, setResultPayload] = useState<PrivateOutputPayload | null>(null);
   const [intakeForShare, setIntakeForShare] = useState<EnginePayload["intake"] | null>(null);
   const [isLoadingResult, setIsLoadingResult] = useState(false);
+  const [isIntakeModalOpen, setIsIntakeModalOpen] = useState(false);
 
   const selectedStates: State[] = states.filter((s) =>
     selectedStateIds.has(s.id)
@@ -127,16 +129,13 @@ function SelfSelectionInterface({
     }
   }
 
-  async function handleTakeDiagnostic() {
+  // Real intake (headcount, industry, org_type, jurisdictions) now
+  // collected via SelfSelectIntakeModal before this runs -- previously
+  // hardcoded entirely blank here, which this session's earlier
+  // engine-side fix made degrade cleanly rather than 500, but still
+  // meant no self-select result was ever priced.
+  async function handleTakeDiagnostic(intake: EnginePayload["intake"]) {
     if (selectedStateIds.size === 0) return;
-    const intake: EnginePayload["intake"] = {
-      headcount: "",
-      industry: "",
-      orgType: "",
-      jurisdictions: [],
-      significantEvents: [],
-      principalRole: "",
-    };
     setIntakeForShare(intake);
     setIsLoadingResult(true);
     try {
@@ -152,6 +151,11 @@ function SelfSelectionInterface({
     } finally {
       setIsLoadingResult(false);
     }
+  }
+
+  function handleIntakeSubmit(intake: EnginePayload["intake"]) {
+    setIsIntakeModalOpen(false);
+    handleTakeDiagnostic(intake);
   }
 
   // Phase 5 — PrivateOutput
@@ -232,7 +236,7 @@ function SelfSelectionInterface({
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
-                  onClick={handleTakeDiagnostic}
+                  onClick={() => setIsIntakeModalOpen(true)}
                   disabled={isLoadingResult}
                   className="flex-1 bg-charcoal text-white font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
@@ -247,6 +251,12 @@ function SelfSelectionInterface({
 
         </div>
       </main>
+
+      <SelfSelectIntakeModal
+        open={isIntakeModalOpen}
+        onClose={() => setIsIntakeModalOpen(false)}
+        onSubmit={handleIntakeSubmit}
+      />
 
       {/* Assembly Panel — phases 2–4 */}
       {currentPhase >= 2 && currentPhase < 5 && <AssemblyPanel />}
