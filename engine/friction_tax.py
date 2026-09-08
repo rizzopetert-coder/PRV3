@@ -3113,7 +3113,17 @@ def compute_legal_compliance_exposure(
                 "priceable curve but none was found",
                 sid, org_size, industry, org_type,
             )
-        # NOT_APPLICABLE: silently excluded, unchanged from before.
+        # NOT_APPLICABLE: silently excluded, unchanged from before. Note:
+        # this is also why resolve_coverage_gate()'s CONFIRMED-branch
+        # partial_state_flag can never surface here -- that branch only sets
+        # partial_state_flag=True when applies=False, and applies=False on a
+        # Cluster 1/2/4b state always resolves to status=NOT_APPLICABLE
+        # above, so the signal is discarded right here. The only reachable
+        # path to has_partial_jurisdictions=True in this aggregate is
+        # FEDERAL_FALLBACK, whose partial_state_flag is set unconditionally
+        # regardless of applies (confirmed live, 2026-09-08: built_to_fail +
+        # jurisdictions=["TX"] (PARTIAL only, no CONFIRMED jurisdiction) ->
+        # coverage_basis="federal_baseline", has_partial_jurisdictions=true).
 
     has_unpriced_conditions = bool(unpriced_state_ids)
 
