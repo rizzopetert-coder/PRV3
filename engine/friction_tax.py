@@ -2300,12 +2300,23 @@ class StateCoverageThreshold:
                       schema change -- a claim type with no override simply
                       isn't a key here.
     damages_cap_treatment: "uncapped" | "state_specific_tiers" |
-                      "federal_cap_applies". Captured for a future pricing
-                      extension (adjusting Cluster 1/2/4b's dollar ceiling
-                      by state) -- NOT yet consumed by resolve_coverage_gate()
-                      or the Cluster 1/2/4b integration below, which only
-                      gates applicability, not dollar amount. See the design
-                      doc's "Next steps."
+                      "state_specific_flat" | "federal_cap_applies".
+                      "uncapped": no damages cap at all. "state_specific_
+                      tiers": the state has its own independent statutory
+                      cap that scales in real tiers by employer size (e.g.
+                      TX, TN, CO -- distinct dollar figures at distinct
+                      headcount bands). "state_specific_flat": the state
+                      has its own independent statutory cap, but it's a
+                      single number regardless of employer size (e.g. VA,
+                      FL -- not tiered, and not deferring to federal).
+                      "federal_cap_applies": no independent state cap
+                      exists at all, so the federal Title VII tiered
+                      schedule fills the gap by default. Captured for a
+                      future pricing extension (adjusting Cluster 1/2/4b's
+                      dollar ceiling by state) -- NOT yet consumed by
+                      resolve_coverage_gate() or the Cluster 1/2/4b
+                      integration below, which only gates applicability,
+                      not dollar amount. See the design doc's "Next steps."
     confidence:       "CONFIRMED" (independently verified against primary
                       statute text this session) | "PARTIAL" (not verified
                       this session -- see citation for what the entry
@@ -2431,9 +2442,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "CO": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes / no minimum
-        damages_cap_treatment="state_specific_tiers",  # capped by employer size, federal-style shape
-        confidence="PARTIAL",
-        citation="CADA, C.R.S. §24-34-402; POWR Act (SB 23-172) eff. Aug. 7, 2023. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="state_specific_tiers",  # $10,000 (1-4 employees) / $25,000 (5-14 employees), then federal Title VII tiers apply at 15+, C.R.S. §24-34-405(3)(d)(I) and (II)(A)/(II)(B)
+        confidence="CONFIRMED",
+        citation="CADA, C.R.S. §24-34-402; POWR Act (SB 23-172) eff. Aug. 7, 2023.",
     ),
     "CT": StateCoverageThreshold(
         thresholds={"general": 1},  # lowered from 3+ eff. Oct. 1, 2022
@@ -2455,9 +2466,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "FL": StateCoverageThreshold(
         thresholds={"general": 15},
-        damages_cap_treatment="state_specific_tiers",  # punitive capped at $100,000 under FCRA
-        confidence="PARTIAL",
-        citation="Florida Civil Rights Act, Fla. Stat. §760.10. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="state_specific_flat",  # flat $100,000 punitive cap, no size-based tiers, Fla. Stat. §760.11(5) (confirmed consistent across a decade of statute versions)
+        confidence="CONFIRMED",
+        citation="Florida Civil Rights Act, Fla. Stat. §760.10.",
     ),
     "GA": StateCoverageThreshold(
         thresholds={"general": 15},  # no general private-sector state law -- federal governs
@@ -2644,15 +2655,15 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "TN": StateCoverageThreshold(
         thresholds={"general": 8},
-        damages_cap_treatment="state_specific_tiers",  # caps compensatory/punitive by employer size
-        confidence="PARTIAL",
-        citation="Tennessee Human Rights Act, T.C.A. §4-21-102 (secondary source). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="state_specific_tiers",  # $25,000 (8-14 employees) / $50,000 (15-100) / $100,000 (101-200) / $200,000 (201-500) / $300,000 (500+), T.C.A. §4-21-313(a)
+        confidence="CONFIRMED",
+        citation="Tennessee Human Rights Act, T.C.A. §4-21-102.",
     ),
     "TX": StateCoverageThreshold(
         thresholds={"general": 15},
-        damages_cap_treatment="state_specific_tiers",  # own tiered caps mirroring federal, Tex. Lab. Code §21.2585
-        confidence="PARTIAL",
-        citation="Texas Labor Code ch. 21 / Texas Commission on Human Rights Act. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="state_specific_tiers",  # $50,000 (<101 employees) / $100,000 (101-200) / $200,000 (201-500) / $300,000 (500+), Tex. Lab. Code §21.2585(d) -- §21.2585(f) removes this cap entirely for sexual-assault and sex-based-harassment/retaliation claims specifically, not currently modeled by claim type
+        confidence="CONFIRMED",
+        citation="Texas Labor Code ch. 21 / Texas Commission on Human Rights Act.",
     ),
     "UT": StateCoverageThreshold(
         thresholds={"general": 15},
@@ -2667,13 +2678,10 @@ STATE_COVERAGE_THRESHOLDS.update({
         citation="Vermont Fair Employment Practices Act, 21 V.S.A. §495. research/jurisdiction-research-headcount.md.",
     ),
     "VA": StateCoverageThreshold(
-        # Source flags this row itself as "nuanced/conflicting": 6+ for most
-        # discrimination, 5+ for unlawful-discharge claims specifically.
-        # General figure (6) used here.
-        thresholds={"general": 6},
-        damages_cap_treatment="state_specific_tiers",  # punitive subject to Virginia's general $350,000 cap
-        confidence="PARTIAL",
-        citation="Virginia Human Rights Act, as amended by the Virginia Values Act 2020, Va. Code §2.2-3905. research/jurisdiction-research-headcount.md.",
+        thresholds={"general": 5},
+        damages_cap_treatment="state_specific_flat",  # flat $350,000 punitive cap, Va. Code §8.01-38.1 (confirmed unchanged)
+        confidence="CONFIRMED",
+        citation="Va. Code §2.2-3905, as amended by SB 637 (Va. Acts ch. 950, 2026), eff. July 1, 2026 -- Virginia Human Rights Act employer threshold now 5, applying uniformly across all protected classes and claim types; the prior 5-20-employee age-discrimination-only carve-out is repealed entirely, not just the general threshold.",
     ),
     "WI": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
@@ -2712,8 +2720,8 @@ assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), 
     "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
     "key set as JURISDICTION_TABLE"
 )
-assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 7, (
-    "Expected exactly 7 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV)"
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 12, (
+    "Expected exactly 12 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO)"
 )
 
 
