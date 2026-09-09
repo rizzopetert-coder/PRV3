@@ -2490,21 +2490,26 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "IN": StateCoverageThreshold(
         thresholds={"general": 6},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Indiana Civil Rights Law, Ind. Code §22-9-1-2. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # compensatory/emotional-distress damages available with no statutory cap; ICRC has no authority to award punitive damages -- Indiana Civil Rights Commission v. Alder, 714 N.E.2d 632 (Ind. 1999)
+        confidence="CONFIRMED",
+        citation="Indiana Civil Rights Law, Ind. Code §22-9-1-2.",
     ),
     "IA": StateCoverageThreshold(
         thresholds={"general": 4},
-        damages_cap_treatment="state_specific_tiers",  # compensatory available, but NO punitive damages
+        # Likely mislabeled -- the "no punitive damages" fact pattern
+        # (see citation) matches this session's independently-confirmed
+        # uncapped states, not a genuine tiered structure. NOT corrected
+        # here: only pattern-consistency, not an independent Iowa
+        # source check, this session. See citation.
+        damages_cap_treatment="state_specific_tiers",
         confidence="PARTIAL",
-        citation="Iowa Civil Rights Act, Iowa Code §216.6. research/jurisdiction-research-headcount.md.",
+        citation="Iowa Civil Rights Act, Iowa Code §216.6; §216.15. \"Uncapped\" is consistent with CT/PA/NH/IN's independently-verified no-punitive-damages structures this session, but not independently source-checked for Iowa specifically -- a lead for the next verification pass, not a confirmed result.",
     ),
     "KS": StateCoverageThreshold(
         thresholds={"general": 4},
-        damages_cap_treatment="state_specific_tiers",  # $2,000 cap on pain/suffering/humiliation
-        confidence="PARTIAL",
-        citation="Kansas Act Against Discrimination, K.S.A. §44-1009. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="state_specific_flat",  # $2,000 flat cap on pain/suffering/humiliation damages specifically, not scaled by employer size, K.S.A. §44-1005(k); no punitive damages authority under KAAD
+        confidence="CONFIRMED",
+        citation="Kansas Act Against Discrimination, K.S.A. §44-1009; §44-1005(k); Woods v. Midwest Conveyor Co.; Sporleder v. U.S. Bancorp.",
     ),
     "KY": StateCoverageThreshold(
         thresholds={"general": 8},  # 15+ for disability & pregnancy accommodation specifically
@@ -2547,15 +2552,15 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "MI": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
-        damages_cap_treatment="uncapped",  # compensatory uncapped; note NO punitive damages available at all
+        damages_cap_treatment="uncapped",  # compensatory/mental-anguish damages uncapped; punitive/exemplary damages not available under ELCRA unless serving a compensatory purpose
         confidence="PARTIAL",
-        citation="Elliott-Larsen Civil Rights Act, MCL §37.2201. research/jurisdiction-research-headcount.md.",
+        citation="Elliott-Larsen Civil Rights Act, MCL §37.2201; §37.2801. \"Uncapped\" is consistent with CT/PA/NH/IN's independently-verified no-punitive-damages structures this session, but not independently source-checked for Michigan specifically -- a lead for the next verification pass, not a confirmed result.",
     ),
     "MN": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
-        damages_cap_treatment="uncapped",  # treble damages available; $25k punitive cap removed 2024 (HF4109)
-        confidence="PARTIAL",
-        citation="Minnesota Human Rights Act, Minn. Stat. ch. 363A. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # treble damages available; 2024 amendment (HF4109, signed May 15 2024, eff. Aug. 1 2024) removed the prior $25,000 punitive-damages cap for private-sector employers -- a $25,000 cap remains only for claims against political subdivisions
+        confidence="CONFIRMED",
+        citation="Minnesota Human Rights Act, Minn. Stat. §363A.29.",
     ),
     "MS": StateCoverageThreshold(
         thresholds={"general": 15},  # no state anti-discrimination law -- federal governs
@@ -2565,9 +2570,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "MO": StateCoverageThreshold(
         thresholds={"general": 6},
-        damages_cap_treatment="state_specific_tiers",  # own tiered cap, SB 43 (2017)
-        confidence="PARTIAL",
-        citation="Missouri Human Rights Act, RSMo §213.010; SB 43 eff. Aug. 28, 2017. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="state_specific_tiers",  # combined compensatory (non-pecuniary)-and-punitive cap: $50,000 (more than 5 and fewer than 101 employees, i.e. 6-100 -- matches MHRA's own 6-employee coverage threshold) / $100,000 (101-200) / $200,000 (201-500) / $500,000 (500+); back pay/front pay not subject to these caps
+        confidence="CONFIRMED",
+        citation="Missouri Human Rights Act, RSMo §213.010; §213.111(4); SB 43 eff. Aug. 28, 2017.",
     ),
     "MT": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum / all sizes
@@ -2737,8 +2742,8 @@ assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), 
     "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
     "key set as JURISDICTION_TABLE"
 )
-assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 22, (
-    "Expected exactly 22 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT)"
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 26, (
+    "Expected exactly 26 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO)"
 )
 
 
