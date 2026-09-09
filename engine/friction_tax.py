@@ -2300,23 +2300,39 @@ class StateCoverageThreshold:
                       schema change -- a claim type with no override simply
                       isn't a key here.
     damages_cap_treatment: "uncapped" | "state_specific_tiers" |
-                      "state_specific_flat" | "federal_cap_applies".
-                      "uncapped": no damages cap at all. "state_specific_
-                      tiers": the state has its own independent statutory
-                      cap that scales in real tiers by employer size (e.g.
-                      TX, TN, CO -- distinct dollar figures at distinct
-                      headcount bands). "state_specific_flat": the state
-                      has its own independent statutory cap, but it's a
-                      single number regardless of employer size (e.g. VA,
-                      FL -- not tiered, and not deferring to federal).
+                      "state_specific_flat" | "federal_cap_applies" |
+                      "no_damages_available".
+                      "uncapped": real compensatory (and/or punitive)
+                      damages exist with no ceiling on the amount.
+                      "state_specific_tiers": the state has its own
+                      independent statutory cap that scales in real tiers
+                      by employer size (e.g. TX, TN, CO -- distinct dollar
+                      figures at distinct headcount bands).
+                      "state_specific_flat": the state has its own
+                      independent statutory cap, but it's a single number
+                      regardless of employer size (e.g. VA, FL -- not
+                      tiered, and not deferring to federal).
                       "federal_cap_applies": no independent state cap
                       exists at all, so the federal Title VII tiered
-                      schedule fills the gap by default. Captured for a
-                      future pricing extension (adjusting Cluster 1/2/4b's
-                      dollar ceiling by state) -- NOT yet consumed by
-                      resolve_coverage_gate() or the Cluster 1/2/4b
-                      integration below, which only gates applicability,
-                      not dollar amount. See the design doc's "Next steps."
+                      schedule fills the gap by default.
+                      "no_damages_available": neither compensatory nor
+                      punitive damages are authorized under this statute
+                      at all -- remedies are limited to equitable/make-
+                      whole relief (back pay, front pay, reinstatement,
+                      injunctive relief, attorney's fees), e.g. ND, WI.
+                      Distinct from "uncapped": that value means real
+                      damages exist with no ceiling; this value means no
+                      damages exist to cap in the first place. A future
+                      pricing extension MUST treat this value as zero
+                      exposure, not unconstrained exposure -- conflating
+                      it with "uncapped" would overstate a state's real
+                      exposure, the exact misread this value exists to
+                      prevent. Captured for a future pricing extension
+                      (adjusting Cluster 1/2/4b's dollar ceiling by
+                      state) -- NOT yet consumed by resolve_coverage_gate()
+                      or the Cluster 1/2/4b integration below, which only
+                      gates applicability, not dollar amount. See the
+                      design doc's "Next steps."
     confidence:       "CONFIRMED" (independently verified against primary
                       statute text this session) | "PARTIAL" (not verified
                       this session -- see citation for what the entry
@@ -2582,9 +2598,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "NE": StateCoverageThreshold(
         thresholds={"general": 15},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Nebraska Fair Employment Practice Act (secondary source). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # punitive damages constitutionally barred in Nebraska (Neb. Const. Art. VII, §5; O'Brien v. Cessna Aircraft Co., 298 Neb. 109 (2017)); compensatory damages under Neb. Rev. Stat. §48-1119(4) have no statutory cap
+        confidence="CONFIRMED",
+        citation="Nebraska Fair Employment Practice Act, Neb. Rev. Stat. §48-1119(4); Neb. Const. Art. VII, §5; O'Brien v. Cessna Aircraft Co., 298 Neb. 109 (2017).",
     ),
     "NV": StateCoverageThreshold(
         thresholds={"general": 15},
@@ -2629,15 +2645,15 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "ND": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="North Dakota Human Rights Act, N.D.C.C. ch. 14-02.4 (secondary source). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="no_damages_available",  # N.D.C.C. §14-02.4-20, direct statute text: "Neither the department nor an administrative hearing officer may order compensatory or punitive damages under this chapter" -- remedies limited to back pay (2-year cap), injunctions, and equitable relief
+        confidence="CONFIRMED",
+        citation="North Dakota Human Rights Act, N.D.C.C. ch. 14-02.4; §14-02.4-20.",
     ),
     "OH": StateCoverageThreshold(
         thresholds={"general": 4},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Ohio Civil Rights Act, R.C. ch. 4112. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="state_specific_tiers",  # H.B. 352 (Employment Law Uniformity Act), eff. Apr. 15, 2021, codified Ohio's Tort Reform Act caps onto R.C. ch. 4112 claims. R.C. 2315.18: non-economic compensatory capped at the greater of $250,000 or 3x economic loss, max $350,000. R.C. 2315.21: punitive capped at 2x compensatory, or for "small employers" (<=100 employees, 500 for manufacturing) at 10% of net worth up to $350,000
+        confidence="CONFIRMED",
+        citation="Ohio Civil Rights Act, R.C. ch. 4112; R.C. 2315.18; R.C. 2315.21; H.B. 352 eff. Apr. 15, 2021.",
     ),
     "OK": StateCoverageThreshold(
         thresholds={"general": 15},
@@ -2671,9 +2687,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "SD": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="SD Human Relations Act, SDCL ch. 20-13 (secondary source). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # compensatory damages available with no statutory cap for a general employment discrimination claim under §20-13-10 (SDCL §20-13-35.1). Punitive damages ARE authorized under §21-3-2, but only for a distinct, narrower set of HRA sections (§§20-13-20 to 20-13-21.2, 20-13-23.4, 20-13-23.7, 20-13-26) that appear housing-related, not general employment discrimination -- do not read this as "no punitive damages under this chapter" broadly
+        confidence="CONFIRMED",
+        citation="SD Human Relations Act, SDCL ch. 20-13; §20-13-10; §20-13-35.1; §21-3-2.",
     ),
     "TN": StateCoverageThreshold(
         thresholds={"general": 8},
@@ -2707,9 +2723,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "WI": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
-        damages_cap_treatment="state_specific_tiers",  # historically limited remedies, compensatory/punitive both restricted
-        confidence="PARTIAL",
-        citation="Wisconsin Fair Employment Act, Wis. Stat. §111.31 et seq. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="no_damages_available",  # 2011 Wisconsin Act 219 repealed the 2009 amendment (Act 20) that had briefly allowed compensatory/punitive damages under WFEA -- current remedies under Wis. Stat. §111.39(4)(c) limited to back pay, front pay, reinstatement, and attorney's fees; neither compensatory nor punitive damages available
+        confidence="CONFIRMED",
+        citation="Wisconsin Fair Employment Act, Wis. Stat. §111.31 et seq.; §111.39(4)(c); 2011 Wisconsin Act 219.",
     ),
     "WY": StateCoverageThreshold(
         thresholds={"general": 2},
@@ -2742,8 +2758,8 @@ assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), 
     "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
     "key set as JURISDICTION_TABLE"
 )
-assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 26, (
-    "Expected exactly 26 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO)"
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 31, (
+    "Expected exactly 31 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI)"
 )
 
 
