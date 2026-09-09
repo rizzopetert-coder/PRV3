@@ -2448,21 +2448,21 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "CT": StateCoverageThreshold(
         thresholds={"general": 1},  # lowered from 3+ eff. Oct. 1, 2022
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="CFEPA, Conn. Gen. Stat. §46a-51(10); P.A. 22-82. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # compensatory uncapped; punitive damages not authorized under CFEPA at all -- Tomick v. UPS, 324 Conn. 470 (2016), Connecticut Supreme Court
+        confidence="CONFIRMED",
+        citation="CFEPA, Conn. Gen. Stat. §46a-51(10), §46a-104; P.A. 22-82.",
     ),
     "DE": StateCoverageThreshold(
-        thresholds={"general": 4},  # 15+ for disability specifically -- general figure used here
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="19 Del. C. §711; §724 (disability, 15+). research/jurisdiction-research-headcount.md.",
+        thresholds={"general": 4},  # disability coverage synced to this general threshold by Chapter 381 (SB 185, 2014) -- no longer a separate 15-employee line
+        damages_cap_treatment="state_specific_tiers",  # $50,000 (4-14 employees) / $75,000 (15-100) / $175,000 (101-200) / $300,000 (201-500) / $500,000 (500+), 19 Del. C. §715(c) (SB 145, 2024, Chapter 203)
+        confidence="CONFIRMED",
+        citation="19 Del. C. §710(6); §722(3), as amended by Chapter 381 (SB 185, 2014).",
     ),
     "DC": StateCoverageThreshold(
         thresholds={"general": 1},
-        damages_cap_treatment="uncapped",  # compensatory AND punitive, no statutory ceiling
-        confidence="PARTIAL",
-        citation="DC Human Rights Act, D.C. Code §2-1401 et seq. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # compensatory AND punitive, no statutory ceiling on either
+        confidence="CONFIRMED",
+        citation="DC Human Rights Act, D.C. Code §2-1401.02(10), §2-1403.16.",
     ),
     "FL": StateCoverageThreshold(
         thresholds={"general": 15},
@@ -2519,16 +2519,31 @@ STATE_COVERAGE_THRESHOLDS.update({
         citation="La. R.S. §23:332; §23:342 (pregnancy). research/jurisdiction-research-headcount.md.",
     ),
     "ME": StateCoverageThreshold(
-        thresholds={"general": 1},  # all sizes; federal-style damages caps apply only at 15+
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Maine Human Rights Act, 5 M.R.S. §4572. research/jurisdiction-research-headcount.md.",
+        thresholds={"general": 1},  # all sizes
+        # <15 employees: "civil penal damages" only (not traditional
+        # compensatory/punitive), tiered $20,000 (1st order) / $50,000
+        # (2nd order) / $100,000 (3rd+ order). 15+ employees: traditional
+        # compensatory and punitive damages, tiered up to $500,000 at the
+        # top employer-size bracket -- exceeds Title VII's $300,000
+        # federal maximum. Only the <15 tiers and the $500,000 ceiling
+        # were independently verified this session -- intermediate
+        # 15+-employee tier breakpoints were NOT verified; confirm
+        # against 5 M.R.S. §4613(2)(B)(7)-(8) directly before relying on
+        # them for anything beyond the applicability gate this field
+        # doesn't yet drive.
+        damages_cap_treatment="state_specific_tiers",
+        confidence="CONFIRMED",
+        citation="Maine Human Rights Act, 5 M.R.S. §4572; §4613(2)(B)(7)-(8).",
     ),
     "MD": StateCoverageThreshold(
         thresholds={"general": 15, "harassment": 1},  # confirmed harassment carve-out, HB 679 (2019)
-        damages_cap_treatment="state_specific_tiers",  # own tiered cap $50k/$100k/$200k/$300k by size
-        confidence="PARTIAL",
-        citation="Md. State Gov't Code §20-601(d), §20-611, §20-1009(b)(3), §20-1013. research/jurisdiction-research-headcount.md.",
+        # Confirmed via §20-1013(e)(2): this is a COMBINED compensatory-
+        # and-punitive cap, not compensatory-only with punitive uncapped
+        # separately -- easy to misread from a partial reading of
+        # §20-1009 alone; resolved this session, not just data entry.
+        damages_cap_treatment="state_specific_tiers",  # $50,000 (15-100 employees) / $100,000 (101-200) / $200,000 (201-500) / $300,000 (501+), Md. State Gov't Code §20-1009(b)(3)
+        confidence="CONFIRMED",
+        citation="Md. State Gov't Code §20-601(d), §20-611, §20-1009(b)(3), §20-1013(e)(2).",
     ),
     "MI": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
@@ -2720,8 +2735,8 @@ assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), 
     "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
     "key set as JURISDICTION_TABLE"
 )
-assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 12, (
-    "Expected exactly 12 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO)"
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 17, (
+    "Expected exactly 17 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD)"
 )
 
 
