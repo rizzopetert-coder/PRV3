@@ -2441,8 +2441,8 @@ STATE_COVERAGE_THRESHOLDS.update({
     "AL": StateCoverageThreshold(
         thresholds={"general": 15},  # no general state anti-discrimination law -- federal governs
         damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="No general state law (age-only state law is 20+, Code of Ala. §25-1-21); federal 15+ governs other traits. research/jurisdiction-research-headcount.md.",
+        confidence="CONFIRMED",
+        citation="No general private-sector state anti-discrimination law exists in Alabama -- federal Title VII (15+) governs entirely. Alabama Age Discrimination in Employment Act (AADEA), Code of Ala. §25-1-21, is a narrow age-only carve-out at 20+ employees.",
     ),
     "AZ": StateCoverageThreshold(
         thresholds={"general": 15, "harassment": 1},  # sexual harassment covers all employers
@@ -2452,9 +2452,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "AR": StateCoverageThreshold(
         thresholds={"general": 9},
-        damages_cap_treatment="state_specific_tiers",  # capped based on employer size
-        confidence="PARTIAL",
-        citation="Arkansas Civil Rights Act, Ark. Code §16-123-107. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="state_specific_tiers",  # $15,000 (fewer than 15 employees) / $50,000 (15-100) / $100,000 (101-200) / $200,000 (201-500) / $300,000 (500+), Ark. Code §16-123-107(c)(2)(B)
+        confidence="CONFIRMED",
+        citation="Arkansas Civil Rights Act, Ark. Code §16-123-107(c)(2)(B).",
     ),
     "CO": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes / no minimum
@@ -2489,8 +2489,8 @@ STATE_COVERAGE_THRESHOLDS.update({
     "GA": StateCoverageThreshold(
         thresholds={"general": 15},  # no general private-sector state law -- federal governs
         damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="No general private-sector state law; disability 15+ (§34-6A-4). research/jurisdiction-research-headcount.md.",
+        confidence="CONFIRMED",
+        citation="No general private-sector state anti-discrimination law exists in Georgia -- federal Title VII (15+) governs entirely. Georgia Equal Employment for Persons with Disabilities Code, O.C.G.A. §34-6A-4, is a narrow disability-only carve-out at 15+ employees.",
     ),
     "HI": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
@@ -2529,15 +2529,15 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "KY": StateCoverageThreshold(
         thresholds={"general": 8},  # 15+ for disability & pregnancy accommodation specifically
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="KRS §344.040. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # back pay, front pay, injunctive relief, and uncapped compensatory damages (emotional distress/humiliation) available under KRS §344.450; the remedy provision doesn't list punitive damages, and courts applying it (e.g. Timmons v. Wal-Mart Stores, following the Grzyb line of reasoning) have confirmed punitive damages aren't recoverable -- statutory-construction consensus, not one clean controlling holding like IN's Alder or PA's Hoy
+        confidence="CONFIRMED",
+        citation="Kentucky Civil Rights Act, KRS §344.450.",
     ),
     "LA": StateCoverageThreshold(
         thresholds={"general": 20},  # pregnancy 25+; federal 15+ is effectively lower either way
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="La. R.S. §23:332; §23:342 (pregnancy). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # compensatory damages, back pay, benefits, attorney's fees available with no statutory cap under La. R.S. §23:303(A); Louisiana's civil-law doctrine bars punitive damages generally absent express statutory authorization (Chauvin v. Exxon Mobil, 2014-0808 (La. 12/9/14); Ross v. Conoco, Inc., 2002-0299 (La. 10/15/02)), and the LEDL provides none
+        confidence="CONFIRMED",
+        citation="Louisiana Employment Discrimination Law, La. R.S. §23:303(A); §23:332; §23:342 (pregnancy).",
     ),
     "ME": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
@@ -2740,6 +2740,23 @@ STATE_COVERAGE_THRESHOLDS.update({
 # this loop should be a no-op in practice (asserted below) and exists only
 # so a future JURISDICTION_TABLE addition can't silently produce a KeyError
 # deep inside resolve_coverage_gate() instead of a clear signal here.
+#
+# This is also why a state with no general private-sector anti-
+# discrimination law (e.g. AL, GA) can't simply be OMITTED from this
+# dict to represent "federal governs entirely." Two mechanisms make
+# that actively broken, not just risky: (1) the assert immediately
+# below requires this dict's key set to exactly match
+# JURISDICTION_TABLE's, so removing an entry crashes the whole module
+# at import time, not just a rare code path; (2) even without that
+# assert, this fallback loop would silently re-create the omitted
+# entry as an unresearched-looking PARTIAL placeholder, actively
+# mislabeling a real, confirmed finding. resolve_coverage_gate()'s own
+# .get(jid) lookup is safe on a missing key -- that's a separate
+# question from whether removal is a good idea (2026-09-09
+# investigation, AL/GA). The correct representation for "no state law
+# exists" is to KEEP the entry with damages_cap_treatment=
+# "federal_cap_applies" and confidence="CONFIRMED" once independently
+# verified -- see AL/GA's own entries above.
 for _jid in JURISDICTION_TABLE:
     if _jid not in STATE_COVERAGE_THRESHOLDS:
         _logger.warning(
@@ -2758,8 +2775,8 @@ assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), 
     "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
     "key set as JURISDICTION_TABLE"
 )
-assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 31, (
-    "Expected exactly 31 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI)"
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 36, (
+    "Expected exactly 36 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA)"
 )
 
 
