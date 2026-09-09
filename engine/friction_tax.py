@@ -2589,19 +2589,21 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "NH": StateCoverageThreshold(
         thresholds={"general": 6},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="RSA ch. 354-A (secondary source). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # RSA 354-A:21-a authorizes uncapped "enhanced compensatory damages" for willful/reckless violations; RSA 354-A isn't one of RSA 507:16's narrow punitive-damages carve-outs (RSA 359-D:11, RSA 570-A:11)
+        confidence="CONFIRMED",
+        citation="RSA ch. 354-A; RSA 354-A:21-a; RSA 507:16.",
     ),
     "NJ": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
-        # UNCAPPED compensatory + punitive under NJLAD itself, but the
-        # general NJ Punitive Damages Act cap (greater of 5x compensatory or
-        # $350,000) may apply to the punitive component -- flagged, not
-        # resolved, in the source document too.
+        # N.J.S.A. §2A:15-5.14(c) explicitly excludes "P.L.1945, c.169
+        # (C.10:5-1 et seq.)" (the LAD) from the general Punitive
+        # Damages Act's 5x-compensatory/$350,000 cap -- both
+        # compensatory and punitive remain genuinely uncapped under
+        # NJLAD specifically. Resolves the prior "flagged, not
+        # resolved" open question.
         damages_cap_treatment="uncapped",
-        confidence="PARTIAL",
-        citation="NJLAD, N.J.S.A. §10:5-5, §10:5-3. research/jurisdiction-research-headcount.md.",
+        confidence="CONFIRMED",
+        citation="NJLAD, N.J.S.A. §10:5-5, §10:5-3; N.J.S.A. §2A:15-5.14(c).",
     ),
     "NM": StateCoverageThreshold(
         thresholds={"general": 4},
@@ -2646,15 +2648,15 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "PA": StateCoverageThreshold(
         thresholds={"general": 4},
-        damages_cap_treatment="state_specific_tiers",  # compensatory available, but PHRA bars punitive entirely
-        confidence="PARTIAL",
-        citation="Pennsylvania Human Relations Act, 43 P.S. §954. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # compensatory (including emotional distress) uncapped; punitive damages not recoverable under the PHRA at all -- Hoy v. Angelone, 554 Pa. 134, 720 A.2d 745 (Pa. 1998), Pennsylvania Supreme Court
+        confidence="CONFIRMED",
+        citation="Pennsylvania Human Relations Act, 43 P.S. §954.",
     ),
     "RI": StateCoverageThreshold(
         thresholds={"general": 4},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="RI Fair Employment Practices Act, R.I. Gen. Laws §28-5-6 (secondary source). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # R.I. Gen. Laws §28-5-24 (compensatory) and §28-5-29.1 (punitive, on a malice/reckless-indifference showing) -- neither imposes a dollar cap or employer-size tier
+        confidence="CONFIRMED",
+        citation="RI Fair Employment Practices Act, R.I. Gen. Laws §28-5-24; §28-5-29.1.",
     ),
     "SC": StateCoverageThreshold(
         thresholds={"general": 15},
@@ -2688,9 +2690,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "VT": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum / all sizes
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Vermont Fair Employment Practices Act, 21 V.S.A. §495. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # 21 V.S.A. §495b(b) authorizes compensatory and punitive damages with no statutory limit of any kind
+        confidence="CONFIRMED",
+        citation="Vermont Fair Employment Practices Act, 21 V.S.A. §495; §495b(b).",
     ),
     "VA": StateCoverageThreshold(
         thresholds={"general": 5},
@@ -2735,8 +2737,8 @@ assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), 
     "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
     "key set as JURISDICTION_TABLE"
 )
-assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 17, (
-    "Expected exactly 17 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD)"
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 22, (
+    "Expected exactly 22 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT)"
 )
 
 
