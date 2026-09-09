@@ -1161,9 +1161,9 @@ check(
     f"symmetric difference: {set(STATE_COVERAGE_THRESHOLDS.keys()) ^ set(_JURISDICTION_TABLE_CHECK.keys())}",
 )
 check(
-    "STATE_COVERAGE_THRESHOLDS has exactly 7 CONFIRMED entries (CA, NY, MA, IL, WA, AK, WV)",
+    "STATE_COVERAGE_THRESHOLDS has exactly 12 CONFIRMED entries (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO)",
     {jid for jid, v in STATE_COVERAGE_THRESHOLDS.items() if v.confidence == "CONFIRMED"}
-    == {"CA", "NY", "MA", "IL", "WA", "AK", "WV"},
+    == {"CA", "NY", "MA", "IL", "WA", "AK", "WV", "VA", "TX", "TN", "FL", "CO"},
     f"got {sorted(jid for jid, v in STATE_COVERAGE_THRESHOLDS.items() if v.confidence == 'CONFIRMED')}",
 )
 check(
@@ -1271,16 +1271,20 @@ check(
 
 
 # -- 38. resolve_coverage_gate() -- PARTIAL-only jurisdiction never drives the answer --
-# TX is PARTIAL (not one of the 7 CONFIRMED states). Confirms PARTIAL data
-# never produces confidence="CONFIRMED" or a driving_jurisdiction, even
-# though it's present in the input and does surface as a qualitative flag.
+# AL is PARTIAL (not one of the 12 CONFIRMED states) -- this test used TX
+# for the same purpose until batch 0 of the PARTIAL-state verification
+# workstream flipped TX to CONFIRMED (2026-09-09); AL has the identical
+# threshold (15) TX had before that, so this is a pure rename, no
+# numeric change. Confirms PARTIAL data never produces
+# confidence="CONFIRMED" or a driving_jurisdiction, even though it's
+# present in the input and does surface as a qualitative flag.
 
 check(
-    "sanity: TX is PARTIAL confidence, not CONFIRMED, needed for the check below",
-    STATE_COVERAGE_THRESHOLDS["TX"].confidence == "PARTIAL",
-    f"got {STATE_COVERAGE_THRESHOLDS['TX'].confidence!r}",
+    "sanity: AL is PARTIAL confidence, not CONFIRMED, needed for the check below",
+    STATE_COVERAGE_THRESHOLDS["AL"].confidence == "PARTIAL",
+    f"got {STATE_COVERAGE_THRESHOLDS['AL'].confidence!r}",
 )
-_gate_partial_only = resolve_coverage_gate(headcount=20, jurisdictions=["TX"], claim_type="general")
+_gate_partial_only = resolve_coverage_gate(headcount=20, jurisdictions=["AL"], claim_type="general")
 check(
     "resolve_coverage_gate: PARTIAL-only jurisdiction list -> confidence='FEDERAL_FALLBACK', "
     "NOT 'CONFIRMED' -- a PARTIAL state's own number never drives the determination",
@@ -1289,9 +1293,9 @@ check(
 )
 check(
     "resolve_coverage_gate: PARTIAL-only jurisdiction list still raises the qualitative flag, "
-    "naming TX specifically, rather than silently using its unverified threshold",
+    "naming AL specifically, rather than silently using its unverified threshold",
     _gate_partial_only.partial_state_flag is True
-    and _gate_partial_only.partial_jurisdictions_considered == ("TX",),
+    and _gate_partial_only.partial_jurisdictions_considered == ("AL",),
     f"got {_gate_partial_only}",
 )
 
