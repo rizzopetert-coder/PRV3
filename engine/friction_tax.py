@@ -2446,9 +2446,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "AZ": StateCoverageThreshold(
         thresholds={"general": 15, "harassment": 1},  # sexual harassment covers all employers
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Arizona Civil Rights Act, A.R.S. §41-1461 et seq., §41-1463. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="no_damages_available",  # A.R.S. §41-1481(G) -- remedies limited to injunctions, reinstatement, back pay, front pay; no compensatory or punitive damages authorized
+        confidence="CONFIRMED",
+        citation="Arizona Civil Rights Act, A.R.S. §41-1461(6)(a); §41-1463; §41-1481(G).",
     ),
     "AR": StateCoverageThreshold(
         thresholds={"general": 9},
@@ -2494,15 +2494,15 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "HI": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="HRS §378-2. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # HRS §378-5 / §368-17(b) -- court actions (post right-to-sue) allow unlimited compensatory (including emotional distress) and punitive damages; Hawaii does not incorporate Title VII's federal caps
+        confidence="CONFIRMED",
+        citation="HRS §378-1; §378-2; §378-5; §368-17(b).",
     ),
     "ID": StateCoverageThreshold(
         thresholds={"general": 5},
-        damages_cap_treatment="state_specific_tiers",  # punitive capped at $1,000 per willful violation
-        confidence="PARTIAL",
-        citation="Idaho Human Rights Act, Idaho Code §67-5909. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="state_specific_flat",  # Idaho Code §67-5908(3)(e) -- punitive damages capped at a flat $1,000 per willful violation, a single statutory ceiling, not employer-size tiers; actual/economic damages available separately, uncapped by this provision
+        confidence="CONFIRMED",
+        citation="Idaho Human Rights Act, Idaho Code §67-5902(6); §67-5908(3)(e).",
     ),
     "IN": StateCoverageThreshold(
         thresholds={"general": 6},
@@ -2592,9 +2592,17 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "MT": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum / all sizes
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Montana Human Rights Act; Wrongful Discharge from Employment Act. research/jurisdiction-research-headcount.md.",
+        # MCA §39-2-912(1) exempts discrimination-based discharges from
+        # the WDEA entirely (which would otherwise cap damages at 4
+        # years wages/benefits and bar punitive) -- discrimination
+        # claims proceed exclusively under the MHRA. Under MCA
+        # §49-2-506(1)(b)/(2) and §49-2-509(2): punitive damages
+        # barred, but compensatory damages (pecuniary harm,
+        # pain/suffering, emotional distress) are authorized and
+        # uncapped by any statutory schedule.
+        damages_cap_treatment="uncapped",
+        confidence="CONFIRMED",
+        citation="Montana Human Rights Act, MCA §49-2-101(11); §49-2-506(1)(b); §49-2-509(2); Wrongful Discharge from Employment Act, MCA §39-2-912(1).",
     ),
     "NE": StateCoverageThreshold(
         thresholds={"general": 15},
@@ -2628,9 +2636,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "NM": StateCoverageThreshold(
         thresholds={"general": 4},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="New Mexico Human Rights Act, NMSA §28-1-2 (secondary source). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # NMSA 1978, §28-1-13(D) -- actual damages including emotional distress available and uncapped; punitive damages not authorized under NMHRA; Title VII's federal caps don't apply to state claims
+        confidence="CONFIRMED",
+        citation="New Mexico Human Rights Act, NMSA 1978, §28-1-2(B); §28-1-13(D).",
     ),
     "NC": StateCoverageThreshold(
         # NCEEPA covers employers with 15+ employees but provides no
@@ -2776,8 +2784,8 @@ assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), 
     "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
     "key set as JURISDICTION_TABLE"
 )
-assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 39, (
-    "Expected exactly 39 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA, MS, NC, OK)"
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 44, (
+    "Expected exactly 44 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA, MS, NC, OK, AZ, HI, ID, MT, NM)"
 )
 
 
