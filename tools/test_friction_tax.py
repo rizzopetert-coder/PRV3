@@ -1161,9 +1161,9 @@ check(
     f"symmetric difference: {set(STATE_COVERAGE_THRESHOLDS.keys()) ^ set(_JURISDICTION_TABLE_CHECK.keys())}",
 )
 check(
-    "STATE_COVERAGE_THRESHOLDS has exactly 36 CONFIRMED entries (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA)",
+    "STATE_COVERAGE_THRESHOLDS has exactly 39 CONFIRMED entries (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA, MS, NC, OK)",
     {jid for jid, v in STATE_COVERAGE_THRESHOLDS.items() if v.confidence == "CONFIRMED"}
-    == {"CA", "NY", "MA", "IL", "WA", "AK", "WV", "VA", "TX", "TN", "FL", "CO", "CT", "DE", "DC", "ME", "MD", "NH", "NJ", "PA", "RI", "VT", "IN", "KS", "MN", "MO", "NE", "ND", "OH", "SD", "WI", "AL", "AR", "GA", "KY", "LA"},
+    == {"CA", "NY", "MA", "IL", "WA", "AK", "WV", "VA", "TX", "TN", "FL", "CO", "CT", "DE", "DC", "ME", "MD", "NH", "NJ", "PA", "RI", "VT", "IN", "KS", "MN", "MO", "NE", "ND", "OH", "SD", "WI", "AL", "AR", "GA", "KY", "LA", "MS", "NC", "OK"},
     f"got {sorted(jid for jid, v in STATE_COVERAGE_THRESHOLDS.items() if v.confidence == 'CONFIRMED')}",
 )
 check(
@@ -1271,21 +1271,22 @@ check(
 
 
 # -- 38. resolve_coverage_gate() -- PARTIAL-only jurisdiction never drives the answer --
-# MS is PARTIAL (not one of the 36 CONFIRMED states) -- this test used
-# AL for the same purpose until batch 5 of the PARTIAL-state
-# verification workstream flipped AL to CONFIRMED (2026-09-09); MS has
-# the identical threshold (15) AL had before that, so this is a pure
-# rename, no numeric change (this test's second substitution --
-# originally TX, per batch 0). Confirms PARTIAL data never produces
-# confidence="CONFIRMED" or a driving_jurisdiction, even though it's
-# present in the input and does surface as a qualitative flag.
+# SC is PARTIAL (not one of the 39 CONFIRMED states) -- this test used
+# MS for the same purpose until batch 6 of the PARTIAL-state
+# verification workstream flipped MS to CONFIRMED (2026-09-10); SC has
+# the identical threshold (15) MS had before that, so this is a pure
+# rename, no numeric change (this test's third substitution --
+# originally TX per batch 0, then AL per batch 5). Confirms PARTIAL data
+# never produces confidence="CONFIRMED" or a driving_jurisdiction, even
+# though it's present in the input and does surface as a qualitative
+# flag.
 
 check(
-    "sanity: MS is PARTIAL confidence, not CONFIRMED, needed for the check below",
-    STATE_COVERAGE_THRESHOLDS["MS"].confidence == "PARTIAL",
-    f"got {STATE_COVERAGE_THRESHOLDS['MS'].confidence!r}",
+    "sanity: SC is PARTIAL confidence, not CONFIRMED, needed for the check below",
+    STATE_COVERAGE_THRESHOLDS["SC"].confidence == "PARTIAL",
+    f"got {STATE_COVERAGE_THRESHOLDS['SC'].confidence!r}",
 )
-_gate_partial_only = resolve_coverage_gate(headcount=20, jurisdictions=["MS"], claim_type="general")
+_gate_partial_only = resolve_coverage_gate(headcount=20, jurisdictions=["SC"], claim_type="general")
 check(
     "resolve_coverage_gate: PARTIAL-only jurisdiction list -> confidence='FEDERAL_FALLBACK', "
     "NOT 'CONFIRMED' -- a PARTIAL state's own number never drives the determination",
@@ -1294,9 +1295,9 @@ check(
 )
 check(
     "resolve_coverage_gate: PARTIAL-only jurisdiction list still raises the qualitative flag, "
-    "naming MS specifically, rather than silently using its unverified threshold",
+    "naming SC specifically, rather than silently using its unverified threshold",
     _gate_partial_only.partial_state_flag is True
-    and _gate_partial_only.partial_jurisdictions_considered == ("MS",),
+    and _gate_partial_only.partial_jurisdictions_considered == ("SC",),
     f"got {_gate_partial_only}",
 )
 
