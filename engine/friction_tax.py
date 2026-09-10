@@ -2612,9 +2612,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "NV": StateCoverageThreshold(
         thresholds={"general": 15},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Nev. Rev. Stat. ch. 613 (secondary source). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="federal_cap_applies",  # NRS §613.432 incorporates the federal Title VII remedy framework, so compensatory/punitive damages are available but subject to federal §1981a tiered caps
+        confidence="CONFIRMED",
+        citation="Nevada Fair Employment Practices Act, NRS §613.310(2); §613.432.",
     ),
     "NH": StateCoverageThreshold(
         thresholds={"general": 6},
@@ -2672,9 +2672,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "OR": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum
-        damages_cap_treatment="uncapped",  # noneconomic damages, per Oregon Sup. Ct. 2021
-        confidence="PARTIAL",
-        citation="ORS §659A.030. research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="uncapped",  # Zweizig v. Rote, 368 Or. 79 (2021) -- Oregon Supreme Court held the $500,000 noneconomic damages cap in ORS 31.710(1) (civil actions for "bodily injury") does NOT apply to unlawful employment practice claims under ORS 659A.030 seeking purely emotional injury damages -- genuinely uncapped
+        confidence="CONFIRMED",
+        citation="ORS §659A.001(4)(a); §659A.030; Zweizig v. Rote, 368 Or. 79 (2021).",
     ),
     "PA": StateCoverageThreshold(
         thresholds={"general": 4},
@@ -2714,9 +2714,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "UT": StateCoverageThreshold(
         thresholds={"general": 15},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Utah Antidiscrimination Act, Utah Code §34A-5-106 (secondary source). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="no_damages_available",  # Utah Code §34A-5-107 is the exclusive remedy for employment discrimination in Utah, confirmed via direct statute text referencing its own "exclusive remedy provision" -- no private right of action in state court; remedies limited to equitable relief (cease-and-desist, reinstatement, back pay), no compensatory or punitive damages authorized
+        confidence="CONFIRMED",
+        citation="Utah Antidiscrimination Act, Utah Code §34A-5-102(1)(i)(D); §34A-5-107.",
     ),
     "VT": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum / all sizes
@@ -2737,10 +2737,10 @@ STATE_COVERAGE_THRESHOLDS.update({
         citation="Wisconsin Fair Employment Act, Wis. Stat. §111.31 et seq.; §111.39(4)(c); 2011 Wisconsin Act 219.",
     ),
     "WY": StateCoverageThreshold(
-        thresholds={"general": 2},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Wyoming Fair Employment Practices Act, Wyo. Stat. §27-9-102 (secondary source). research/jurisdiction-research-headcount.md.",
+        thresholds={"general": 2},  # unusually low figure, confirmed correct via direct statute text, independently corroborated by 6 sources
+        damages_cap_treatment="no_damages_available",  # Wyo. Stat. §27-9-106(g) -- remedies limited to affirmative action (hiring, reinstatement, upgrading) with or without back pay; no compensatory or punitive damages authorized anywhere in the section
+        confidence="CONFIRMED",
+        citation="Wyoming Fair Employment Practices Act, Wyo. Stat. §27-9-102(b); §27-9-106(g).",
     ),
 })
 
@@ -2784,8 +2784,8 @@ assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), 
     "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
     "key set as JURISDICTION_TABLE"
 )
-assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 44, (
-    "Expected exactly 44 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA, MS, NC, OK, AZ, HI, ID, MT, NM)"
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 48, (
+    "Expected exactly 48 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA, MS, NC, OK, AZ, HI, ID, MT, NM, NV, OR, UT, WY)"
 )
 
 
