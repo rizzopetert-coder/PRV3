@@ -350,7 +350,21 @@ STATE_PROFILES["the_undefined_role"].descriptive_prose = "The role's actual boun
 _reg(_profile(
     state_id="the_paper_tiger",
     state_name="The Paper Tiger",
-    primary_dimension="Aptitude",
+    # Corrected from "Aptitude" (this session): the Phase 5 re-authoring
+    # (2026-08-25) already moved dimensional_vector to
+    # authority_liability=0.35 dominant, per the real descriptive_prose
+    # (documentation/accountability gap, not a skill/resourcing story),
+    # but primary_dimension was never updated alongside it. Confirmed
+    # via direct trace of tools/calibration_runner.py's
+    # best_option_for_state(): the stale "Aptitude" value caused
+    # generate_answers() to select aptitude-maximizing answer options
+    # for the_paper_tiger's own wired questions instead of
+    # authority-maximizing ones -- concretely, Q06 picked an option
+    # carrying authority_liability=0.00 instead of the correct
+    # authority-maximizing option's 0.60, and Q36 picked an option
+    # carrying authority_liability=-0.40 (actively negative) instead of
+    # a neutral 0.00 pick.
+    primary_dimension="Authority",
     signal_weight="high",
     cluster_id=None,
     liability_axes=["Legal & Compliance", "Governance & Authority", "Financial & Economic"],
@@ -395,7 +409,15 @@ STATE_PROFILES["the_paper_tiger"].descriptive_prose = "A performance problem has
 _reg(_profile(
     state_id="invisible_performance_management",
     state_name="Invisible Performance Management",
-    primary_dimension="Aptitude",
+    # Corrected from "Aptitude" (this session): same bug class as
+    # the_paper_tiger's fix earlier this session -- the SCD-WCS full
+    # re-authoring program (Phase 2 Batch 1, 2026-08-24, staged Phase 5,
+    # 2026-08-25) already moved dimensional_vector to
+    # authority_liability=0.60 dominant ("Full axis flip... the entire
+    # deficiency described is evidentiary/documentation weight
+    # (Authority)", see that vector's own comment below), but
+    # primary_dimension was never updated alongside it.
+    primary_dimension="Authority",
     signal_weight="medium",
     cluster_id=None,
     liability_axes=["Legal & Compliance", "Governance & Authority", "Talent & Retention"],
@@ -1171,7 +1193,15 @@ STATE_PROFILES["the_suppression_filter"].descriptive_prose = "Bad news gets filt
 _reg(_profile(
     state_id="the_arbitrary_standard",
     state_name="The Arbitrary Standard",
-    primary_dimension="Alliance",
+    # Corrected from "Alliance" (this session): same bug class as
+    # the_paper_tiger's and invisible_performance_management's fixes
+    # earlier this session -- the SCD-WCS full re-authoring program
+    # (Phase 2 Batch 2, 2026-08-24, staged Phase 5, 2026-08-25) already
+    # moved dimensional_vector to authority_liability=0.35 dominant
+    # ("this state's text is Authority-centered... Ends the mechanical
+    # tier-template tie", see that vector's own comment below), but
+    # primary_dimension was never updated alongside it.
+    primary_dimension="Authority",
     signal_weight="medium",
     cluster_id=None,
     liability_axes=["Cultural & Behavioral", "Talent & Retention", "Legal & Compliance"],
