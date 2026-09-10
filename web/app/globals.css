@@ -293,6 +293,19 @@
      computed at 1.18:1, a severe WCAG failure, confirmed live in
      browser once the paper fix (above) actually started working. */
   --home-ink: #26241F;
+  /* --home-cta-bg / --home-cta-text / --home-footer-text /
+     --home-avatar-text (2026-09-10): three more fixed, non-reactive
+     Tailwind colors found by the same-shaped audit as --home-ink above
+     (bg-charcoal/text-white/hover:bg-gray-700 on the CTA button,
+     text-gray-400 on the footer, text-white on the avatar circle's
+     --home-slate fill). Warm/Neutral values here are zero-visual-change
+     copies of what was already rendering -- the Dark overrides below are
+     what actually fix each failure. See each token's own margin-search
+     detail on the [data-theme="dark"] .home-scope block below. */
+  --home-cta-bg: #26241F;
+  --home-cta-text: #FFFFFF;
+  --home-footer-text: #2458A4;
+  --home-avatar-text: #FFFFFF;
 }
 
 /* .home-scope dark/neutral variants (2026-09-06) -- closes the gap where
@@ -339,6 +352,37 @@
      unreviewed side effect of a Dark-theme fix, not match an existing
      pattern. */
   --home-ink: #EDEAE3;
+  /* --home-cta-bg / --home-cta-text (2026-09-10): CTA button was
+     bg-charcoal text-white, computed at 1.18:1 button-vs-page in Dark --
+     a severe failure (both near-black). WCAG's own contrast formula
+     proves no single color can clear 4.5:1 against this near-black
+     --home-paper (#171512) while ALSO letting white text clear 4.5:1
+     against it -- the two luminance ranges required don't overlap, so a
+     light bg + dark text is the only viable shape, not a stylistic
+     choice. #5B9BD9 reuses --home-slate's own Dark value (already
+     vetted, already live on this page's avatar/labels) rather than
+     inventing a new hue -- computed 6.19:1 vs --home-paper. #26241F
+     reuses --color-charcoal as the text color -- computed 5.27:1
+     against the new bg. Both clear 4.5:1 with real margin. */
+  --home-cta-bg: #5B9BD9;
+  --home-cta-text: #26241F;
+  /* --home-footer-text (2026-09-10): text-gray-400 (#99A1AF, fixed)
+     happened to clear Dark by coincidence (7.00:1) while failing Warm
+     and Neutral -- see the base .home-scope block's own comment for the
+     full failure detail. Reuses --home-slate's own Dark value here too,
+     for the same "intentionally quiet, not a mismatched gray" reason as
+     Warm/Neutral -- computed 6.19:1 vs --home-paper, still comfortably
+     clears AA (4.5:1), not a regression into failure. */
+  --home-footer-text: #5B9BD9;
+  /* --home-avatar-text (2026-09-10): the avatar circle's bg is already
+     theme-reactive (--home-slate), but white text was never checked
+     against --home-slate's OWN Dark value, which was tuned for a
+     different consumer (body-text-against-page contrast, see that
+     token's own comment above) -- computed 2.94:1 with white text, a
+     real failure. #26241F (same --color-charcoal reuse as the CTA text
+     fix above) computes at 5.27:1. --home-slate's own value is
+     untouched -- its Dark tuning's original reason still holds. */
+  --home-avatar-text: #26241F;
 }
 
 [data-theme="neutral"] .home-scope {
