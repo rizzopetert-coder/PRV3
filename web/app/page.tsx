@@ -60,7 +60,7 @@ function VoiceSection() {
         you get there.
       </p>
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-(--home-slate) text-white flex items-center justify-center font-display text-lg shrink-0">
+        <div className="w-10 h-10 rounded-full bg-(--home-slate) text-(--home-avatar-text) flex items-center justify-center font-display text-lg shrink-0">
           P
         </div>
         <p className="font-ui text-sm text-(--home-ink) opacity-70">
@@ -84,7 +84,7 @@ function CloserSection() {
       </p>
       <Link
         href="/diagnostic"
-        className="inline-block bg-charcoal text-white font-ui text-sm font-medium px-6 py-3 hover:bg-gray-700 transition-colors"
+        className="inline-block bg-(--home-cta-bg) text-(--home-cta-text) font-ui text-sm font-medium px-6 py-3 hover:opacity-90 transition-opacity"
       >
         Begin the diagnostic →
       </Link>
@@ -156,7 +156,7 @@ export default function Home() {
         <CloserSection />
 
         {/* Footer */}
-        <p className="font-ui text-sm text-gray-400 text-center">
+        <p className="font-ui text-sm text-(--home-footer-text) text-center">
           Principal Resolution.
         </p>
 
