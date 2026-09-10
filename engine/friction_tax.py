@@ -2512,14 +2512,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "IA": StateCoverageThreshold(
         thresholds={"general": 4},
-        # Likely mislabeled -- the "no punitive damages" fact pattern
-        # (see citation) matches this session's independently-confirmed
-        # uncapped states, not a genuine tiered structure. NOT corrected
-        # here: only pattern-consistency, not an independent Iowa
-        # source check, this session. See citation.
-        damages_cap_treatment="state_specific_tiers",
-        confidence="PARTIAL",
-        citation="Iowa Civil Rights Act, Iowa Code §216.6; §216.15. \"Uncapped\" is consistent with CT/PA/NH/IN's independently-verified no-punitive-damages structures this session, but not independently source-checked for Iowa specifically -- a lead for the next verification pass, not a confirmed result.",
+        damages_cap_treatment="uncapped",  # Ackelson v. Manley Toy Direct, L.L.C., 832 N.W.2d 678 (Iowa 2013) -- Iowa Supreme Court affirmed (unanimously, reaffirming 1986 precedent) that punitive damages are not permitted under the ICRA
+        confidence="CONFIRMED",
+        citation="Iowa Civil Rights Act, Iowa Code §216.15(9)(a)(8); Ackelson v. Manley Toy Direct, L.L.C., 832 N.W.2d 678 (Iowa 2013).",
     ),
     "KS": StateCoverageThreshold(
         thresholds={"general": 4},
@@ -2568,9 +2563,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "MI": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
-        damages_cap_treatment="uncapped",  # compensatory/mental-anguish damages uncapped; punitive/exemplary damages not available under ELCRA unless serving a compensatory purpose
-        confidence="PARTIAL",
-        citation="Elliott-Larsen Civil Rights Act, MCL §37.2201; §37.2801. \"Uncapped\" is consistent with CT/PA/NH/IN's independently-verified no-punitive-damages structures this session, but not independently source-checked for Michigan specifically -- a lead for the next verification pass, not a confirmed result.",
+        damages_cap_treatment="uncapped",  # Eide v. Kelsey-Hayes Co., 431 Mich. 26, 427 N.W.2d 488 (1988) -- Michigan Supreme Court held "exemplary damages" for mental anguish/distress/humiliation are available and uncapped, but are strictly compensatory in nature; traditional punitive damages designed to punish are not available under ELCRA
+        confidence="CONFIRMED",
+        citation="Elliott-Larsen Civil Rights Act, MCL §37.2801(1); §37.2801(3); Eide v. Kelsey-Hayes Co., 431 Mich. 26, 427 N.W.2d 488 (1988).",
     ),
     "MN": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
@@ -2690,9 +2685,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "SC": StateCoverageThreshold(
         thresholds={"general": 15},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="SC Human Affairs Law, S.C. Code §1-13-30. Gemini's finding (no_damages_available per S.C. Code §1-13-90(d)(9)) was not independently verified against primary source text this session -- the statute's existence and general procedural structure were confirmed, but the specific remedies subsection Gemini cited was not directly located and confirmed. Working hypothesis for a future verification pass, same treatment as IA/MI.",
+        damages_cap_treatment="no_damages_available",  # S.C. Code Ann. §1-13-90(c)(16) -- remedies limited to an order that the discriminatory practice be discontinued, plus affirmative action (hiring, reinstatement, upgrading) with or without back pay; no compensatory damages for emotional distress, no punitive damages authorized anywhere in the section
+        confidence="CONFIRMED",
+        citation="SC Human Affairs Law, S.C. Code §1-13-30; §1-13-90(c)(16).",
     ),
     "SD": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum
@@ -2784,8 +2779,8 @@ assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), 
     "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
     "key set as JURISDICTION_TABLE"
 )
-assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 48, (
-    "Expected exactly 48 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA, MS, NC, OK, AZ, HI, ID, MT, NM, NV, OR, UT, WY)"
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 51, (
+    "Expected exactly 51 CONFIRMED states -- all of STATE_COVERAGE_THRESHOLDS, the PARTIAL-state verification workstream is complete (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA, MS, NC, OK, AZ, HI, ID, MT, NM, NV, OR, UT, WY, IA, MI, SC)"
 )
 
 
