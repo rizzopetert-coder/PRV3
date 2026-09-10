@@ -2581,8 +2581,8 @@ STATE_COVERAGE_THRESHOLDS.update({
     "MS": StateCoverageThreshold(
         thresholds={"general": 15},  # no state anti-discrimination law -- federal governs
         damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="No state anti-discrimination law; federal 15+ governs. research/jurisdiction-research-headcount.md.",
+        confidence="CONFIRMED",
+        citation="No comprehensive state anti-discrimination statute for private employers, confirmed directly against primary source text (9 independent sources); narrow existing carve-outs (military service, equal pay) don't provide general coverage. Federal 15+ threshold governs the applicable claim.",
     ),
     "MO": StateCoverageThreshold(
         thresholds={"general": 6},
@@ -2633,15 +2633,16 @@ STATE_COVERAGE_THRESHOLDS.update({
         citation="New Mexico Human Rights Act, NMSA §28-1-2 (secondary source). research/jurisdiction-research-headcount.md.",
     ),
     "NC": StateCoverageThreshold(
-        # No private right of action under NC's state anti-discrimination
-        # statute at all -- only a common-law wrongful-discharge claim
-        # exists, which isn't headcount-gated the way this table models.
-        # Federal threshold used here since that's the applicable
-        # statutory framework for an actual discrimination claim.
+        # NCEEPA covers employers with 15+ employees but provides no
+        # private right of action -- the statute's own public-policy
+        # declaration can support a common-law wrongful-discharge claim
+        # instead, which isn't headcount-gated the way this table
+        # models. federal_cap_applies remains the structurally correct
+        # treatment for the actual statutory discrimination framework.
         thresholds={"general": 15},
         damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="No private right of action under state statute; common-law wrongful-discharge available regardless of size. research/jurisdiction-research-headcount.md.",
+        confidence="CONFIRMED",
+        citation="North Carolina Equal Employment Practices Act, N.C. Gen. Stat. §143-422.2(a).",
     ),
     "ND": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum
@@ -2657,9 +2658,9 @@ STATE_COVERAGE_THRESHOLDS.update({
     ),
     "OK": StateCoverageThreshold(
         thresholds={"general": 15},
-        damages_cap_treatment="federal_cap_applies",
-        confidence="PARTIAL",
-        citation="Oklahoma Anti-Discrimination Act, 25 O.S. §1301 (secondary source). research/jurisdiction-research-headcount.md.",
+        damages_cap_treatment="no_damages_available",  # 25 O.S. §1350, added 2011 (Laws 2011, c. 270, §11, eff. Nov. 1, 2011) -- subsection (A) abolished all common-law remedies for employment discrimination (previously available via the Burk tort, which allowed unlimited compensatory/punitive damages); subsection (G), confirmed via direct statute text, limits the statutory remedy to injunctive relief, reinstatement, back pay, and liquidated damages equal to back pay -- no compensatory damages for emotional distress, no punitive damages authorized anywhere in the section
+        confidence="CONFIRMED",
+        citation="Oklahoma Anti-Discrimination Act, 25 O.S. §1301; 25 O.S. §1350 (added by Laws 2011, c. 270, §11, eff. Nov. 1, 2011).",
     ),
     "OR": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum
@@ -2683,7 +2684,7 @@ STATE_COVERAGE_THRESHOLDS.update({
         thresholds={"general": 15},
         damages_cap_treatment="federal_cap_applies",
         confidence="PARTIAL",
-        citation="SC Human Affairs Law, S.C. Code §1-13-30 (secondary source). research/jurisdiction-research-headcount.md.",
+        citation="SC Human Affairs Law, S.C. Code §1-13-30. Gemini's finding (no_damages_available per S.C. Code §1-13-90(d)(9)) was not independently verified against primary source text this session -- the statute's existence and general procedural structure were confirmed, but the specific remedies subsection Gemini cited was not directly located and confirmed. Working hypothesis for a future verification pass, same treatment as IA/MI.",
     ),
     "SD": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum
@@ -2775,8 +2776,8 @@ assert set(STATE_COVERAGE_THRESHOLDS.keys()) == set(JURISDICTION_TABLE.keys()), 
     "STATE_COVERAGE_THRESHOLDS must cover exactly the same 50-states-plus-DC "
     "key set as JURISDICTION_TABLE"
 )
-assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 36, (
-    "Expected exactly 36 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA)"
+assert sum(1 for v in STATE_COVERAGE_THRESHOLDS.values() if v.confidence == "CONFIRMED") == 39, (
+    "Expected exactly 39 CONFIRMED states (CA, NY, MA, IL, WA, AK, WV, VA, TX, TN, FL, CO, CT, DE, DC, ME, MD, NH, NJ, PA, RI, VT, IN, KS, MN, MO, NE, ND, OH, SD, WI, AL, AR, GA, KY, LA, MS, NC, OK)"
 )
 
 
