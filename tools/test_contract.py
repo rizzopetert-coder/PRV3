@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).parents[1]))
 
 from engine.contract import (
     assemble_output, validate_schema, SessionData, ENGINE_VERSION,
-    _OUTPUT_TYPE_VALUES, _SEVERITY_TIER_VALUES,
+    _OUTPUT_TYPE_VALUES, _SEVERITY_TIER_VALUES, LEGAL_TAIL_RISK_CAVEAT_TEXT,
 )
 from engine.test_suite import (
     TestCase, TestAnswer, ExpectedOutput, TestResult,
@@ -839,6 +839,78 @@ check("Scenario D: flag not triggered (no protected activity)",
       f"tc={flag_d.get('trigger_conditions')}")
 check("Scenario D: protected_activity_sources empty",
       flag_d.get("trigger_conditions", {}).get("protected_activity_sources") == [])
+
+
+# ── engine/contract.py:574 legal_tail_risk_exposure guard -- OH QUALITATIVE_ONLY (Phase 2b) ────
+
+def _make_rankings_for(dominant_sid, top_score=0.9):
+    """Same shape as make_rankings() above, parametrized by dominant state --
+    local to this test block, doesn't touch make_rankings() itself since other
+    tests in this file depend on that function's existing first_sid behavior."""
+    remaining = (1.0 - top_score) / (n - 1)
+    rankings = []
+    for i, sid in enumerate(STATE_PROFILES):
+        s = top_score if sid == dominant_sid else remaining
+        rankings.append(StateRanking(rank=i+1, state_id=sid, distance=0.3, score=s))
+    rankings.sort(key=lambda r: -r.score)
+    for i, r in enumerate(rankings):
+        r.rank = i + 1
+    return rankings
+
+oh_intake = IntakeData(
+    headcount=20,
+    industry="Professional Services",
+    org_type="Founder-led",
+    jurisdictions=["OH"],
+    significant_events=["none"],
+    principal_role="C-suite",
+)
+oh_rankings = _make_rankings_for("the_paper_tiger", top_score=floor_val + 0.05)
+oh_pkg = out_engine.build(oh_rankings, sev)
+oh_session = SessionData(
+    session_id=SessionData.new_session_id(),
+    intake=oh_intake,
+    final_rankings=oh_rankings,
+    accumulated_vector=acc_vector,
+    output_package=oh_pkg,
+    severity_result=sev,
+)
+oh_out = assemble_output(oh_session)
+oh_identified = oh_out.get("identified_states", [])
+check(
+    "sanity: the_paper_tiger is the single identified state for the OH session -- needed for the "
+    "checks below to mean what they claim",
+    len(oh_identified) == 1 and oh_identified[0].get("state_id") == "the_paper_tiger",
+    f"got {oh_identified}",
+)
+oh_legal = oh_out.get("private_output", {}).get("legal_tail_risk_exposure")
+check(
+    "engine/contract.py:574 guard -- OH's QUALITATIVE_ONLY result (low=None, "
+    "has_unpriced_conditions=True) still renders a non-null legal_tail_risk_exposure block, "
+    "exercised directly through assemble_output() rather than inferred from the Government/"
+    "hr_capture case's already-proven shape",
+    oh_legal is not None,
+    f"got {oh_legal!r}",
+)
+check(
+    "OH legal_tail_risk_exposure: low/high/band all None, has_unpriced_conditions=True, "
+    "unpriced_state_ids=['the_paper_tiger'] -- the exact real-pipeline shape that satisfies the "
+    "guard's second OR operand rather than its first",
+    oh_legal is not None
+    and oh_legal.get("low") is None
+    and oh_legal.get("high") is None
+    and oh_legal.get("band") is None
+    and oh_legal.get("has_unpriced_conditions") is True
+    and oh_legal.get("unpriced_state_ids") == ["the_paper_tiger"],
+    f"got {oh_legal}",
+)
+check(
+    "OH legal_tail_risk_exposure carries the same caveat text as any other rendered block -- "
+    "confirms this isn't a special-cased or truncated object, just the normal dict with "
+    "low/high absent",
+    oh_legal is not None and oh_legal.get("caveat") == LEGAL_TAIL_RISK_CAVEAT_TEXT,
+    f"got caveat={oh_legal.get('caveat')!r}",
+)
 
 
 # ── Summary ────────────────────────────────────────────────────────────────────
