@@ -1138,6 +1138,7 @@ _QDATA = [
             ("B", "We talk about whether the role itself is set up to let them succeed.", False, None),
             ("C", "We talk about whether this is the right role for this person.", False, None),
             ("D", "We don't usually have that conversation until something forces it.", False, None),
+            ("E", "We talk about it regularly and it seems to land, but none of it gets written down.", False, None),
         ],
         ["built_to_fail", "the_undefined_role", "the_overloaded_manager", "invisible_performance_management"],
         False,
@@ -2001,11 +2002,18 @@ def _build_library():
             "E": {**_z, "attitude_liability": 0.25},                    # A
         },
         # -- End WS1 entries ----------------------------------------------------
-        "Q35": {  # Contrast B v16; amplify B v17.
+        "Q35": {  # Contrast B v16; amplify B v17. Option E added this session --
+                  # invisible_performance_management's only wired question had
+                  # zero positive-authority options anywhere (a leftover from
+                  # before the SCD-WCS re-authoring flipped this state from
+                  # Aptitude to Authority-dominant); E gives it a real,
+                  # correctly-directed pick, kept single-field/clean so it
+                  # can't be confused for a contrast against A-D's own logic.
             "A": {**_z, "aptitude_liability": 0.25},
             "B": {**_z, "aptitude_liability": 0.80, "authority_liability": -0.35},  # contrast v16, amplify v17
             "C": {**_z, "aptitude_liability": 0.40},
             "D": {**_z, "aptitude_liability": 0.40},
+            "E": {**_z, "authority_liability": 0.60},
         },
         "Q36": {  # Contrast E v16 (APT-PT-00 decoupling); amplify E v17.
             "A": {**_z, "aptitude_asset":    0.40, "authority_asset":    0.40},
