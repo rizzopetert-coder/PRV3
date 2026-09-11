@@ -2365,6 +2365,26 @@ class StateCoverageThreshold:
                       1 and 4b -- see resolve_damages_treatment() and
                       _resolve_flat_cap() below. None for every other
                       damages_cap_treatment value.
+    is_combined_cap:  True only for MD and MO (Phase 2a) -- these two
+                      states' own state_specific_tiers dollar figures
+                      cap compensatory and punitive damages TOGETHER as
+                      one combined number, confirmed directly against
+                      each state's own statute text (MD: Md. State
+                      Gov't Code Sec20-1013(e)(2); MO: RSMo
+                      Sec213.111(4), which explicitly excludes back
+                      pay/front pay from the same combined cap). False
+                      (the default) for every other state, including
+                      the other 7 state_specific_tiers states, whose
+                      combined-vs-split structure has NOT been
+                      independently verified either way -- False here
+                      means "not confirmed combined," not "confirmed
+                      split." Not consumed by any pricing logic yet --
+                      same precedent as is_floor in Phase 1: encode the
+                      statutory truth once confirmed, even before an
+                      output layer exists to consume it, so a future
+                      "detailed compensatory/punitive breakdown"
+                      feature can't silently double-count a combined
+                      cap as two independent ones.
     confidence:       "CONFIRMED" (independently verified against primary
                       statute text this session) | "PARTIAL" (not verified
                       this session -- see citation for what the entry
@@ -2380,6 +2400,7 @@ class StateCoverageThreshold:
     confidence: str
     citation: str
     flat_cap: Optional[float] = None
+    is_combined_cap: bool = False
 
 
 # CONFIRMED states -- independently verified against primary statute text
@@ -2596,6 +2617,7 @@ STATE_COVERAGE_THRESHOLDS.update({
         damages_cap_treatment="state_specific_tiers",  # $50,000 (15-100 employees) / $100,000 (101-200) / $200,000 (201-500) / $300,000 (501+), Md. State Gov't Code §20-1009(b)(3)
         confidence="CONFIRMED",
         citation="Md. State Gov't Code §20-601(d), §20-611, §20-1009(b)(3), §20-1013(e)(2).",
+        is_combined_cap=True,
     ),
     "MI": StateCoverageThreshold(
         thresholds={"general": 1},  # all sizes
@@ -2620,6 +2642,7 @@ STATE_COVERAGE_THRESHOLDS.update({
         damages_cap_treatment="state_specific_tiers",  # combined compensatory (non-pecuniary)-and-punitive cap: $50,000 (more than 5 and fewer than 101 employees, i.e. 6-100 -- matches MHRA's own 6-employee coverage threshold) / $100,000 (101-200) / $200,000 (201-500) / $500,000 (500+); back pay/front pay not subject to these caps
         confidence="CONFIRMED",
         citation="Missouri Human Rights Act, RSMo §213.010; §213.111(4); SB 43 eff. Aug. 28, 2017.",
+        is_combined_cap=True,
     ),
     "MT": StateCoverageThreshold(
         thresholds={"general": 1},  # no minimum / all sizes
@@ -3078,6 +3101,49 @@ def _resolve_flat_cap(jurisdictions: list[str]) -> Optional[float]:
     return best
 
 
+def _co_drives_federal_tier_deferral(jurisdictions: list[str], headcount) -> bool:
+    """
+    True only when Colorado is the SPECIFIC jurisdiction
+    resolve_damages_treatment() would resolve a state_specific_tiers
+    result from, AND headcount has cleared the federal 15-employee
+    floor Colorado's own statute defers to at that point (C.R.S.
+    Sec24-34-405(3)(d)(II)(A)/(II)(B)) -- Colorado's own comment is the
+    only one among all 9 state_specific_tiers states that describes
+    deferring to federal Title VII tiers at any headcount; the other 8
+    keep their own (unmodeled) tiers at every headcount. Cannot be a
+    blanket check on the resolved treatment string alone -- that would
+    also fire for a jurisdictions list whose real driving state is TX,
+    AR, etc. (also state_specific_tiers, but non-deferring).
+
+    Re-derives resolve_damages_treatment()'s own priority-resolution
+    loop rather than changing that function's return contract to
+    additionally expose the winning jurisdiction -- three existing call
+    sites and the test suite depend on it returning a bare string.
+
+    Known limitation, not fixed here: if two state_specific_tiers
+    jurisdictions tie for best_rank (e.g. CO and TX both selected),
+    resolve_damages_treatment()'s own strict `>` comparison means
+    whichever is encountered FIRST in the input list wins -- this
+    function inherits that same input-order dependency rather than
+    resolving it, since disambiguating which specific tiers state
+    governs a multi-tiers-state selection is a pre-existing gap this
+    Phase 2a build didn't create and isn't scoped to fix.
+    """
+    if not isinstance(headcount, (int, float)) or headcount < _FEDERAL_DEFAULT_THRESHOLD:
+        return False
+    best_jid: Optional[str] = None
+    best_rank = -1
+    for jid in jurisdictions:
+        entry = STATE_COVERAGE_THRESHOLDS.get(jid)
+        if entry is None or entry.confidence != "CONFIRMED":
+            continue
+        rank = _DAMAGES_TREATMENT_PRIORITY.get(entry.damages_cap_treatment, -1)
+        if rank > best_rank:
+            best_rank = rank
+            best_jid = jid
+    return best_jid == "CO"
+
+
 def _cluster_4_curve_for_org_type(
     org_type: str, org_size: str, headcount: int, jurisdictions: list[str]
 ) -> LegalCurveLookup:
@@ -3126,6 +3192,19 @@ def _cluster_4_curve_for_org_type(
             curve=None, status=LegalPricingStatus.NOT_APPLICABLE,
             coverage_confidence="CONFIRMED", partial_state_flag=coverage.partial_state_flag,
         )
+    if treatment == "state_specific_tiers" and _co_drives_federal_tier_deferral(jurisdictions, headcount):
+        # Colorado's own statute explicitly defers to the federal Title
+        # VII tier table at 15+ employees -- swap in that treatment
+        # label for the rest of this resolution. Cluster 4b's ceiling
+        # table below IS that same federal bracket table already (per
+        # its own comment), so the ceiling VALUE doesn't change here --
+        # only is_floor does, since the number is now Colorado's own
+        # real, confirmed answer at this headcount, not a placeholder.
+        # Inverted shape vs. the no_damages_available branch above:
+        # that one returns early BELOW its threshold; this one lets
+        # normal resolution continue with a corrected label ABOVE one.
+        # Phase 2a, prompts/damages-cap-treatment-phase2-spec.md.
+        treatment = "federal_cap_applies"
     ceiling = _CLUSTER_4B_CEILING_BY_HEADCOUNT.get(org_size)
     if ceiling is None:
         return LegalCurveLookup(
