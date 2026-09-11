@@ -34,30 +34,49 @@ function VoiceSection() {
         THE PERSPECTIVE
       </p>
       <p className="font-display text-2xl md:text-3xl leading-relaxed text-(--home-ink) mb-6">
-        Many of the &quot;people problems&quot; leaders describe are the
-        symptoms of deeper conditions that are more challenging to work
-        through. Because they&apos;re more challenging, and often require
-        leaders to look in the mirror, it is often easier for leaders to
-        believe they&apos;re a training or a PIP or a termination away from
-        resolving their problems. But workplace performance and behaviors
-        are significantly influenced by leadership behaviors: consistency,
-        accountability, strong communication, and a fundamental
-        understanding of the organization&apos;s values. Consistent
-        leadership behaviors result in more consistent employee behaviors,
-        and more consistent, more predictable results.
+        Many of the &quot;people problems&quot; leaders describe are
+        symptoms of{" "}
+        <Link
+          href="/book/methodology/symptoms-states-and-why-the-distinction-matters"
+          className="text-(--home-slate) underline hover:opacity-90 transition-opacity"
+        >
+          deeper conditions
+        </Link>{" "}
+        that are more challenging to identify and work through. Because
+        they&apos;re more challenging, and often require leaders to look in
+        the mirror, it is often easier for leaders to believe they&apos;re a
+        training, a performance improvement plan, or a termination away from
+        resolution.
+      </p>
+      <p className="font-display text-2xl md:text-3xl leading-relaxed text-(--home-ink) mb-6">
+        Workplace performance is significantly influenced by leadership
+        behaviors:{" "}
+        <em className="not-italic font-semibold text-(--home-slate)">
+          consistency
+        </em>
+        ,{" "}
+        <em className="not-italic font-semibold text-(--home-slate)">
+          accountability
+        </em>
+        ,{" "}
+        <em className="not-italic font-semibold text-(--home-slate)">
+          strong communication
+        </em>
+        , and a fundamental understanding of the organization&apos;s values.
+        Consistent leadership results in more consistent, more predictable
+        results for employees and for the organization.
       </p>
       <p className="font-ui text-base leading-relaxed text-(--home-ink) opacity-80 mb-4">
         Clients don&apos;t need another framework or slide deck. They want a
-        confidant and advisor with a perspective they know they can trust. A
-        partner with a genuine understanding of their business, their
+        confidant, an advisor with experience and perspective they can trust.
+        A partner with a genuine understanding of their business, their
         history, their values, and what they&apos;re actually trying to
         build. And given all that, someone who can filter out the noise and
-        give the objective truth.
+        give them objective guidance.
       </p>
       <p className="font-ui text-base leading-relaxed text-(--home-ink) opacity-80 mb-10">
-        I don&apos;t tell you what decision to make. Decide what&apos;s best
-        for your business, and give me the marching orders. We&apos;ll help
-        you get there.
+        We don&apos;t tell you what decisions to make. Decide what&apos;s
+        best for your business, and we&apos;ll help you get there.
       </p>
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-(--home-slate) text-(--home-avatar-text) flex items-center justify-center font-display text-lg shrink-0">
