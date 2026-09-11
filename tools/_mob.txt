@@ -3376,7 +3376,7 @@ did not reopen that question.
 Commit `49f8796` (the fix) + `cd32629`-adjacent audit-trail scripts,
 pushed (Group 1).
 
-### 3. v2 token migration re-examined and closed; 3 new contrast bugs found and fixed -- PUSH HELD
+### 3. v2 token migration re-examined and closed; 3 new contrast bugs found and fixed -- pushed
 `--home-ink`/`--ink` re-examined per the Sept 7 Section 13a row's open
 question. Confirmed live via `getComputedStyle` (not source-reading
 alone): the Sept 7 rejection was correct and still holds --
@@ -3410,14 +3410,20 @@ and corrected before any number was reported or acted on). `tsc
 
 Commits `6af546c`/`9f8c16e` (the fixes), `0d985aa`/`5c82240` (MOB/
 CLAUDE.md updates for this and item 2 above), plus associated patch
-scripts -- **all committed, PUSH HELD.** Below-the-fold screenshots of
-the three fixed elements could not be captured this session (the
-Browser pane was in a hidden state that blocks scroll-dependent
-repaint, confirmed reproducible and confirmed not an app problem via
-`get_page_text`/`getComputedStyle` both returning correct live values
-regardless) -- the standing production-facing-UI exception applies
-until a visual check confirms the fix in Dark theme specifically,
-where the failure was most severe.
+scripts -- **all committed, PUSH HELD at the time this entry was first
+written.** Below-the-fold screenshots of the three fixed elements could
+not be captured this session (the Browser pane was in a hidden state
+that blocks scroll-dependent repaint, confirmed reproducible and
+confirmed not an app problem via `get_page_text`/`getComputedStyle`
+both returning correct live values regardless) -- the standing
+production-facing-UI exception applies until a visual check confirms
+the fix in Dark theme specifically, where the failure was most severe.
+
+**RESOLVED, same calendar day (2026-09-10), later continuation
+session:** visually confirmed in Dark theme -- CTA button, footer text,
+and avatar circle all clean -- and pushed as part of a 14-commit batch
+earlier in that session, before the VoiceSection copy update. The
+push-hold above is historical -- this workstream is closed.
 
 ### 4. damages_cap_treatment Phase 1 -- fully scoped, not built
 Two rounds of Gemini architecture review, both independently
@@ -3497,10 +3503,10 @@ fields, no `tools/test_friction_tax.py` fixture depends on that field).
    (`prompts/damages-cap-treatment-phase1-spec.md`), zero open
    blockers. This is now a "when Pete wants to build it" item, not a
    "when someone scopes it" item.
-3. Group 2 push confirmation (homepage contrast fixes) -- committed,
-   needs Pete's visual check in Dark theme before pushing. See item 3
-   above for the full detail on why screenshots couldn't be captured
-   this session.
+3. ~~Group 2 push confirmation (homepage contrast fixes)~~ --
+   RESOLVED same calendar day, later continuation session: visually
+   confirmed in Dark theme and pushed. See item 3 above (amended) for
+   detail. No longer an active queue item.
 4. EXP-IPM-02 moderate-tier magnitude weakness -- new this session, low
    priority, same issue class as `the_paper_tiger`'s former `APT-PT-02`.
 5. Quarterly Step-Back -- last run August 22, due ~September 5, now
