@@ -75,7 +75,7 @@ function SelfSelectionInterface({
   currentPhase,
   onPhaseAdvance,
 }: SelfSelectionInterfaceProps) {
-  const { selectedStateIds, selectedSignatureIds } = useSelfSelection();
+  const { selectedStateIds, selectedSignatureIds, assemblyTriggerHeight } = useSelfSelection();
 
   const [interpretation, setInterpretation] = useState<string | null>(null);
   const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
@@ -279,7 +279,10 @@ function SelfSelectionInterface({
 
       {/* Phase 2 → Phase 3 transition bar */}
       {showPhase2Bar && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 px-6 py-4 flex justify-between items-center animate-fade-up">
+        <div
+          className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 px-6 py-4 flex justify-between items-center animate-fade-up"
+          style={{ bottom: assemblyTriggerHeight }}
+        >
           {selectedStateIds.size < 2 ? (
             <span className="font-ui text-xs text-gray-400">
               Select at least two conditions to continue.

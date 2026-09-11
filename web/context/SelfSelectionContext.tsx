@@ -7,12 +7,19 @@ interface SelfSelectionState {
   selectedSignatureIds: Set<string>;
   // 'assembly' | signatureId | null
   activeSheet: string | null;
+  // Live rendered height (px) of AssemblyPanel's mobile Drawer.Trigger,
+  // measured via ResizeObserver. Used by the Phase 2 transition bar to
+  // offset its own bottom position so the two fixed bars stack instead
+  // of overlapping. 0 when the trigger isn't rendered (desktop, or
+  // AssemblyPanel unmounted).
+  assemblyTriggerHeight: number;
 }
 
 interface SelfSelectionActions {
   toggleState: (stateId: string, signatureId: string) => void;
   toggleSignature: (signatureId: string, stateIds: string[]) => void;
   setActiveSheet: (sheet: string | null) => void;
+  setAssemblyTriggerHeight: (height: number) => void;
   clearAll: () => void;
 }
 
@@ -24,6 +31,7 @@ export function SelfSelectionProvider({ children }: { children: ReactNode }) {
   const [selectedStateIds, setSelectedStateIds] = useState<Set<string>>(new Set());
   const [selectedSignatureIds, setSelectedSignatureIds] = useState<Set<string>>(new Set());
   const [activeSheet, setActiveSheetState] = useState<string | null>(null);
+  const [assemblyTriggerHeight, setAssemblyTriggerHeightState] = useState<number>(0);
 
   const toggleState = useCallback((stateId: string, signatureId: string) => {
     setSelectedStateIds(prev => {
@@ -69,6 +77,10 @@ export function SelfSelectionProvider({ children }: { children: ReactNode }) {
     setActiveSheetState(sheet);
   }, []);
 
+  const setAssemblyTriggerHeight = useCallback((height: number) => {
+    setAssemblyTriggerHeightState(height);
+  }, []);
+
   const clearAll = useCallback(() => {
     setSelectedStateIds(new Set());
     setSelectedSignatureIds(new Set());
@@ -80,9 +92,11 @@ export function SelfSelectionProvider({ children }: { children: ReactNode }) {
       selectedStateIds,
       selectedSignatureIds,
       activeSheet,
+      assemblyTriggerHeight,
       toggleState,
       toggleSignature,
       setActiveSheet,
+      setAssemblyTriggerHeight,
       clearAll,
     }}>
       {children}

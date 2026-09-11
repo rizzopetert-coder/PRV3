@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Drawer } from "vaul";
 import { signatures, getStatesForSignature } from "@/data/taxonomy";
 import { useSelfSelection } from "@/context/SelfSelectionContext";
@@ -56,8 +57,25 @@ function AssemblyList() {
 }
 
 export default function AssemblyPanel() {
-  const { selectedStateIds, activeSheet, setActiveSheet } = useSelfSelection();
+  const { selectedStateIds, activeSheet, setActiveSheet, setAssemblyTriggerHeight } =
+    useSelfSelection();
   const count = selectedStateIds.size;
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const el = triggerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(() => {
+      setAssemblyTriggerHeight(el.getBoundingClientRect().height);
+    });
+    observer.observe(el);
+
+    return () => {
+      observer.disconnect();
+      setAssemblyTriggerHeight(0);
+    };
+  }, [setAssemblyTriggerHeight]);
 
   return (
     <>
@@ -79,6 +97,7 @@ export default function AssemblyPanel() {
         >
           <Drawer.Trigger asChild>
             <button
+              ref={triggerRef}
               onClick={() => setActiveSheet("assembly")}
               className="fixed bottom-0 left-0 right-0 z-40 bg-paper border-t border-gray-200 px-5 py-4 flex items-center justify-between text-sm font-medium text-charcoal"
             >
