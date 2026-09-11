@@ -119,13 +119,3 @@ push.
 - **If running the overdue Quarterly Step-Back:** no specific files —
   full project assessment per the dual-sourced format (CLAUDE.md's own
   Quarterly Step-Back section).
-
-## Flag for Pete (not silently resolved)
-
-The prior queue (v4.297) carried a still-open item — "Group 2 push
-confirmation (homepage contrast fixes), committed, needs Pete's visual
-check in Dark theme before pushing" — that does not appear in this
-session's given Priority Queue list. Nothing this session touched that
-work. Carrying it forward here rather than silently dropping it; flagged
-in the closeout report for Pete to confirm whether it's resolved,
-superseded, or should stay on the active queue.
