@@ -6,11 +6,14 @@ import {
   isLastQuestionInSequence,
   validateIndexInvariant,
   severityFollowOnAlreadyAsked,
+  shouldSpliceQ28,
+  shouldSpliceQ45,
+  checkpointIdMap,
+  checkpointSlot,
+  setCheckpointSlot,
   spliceLabel,
   resolveQuestionLabel,
   type AnswerLogEntry,
-  type CheckpointResult,
-  type DiagnosticSession,
 } from "@/lib/session-store";
 import {
   invokeAccumulate,
@@ -21,38 +24,10 @@ import {
 } from "@/lib/engine-client";
 import { completeDiagnosticSession } from "@/lib/diagnostic-completion";
 
-// Checkpoint ID mapping (Phase 2) — Q27 has two branch IDs (Q27A/Q27B)
-// depending on intake.significant_events; Phase 1's locked intake adapter
-// always takes the Q27B branch (session-store.ts header), but both map to
-// the same canonical checkpoint position so this route doesn't hardcode
-// that assumption. Only question_ids present here trigger a checkpoint
-// evaluation call below.
-const checkpointIdMap: Record<string, "Q11" | "Q19" | "Q27"> = {
-  Q11: "Q11",
-  Q19: "Q19",
-  Q27A: "Q27",
-  Q27B: "Q27",
-};
-
-// Three independent DiagnosticSession slots (Stage 1) — not a nested dict.
-function checkpointSlot(
-  session: DiagnosticSession,
-  position: "Q11" | "Q19" | "Q27",
-): CheckpointResult | null {
-  if (position === "Q11") return session.checkpoint_q11;
-  if (position === "Q19") return session.checkpoint_q19;
-  return session.checkpoint_q27;
-}
-
-function setCheckpointSlot(
-  session: DiagnosticSession,
-  position: "Q11" | "Q19" | "Q27",
-  result: CheckpointResult,
-): void {
-  if (position === "Q11") session.checkpoint_q11 = result;
-  else if (position === "Q19") session.checkpoint_q19 = result;
-  else session.checkpoint_q27 = result;
-}
+// checkpointIdMap/checkpointSlot/setCheckpointSlot moved to session-store.ts
+// (this session) so session/undo/route.ts can share them without a parallel
+// reimplementation. Only question_ids present in checkpointIdMap trigger a
+// checkpoint evaluation call below.
 
 // ---------------------------------------------------------------------------
 // Path 1 (Session 71, Phase 1) — session/answer
@@ -200,7 +175,7 @@ export async function POST(request: NextRequest) {
   // so this is a direct, explicit check rather than reusing the severity
   // mechanism above -- a single hardcoded case, not a generalized
   // framework, since nothing else currently needs this shape.
-  if (question_id === "Q06" && (option_ids.includes("A") || option_ids.includes("B"))) {
+  if (question_id === "Q06" && shouldSpliceQ28(option_ids)) {
     session.question_sequence = spliceDistinguishers(
       session.question_sequence,
       currentIndex,
@@ -216,7 +191,7 @@ export async function POST(request: NextRequest) {
   // been addressed?") not applicable -- so the splice fires on B/C/D
   // only, not unconditionally. Q45 itself carries no severity_trigger
   // of its own.
-  if (question_id === "Q44" && (option_ids.includes("B") || option_ids.includes("C") || option_ids.includes("D"))) {
+  if (question_id === "Q44" && shouldSpliceQ45(option_ids)) {
     session.question_sequence = spliceDistinguishers(
       session.question_sequence,
       currentIndex,
