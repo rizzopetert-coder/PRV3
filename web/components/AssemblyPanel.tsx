@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { Drawer } from "vaul";
 import { signatures, getStatesForSignature } from "@/data/taxonomy";
 import { useSelfSelection } from "@/context/SelfSelectionContext";
@@ -56,26 +55,17 @@ function AssemblyList() {
   );
 }
 
-export default function AssemblyPanel() {
-  const { selectedStateIds, activeSheet, setActiveSheet, setAssemblyTriggerHeight } =
-    useSelfSelection();
+interface AssemblyPanelProps {
+  // When true, suppress the mobile bottom trigger row -- its job (opening
+  // the assembly drawer) is being handled by an external merged row
+  // instead (Phase 2's combined count-label + CTA bar). The desktop
+  // sidebar and the drawer itself are unaffected either way.
+  hideMobileTrigger?: boolean;
+}
+
+export default function AssemblyPanel({ hideMobileTrigger = false }: AssemblyPanelProps) {
+  const { selectedStateIds, activeSheet, setActiveSheet } = useSelfSelection();
   const count = selectedStateIds.size;
-  const triggerRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const el = triggerRef.current;
-    if (!el) return;
-
-    const observer = new ResizeObserver(() => {
-      setAssemblyTriggerHeight(el.getBoundingClientRect().height);
-    });
-    observer.observe(el);
-
-    return () => {
-      observer.disconnect();
-      setAssemblyTriggerHeight(0);
-    };
-  }, [setAssemblyTriggerHeight]);
 
   return (
     <>
@@ -95,20 +85,21 @@ export default function AssemblyPanel() {
           open={activeSheet === "assembly"}
           onOpenChange={(open) => setActiveSheet(open ? "assembly" : null)}
         >
-          <Drawer.Trigger asChild>
-            <button
-              ref={triggerRef}
-              onClick={() => setActiveSheet("assembly")}
-              className="fixed bottom-0 left-0 right-0 z-40 bg-paper border-t border-gray-200 px-5 py-4 flex items-center justify-between text-sm font-medium text-charcoal"
-            >
-              <span>
-                {count > 0
-                  ? `${count} ${count === 1 ? "condition" : "conditions"} selected`
-                  : "Select conditions to build your picture."}
-              </span>
-              <span className="text-gray-400 text-xs">View</span>
-            </button>
-          </Drawer.Trigger>
+          {!hideMobileTrigger && (
+            <Drawer.Trigger asChild>
+              <button
+                onClick={() => setActiveSheet("assembly")}
+                className="fixed bottom-0 left-0 right-0 z-40 bg-paper border-t border-gray-200 px-5 py-4 flex items-center justify-between text-sm font-medium text-charcoal"
+              >
+                <span>
+                  {count > 0
+                    ? `${count} ${count === 1 ? "condition" : "conditions"} selected`
+                    : "Select conditions to build your picture."}
+                </span>
+                <span className="text-gray-400 text-xs">View</span>
+              </button>
+            </Drawer.Trigger>
+          )}
           <Drawer.Portal>
             <Drawer.Overlay className="fixed inset-0 z-40 bg-black/30" />
             <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-paper rounded-t-2xl border-t border-gray-200 flex flex-col max-h-[80vh]">
