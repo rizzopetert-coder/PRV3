@@ -233,9 +233,11 @@ _QDATA = [
             ("B", "It gets addressed eventually, but it takes longer than it should.", False, None),
             ("C", "It depends on who the person is. Some people are held accountable and some aren't.", True, "SEVER-25"),
             ("D", "Not much. Underperformance tends to get tolerated.", False, None),
+            ("E", "It gets recognized and handled well in the moment, but none of it gets written down.", False, None),
         ],
         ["the_basement_standard", "the_untouchable", "the_inside_track",
-         "the_arbitrary_standard", "the_wrong_reward", "the_paper_tiger"],
+         "the_arbitrary_standard", "the_wrong_reward", "the_paper_tiger",
+         "invisible_performance_management"],
         False,
     ),
     (
@@ -1799,6 +1801,12 @@ def _build_library():
             "B": {**_z, "attitude_liability": 0.25},                    # A
             "C": {**_z, "attitude_liability": 0.60},                    # P
             "D": {**_z, "attitude_liability": 0.60},                    # P
+            # Option E added this session -- invisible_performance_management's
+            # second wired question (was 1/52 core questions, Q35 only).
+            # Same fix shape as Q35's own option E: single-field, clean
+            # authority_liability pick, can't be confused for a contrast
+            # against A-D's own Attitude-axis logic.
+            "E": {**_z, "authority_liability": 0.60},
         },
         "Q06": {  # Authority HIGH + Attitude (dual) + aptitude crossover.
             "A": {**_z, "authority_liability": 0.60, "attitude_liability": 0.30, "aptitude_liability": 0.25},  # P
