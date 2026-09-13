@@ -75,7 +75,7 @@ function SelfSelectionInterface({
   currentPhase,
   onPhaseAdvance,
 }: SelfSelectionInterfaceProps) {
-  const { selectedStateIds, selectedSignatureIds, assemblyTriggerHeight } = useSelfSelection();
+  const { selectedStateIds, selectedSignatureIds, setActiveSheet } = useSelfSelection();
 
   const [interpretation, setInterpretation] = useState<string | null>(null);
   const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
@@ -258,8 +258,11 @@ function SelfSelectionInterface({
         onSubmit={handleIntakeSubmit}
       />
 
-      {/* Assembly Panel — phases 2–4 */}
-      {currentPhase >= 2 && currentPhase < 5 && <AssemblyPanel />}
+      {/* Assembly Panel — phases 2–4. Its own mobile trigger is suppressed
+          in Phase 2, where the merged row below absorbs that function. */}
+      {currentPhase >= 2 && currentPhase < 5 && (
+        <AssemblyPanel hideMobileTrigger={showPhase2Bar} />
+      )}
 
       {/* Phase 1 → Phase 2 transition bar */}
       {showPhase1Bar && (
@@ -277,21 +280,27 @@ function SelfSelectionInterface({
         </div>
       )}
 
-      {/* Phase 2 → Phase 3 transition bar */}
+      {/* Phase 2 merged row — combines what used to be AssemblyPanel's own
+          mobile trigger (left side, opens the assembly drawer) and the
+          Phase 2 → Phase 3 transition bar (right side) into one fixed
+          row instead of two stacked ones (Option C, mobile CTA merge). */}
       {showPhase2Bar && (
-        <div
-          className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 px-6 py-4 flex justify-between items-center animate-fade-up"
-          style={{ bottom: assemblyTriggerHeight }}
-        >
-          {selectedStateIds.size < 2 ? (
-            <span className="font-ui text-xs text-gray-400">
-              Select at least two conditions to continue.
-            </span>
-          ) : (
-            <span className="font-ui text-sm text-gray-500">
-              {selectedStateIds.size} conditions selected
-            </span>
-          )}
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 px-5 py-1 flex justify-between items-center animate-fade-up">
+          <button
+            onClick={() => setActiveSheet("assembly")}
+            className="flex items-center gap-2 text-left min-w-0"
+          >
+            {selectedStateIds.size < 2 ? (
+              <span className="font-ui text-xs text-gray-400">
+                Select at least two conditions to continue.
+              </span>
+            ) : (
+              <span className="font-ui text-sm text-gray-500">
+                {selectedStateIds.size} conditions selected
+              </span>
+            )}
+            <span className="text-gray-400 text-xs shrink-0">View</span>
+          </button>
           <button
             onClick={handleSeeWhatThisMeans}
             disabled={selectedStateIds.size < 2}
