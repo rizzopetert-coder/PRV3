@@ -318,6 +318,75 @@ export function severityFollowOnAlreadyAsked(
   return answersLog.some((entry) => entry.question_id === followOnId);
 }
 
+// Returns a NEW array with every ID in `ids` removed, preserving relative
+// order of what remains. Does not mutate sequence. The inverse of
+// spliceDistinguishers() -- used by session/undo to remove not-yet-answered
+// questions that a since-undone answer had spliced in. Filter-based rather
+// than positional: safe regardless of where the removed IDs ended up
+// relative to any other splice that happened later in the sequence, since
+// membership (not position) is what determines removal.
+export function removeFromSequence(sequence: string[], ids: string[]): string[] {
+  if (ids.length === 0) return sequence;
+  const toRemove = new Set(ids);
+  return sequence.filter((id) => !toRemove.has(id));
+}
+
+// Q28 conditional splice condition (Q06 -> Q28) -- extracted from
+// session/answer/route.ts so session/undo can check the identical
+// condition without a parallel reimplementation that could drift. Q06
+// itself carries no severity_trigger of its own, so this is a direct,
+// explicit check rather than reusing the severity mechanism.
+export function shouldSpliceQ28(optionIds: string[]): boolean {
+  return optionIds.includes("A") || optionIds.includes("B");
+}
+
+// Q45 conditional splice condition (Q44 -> Q45) -- same extraction
+// reasoning as shouldSpliceQ28 above. Q44's "A" option means "actively
+// addressed by people with the authority to fix it," which makes Q45 not
+// applicable -- the splice fires on B/C/D only.
+export function shouldSpliceQ45(optionIds: string[]): boolean {
+  return optionIds.includes("B") || optionIds.includes("C") || optionIds.includes("D");
+}
+
+// Checkpoint ID mapping (Phase 2) -- moved here from session/answer/route.ts
+// so session/undo can share it rather than redeclare it. Q27 has two branch
+// IDs (Q27A/Q27B) depending on intake.significant_events; Phase 1's locked
+// intake adapter always takes the Q27B branch (PHASE_1_QUESTION_SEQUENCE's
+// own header comment), but both map to the same canonical checkpoint
+// position so callers don't need to hardcode that assumption.
+export const checkpointIdMap: Record<string, "Q11" | "Q19" | "Q27"> = {
+  Q11: "Q11",
+  Q19: "Q19",
+  Q27A: "Q27",
+  Q27B: "Q27",
+};
+
+// Three independent DiagnosticSession slots (Stage 1) -- not a nested dict.
+// Moved here from session/answer/route.ts, same reasoning as
+// checkpointIdMap above.
+export function checkpointSlot(
+  session: DiagnosticSession,
+  position: "Q11" | "Q19" | "Q27",
+): CheckpointResult | null {
+  if (position === "Q11") return session.checkpoint_q11;
+  if (position === "Q19") return session.checkpoint_q19;
+  return session.checkpoint_q27;
+}
+
+// result: CheckpointResult | null -- null is a real, live value here (not
+// widened speculatively): session/undo resets a checkpoint slot back to
+// null when undoing the question that triggered it, so it can re-fire
+// correctly once that question is re-answered.
+export function setCheckpointSlot(
+  session: DiagnosticSession,
+  position: "Q11" | "Q19" | "Q27",
+  result: CheckpointResult | null,
+): void {
+  if (position === "Q11") session.checkpoint_q11 = result;
+  else if (position === "Q19") session.checkpoint_q19 = result;
+  else session.checkpoint_q27 = result;
+}
+
 // ---------------------------------------------------------------------------
 // Display labeling (splice-numbering fix)
 //
