@@ -6,10 +6,17 @@ import {
   isLastQuestionInSequence,
   validateIndexInvariant,
   severityFollowOnAlreadyAsked,
+  removeFromSequence,
+  shouldSpliceQ28,
+  shouldSpliceQ45,
+  checkpointIdMap,
+  checkpointSlot,
+  setCheckpointSlot,
   coreQuestionPosition,
   spliceLabel,
   resolveQuestionLabel,
   type AnswerLogEntry,
+  type DiagnosticSession,
 } from "./session-store";
 
 // All tests exercise the same PHASE_1_QUESTION_SEQUENCE template that
@@ -168,6 +175,147 @@ describe("severityFollowOnAlreadyAsked", () => {
       { question_id: "SEVER-11", option_ids: ["B"] },
     ];
     expect(severityFollowOnAlreadyAsked(log, "SEVER-11")).toBe(true);
+  });
+});
+
+describe("removeFromSequence (session/undo)", () => {
+  it("removes a single ID, preserving order of what remains", () => {
+    const sequence = ["Q01", "Q02", "SEVER-04", "Q03"];
+    expect(removeFromSequence(sequence, ["SEVER-04"])).toEqual(["Q01", "Q02", "Q03"]);
+  });
+
+  it("removes multiple IDs from different positions in one call", () => {
+    const sequence = ["Q01", "DIST-CM-01", "Q02", "DIST-CM-02", "Q03"];
+    expect(removeFromSequence(sequence, ["DIST-CM-01", "DIST-CM-02"])).toEqual([
+      "Q01",
+      "Q02",
+      "Q03",
+    ]);
+  });
+
+  it("does not mutate the input array", () => {
+    const sequence = ["Q01", "SEVER-04", "Q02"];
+    const copy = [...sequence];
+    removeFromSequence(sequence, ["SEVER-04"]);
+    expect(sequence).toEqual(copy);
+  });
+
+  it("is a no-op (same content, new-or-same array either way) when ids is empty", () => {
+    const sequence = ["Q01", "Q02"];
+    expect(removeFromSequence(sequence, [])).toEqual(sequence);
+  });
+
+  it("is a no-op when none of the given ids are present", () => {
+    const sequence = ["Q01", "Q02"];
+    expect(removeFromSequence(sequence, ["SEVER-99"])).toEqual(sequence);
+  });
+
+  it("undoes spliceDistinguishers() exactly -- round-trips back to the original sequence", () => {
+    const template = [...PHASE_1_QUESTION_SEQUENCE];
+    const q11Index = template.indexOf("Q11");
+    const spliced = spliceDistinguishers(template, q11Index, ["DIST-CM-01", "DIST-CM-02"]);
+    const restored = removeFromSequence(spliced, ["DIST-CM-01", "DIST-CM-02"]);
+    expect(restored).toEqual(template);
+  });
+});
+
+describe("shouldSpliceQ28 (Q06 -> Q28 conditional splice)", () => {
+  it("fires on option A", () => {
+    expect(shouldSpliceQ28(["A"])).toBe(true);
+  });
+  it("fires on option B", () => {
+    expect(shouldSpliceQ28(["B"])).toBe(true);
+  });
+  it("fires when A is selected alongside other options (weighted_multi_select)", () => {
+    expect(shouldSpliceQ28(["A", "D"])).toBe(true);
+  });
+  it("does not fire on C or D alone", () => {
+    expect(shouldSpliceQ28(["C"])).toBe(false);
+    expect(shouldSpliceQ28(["D"])).toBe(false);
+  });
+});
+
+describe("shouldSpliceQ45 (Q44 -> Q45 conditional splice)", () => {
+  it("fires on B, C, or D", () => {
+    expect(shouldSpliceQ45(["B"])).toBe(true);
+    expect(shouldSpliceQ45(["C"])).toBe(true);
+    expect(shouldSpliceQ45(["D"])).toBe(true);
+  });
+  it("does not fire on A -- 'actively addressed' makes Q45 not applicable", () => {
+    expect(shouldSpliceQ45(["A"])).toBe(false);
+  });
+});
+
+describe("checkpointIdMap / checkpointSlot / setCheckpointSlot", () => {
+  function emptySession(): DiagnosticSession {
+    return {
+      session_id: "test",
+      intake: {} as DiagnosticSession["intake"],
+      next_question_id: "Q11",
+      accumulated_vector: {
+        aptitude_liability: 0, aptitude_asset: 0,
+        authority_liability: 0, authority_asset: 0,
+        alliance_liability: 0, alliance_asset: 0,
+        attitude_liability: 0, attitude_asset: 0,
+      },
+      answers_log: [],
+      status: "in_progress",
+      checkpoint_q11: null,
+      checkpoint_q19: null,
+      checkpoint_q27: null,
+      question_sequence: [...PHASE_1_QUESTION_SEQUENCE],
+      severity_inputs: [],
+      severity_follow_on_origins: {},
+      question_labels: {},
+      narrative_fired: false,
+      narrative_response: "",
+      narrative_severity_addition: 0,
+      narrative_trigger_point: null,
+      narrative_overall_confidence: 0,
+      narrative_signals_count: 0,
+      pre_narrative_vector: null,
+      pending_narrative_prompt: null,
+      pending_completion: false,
+    };
+  }
+
+  it("Q27A and Q27B both map to the canonical Q27 checkpoint position", () => {
+    expect(checkpointIdMap["Q27A"]).toBe("Q27");
+    expect(checkpointIdMap["Q27B"]).toBe("Q27");
+  });
+
+  it("Q11/Q19 map to themselves; a non-checkpoint question_id is absent (undefined)", () => {
+    expect(checkpointIdMap["Q11"]).toBe("Q11");
+    expect(checkpointIdMap["Q19"]).toBe("Q19");
+    expect(checkpointIdMap["Q12"]).toBeUndefined();
+  });
+
+  it("checkpointSlot reads the correct independent slot per position", () => {
+    const session = emptySession();
+    session.checkpoint_q19 = {
+      entropy: 0.5, threshold: 0.4, fires: true,
+      distinguishers: ["DIST-X-01"], top_cluster: "x", narrative_trigger: false,
+    };
+    expect(checkpointSlot(session, "Q11")).toBeNull();
+    expect(checkpointSlot(session, "Q19")).toEqual(session.checkpoint_q19);
+    expect(checkpointSlot(session, "Q27")).toBeNull();
+  });
+
+  it("setCheckpointSlot writes the correct independent slot, and can reset it back to null (session/undo)", () => {
+    const session = emptySession();
+    const result = {
+      entropy: 0.6, threshold: 0.4, fires: true,
+      distinguishers: ["DIST-CM-01", "DIST-CM-02"], top_cluster: "cm", narrative_trigger: false,
+    };
+    setCheckpointSlot(session, "Q11", result);
+    expect(session.checkpoint_q11).toEqual(result);
+    expect(session.checkpoint_q19).toBeNull();
+
+    // The reset path session/undo relies on -- re-firing after an undone
+    // checkpoint-position answer requires the slot to genuinely be null
+    // again, not just "falsy-ish".
+    setCheckpointSlot(session, "Q11", null);
+    expect(session.checkpoint_q11).toBeNull();
   });
 });
 
