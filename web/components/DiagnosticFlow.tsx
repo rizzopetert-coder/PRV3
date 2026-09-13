@@ -189,7 +189,20 @@ interface QuestionCopy {
 type FlowState =
   | { phase: "intake" }
   | { phase: "loading" }
-  | { phase: "question"; sessionId: string; question: QuestionCopy; label: QuestionLabel }
+  // prefillOptionIds: non-null only when this question is being shown as
+  // the result of an undo -- session/undo/route.ts returns the just-undone
+  // answer's own option_ids so QuestionView can restore the prior
+  // selection instead of showing the question fresh. null everywhere else
+  // (start, normal forward advance, resume, narrative completion) --
+  // required (not optional) so every call site has to state its intent
+  // explicitly rather than risk a stale value leaking from a prior render.
+  | {
+      phase: "question";
+      sessionId: string;
+      question: QuestionCopy;
+      label: QuestionLabel;
+      prefillOptionIds: string[] | null;
+    }
   // Narrative modulation (Phase 3) -- returned by session/answer or
   // session/resume in place of the next question, once, per session.
   | { phase: "narrative"; sessionId: string; prompt: string }
@@ -428,18 +441,32 @@ function QuestionView({
   question,
   label,
   onAnswer,
+  prefillOptionIds,
 }: {
   question: QuestionCopy;
   label: QuestionLabel;
   onAnswer: (optionIds: string[]) => void;
+  // Single-step undo (this session) -- the option_ids of the answer being
+  // undone, so the respondent sees what they picked rather than a blank
+  // question. Only meaningful for weighted_multi_select's checkbox state
+  // (below); forced_choice has no "selected, not yet submitted" state to
+  // restore -- each option is an immediate-submit button -- so it's used
+  // there only to visually highlight the previously-picked option.
+  prefillOptionIds: string[] | null;
 }) {
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>(prefillOptionIds ?? []);
 
   // New question -- clear any in-progress multi-select state from the
-  // previous one. Keyed on question_id, not label, since spliced
-  // follow-ups reuse label shapes but never question_ids.
+  // previous one, or restore it from prefillOptionIds if this question is
+  // being shown as the result of an undo. Keyed on question_id, not label,
+  // since spliced follow-ups reuse label shapes but never question_ids.
+  // prefillOptionIds itself isn't a dependency: it always changes in the
+  // same state update as question (both come from the same setState call
+  // in DiagnosticFlow), so the closure value here is already correct for
+  // this question_id by the time the effect runs.
   useEffect(() => {
-    setSelected([]);
+    setSelected(prefillOptionIds ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question.question_id]);
 
   const isMultiSelect = question.format === "weighted_multi_select";
@@ -504,7 +531,15 @@ function QuestionView({
             <button
               key={opt.option_id}
               onClick={() => onAnswer([opt.option_id])}
-              className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-colors font-ui text-sm text-charcoal"
+              // forced_choice has no "selected, not yet submitted" state --
+              // each option submits immediately on click -- so a
+              // prefillOptionIds match only highlights which option was
+              // picked before, it doesn't change the click behavior.
+              className={`w-full text-left p-4 rounded-xl border transition-colors font-ui text-sm text-charcoal ${
+                prefillOptionIds?.includes(opt.option_id)
+                  ? "border-charcoal bg-gray-50"
+                  : "border-gray-200 bg-white hover:border-charcoal"
+              }`}
             >
               {opt.option_text}
             </button>
@@ -521,9 +556,18 @@ function QuestionView({
 // of what this browser tab has already rendered and submitted. Never
 // reads or touches accumulated_vector/question_sequence/checkpoints/
 // severity_inputs; read-only by construction.
+//
+// question_id/option_ids added this session (single-step undo) alongside
+// the existing display strings -- needed so a future edit-and-replay-style
+// feature could read real IDs off this same array rather than re-deriving
+// them, though HistoryPanel itself stays read-only and untouched here.
+// handleUndo() below does not read from this array; it pops the last
+// entry directly, mirroring handleAnswer()'s own append.
 interface AnsweredEntry {
   questionText: string;
   selectedOptionTexts: string[];
+  question_id: string;
+  option_ids: string[];
 }
 
 function HistoryPanel({ history }: { history: AnsweredEntry[] }) {
@@ -602,6 +646,7 @@ export default function DiagnosticFlow() {
         sessionId,
         question: data.question,
         label: data.label,
+        prefillOptionIds: null,
       });
     } catch {
       setState({ phase: "error", message: ERROR_COPY });
@@ -640,6 +685,7 @@ export default function DiagnosticFlow() {
         sessionId: data.session_id,
         question: data.question,
         label: data.label,
+        prefillOptionIds: null,
       });
     } catch {
       setState({ phase: "error", message: ERROR_COPY });
@@ -670,7 +716,12 @@ export default function DiagnosticFlow() {
       );
       setHistory((prev) => [
         ...prev,
-        { questionText: question.question_text, selectedOptionTexts: selectedTexts },
+        {
+          questionText: question.question_text,
+          selectedOptionTexts: selectedTexts,
+          question_id: question.question_id,
+          option_ids: optionIds,
+        },
       ]);
       const data = await res.json();
       if (data.status === "complete") {
@@ -683,8 +734,60 @@ export default function DiagnosticFlow() {
           sessionId,
           question: data.question,
           label: data.label,
+          prefillOptionIds: null,
         });
       }
+    } catch {
+      setState({ phase: "error", message: ERROR_COPY });
+    }
+  }
+
+  // Single-step "back to previous question" undo, this session. Only
+  // reachable from the "question" phase with a non-empty history -- the
+  // button itself is hidden below history.length === 0, and the server
+  // independently no-ops rather than erroring in that case too (belt and
+  // suspenders, matching session/answer's own index-invariant philosophy).
+  //
+  // Pre-fills the re-rendered question with the undone answer's own
+  // option_ids (session/undo/route.ts returns them). Repeated Back clicks
+  // without re-submitting in between are safe by construction, not by a
+  // special guard: a pre-filled-but-unsubmitted question is never added to
+  // answers_log (only a real handleAnswer() POST does that), so a second
+  // Back click's server-side undo call reads answers_log's actual last
+  // entry -- whatever real answer preceded the one just undone -- and
+  // correctly steps back one more real answer, skipping the unsubmitted
+  // pre-fill entirely. Covered directly by the "multiple sequential
+  // undos" route test (session/undo/route.test.ts), which already calls
+  // undo twice in a row with no answer submission in between.
+  async function handleUndo() {
+    if (state.phase !== "question") return;
+    if (history.length === 0) return;
+    const { sessionId } = state;
+
+    setState({ phase: "loading" });
+    try {
+      const res = await fetch("/api/diagnostic/session/undo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
+      if (!res.ok) {
+        setState({ phase: "error", message: ERROR_COPY });
+        return;
+      }
+      const data = await res.json();
+      setHistory((prev) => prev.slice(0, -1));
+      setState({
+        phase: "question",
+        sessionId,
+        question: data.question,
+        label: data.label,
+        // "noop" status (empty answers_log -- shouldn't be reachable given
+        // the button's own history.length guard above, but the server
+        // handles it independently) never includes option_ids, since
+        // there's no undone answer to pre-fill.
+        prefillOptionIds: data.option_ids ?? null,
+      });
     } catch {
       setState({ phase: "error", message: ERROR_COPY });
     }
@@ -718,6 +821,7 @@ export default function DiagnosticFlow() {
           sessionId,
           question: data.question,
           label: data.label,
+          prefillOptionIds: null,
         });
       }
     } catch {
@@ -801,12 +905,22 @@ export default function DiagnosticFlow() {
     return (
       <>
         <div className="max-w-xl mx-auto px-6 pt-6 flex items-center justify-between">
-          <button
-            onClick={() => setShowHistory((s) => !s)}
-            className="font-ui text-xs text-gray-400 hover:text-hover-ink transition-colors"
-          >
-            {showHistory ? "Hide" : "Review"} your answers so far
-          </button>
+          <div className="flex items-center gap-4">
+            {history.length > 0 && (
+              <button
+                onClick={handleUndo}
+                className="font-ui text-xs text-gray-400 hover:text-hover-ink transition-colors"
+              >
+                &larr; Back
+              </button>
+            )}
+            <button
+              onClick={() => setShowHistory((s) => !s)}
+              className="font-ui text-xs text-gray-400 hover:text-hover-ink transition-colors"
+            >
+              {showHistory ? "Hide" : "Review"} your answers so far
+            </button>
+          </div>
           <button
             onClick={handleReset}
             className="font-ui text-xs text-gray-400 hover:text-hover-ink transition-colors"
@@ -819,6 +933,7 @@ export default function DiagnosticFlow() {
           question={state.question}
           label={state.label}
           onAnswer={handleAnswer}
+          prefillOptionIds={state.prefillOptionIds}
         />
         <ContextOrientation
           variant="floating"
