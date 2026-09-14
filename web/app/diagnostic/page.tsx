@@ -158,14 +158,39 @@ function SelfSelectionInterface({
     handleTakeDiagnostic(intake);
   }
 
-  // Phase 5 — PrivateOutput
+  // Phase 5 — PrivateOutput. Separate early return (not the shared `main`
+  // below), so it previously had no page shell at all -- no min-h-screen/
+  // bg-paper, no main padding -- unlike phases 2-4. Back button here is a
+  // duplicate of the one below (same handler/classes), not a shared
+  // extraction, since that one lives in a JSX branch this return never
+  // reaches. Wrapped in the same shell now so the button has a consistent
+  // place to sit rather than rendering flush at the viewport edge.
+  // disabled prop kept for consistency even though isLoadingResult is
+  // already guaranteed false here -- setResultPayload/onPhaseAdvance(5)/
+  // setIsLoadingResult(false) are all synchronous, batched into the same
+  // render that first shows Phase 5.
   if (currentPhase === 5 && resultPayload && intakeForShare) {
     return (
-      <PrivateOutput
-        payload={resultPayload}
-        selectedStateIds={[...selectedStateIds]}
-        intake={intakeForShare}
-      />
+      <div className="flex min-h-screen bg-paper">
+        <main className="flex-1 min-w-0 px-6 py-10 md:px-10 md:py-14">
+          <div className="max-w-2xl">
+            <div className="mb-4">
+              <button
+                onClick={() => onPhaseAdvance(currentPhase - 1)}
+                disabled={isLoadingInterpretation || isLoadingResult}
+                className="font-ui text-xs text-gray-400 hover:text-hover-ink transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                &larr; Back
+              </button>
+            </div>
+            <PrivateOutput
+              payload={resultPayload}
+              selectedStateIds={[...selectedStateIds]}
+              intake={intakeForShare}
+            />
+          </div>
+        </main>
+      </div>
     );
   }
 
@@ -173,6 +198,35 @@ function SelfSelectionInterface({
     <div className="flex min-h-screen bg-paper">
       <main className="flex-1 min-w-0 px-6 py-10 md:px-10 md:py-14 pb-36 md:pb-14">
         <div className={`max-w-5xl ${currentPhase === 1 ? "mx-auto" : ""}`}>
+
+          {/* Back — single-step, this session (Priority Queue item 8).
+              Absent on Phase 1 only (nothing to go back to). Phase 5 gets
+              the identical button too, but duplicated into that phase's
+              own early-return branch above rather than reachable from
+              here -- see the comment there. currentPhase - 1 is always
+              the correct target: phases advance strictly sequentially
+              here (1->2->3->4->5, confirmed by reading every
+              onPhaseAdvance() call site -- none skip a phase), so there's
+              no branching to account for. Selections themselves need no
+              restore logic at all: selectedStateIds/selectedSignatureIds
+              live in SelfSelectionContext, not phase-scoped state, so
+              they're already exactly as the respondent left them the
+              moment the phase changes -- pre-filled and editable by
+              construction, not by extra code. Disabled during either
+              in-flight async call (interpretation fetch, diagnostic
+              submission) so a stale response can't land confusingly
+              after the respondent has already navigated away. */}
+          {currentPhase > 1 && currentPhase < 5 && (
+            <div className="mb-4">
+              <button
+                onClick={() => onPhaseAdvance(currentPhase - 1)}
+                disabled={isLoadingInterpretation || isLoadingResult}
+                className="font-ui text-xs text-gray-400 hover:text-hover-ink transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                &larr; Back
+              </button>
+            </div>
+          )}
 
           {/* Phase 1 orientation block */}
           {currentPhase === 1 && (
