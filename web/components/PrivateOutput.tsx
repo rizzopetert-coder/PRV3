@@ -1,51 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import type { PrivateOutputPayload, SeverityTier, StateRef, LegalTailRiskBand } from "@/lib/types";
+import type { PrivateOutputPayload, SeverityTier, LegalTailRiskBand } from "@/lib/types";
 import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
+import CopyResultsButton from "@/components/CopyResultsButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
 import { stateIdToSlug } from "@/lib/state-slug";
 import ContextOrientation from "@/components/ContextOrientation";
 import { getResultsOrientation } from "@/data/orientation-copy";
-
-// First-sentence extraction for a secondary state's short-version summary
-// (Block 4b) -- splits on the first sentence-ending period, not a hard
-// character-count truncation. Falls through to the whole string when no
-// internal ". " boundary exists (confirmed against all 58 real
-// descriptive_prose values this session -- one state, cultural_overtime,
-// is a single sentence with no internal boundary; this is that case
-// resolving correctly, not a bug).
-function firstSentence(text: string): string {
-  const match = text.match(/\.\s/);
-  if (!match || match.index === undefined) return text;
-  return text.slice(0, match.index + 1);
-}
-
-// Core cluster bucketing (Direction 3, Category E, this session) --
-// Gemini-reviewed design: delta-weight bucket at 0.08 of the primary
-// state's normalized weight, core cluster capped at 5, everything else
-// folds into a "+N co-occurring conditions" overflow count. Replaces a
-// fixed 2/3-state tier, ruled out by real distribution data (58 real
-// high_confidence profiles: median 7 qualified states, 50% displaying
-// an identical percentage -- see
-// prompts/category-e-direction3-cluster-display.md). secondary_states
-// arrives already sorted descending by weight (both construction sites
-// -- session/answer/route.ts and result/route.ts -- build it straight
-// from the engine's own rank-sorted rankings), so no re-sort here.
-const CORE_CLUSTER_DELTA = 0.08;
-const CORE_CLUSTER_CAP = 5;
-
-function buildCoreCluster(
-  secondaryStates: StateRef[],
-  primaryWeight: number,
-): { core: StateRef[]; overflowCount: number } {
-  const withinDelta = secondaryStates.filter(
-    (s) => primaryWeight - s.weight <= CORE_CLUSTER_DELTA,
-  );
-  const core = withinDelta.slice(0, CORE_CLUSTER_CAP);
-  return { core, overflowCount: secondaryStates.length - core.length };
-}
+import { firstSentence, buildCoreCluster, joinNames } from "@/lib/output-text";
 
 // Tier-based LOCKED copy — mirrors engine/severity.py SEVERITY_TIER_DESCRIPTIONS.
 const SEVERITY_ANCHOR: Record<SeverityTier, string> = {
@@ -88,16 +52,6 @@ const LEGAL_BAND_WEIGHT: Record<LegalTailRiskBand, string> = {
   Elevated: "font-semibold",
   Significant: "font-semibold text-sm",
 };
-
-// Oxford-comma join for unpriced_state_ids names -- the only inline
-// text-list formatting need in this component (observable indicators
-// render as a bullet list, not inline text).
-function joinNames(names: string[]): string {
-  if (names.length === 0) return "";
-  if (names.length === 1) return names[0];
-  if (names.length === 2) return `${names[0]} and ${names[1]}`;
-  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
-}
 
 function Rule() {
   return (
@@ -481,6 +435,15 @@ export default function PrivateOutput({
           </p>
         </div>
       )}
+
+      {/* Block 4e — Copy results as text (this session). Comprehensive
+          scope, visible to every respondent regardless of path -- NOT
+          gated behind enableSharing/enableEngage, unlike Blocks 5/6.
+          No backend round-trip: payload is already fully present
+          client-side by the time this renders. */}
+      <div className="mt-2 w-full">
+        <CopyResultsButton payload={payload} />
+      </div>
 
       {/* Block 5 — ShareButton */}
       {enableSharing && (
