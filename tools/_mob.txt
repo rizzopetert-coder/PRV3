@@ -4469,10 +4469,29 @@ via isolated git worktrees, not committed (scratch, cleaned up).
    restructuring persistent nav to chase given item 6 above serves the
    actual underlying need more directly. Revisit only if Pete confirms
    the export feature doesn't fully cover the use case.
-8. Diagnostic back button -- single-step undo SHIPPED, this session
-   (question-by-question path only: `session/undo`, pre-filled
-   re-render). Confirmed never built on the self-select path at all --
-   still a net-new feature request there, unscoped.
+8. Diagnostic back button -- **CLOSED, both paths.** Question-by-question
+   (Path 1) single-step undo shipped 2026-09-13 (`session/undo`,
+   pre-filled re-render) -- unchanged from the prior entry, restated here
+   for completeness. Self-select path (Phases 2-5) -- **CLOSED, this
+   session (2026-09-14).** Shipped commit `15b242f`: the same
+   `onPhaseAdvance(currentPhase - 1)` Back link phases 2-4 already used,
+   extended to Phase 5's completed-result view -- previously excluded
+   there on the mistaken inference that a completed result was out of
+   scope for a back control, corrected this session on Pete's explicit
+   instruction. Selections preserved and editable on return with no
+   restore logic needed -- `selectedStateIds`/`selectedSignatureIds` live
+   in `SelfSelectionContext` as global session state, not phase-scoped,
+   so they're already exactly as the respondent left them the moment the
+   phase changes. Phase 5 needed its own page-shell wrapper
+   (`min-h-screen`/`bg-paper`/`main` padding, `max-w-2xl`) since that
+   phase was a separate early-return branch with no shared shell before
+   this build -- not just a widened condition on the existing phases 2-4
+   button. Verified live in production (`principalresolution.com`) on
+   the Phase 2 -> 1 transition specifically. Full local verification of
+   every other phase transition (3->2, 4->3, 5->4, round-trip
+   4->5->4->5, mobile viewport) via a mocked `/api/result` response,
+   since the real engine backend and `/api/interpret` aren't reachable
+   from local dev this session -- see the dated note above.
 9. `_oh_is_small_employer()` -- built and tested, not wired into any
    pricing branch. Revisit whenever a real compensatory-damages/
    net-worth pricing path for OH is scoped.
@@ -4485,3 +4504,41 @@ via isolated git worktrees, not committed (scratch, cleaned up).
     overdue -- the prior "last run August 22" framing carried in this
     queue since MOB v4.279 undercounted; Pete's own scheduling
     correction is authoritative here, not independently re-derived).
+
+## DATED NOTE (2026-09-14) -- local dev environment gap: interpret/result
+## API routes not exercisable end-to-end from local dev
+
+Found live during this session's browser verification of the self-select
+Phase 5 back button build (Priority Queue item 8, closed this session --
+see above). Not part of that build, not fixed -- logged per Pete's
+instruction so it isn't rediscovered cold next session.
+
+- `/api/interpret` (co-existence interpretation, Path B multi-signature
+  case) returned a live 401 from Anthropic (`invalid x-api-key`) when hit
+  from a fresh local `next dev` run this session -- confirmed directly via
+  `preview_logs`, not inferred. Whatever `ANTHROPIC_API_KEY` this local
+  environment's `web/.env.local` resolves to is invalid or expired.
+- `/api/result` (self-select "Take the full diagnostic" path) threw
+  `TypeError [ERR_INVALID_URL]` inside `engineFetch()`
+  (`lib/engine-client.ts:37`), called from `app/api/result/route.ts:127`
+  -- the fetch call failed before any network request was attempted,
+  consistent with the configured engine URL being empty, malformed, or
+  otherwise not resolving to a valid URL string in this local environment.
+  Root cause not chased further than that -- not confirmed whether this is
+  a missing env var, a local-only config gap, or something else.
+- Practical effect: neither the multi-signature (non-dominant-signature)
+  interpretation path nor the self-select result path can be exercised
+  end-to-end from local dev right now. Both are separate from the
+  single-dominant-signature path (skips both calls, synchronous), which
+  works locally and was used for most of this session's verification.
+  Confirmed this is local-only, not a production issue: the self-select
+  flow's Phase 2 Back link was live-verified on `principalresolution.com`
+  this session with no equivalent error.
+- Workaround used this session: mocked `window.fetch` for `/api/result`
+  in-browser to verify the Phase 5 back button's rendering and state
+  behavior without a real engine round-trip. Not a fix, not a standing
+  workaround -- one-off for this session's verification only.
+- Not investigated further. Revisit only if local dev needs the real
+  interpretation or result path exercised again (e.g. calibration work,
+  interpretation-copy work, or anything else that can't be verified via
+  the single-dominant-signature shortcut).
