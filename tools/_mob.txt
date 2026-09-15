@@ -4457,10 +4457,51 @@ via isolated git worktrees, not committed (scratch, cleaned up).
    (MOB v4.302). Own-profile calibration capture rate remains 0/3,
    unchanged, tracked under item 5 below, not reopened by that fix.
 5. `invisible_performance_management`/`the_founders_grip` vector
-   duplicate -- corrected record (MOB v4.302). Confirmed deliberate, not
-   an oversight; part of the already-diagnosed 8-state rank-3 cluster
-   issue tracked in `prompts/scd-wcs-remediation-tracker.md`; confirmed
-   latent, not live. Out of scope to fix in isolation. No urgency.
+   duplicate -- **CLOSED, this session (2026-09-14).** Pete's explicit
+   call to skip the Gemini architecture gate on this one and go
+   straight to Claude Code (content decision still Pete-confirmed
+   before any code was written). `invisible_performance_management`'s
+   `dimensional_vector` corrected from the HIGH-tier magnitude it had
+   been carrying (`authority_liability=0.60`/`authority_asset=0.10`) --
+   mismatched against its own declared `signal_weight="medium"`, traced
+   to `f88a7c2` (2026-08-25) copying `the_founders_grip`'s HIGH-tier
+   numbers verbatim during that commit's Aptitude -> Authority axis
+   flip -- to the MEDIUM-tier magnitude its own tier actually calls for
+   (`authority_liability=0.45`/`authority_asset=0.15`), with
+   `aptitude_asset` custom-elevated to `0.20` (held above the flat
+   `0.15` template value) on real textual grounding: this state's own
+   descriptive_prose explicitly affirms "a manager's read... is
+   accurate... a sound judgment" -- an asset-side Aptitude signal the
+   old flat vector ignored entirely. This both resolves the
+   `invisible_performance_management`/`the_founders_grip` duplicate
+   named in this item and fixes the independent tier-magnitude bug
+   found during investigation (a state whose vector never matched its
+   own declared tier). Confirmed unique against every other vector in
+   `engine/data/states.py`, including `the_founders_grip` and the
+   10-state flat MEDIUM-tier Authority template (`the_uninitiated`,
+   `leadership_continuity_risk`, `decision_paralysis`, `the_policy_lag`,
+   `dueling_narratives`, `transition_paralysis`, `the_lost_map`,
+   `pay_exposure`, `the_pay_fog`, `compression_crisis`) -- not simply
+   relocated into that group. Full 175-profile ripple check
+   (`build_confusion_matrix()`, same tooling that caught the item 2
+   ripple) run before shipping: zero profiles anywhere in the suite
+   changed predicted rank-1; `the_unexamined_algorithm`'s 3 own
+   profiles and all 10 MEDIUM-tier template states' own profiles
+   confirmed identical before/after; the rank-3 cluster's other 7
+   members (`the_founders_grip`, `disparate_impact_architecture`,
+   `heard_and_ignored`, `hr_capture`, `sequential_decision_blindness`,
+   `the_exposed`, `the_tolerated_violation`) confirmed byte-identical
+   before/after, untouched by this fix -- that broader 8-state cluster
+   architecture question remains explicitly out of scope and parked,
+   per Pete's instruction. `engine/data/validate.py` re-run before and
+   after writing: identical 37 passed / 4 failed both times (the 4
+   failures are pre-existing and unrelated -- state-count and
+   cluster_id gaps). One honest carry-forward: `IPM`'s own-profile
+   capture rate (3/3 predicted `the_uninitiated`, not itself) is
+   unchanged by this fix and remains separately tracked -- not
+   reopened, not claimed fixed here. Shipped via
+   `tools/patch_ipm_rank3_vector_differentiation.py`, dry-run validated
+   then written, kept committed as audit trail per repo convention.
 6. Diagnostic result export (copy-as-text) -- SHIPPED, this session.
    "Copy results" button live on `PrivateOutput.tsx`, comprehensive
    scope, visible to all respondents. See this session's own build entry.
