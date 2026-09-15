@@ -155,11 +155,74 @@ rate-to-multiplier conversion are all decided.
   that would let 51 small-denominator states pull the reference point
   away from where most of the actual workforce sits.
 - **Multiplier = state rate ÷ aggregate national rate.**
-- **Clamped to 0.8x–1.2x**, to guard against small-state noise (a tiny
-  raw charge count producing an implausible swing). This exact range
-  is Pete's working figure from this session — explicitly flagged as
-  adjustable pending Gemini's reaction at the architecture gate, not
-  to be presented as final or locked.
+- **Clamped, asymmetrically** — see "Decided, 2026-09-15e" below for
+  the finalized bounds; the first-pass 0.8x–1.2x figure this bullet
+  originally proposed was replaced after distribution analysis showed
+  it clamped 78% of jurisdictions, well past a small-noise guard.
+
+## Decided, 2026-09-15e (finalized clamp bounds: floor 0.25, ceiling
+## 2.30; DC excluded from the multiplier table)
+
+Pete-confirmed. This replaces the 0.8x–1.2x figure above outright —
+that number is not carried forward as a default anywhere in this plan.
+
+- **DC excluded from the multiplier table entirely.** DC's rate
+  (146.197/100k, the highest of all 51 jurisdictions) is a structural
+  artifact of this denominator's own design, not sample noise and not
+  reliable litigation-risk signal: roughly 25% of DC's total
+  employment is federal (confirmed in the QCEW pull, "Decided,
+  2026-09-15c" above), and federal employment is deliberately excluded
+  from the Private+State+Local denominator by design — mechanically
+  shrinking DC's denominator and inflating its rate independent of
+  actual filing behavior. DC's raw numerator, denominator, and
+  unclamped rate remain unchanged in both Appendices above — only its
+  row in the multiplier table below is omitted, footnoted there with
+  this same reasoning.
+- **Floor: 0.25.** Grounded in a raw-charge-count reliability gap, not
+  a percentile or a ratio-value cutoff picked in isolation. Ranked by
+  ratio (DC excluded, n=50), ranks 1–6 (ID, MT, ME, VT, NH, WY — ratios
+  0.1092 to 0.2409) are *all* built on fewer than 100 raw EEOC charges
+  for the entire fiscal year. Rank 7 (NE, ratio 0.2720) jumps to 157
+  charges — a >4x increase in sample size. There's no meaningful gap in
+  the *ratio* values at that boundary (0.2409 → 0.2720 is a small
+  step) — the meaningful gap is in the raw counts, which a percentile
+  cutoff on the ratio distribution would not reveal. 0.25 sits in that
+  gap (above WY, below NE), clamping exactly the 6-state thin-sample
+  cluster and nothing else.
+- **Methodological finding, kept on record for future sessions: raw
+  charge count alone does not select which states need floor
+  protection.** AK (83 charges) and ND (99 charges) are just as
+  statistically thin as the 6-state cluster above, but their ratios
+  (0.4545 and 0.4096) aren't extreme — their QCEW employment
+  denominators are proportionally small too, so the resulting rate
+  lands mid-pack rather than at an implausible low. A blanket "any
+  state under ~100 charges gets clamped" rule would have force-lowered
+  these two from ordinary-looking values for no real reason. The floor
+  is a clamp on the *ratio value* (`max(raw_ratio, 0.25)`), which
+  naturally only touches whichever states' ratios happen to fall below
+  it — raw charge count is what justifies *where* that value sits, not
+  a rule for *which states* get overridden. AK and ND are correctly
+  untouched under floor=0.25; a future session revisiting these bounds
+  should re-derive the floor the same way (find the reliability gap in
+  raw counts, then check where it lands on the ratio scale) rather
+  than assume "low count" and "gets clamped" are the same test.
+- **Ceiling: 2.30.** Grounded in the real non-DC maximum (AR, 2.2691 —
+  not GA, which is third-highest at 2.2074, one place below AR), plus
+  a small round-number margin for headroom, not an arbitrary figure
+  picked without reference to the data. Confirmed this preserves every
+  named real-signal state at its actual computed ratio, uncompressed:
+  GA 2.2074, AL 1.7777, TN 1.5951, AR 2.2691, MS 1.9724, NC 1.5271, and
+  every other non-DC state (all ≤ AR's 2.2691). Worth recording
+  explicitly: even the 95th percentile of the 50-state distribution
+  (1.8848) sits below MS's own ratio (1.9724) — a percentile-based
+  ceiling could not have satisfied "don't compress the real-signal
+  states" here at any reasonable percentile; only a ceiling grounded in
+  the actual maximum could.
+- **Net effect:** 6 of 50 jurisdictions clamped (12%), all at the floor
+  — down from the first-pass bounds' 40 of 51 (78%). The ceiling
+  affects zero jurisdictions this year; it exists purely as a
+  forward-looking backstop against a future year's data exceeding
+  this year's real maximum.
 
 ## Not decided / open
 
@@ -175,17 +238,13 @@ rate-to-multiplier conversion are all decided.
   or whether the multiplier/base-salary mechanism should be built
   jurisdiction-agnostic from the start is an open architecture
   question for the Gemini gate, not decided here.
-- **The 0.8x–1.2x clamp bounds specifically** — the mechanism/formula
-  is decided, but the exact numbers are Pete's working figure, not
-  locked. Worth flagging for the Gemini gate with real weight: computed
-  against the actual FY2025/QCEW data (see the new Appendix below),
-  **40 of 51 jurisdictions (78%) hit one clamp boundary or the other**
-  — only 11 states fall inside the un-clamped middle band. That's a
-  real signal the 0.8–1.2 range may be narrow relative to the actual
-  spread of state-level rate variation (raw rates span roughly 6 to
-  146 per 100k, a ~23x range, compressed into a 1.5x band), not just a
-  theoretical edge-case guard — worth Gemini's explicit attention, not
-  a rubber stamp.
+
+**Resolved this session, no longer open:** the clamp bounds. The
+original 0.8x–1.2x first-pass figure clamped 78% of jurisdictions —
+replaced with floor 0.25 / ceiling 2.30 (12% clamped, all at the
+floor), derived from the actual data's reliability structure rather
+than a guessed round number. Full reasoning: "Decided, 2026-09-15e"
+above.
 
 ## Appendix — EEOC Table E1b, FY2025 Total Charges by state (raw
 ## numerator, verified 2026-09-15b, not yet normalized)
@@ -286,42 +345,51 @@ outlier in either direction. For context: DC's rate (146.197, the
 highest) is driven by an unusually small denominator (DC's
 private+state+local employment is only 556,100 — a quarter of DC's
 total employment is federal, per the QCEW pull above) rather than
-necessarily a higher underlying filing rate — worth flagging as a
-possible edge case if DC is ever surfaced individually rather than as
-part of a full 51-jurisdiction table.
+necessarily a higher underlying filing rate. **Resolved, 2026-09-15e:**
+this is exactly why DC is excluded from the computed-multiplier
+Appendix below (structural artifact, not signal) — DC's own numerator/
+denominator/rate stay unchanged here, only its multiplier-table row is
+omitted.
 
-## Appendix — computed clamped multiplier, all 51 jurisdictions,
-## verified 2026-09-15d
+## Appendix — computed clamped multiplier, 50 jurisdictions (DC
+## excluded), finalized 2026-09-15e
 
 Computed directly from the two appendices above (no new data pulled).
+Supersedes the first-pass 0.8x–1.2x table this appendix previously
+held — that table and its bounds are not carried forward as a default
+anywhere in this plan.
 
-**Aggregate national rate (size-weighted, per "Decided, 2026-09-15d"
-above):** 87,835 total charges ÷ 152,818,850 total priv+state+local
-employment × 100,000 = **57.4765 per 100,000**. (This is the sum of
-the 51-state numerator/denominator pairs already in this doc, so it
-excludes the small suppressed/non-state territories the same way the
-per-state rate appendix does — it is not identical to the file's own
-88,201 US-wide "Total" row, which includes territories.)
+**DC excluded from this table.** DC's own numerator (813 charges),
+denominator (556,100), and unclamped rate (146.197/100k) are unchanged
+in the two Appendices above — omitted here only, because DC's rate is
+a structural artifact of ~25% of its total employment being federal
+(excluded from this denominator by design), not sample noise and not
+reliable litigation-risk signal. See "Decided, 2026-09-15e" above for
+the full reasoning.
 
-`raw multiplier = state rate ÷ 57.4765`, then clamped to [0.8, 1.2].
+**Aggregate national rate (size-weighted, unchanged from
+"Decided, 2026-09-15d" — DC's real charges/employment remain part of
+the true national baseline even though DC has no row below):**
+57.4765 per 100,000.
+
+`raw multiplier = state rate ÷ 57.4765`, then `clamped = min(2.30, max(0.25, raw multiplier))`.
 
 | State | Rate /100k | Raw multiplier | Clamped | Hit bound |
 |---|---:|---:|---:|:---:|
-| DC | 146.197 | 2.5436 | 1.2000 | ceiling |
-| AR | 130.422 | 2.2691 | 1.2000 | ceiling |
-| GA | 126.873 | 2.2074 | 1.2000 | ceiling |
-| MS | 113.364 | 1.9724 | 1.2000 | ceiling |
-| AL | 102.176 | 1.7777 | 1.2000 | ceiling |
-| TN | 91.678 | 1.5951 | 1.2000 | ceiling |
-| NV | 90.226 | 1.5698 | 1.2000 | ceiling |
-| NC | 87.771 | 1.5271 | 1.2000 | ceiling |
-| IL | 86.510 | 1.5051 | 1.2000 | ceiling |
-| MD | 82.421 | 1.4340 | 1.2000 | ceiling |
-| PA | 79.500 | 1.3832 | 1.2000 | ceiling |
-| MO | 79.441 | 1.3822 | 1.2000 | ceiling |
-| LA | 70.500 | 1.2266 | 1.2000 | ceiling |
-| VA | 69.847 | 1.2152 | 1.2000 | ceiling |
-| FL | 69.536 | 1.2098 | 1.2000 | ceiling |
+| AR | 130.422 | 2.2691 | 2.2691 | — |
+| GA | 126.873 | 2.2074 | 2.2074 | — |
+| MS | 113.364 | 1.9724 | 1.9724 | — |
+| AL | 102.176 | 1.7777 | 1.7777 | — |
+| TN | 91.678 | 1.5951 | 1.5951 | — |
+| NV | 90.226 | 1.5698 | 1.5698 | — |
+| NC | 87.771 | 1.5271 | 1.5271 | — |
+| IL | 86.510 | 1.5051 | 1.5051 | — |
+| MD | 82.421 | 1.4340 | 1.4340 | — |
+| PA | 79.500 | 1.3832 | 1.3832 | — |
+| MO | 79.441 | 1.3822 | 1.3822 | — |
+| LA | 70.500 | 1.2266 | 1.2266 | — |
+| VA | 69.847 | 1.2152 | 1.2152 | — |
+| FL | 69.536 | 1.2098 | 1.2098 | — |
 | TX | 67.399 | 1.1726 | 1.1726 | — |
 | DE | 65.268 | 1.1356 | 1.1356 | — |
 | AZ | 61.059 | 1.0623 | 1.0623 | — |
@@ -333,74 +401,82 @@ per-state rate appendix does — it is not identical to the file's own
 | **OH** | **53.040** | **0.9228** | **0.9228** | **—** |
 | SC | 51.551 | 0.8969 | 0.8969 | — |
 | WA | 48.922 | 0.8512 | 0.8512 | — |
-| CO | 45.472 | 0.7911 | 0.8000 | floor |
-| NY | 42.688 | 0.7427 | 0.8000 | floor |
-| KY | 41.171 | 0.7163 | 0.8000 | floor |
-| RI | 37.924 | 0.6598 | 0.8000 | floor |
-| NJ | 37.055 | 0.6447 | 0.8000 | floor |
-| MN | 37.025 | 0.6442 | 0.8000 | floor |
-| HI | 35.768 | 0.6223 | 0.8000 | floor |
-| WI | 34.367 | 0.5979 | 0.8000 | floor |
-| SD | 26.948 | 0.4689 | 0.8000 | floor |
-| CA | 26.444 | 0.4601 | 0.8000 | floor |
-| AK | 26.125 | 0.4545 | 0.8000 | floor |
-| UT | 23.988 | 0.4174 | 0.8000 | floor |
-| ND | 23.544 | 0.4096 | 0.8000 | floor |
-| OR | 20.669 | 0.3596 | 0.8000 | floor |
-| CT | 20.194 | 0.3513 | 0.8000 | floor |
-| WV | 19.708 | 0.3429 | 0.8000 | floor |
-| MA | 19.391 | 0.3374 | 0.8000 | floor |
-| IA | 17.331 | 0.3015 | 0.8000 | floor |
-| NE | 15.631 | 0.2720 | 0.8000 | floor |
-| WY | 13.846 | 0.2409 | 0.8000 | floor |
-| NH | 12.056 | 0.2098 | 0.8000 | floor |
-| VT | 9.951 | 0.1731 | 0.8000 | floor |
-| ME | 9.149 | 0.1592 | 0.8000 | floor |
-| MT | 7.419 | 0.1291 | 0.8000 | floor |
-| ID | 6.277 | 0.1092 | 0.8000 | floor |
+| CO | 45.472 | 0.7911 | 0.7911 | — |
+| NY | 42.688 | 0.7427 | 0.7427 | — |
+| KY | 41.171 | 0.7163 | 0.7163 | — |
+| RI | 37.924 | 0.6598 | 0.6598 | — |
+| NJ | 37.055 | 0.6447 | 0.6447 | — |
+| MN | 37.025 | 0.6442 | 0.6442 | — |
+| HI | 35.768 | 0.6223 | 0.6223 | — |
+| WI | 34.367 | 0.5979 | 0.5979 | — |
+| SD | 26.948 | 0.4689 | 0.4689 | — |
+| CA | 26.444 | 0.4601 | 0.4601 | — |
+| AK | 26.125 | 0.4545 | 0.4545 | — |
+| UT | 23.988 | 0.4174 | 0.4174 | — |
+| ND | 23.544 | 0.4096 | 0.4096 | — |
+| OR | 20.669 | 0.3596 | 0.3596 | — |
+| CT | 20.194 | 0.3513 | 0.3513 | — |
+| WV | 19.708 | 0.3429 | 0.3429 | — |
+| MA | 19.391 | 0.3374 | 0.3374 | — |
+| IA | 17.331 | 0.3015 | 0.3015 | — |
+| NE | 15.631 | 0.2720 | 0.2720 | — |
+| WY | 13.846 | 0.2409 | 0.2500 | floor |
+| NH | 12.056 | 0.2098 | 0.2500 | floor |
+| VT | 9.951 | 0.1731 | 0.2500 | floor |
+| ME | 9.149 | 0.1592 | 0.2500 | floor |
+| MT | 7.419 | 0.1291 | 0.2500 | floor |
+| ID | 6.277 | 0.1092 | 0.2500 | floor |
 
-**Ohio's resulting multiplier: 0.9228** (unclamped — Ohio's raw ratio
-already falls inside the 0.8–1.2 band, so the clamp has zero effect on
-Ohio specifically). Ohio's rate sits just under the national average
-(53.040 vs. 57.4765 per 100k), producing a mild below-average
-multiplier — directionally sane and unremarkable for a plausibility
-check: no sign error, no order-of-magnitude error, no clamp artifact
-distorting Ohio's own number.
+50 rows, DC excluded as documented above. **6 of 50 clamped (12%)**,
+all at the floor — down from the first-pass bounds' 40 of 51 (78%).
+Zero jurisdictions hit the 2.30 ceiling this year (real non-DC max is
+AR at 2.2691); the ceiling is a forward-looking backstop only. AK and
+ND (both under 100 raw charges, same reliability profile as the 6
+floored states) are correctly untouched — their own ratios aren't
+extreme, per the methodological finding in "Decided, 2026-09-15e"
+above.
 
-**Distributional finding, flagged for the Gemini gate:** 15 states hit
-the 1.2 ceiling and 25 hit the 0.8 floor — **40 of 51 (78%) are
-clamped**, only 11 reflect their actual computed ratio. Worth weighing
-explicitly against whether 0.8–1.2 is the intended design (a
-deliberately narrow, conservative band) or an accidental
-under-calibration relative to the real spread in the data — this
-plan doc takes no position on which, per Pete's explicit "not to be
-presented as final or locked" instruction.
+Ohio's own multiplier: **0.9228**, unclamped — Ohio's raw ratio already
+falls inside the band, confirmed as the plausibility check this
+appendix exists to support: no sign error, no order-of-magnitude
+error, no clamp artifact. Ohio's rate sits just under the national
+average (53.040 vs. 57.4765 per 100k), producing a mild below-average
+multiplier — directionally sane and unremarkable, exactly what a
+plausibility check should find.
 
 ## Process
 
-- This entire methodology (new pricing capability, new legal-content
-  claim) requires the Gemini architecture gate before any code is
-  written — not yet submitted.
-- **Multiplier mechanism is now methodology-complete (2026-09-15d):**
-  concept, source, normalization base, denominator, rate computation,
-  and the rate-to-multiplier conversion (national reference,
-  formula, clamp) are all decided and computed for all 51
-  jurisdictions — see "Decided, 2026-09-15" through "2026-09-15d" and
-  all three Appendices above. This closes the multiplier-sourcing
-  research task in full. Salary-basis methodology (top of this
-  document, under "Decided") was already settled in the prior session.
-- **Ready for Gemini architecture-gate submission, pending one thing:
-  Pete's review of Ohio's own computed multiplier (0.9228, see the
-  new Appendix) as a plausibility check.** Once that's confirmed, the
-  remaining open items are genuinely architecture-level questions for
-  Gemini itself, not further research: output framing (not yet
-  drafted), whether a new `LegalPricingResult`/`LegalCurveLookup`
-  field is needed, the OH-only-vs-jurisdiction-agnostic scope
-  question, the `_INDUSTRY_WAGE_DATA` mean-vs-distribution citation-
-  accuracy consequence flagged earlier, and the 0.8–1.2 clamp bounds'
-  own distributional finding (40/51 jurisdictions clamped) — all
-  listed in "Not decided / open" above, all explicitly for Gemini to
-  weigh, not resolved unilaterally here.
+- **This mechanism is now fully specified and ready for Gemini
+  architecture-gate submission (2026-09-15e).** No code has been
+  written — this remains documentation only. Everything the
+  methodology needs is decided:
+  - Salary basis: `_INDUSTRY_WAGE_DATA` (existing BLS OEWS table), no
+    individual/case-specific salary collection, ever (top of this
+    document, under "Decided" — settled in the prior session).
+  - Multiplier source: EEOC Table E1b charge-filing frequency,
+    verified public URL, suppression checked and cleared.
+  - Normalization base: BLS QCEW employment (Total Covered minus
+    Federal Government), matched to Table E1b's own private +
+    state/local (excl. federal) coverage.
+  - National reference: size-weighted aggregate rate, not a mean of
+    state rates.
+  - Clamp: floor 0.25 / ceiling 2.30, asymmetric, both grounded in the
+    actual data's reliability structure (raw-count gap; real non-DC
+    maximum) rather than guessed round numbers — Pete-confirmed,
+    2026-09-15e.
+  - DC excluded from the multiplier table, footnoted, as a documented
+    structural artifact rather than silently dropped or silently kept.
+  See "Decided, 2026-09-15" through "2026-09-15e" and all three
+  Appendices above for the full derivation and verification trail.
+- **Genuinely open items remaining for the Gemini gate itself, not
+  further research:** output framing (not yet drafted, given no
+  case-specific data is ever collected), whether a new
+  `LegalPricingResult`/`LegalCurveLookup` field is needed, the
+  OH-only-vs-jurisdiction-agnostic scope question, and the
+  `_INDUSTRY_WAGE_DATA` mean-vs-distribution citation-accuracy
+  consequence flagged under "Decided" above — all listed in "Not
+  decided / open," all explicitly for Gemini to weigh, not resolved
+  unilaterally here.
 - Every claim was independently verified against primary source before
   use, per standing verification discipline, given Gemini's documented
   pattern of citation fabrication in this exact codebase (real source,
