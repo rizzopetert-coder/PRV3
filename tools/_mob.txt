@@ -4583,3 +4583,43 @@ instruction so it isn't rediscovered cold next session.
   interpretation or result path exercised again (e.g. calibration work,
   interpretation-copy work, or anything else that can't be verified via
   the single-dominant-signature shortcut).
+
+## DATED NOTE (2026-09-14) -- /api/result (Path B) does not exercise
+## rank_states() or dimensional_vector -- do not use it to spot-check a
+## ranking-logic change in production
+
+Found mid-session while spot-checking the IPM vector fix (Priority
+Queue item 5, commit 09ed822) in production. Logging the pattern, not
+the specific fix -- that verification is already closed (see below).
+
+- Confirmed via `engine/main.py`'s own docstring: Path B ("AccumulationEngine
+  and rank_states are bypassed. selectedStateIds are the declared
+  diagnosis. Synthetic score 1.0...") and empirically -- three live
+  `https://principalresolution.com/api/result` round-trips this
+  session, varying selected states and counts each time, all returned
+  `dimension_summary: {aptitude: 0, authority: 0, alliance: 0,
+  attitude: 0}` regardless of input. Path B never consults
+  `dimensional_vector` for ranking or for `dimension_summary` at all --
+  it just declares the selected states as the result at equal
+  synthetic weight.
+- Only Path 1 (`/api/diagnostic/session/*`) actually calls
+  `rank_states()` against a real accumulated vector in production.
+  Confirming a `rank_states()`/`dimensional_vector` change live
+  requires driving a full Path 1 session to completion (~30-40
+  question/answer round trips plus a narrative response) -- not a
+  couple of `/api/result` calls.
+- Practical rule for future sessions: `/api/result` round-trips are a
+  legitimate no-crash/no-garbage sanity check on STATE_PROFILES content
+  (name, descriptive_prose, resolution_family for a single selected
+  state) but prove nothing about a ranking/scoring change. Don't reach
+  for them as a production spot-check for that category of fix --
+  reach for a real Path 1 session instead, or accept a local
+  `rank_states()`/`build_confusion_matrix()` ripple check as the
+  primary evidence and skip live ranking verification if a live Path 1
+  session is too heavy for the moment (Pete's call each time, per the
+  Tier 1 workflow).
+- This item's own verification is fully closed: Pete confirmed the
+  local 175-profile ripple check plus the three `/api/result` sanity
+  round-trips as sufficient for the IPM vector fix specifically. This
+  note is about not repeating the same non-representative check next
+  time, not about reopening that call.
