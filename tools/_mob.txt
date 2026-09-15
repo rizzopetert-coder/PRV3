@@ -4533,14 +4533,87 @@ via isolated git worktrees, not committed (scratch, cleaned up).
    4->5->4->5, mobile viewport) via a mocked `/api/result` response,
    since the real engine backend and `/api/interpret` aren't reachable
    from local dev this session -- see the dated note above.
-9. `_oh_is_small_employer()` -- built and tested, not wired into any
-   pricing branch. Revisit whenever a real compensatory-damages/
-   net-worth pricing path for OH is scoped.
-10. NAICS-vs-"Manufacturing & Industrial" mapping gap (OH) -- documented
-    approximation in `_oh_is_small_employer()`'s docstring and OH's
-    citation comment. No NAICS-level intake data exists to resolve it
-    precisely; revisit only if OH's small-employer routing is ever
-    wired into a real pricing path.
+9. `_oh_is_small_employer()`/OH compensatory-damages pricing -- **CLOSED,
+   this session (2026-09-15).** Ohio's real R.C. 2315.21 formula is now
+   wired into all three call sites that can reach it (Clusters 1, 2,
+   4b) via a shared `_oh_compensatory_damages_pricing()` helper, shipped
+   commit `2dff83f`: compensatory base = `_INDUSTRY_WAGE_DATA[industry]`
+   x a new 50-state (DC excluded) EEOC/QCEW-derived jurisdiction
+   litigation-risk multiplier table
+   (`_JURISDICTION_MULTIPLIER_DATA`). `_oh_is_small_employer()` was
+   "built and tested, not wired into any pricing branch" before this
+   session -- both halves of that gap (the missing compensatory base and
+   the never-called routing function) are now closed together, not
+   separately. General employer: 2x compensatory, uncapped,
+   `is_floor=True`. Small employer/individual defendant: 2x
+   compensatory, hard-capped at $350,000 -- the statutory net-worth
+   alternative is never computed (no individual/case-specific financial
+   data is collected, ever, matching the plan doc's permanent "no
+   individual salary collection" decision extended to net worth), so
+   this branch's figure can OVERSTATE the real cap for a low-net-worth
+   organization. Flagged via a new field,
+   `may_overstate_for_uncollected_net_worth`
+   (`LegalPricingResult`/`LegalCurveLookup`), deliberately kept distinct
+   from `is_floor` rather than an inverted reuse of it -- `is_floor`
+   means the opposite direction ("may understate") everywhere else in
+   this file, confirmed this session via direct investigation of a
+   Gemini-cited "precedent" (Texas's own `is_floor=True`) that turned
+   out to be a blanket category-wide default, not a purpose-built
+   honesty flag -- reusing it here would have made one field mean
+   opposite things depending on which branch set it.
+
+   Both the multiplier-sourcing methodology and this wiring were
+   Gemini-reviewed at the architecture gate; every cited claim
+   (dataclass shapes, function signatures, the Ohio-uniqueness claim
+   across all 52 jurisdiction entries, the "credibility over
+   calculation" framing, the Texas `is_floor` precedent) was
+   independently re-verified against live source before being treated
+   as confirmed -- two of Gemini's claims needed correction before this
+   was built, full trail in
+   `prompts/oh-compensatory-damages-pricing-plan.md`. Verified before
+   shipping: 189/189 tests pass, `validate.py` baseline unchanged
+   (37/4), a 36,000-combination ripple check (every Legal-scoring
+   taxonomy state x every non-OH CONFIRMED jurisdiction x
+   industry/headcount/org_type/org_size variation) confirmed zero
+   behavioral change to any non-OH jurisdiction, and two real
+   worked-example scenarios (a 40-employee retail small-employer case,
+   a 250-employee healthcare general-employer case) checked for
+   plausibility before commit.
+
+   **Still open, not part of this build:** UI-facing output framing --
+   given no case-specific data is ever collected, the presentation
+   needs to read as a rough, heavily-caveated range, not a real case
+   estimate, and this session's own worked examples surfaced a
+   concrete rendering question that work will need to handle: OH's
+   `dollar_range` is always a degenerate point value (`low == high`,
+   e.g. `(73179.89, 73179.89)`), not a real range like every other
+   PRICED jurisdiction -- whatever renders `legal_tail_risk_exposure`
+   needs to either handle a collapsed range gracefully or this needs a
+   deliberate design decision, not an accidental one. Also still open:
+   whether `LegalPricingResult`'s new field should reach
+   `compute_legal_compliance_exposure()`'s aggregate dict,
+   `contract.py`'s `legal_tail_risk_exposure`, or
+   `web/lib/types.ts`'s `LegalTailRiskExposure` -- confirmed this
+   session that it currently does NOT (same "no consumer yet" status
+   `is_floor` itself already carries -- neither field is read by
+   `compute_legal_compliance_exposure()`'s per-state aggregation loop),
+   consistent with existing precedent, not a new gap, but real work for
+   whoever builds the output-framing pass.
+10. NAICS-vs-"Manufacturing & Industrial" mapping gap (OH) -- **status
+    corrected, this session (2026-09-15): no longer hypothetical.** This
+    approximation is now live in a real pricing path for the first
+    time, not just documented in a docstring -- it directly determines
+    `_oh_is_small_employer()`'s branch routing (general vs.
+    small-employer/$350k-capped), which item 9 above just wired into
+    real dollar output. Confirmed concretely by this session's own
+    Scenario B worked example (250-employee Healthcare & Life Sciences
+    org, general-employer branch), which depended on that industry not
+    matching "Manufacturing & Industrial" -- had it been misclassified
+    either direction, the org would have landed on the wrong side of
+    the $350,000 cap. The gap itself is unchanged and not resolved
+    here (still no NAICS-level intake data to resolve it precisely) --
+    only the status is corrected: this is a live, consequential
+    approximation today, not a "revisit only if ever wired in" item.
 11. Quarterly Step-Back -- due next week, per Pete's correction (not
     overdue -- the prior "last run August 22" framing carried in this
     queue since MOB v4.279 undercounted; Pete's own scheduling
