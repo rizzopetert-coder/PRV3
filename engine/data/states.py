@@ -441,22 +441,40 @@ _reg(_profile(
     resolution_family="Development + Roadmap",
 ))
 STATE_PROFILES["invisible_performance_management"].dimensional_vector = DimensionalVector(
-    # SCD-WCS full re-authoring, Phase 2 Batch 1 (2026-08-24), staged
-    # Phase 5 (2026-08-25) -- prompts/scd-wcs-full-reauthoring-
-    # program.md. Full axis flip, supersedes Candidate C: real text
-    # ("a manager's read... is accurate... a sound judgment") directly
-    # disclaims Aptitude as the liability -- the entire deficiency
-    # described is evidentiary/documentation weight (Authority).
-    # Dry-run confirmed clean (Phase 4c): false-rank-1 43 -> 0/175,
-    # zero new collision against the_founders_grip.
+    # Rank-3 cluster differentiation (2026-09-14), Priority Queue item 5.
+    # f88a7c2 (2026-08-25)'s axis flip to Authority was correct -- real
+    # text is an evidentiary-weight problem, not an Aptitude one -- but
+    # it copied the_founders_grip's own HIGH-tier magnitude (0.60/0.10)
+    # verbatim, producing a byte-identical vector and landing this state
+    # in the already-diagnosed 8-state rank-3 cluster
+    # (prompts/scd-wcs-remediation-tracker.md, Stage 3-5) as an
+    # unintended side effect, not a deliberate decision. Magnitude
+    # corrected here to 0.45/0.15, matching this state's own
+    # signal_weight="medium" -- it was never actually a HIGH-tier state,
+    # the vector just carried HIGH-tier numbers. aptitude_asset raised
+    # 0.10 -> 0.20 (aptitude_liability held at 0.10, not raised to the
+    # flat 0.15 template value) on real textual grounding this state's
+    # own descriptive_prose already carries: "a manager's read... is
+    # accurate... a sound judgment" is an explicit asset-side Aptitude
+    # signal the flat template ignores. Confirmed unique against every
+    # other vector in this file, including the_founders_grip and the
+    # 10-state flat MEDIUM-tier Authority template (the_uninitiated,
+    # leadership_continuity_risk, decision_paralysis, the_policy_lag,
+    # dueling_narratives, transition_paralysis, the_lost_map,
+    # pay_exposure, the_pay_fog, compression_crisis) this state is not
+    # being folded back into. Full 175-profile ripple check confirmed
+    # zero flips anywhere in the suite before this shipped (scratch
+    # script, not committed). the_founders_grip and the cluster's other
+    # 6 members are explicitly untouched -- that broader architectural
+    # question stays out of scope, per Pete's explicit instruction.
     aptitude_liability=0.10,
-    aptitude_asset=0.10,
-    authority_liability=0.60,
-    authority_asset=0.10,
-    alliance_liability=0.10,
-    alliance_asset=0.10,
-    attitude_liability=0.10,
-    attitude_asset=0.10,
+    aptitude_asset=0.20,
+    authority_liability=0.45,
+    authority_asset=0.15,
+    alliance_liability=0.15,
+    alliance_asset=0.15,
+    attitude_liability=0.15,
+    attitude_asset=0.15,
 )
 STATE_PROFILES["invisible_performance_management"].descriptive_prose = "A manager's read on an underperforming employee is accurate but was never written down, so it carries no evidentiary weight when a decision needs defending. This isn't concealment. It's an absence of documentation that turns a sound judgment into an exposed one."
 
