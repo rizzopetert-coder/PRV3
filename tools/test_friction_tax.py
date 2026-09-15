@@ -1615,7 +1615,7 @@ check(
     and _r_id_clamp.is_floor is True,
     f"got {_r_id_clamp}",
 )
-_r_va_noop = _ft._cluster_4_curve_for_org_type("Founder-led", "1000+", 1000, ["VA"])
+_r_va_noop = _ft._cluster_4_curve_for_org_type("Founder-led", "1000+", 1000, ["VA"], "Professional Services")
 check(
     "Cluster 4b, VA (state_specific_flat, $350,000 cap) at the '1000+' bucket (generic ceiling "
     "$300,000): the clamp is a genuine NO-OP here -- min(300000, 350000) = 300000, confirmed "
@@ -1656,7 +1656,7 @@ check(
     and _r_c1_tiers.is_floor is True,
     f"got {_r_c1_tiers}",
 )
-_r_c4b_uncapped = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 300, ["CA"])
+_r_c4b_uncapped = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 300, ["CA"], "Professional Services")
 check(
     "Cluster 4b, CA (uncapped), '250-499' bucket: is_floor=True, ceiling unchanged at the generic "
     "$200,000 (same figure as this file's own pre-existing hr_capture/250-499 test, confirming this "
@@ -1713,7 +1713,7 @@ for _sid in ("AR", "DE", "TN"):
         and _r_c1.is_floor is True,
         f"got {_r_c1}",
     )
-    _r_c4b = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 300, [_sid])
+    _r_c4b = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 300, [_sid], "Professional Services")
     check(
         f"Cluster 4b, {_sid} (state_specific_tiers, Phase 2a): still the generic $200,000 ceiling "
         "('250-499' bucket), is_floor=True -- same reasoning as the Cluster 1 check above",
@@ -1786,7 +1786,7 @@ check(
     _ft._co_drives_federal_tier_deferral(["TX", "CO"], 20) is False,
     f"got {_ft._co_drives_federal_tier_deferral(['TX', 'CO'], 20)!r}",
 )
-_r_co_14 = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 14, ["CO"])
+_r_co_14 = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 14, ["CO"], "Professional Services")
 check(
     "Cluster 4b, CO alone, headcount=14 (below the federal floor): is_floor=True, generic $200,000 "
     "ceiling -- CO's own tiers haven't yielded to federal yet, still a placeholder",
@@ -1795,7 +1795,7 @@ check(
     and _r_co_14.is_floor is True,
     f"got {_r_co_14}",
 )
-_r_co_15 = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 15, ["CO"])
+_r_co_15 = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 15, ["CO"], "Professional Services")
 check(
     "Cluster 4b, CO alone, headcount=15 (at the federal floor): is_floor=False now -- same $200,000 "
     "ceiling (Cluster 4b's table already IS the federal table, so the number itself doesn't move), "
@@ -1805,7 +1805,7 @@ check(
     and _r_co_15.is_floor is False,
     f"got {_r_co_15}",
 )
-_r_co_ca_15 = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 15, ["CO", "CA"])
+_r_co_ca_15 = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 15, ["CO", "CA"], "Professional Services")
 check(
     "Cluster 4b, CO+CA, headcount=15: is_floor=True -- CA (uncapped) outranks CO here, so the "
     "resolved treatment is 'uncapped', not 'state_specific_tiers', and CO's federal-deferral branch "
@@ -1817,7 +1817,8 @@ check(
 )
 
 
-# -- 48. OH -- QUALITATIVE_ONLY, intake-aware routing (Phase 2b) --
+# -- 48. OH -- real R.C. 2315.21 formula, PRICED (Phase 2b wiring, superseded this session -- --
+# -- Priority Queue item 9 -- by _oh_compensatory_damages_pricing()) --
 
 # -- 48a. _oh_is_small_employer() -- the four boundary combinations --
 
@@ -1885,17 +1886,31 @@ check(
     f"got {_ft._oh_drives_tiers_result(['TX', 'OH'])!r}",
 )
 
-# -- 48c. Integration -- Clusters 1, 2, 4b all resolve OH to QUALITATIVE_ONLY --
+# -- 48c. Integration -- Clusters 1, 2, 4b all resolve OH to PRICED (Priority Queue item 9, -- --
+# -- this session -- was QUALITATIVE_ONLY before _oh_compensatory_damages_pricing() was wired --
+# -- in; expected dollar figures independently derived, not copied from implementation output: --
+# -- compensatory_base = _INDUSTRY_WAGE_DATA["Professional Services"][0] (102,670.0) x --
+# -- _JURISDICTION_MULTIPLIER_DATA["OH"][0] (0.9228) = 94,743.876; 2x = 189,487.752, which is --
+# -- under the $350,000 small-employer cap either way, so headcount=20 (small, capped) and --
+# -- headcount=300 (general, uncapped) happen to produce the same number here by coincidence --
+# -- of this specific industry/multiplier combination, not because the two branches collapse --
+# -- to one -- their status/is_floor/may_overstate_for_uncollected_net_worth fields differ. --
 
 _r_oh_c1 = _ft._single_state_legal_pricing(
     "the_paper_tiger", org_size="Under 25", industry="Professional Services",
     org_type="Founder-led", headcount=20, jurisdictions=["OH"],
 )
 check(
-    "Cluster 1, OH: QUALITATIVE_ONLY, dollar_range=None -- no longer falls through to the generic "
-    "$450,000 placeholder curve",
-    _r_oh_c1.status == LegalPricingStatus.QUALITATIVE_ONLY
-    and _r_oh_c1.dollar_range is None,
+    "Cluster 1, OH, headcount=20 (small employer): PRICED, dollar_range=(189487.752, 189487.752) "
+    "(2x compensatory, capped at $350,000 -- doesn't bind here), coverage_confidence threaded "
+    "through as real CONFIRMED (not hardcoded NOT_APPLICABLE), is_floor=False, "
+    "may_overstate_for_uncollected_net_worth=True (net_worth alternative not computed)",
+    _r_oh_c1.status == LegalPricingStatus.PRICED
+    and _r_oh_c1.dollar_range == (189487.75199999998, 189487.75199999998)
+    and _r_oh_c1.coverage_confidence == "CONFIRMED"
+    and _r_oh_c1.partial_state_flag is False
+    and _r_oh_c1.is_floor is False
+    and _r_oh_c1.may_overstate_for_uncollected_net_worth is True,
     f"got {_r_oh_c1}",
 )
 check(
@@ -1910,23 +1925,46 @@ _r_oh_c2 = _ft._single_state_legal_pricing(
     org_type="Founder-led", headcount=20, jurisdictions=["OH"],
 )
 check(
-    "Cluster 2, OH: QUALITATIVE_ONLY, dollar_range=None -- no longer falls through to the fixed "
-    "discrete tiers",
-    _r_oh_c2.status == LegalPricingStatus.QUALITATIVE_ONLY
-    and _r_oh_c2.dollar_range is None,
+    "Cluster 2, OH, headcount=20 (small employer): PRICED, same dollar_range and flags as Cluster "
+    "1 above -- Ohio's formula is cluster-independent, doesn't fall through to the fixed discrete "
+    "tiers",
+    _r_oh_c2.status == LegalPricingStatus.PRICED
+    and _r_oh_c2.dollar_range == (189487.75199999998, 189487.75199999998)
+    and _r_oh_c2.coverage_confidence == "CONFIRMED"
+    and _r_oh_c2.is_floor is False
+    and _r_oh_c2.may_overstate_for_uncollected_net_worth is True,
     f"got {_r_oh_c2}",
 )
-_r_oh_c4b = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 300, ["OH"])
+_r_oh_c4b = _ft._cluster_4_curve_for_org_type(
+    "Founder-led", "250-499", 300, ["OH"], "Professional Services",
+)
 check(
-    "Cluster 4b, OH: QUALITATIVE_ONLY, curve=None -- no longer falls through to the generic "
-    "$200,000 ceiling",
-    _r_oh_c4b.status == LegalPricingStatus.QUALITATIVE_ONLY
-    and _r_oh_c4b.curve is None,
+    "Cluster 4b, OH, headcount=300 (general employer -- 300 > 100, not Manufacturing & "
+    "Industrial): PRICED, flat curve floor==ceiling==189487.752 (2x compensatory, uncapped -- "
+    "same number as the small-employer case above by coincidence of this industry/multiplier "
+    "combo, not because the branches collapse), is_floor=True (standard 'uncapped' semantics, no "
+    "direction mismatch), may_overstate_for_uncollected_net_worth=False (general-employer branch "
+    "never sets it) -- no longer falls through to the generic $200,000 ceiling",
+    _r_oh_c4b.status == LegalPricingStatus.PRICED
+    and _r_oh_c4b.curve is not None
+    and _r_oh_c4b.curve.floor == 189487.75199999998
+    and _r_oh_c4b.curve.ceiling == 189487.75199999998
+    and _r_oh_c4b.is_floor is True
+    and _r_oh_c4b.may_overstate_for_uncollected_net_worth is False,
     f"got {_r_oh_c4b}",
 )
+check(
+    "Cluster 4b, OH, headcount=300: _legal_score_fraction(curve, score) collapses to exactly "
+    "curve.floor regardless of score when floor == ceiling -- confirms the flat-curve trick "
+    "actually bypasses score-scaling in the real code path, not just in isolated theory",
+    _ft._legal_score_fraction(_r_oh_c4b.curve, 1) == 189487.75199999998
+    and _ft._legal_score_fraction(_r_oh_c4b.curve, 4) == 189487.75199999998,
+    f"got score=1: {_ft._legal_score_fraction(_r_oh_c4b.curve, 1)}, "
+    f"score=4: {_ft._legal_score_fraction(_r_oh_c4b.curve, 4)}",
+)
 
-# -- 48d. compute_legal_compliance_exposure() -- has_unpriced_conditions, same shape as the -- --
-# -- existing Government/hr_capture precedent (~1006-1017), proven renderable via that same path --
+# -- 48d. compute_legal_compliance_exposure() -- OH now PRICED, same shape/rounding as any --
+# -- other real single-state PRICED result (round(x, 2), band from _legal_exposure_band()) --
 
 _r_oh_aggregate = compute_legal_compliance_exposure(
     state_ids=["the_paper_tiger"],
@@ -1936,15 +1974,14 @@ _r_oh_aggregate = compute_legal_compliance_exposure(
     jurisdictions=["OH"],
 )
 check(
-    "compute_legal_compliance_exposure(), OH: low/high/band all None, has_unpriced_conditions=True, "
-    "unpriced_state_ids=['the_paper_tiger'] -- identical shape to the Government/hr_capture "
-    "precedent already proven to reach engine/contract.py's non-null legal_tail_risk_exposure guard "
-    "(low is not None or has_unpriced_conditions) and PrivateOutput.tsx's already-status-agnostic "
-    "unpriced-state copy",
+    "compute_legal_compliance_exposure(), OH, headcount=20: low=high=189487.75 (rounded), "
+    "band='Moderate' ($100,000-$500,000), has_unpriced_conditions=False, unpriced_state_ids=[], "
+    "coverage_basis='state_specific' (CONFIRMED-only), has_partial_jurisdictions=False -- was "
+    "the all-None/has_unpriced_conditions=True shape before this session's build",
     _r_oh_aggregate == {
-        "low": None, "high": None, "currency": "USD", "band": None,
-        "has_unpriced_conditions": True, "unpriced_state_ids": ["the_paper_tiger"],
-        "coverage_basis": None, "has_partial_jurisdictions": False,
+        "low": 189487.75, "high": 189487.75, "currency": "USD", "band": "Moderate",
+        "has_unpriced_conditions": False, "unpriced_state_ids": [],
+        "coverage_basis": "state_specific", "has_partial_jurisdictions": False,
     },
     f"got {_r_oh_aggregate}",
 )
@@ -1986,7 +2023,7 @@ for _hc in (100, 101, 200, 201, 500, 501):
         f"got {_r_c1_me}",
     )
 
-_r_c4b_me = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 300, ["ME"])
+_r_c4b_me = _ft._cluster_4_curve_for_org_type("Founder-led", "250-499", 300, ["ME"], "Professional Services")
 check(
     "Cluster 4b, ME (state_specific_tiers, Phase 2c): still the generic $200,000 ceiling "
     "('250-499' bucket), is_floor=True -- same reasoning as the Cluster 1 checks above",

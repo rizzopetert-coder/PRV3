@@ -2219,12 +2219,29 @@ class LegalPricingResult:
     not a hard ceiling. False by default so every pre-existing
     construction site needs no change; not yet consumed by any output
     layer, same "no consumer yet" status as damages_cap_treatment
-    itself before this build."""
+    itself before this build.
+
+    may_overstate_for_uncollected_net_worth (Priority Queue item 9,
+    this session -- Ohio's R.C. 2315.21 compensatory-damages build) is
+    the opposite direction from is_floor, deliberately kept as its own
+    field rather than an inverted reuse of is_floor: the small-employer/
+    individual-defendant branch's real statutory cap is
+    min(2x compensatory, 10% of net worth, $350,000), but net_worth
+    isn't collected at intake, so this codebase computes
+    min(2x compensatory, $350,000) -- a figure that can be HIGHER than
+    the real cap for a low-net-worth organization, not lower. Reusing
+    is_floor here (even inverted) would make one field mean opposite
+    things depending on which branch set it. False by default so every
+    pre-existing construction site needs no change; set True only by
+    Ohio's small-employer branch. Not yet consumed by any output layer
+    -- same "no consumer yet" status is_floor itself already carries;
+    UI-facing framing is explicitly out of scope for this build."""
     status: LegalPricingStatus
     dollar_range: Optional[tuple[float, float]]
     coverage_confidence: Literal["CONFIRMED", "FEDERAL_FALLBACK", "NOT_APPLICABLE"]
     partial_state_flag: bool
     is_floor: bool = False
+    may_overstate_for_uncollected_net_worth: bool = False
 
 
 @dataclass(frozen=True)
@@ -2240,12 +2257,17 @@ class LegalCurveLookup:
     is_floor carries the same meaning as LegalPricingResult's own field
     of that name (Phase 1, prompts/damages-cap-treatment-phase1-spec.md
     items 3/4) -- forwarded into the final LegalPricingResult by
-    _single_state_legal_pricing()'s Cluster 4 branch."""
+    _single_state_legal_pricing()'s Cluster 4 branch.
+    may_overstate_for_uncollected_net_worth carries the same meaning as
+    LegalPricingResult's own field of that name (Priority Queue item 9,
+    this session) -- forwarded the same way, for Ohio's Cluster 4b
+    small-employer branch specifically."""
     curve: Optional[LegalDollarCurve]
     status: LegalPricingStatus
     coverage_confidence: Literal["CONFIRMED", "FEDERAL_FALLBACK", "NOT_APPLICABLE"]
     partial_state_flag: bool
     is_floor: bool = False
+    may_overstate_for_uncollected_net_worth: bool = False
 
 
 # Cluster 1 -- Individual/isolated claim (Addendum 1).
@@ -2745,17 +2767,25 @@ STATE_COVERAGE_THRESHOLDS.update({
         # 2315.21(D)(2)). Small employer (<=100 FT employees, or <=500 if
         # NAICS-manufacturing-classified) or individual defendant: capped
         # at the LESSER of 2x compensatory OR 10% of net worth at time of
-        # tort, up to $350,000 (R.C. 2315.21(D)(2)(b)). Resolved
-        # QUALITATIVE_ONLY -- this codebase has no compensatory-damages-
-        # specific figure to apply either multiplier to, and does not
-        # collect net_worth. Small-employer routing (were it ever wired
-        # in -- see _oh_is_small_employer()) uses this app's
-        # "Manufacturing & Industrial" industry bucket as an
-        # approximation of Ohio's NAICS-manufacturing test -- confirmed
-        # this session that the two are not identical (the app bucket may
-        # sweep in adjacent non-manufacturing industrial activity like
-        # utilities or mining); flagged here, not resolved, since no
-        # NAICS-level intake data exists to resolve it precisely.
+        # tort, up to $350,000 (R.C. 2315.21(D)(2)(b)). Wired to PRICED
+        # (Priority Queue item 9, this session) -- see
+        # _oh_compensatory_damages_pricing() for the real formula:
+        # compensatory base = _INDUSTRY_WAGE_DATA x
+        # _JURISDICTION_MULTIPLIER_DATA["OH"] (prompts/oh-compensatory-
+        # damages-pricing-plan.md). The small-employer/individual-
+        # defendant branch omits the "OR 10% of net worth" alternative
+        # entirely -- net_worth still isn't collected at intake -- so its
+        # computed figure can OVERSTATE the real cap for a low-net-worth
+        # organization; flagged via
+        # LegalPricingResult.may_overstate_for_uncollected_net_worth, not
+        # silently accepted. Small-employer routing (see
+        # _oh_is_small_employer()) uses this app's "Manufacturing &
+        # Industrial" industry bucket as an approximation of Ohio's
+        # NAICS-manufacturing test -- confirmed this session that the two
+        # are not identical (the app bucket may sweep in adjacent
+        # non-manufacturing industrial activity like utilities or
+        # mining); flagged here, not resolved, since no NAICS-level
+        # intake data exists to resolve it precisely.
         damages_cap_treatment="state_specific_tiers",
         confidence="CONFIRMED",
         citation="Ohio Civil Rights Act, R.C. ch. 4112; R.C. 2315.18; R.C. 2315.21; H.B. 352 eff. Apr. 15, 2021.",
@@ -3196,11 +3226,13 @@ def _oh_drives_tiers_result(jurisdictions: list[str]) -> bool:
     which jurisdiction won, and a blanket check on the resolved
     treatment string alone would also fire for TX, AR, etc.).
 
-    Unlike CO's helper, this carries no headcount gate -- Ohio's
-    QUALITATIVE_ONLY status applies at every headcount; headcount only
-    selects which of R.C. 2315.21's two statutory branches would
-    govern (see _oh_is_small_employer() below), a question this
-    function doesn't answer.
+    Unlike CO's helper, this carries no headcount gate -- Ohio's real
+    formula applies at every headcount (Priority Queue item 9, this
+    session -- previously QUALITATIVE_ONLY at every headcount, before
+    that formula was wired in); headcount only selects which of R.C.
+    2315.21's two statutory branches would govern (see
+    _oh_is_small_employer() below), a question this function doesn't
+    answer.
 
     Same known limitation as _co_drives_federal_tier_deferral(),
     inherited not introduced: a tie between two state_specific_tiers
@@ -3217,6 +3249,543 @@ def _oh_drives_tiers_result(jurisdictions: list[str]) -> bool:
             best_rank = rank
             best_jid = jid
     return best_jid == "OH"
+
+
+# -- Jurisdiction litigation-risk multiplier (Priority Queue item 9, this
+# session's OH compensatory-damages pricing build) --------------------------
+# Relative jurisdiction-risk signal derived from EEOC charge-filing
+# frequency, normalized by BLS QCEW employment -- explicitly NOT a
+# dollar-based settlement/verdict-size signal (that distinction is load-
+# bearing, not incidental -- see prompts/oh-compensatory-damages-pricing-
+# plan.md's "Decided, 2026-09-15" entry). Multiplier = (state's own EEOC
+# Table E1b FY2025 Total Charges / BLS QCEW 2025 Private+State+Local
+# employment) / 57.4765 (the size-weighted national aggregate rate across
+# all 50 states, not a mean of the 50 state rates), clamped to [0.25, 2.30]
+# -- floor grounded in a raw-charge-count reliability gap (WY at 38 charges
+# to NE at 157 charges, not a percentile or ratio-value cutoff picked in
+# isolation), ceiling grounded in the real non-DC maximum (AR, 2.2691) plus
+# headroom, not an arbitrary round number. DC excluded entirely (its rate is
+# a structural artifact of ~25% of its employment being federal, excluded
+# from this denominator by design -- not sample noise and not reliable
+# litigation-risk signal). Full derivation, every intermediate number, and
+# the two explicitly-superseded first-pass bounds (0.8-1.2, which clamped
+# 40 of 51 jurisdictions): prompts/oh-compensatory-damages-pricing-plan.md.
+#
+# Currently consumed by Ohio's own R.C. 2315.21 compensatory-damages
+# formula only (Stage 2 of this build, _single_state_legal_pricing()) --
+# built as a full 50-state table rather than an OH-only value because the
+# plan doc's own "Not decided / open" section leaves OH-only-vs-
+# jurisdiction-agnostic as a genuine open architecture question for a
+# future Gemini pass, not resolved here.
+
+_JURISDICTION_MULTIPLIER_DATA: dict[str, tuple[float, str, str]] = {
+    "AK": (
+        0.4545,
+        "EEOC Table E1b FY2025 Total Charges: 83. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 317,705. Rate 26.125 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.4545 raw multiplier. Unclamped, "
+        "falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_AK",
+    ),
+    "AL": (
+        1.7777,
+        "EEOC Table E1b FY2025 Total Charges: 2,107. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 2,062,121. Rate 102.176 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.7777 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_AL",
+    ),
+    "AR": (
+        2.2691,
+        "EEOC Table E1b FY2025 Total Charges: 1,675. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,284,297. Rate 130.422 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 2.2691 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_AR",
+    ),
+    "AZ": (
+        1.0623,
+        "EEOC Table E1b FY2025 Total Charges: 1,940. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 3,177,231. Rate 61.059 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.0623 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_AZ",
+    ),
+    "CA": (
+        0.4601,
+        "EEOC Table E1b FY2025 Total Charges: 4,750. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 17,962,398. Rate 26.444 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.4601 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_CA",
+    ),
+    "CO": (
+        0.7911,
+        "EEOC Table E1b FY2025 Total Charges: 1,290. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 2,836,914. Rate 45.472 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.7911 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_CO",
+    ),
+    "CT": (
+        0.3513,
+        "EEOC Table E1b FY2025 Total Charges: 338. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,673,769. Rate 20.194 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.3513 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_CT",
+    ),
+    "DE": (
+        1.1356,
+        "EEOC Table E1b FY2025 Total Charges: 310. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 474,967. Rate 65.268 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 1.1356 raw multiplier. Unclamped, "
+        "falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_DE",
+    ),
+    "FL": (
+        1.2098,
+        "EEOC Table E1b FY2025 Total Charges: 6,784. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 9,756,081. Rate 69.536 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.2098 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_FL",
+    ),
+    "GA": (
+        2.2074,
+        "EEOC Table E1b FY2025 Total Charges: 6,064. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 4,779,581. Rate 126.873 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 2.2074 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_GA",
+    ),
+    "HI": (
+        0.6223,
+        "EEOC Table E1b FY2025 Total Charges: 218. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 609,478. Rate 35.768 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.6223 raw multiplier. Unclamped, "
+        "falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_HI",
+    ),
+    "IA": (
+        0.3015,
+        "EEOC Table E1b FY2025 Total Charges: 267. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,540,614. Rate 17.331 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.3015 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_IA",
+    ),
+    "ID": (
+        0.2500,
+        "EEOC Table E1b FY2025 Total Charges: 54. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 860,258. Rate 6.277 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.1092 raw multiplier. Clamped at "
+        "the 0.25 floor (raw ratio 0.1092) -- fewer than 100 raw EEOC charges for "
+        "the fiscal year, below this multiplier's reliability threshold. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_ID",
+    ),
+    "IL": (
+        1.5051,
+        "EEOC Table E1b FY2025 Total Charges: 5,180. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 5,987,775. Rate 86.510 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.5051 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_IL",
+    ),
+    "IN": (
+        1.0359,
+        "EEOC Table E1b FY2025 Total Charges: 1,876. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 3,150,977. Rate 59.537 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.0359 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_IN",
+    ),
+    "KS": (
+        0.9388,
+        "EEOC Table E1b FY2025 Total Charges: 759. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,406,687. Rate 53.957 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.9388 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_KS",
+    ),
+    "KY": (
+        0.7163,
+        "EEOC Table E1b FY2025 Total Charges: 805. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,955,240. Rate 41.171 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.7163 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_KY",
+    ),
+    "LA": (
+        1.2266,
+        "EEOC Table E1b FY2025 Total Charges: 1,337. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,896,463. Rate 70.500 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.2266 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_LA",
+    ),
+    "MA": (
+        0.3374,
+        "EEOC Table E1b FY2025 Total Charges: 696. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 3,589,352. Rate 19.391 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.3374 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_MA",
+    ),
+    "MD": (
+        1.4340,
+        "EEOC Table E1b FY2025 Total Charges: 2,146. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 2,603,713. Rate 82.421 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.4340 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_MD",
+    ),
+    "ME": (
+        0.2500,
+        "EEOC Table E1b FY2025 Total Charges: 58. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 633,951. Rate 9.149 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.1592 raw multiplier. Clamped at "
+        "the 0.25 floor (raw ratio 0.1592) -- fewer than 100 raw EEOC charges for "
+        "the fiscal year, below this multiplier's reliability threshold. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_ME",
+    ),
+    "MI": (
+        0.9937,
+        "EEOC Table E1b FY2025 Total Charges: 2,486. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 4,352,688. Rate 57.114 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.9937 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_MI",
+    ),
+    "MN": (
+        0.6442,
+        "EEOC Table E1b FY2025 Total Charges: 1,078. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 2,911,560. Rate 37.025 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.6442 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_MN",
+    ),
+    "MO": (
+        1.3822,
+        "EEOC Table E1b FY2025 Total Charges: 2,259. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 2,843,602. Rate 79.441 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.3822 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_MO",
+    ),
+    "MS": (
+        1.9724,
+        "EEOC Table E1b FY2025 Total Charges: 1,300. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,146,746. Rate 113.364 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.9724 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_MS",
+    ),
+    "MT": (
+        0.2500,
+        "EEOC Table E1b FY2025 Total Charges: 37. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 498,739. Rate 7.419 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.1291 raw multiplier. Clamped at "
+        "the 0.25 floor (raw ratio 0.1291) -- fewer than 100 raw EEOC charges for "
+        "the fiscal year, below this multiplier's reliability threshold. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_MT",
+    ),
+    "NC": (
+        1.5271,
+        "EEOC Table E1b FY2025 Total Charges: 4,266. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 4,860,387. Rate 87.771 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.5271 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_NC",
+    ),
+    "ND": (
+        0.4096,
+        "EEOC Table E1b FY2025 Total Charges: 99. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 420,491. Rate 23.544 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.4096 raw multiplier. Unclamped, "
+        "falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_ND",
+    ),
+    "NE": (
+        0.2720,
+        "EEOC Table E1b FY2025 Total Charges: 157. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,004,397. Rate 15.631 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.2720 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_NE",
+    ),
+    "NH": (
+        0.2500,
+        "EEOC Table E1b FY2025 Total Charges: 82. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 680,142. Rate 12.056 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.2098 raw multiplier. Clamped at "
+        "the 0.25 floor (raw ratio 0.2098) -- fewer than 100 raw EEOC charges for "
+        "the fiscal year, below this multiplier's reliability threshold. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_NH",
+    ),
+    "NJ": (
+        0.6447,
+        "EEOC Table E1b FY2025 Total Charges: 1,569. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 4,234,240. Rate 37.055 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.6447 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_NJ",
+    ),
+    "NM": (
+        1.0376,
+        "EEOC Table E1b FY2025 Total Charges: 505. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 846,777. Rate 59.638 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 1.0376 raw multiplier. Unclamped, "
+        "falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_NM",
+    ),
+    "NV": (
+        1.5698,
+        "EEOC Table E1b FY2025 Total Charges: 1,396. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,547,223. Rate 90.226 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.5698 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_NV",
+    ),
+    "NY": (
+        0.7427,
+        "EEOC Table E1b FY2025 Total Charges: 4,132. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 9,679,488. Rate 42.688 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.7427 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_NY",
+    ),
+    "OH": (
+        0.9228,
+        "EEOC Table E1b FY2025 Total Charges: 2,892. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 5,452,486. Rate 53.040 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.9228 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_OH",
+    ),
+    "OK": (
+        1.0597,
+        "EEOC Table E1b FY2025 Total Charges: 1,004. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,648,462. Rate 60.905 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.0597 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_OK",
+    ),
+    "OR": (
+        0.3596,
+        "EEOC Table E1b FY2025 Total Charges: 405. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,959,447. Rate 20.669 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.3596 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_OR",
+    ),
+    "PA": (
+        1.3832,
+        "EEOC Table E1b FY2025 Total Charges: 4,732. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 5,952,205. Rate 79.500 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.3832 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_PA",
+    ),
+    "RI": (
+        0.6598,
+        "EEOC Table E1b FY2025 Total Charges: 185. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 487,812. Rate 37.924 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.6598 raw multiplier. Unclamped, "
+        "falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_RI",
+    ),
+    "SC": (
+        0.8969,
+        "EEOC Table E1b FY2025 Total Charges: 1,177. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 2,283,169. Rate 51.551 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.8969 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_SC",
+    ),
+    "SD": (
+        0.4689,
+        "EEOC Table E1b FY2025 Total Charges: 121. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 449,014. Rate 26.948 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.4689 raw multiplier. Unclamped, "
+        "falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_SD",
+    ),
+    "TN": (
+        1.5951,
+        "EEOC Table E1b FY2025 Total Charges: 2,942. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 3,209,041. Rate 91.678 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.5951 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_TN",
+    ),
+    "TX": (
+        1.1726,
+        "EEOC Table E1b FY2025 Total Charges: 9,360. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 13,887,434. Rate 67.399 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.1726 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_TX",
+    ),
+    "UT": (
+        0.4174,
+        "EEOC Table E1b FY2025 Total Charges: 408. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 1,700,830. Rate 23.988 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.4174 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_UT",
+    ),
+    "VA": (
+        1.2152,
+        "EEOC Table E1b FY2025 Total Charges: 2,767. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 3,961,540. Rate 69.847 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 1.2152 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_VA",
+    ),
+    "VT": (
+        0.2500,
+        "EEOC Table E1b FY2025 Total Charges: 30. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 301,478. Rate 9.951 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.1731 raw multiplier. Clamped at "
+        "the 0.25 floor (raw ratio 0.1731) -- fewer than 100 raw EEOC charges for "
+        "the fiscal year, below this multiplier's reliability threshold. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_VT",
+    ),
+    "WA": (
+        0.8512,
+        "EEOC Table E1b FY2025 Total Charges: 1,724. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 3,523,948. Rate 48.922 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.8512 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_WA",
+    ),
+    "WI": (
+        0.5979,
+        "EEOC Table E1b FY2025 Total Charges: 1,002. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 2,915,609. Rate 34.367 per 100,000, "
+        "divided by the 57.4765 national aggregate rate = 0.5979 raw multiplier. "
+        "Unclamped, falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_WI",
+    ),
+    "WV": (
+        0.3429,
+        "EEOC Table E1b FY2025 Total Charges: 132. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 669,784. Rate 19.708 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.3429 raw multiplier. Unclamped, "
+        "falls inside the 0.25 to 2.30 band. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_WV",
+    ),
+    "WY": (
+        0.2500,
+        "EEOC Table E1b FY2025 Total Charges: 38. BLS QCEW 2025 annual "
+        "Private+State+Local employment: 274,439. Rate 13.846 per 100,000, divided "
+        "by the 57.4765 national aggregate rate = 0.2409 raw multiplier. Clamped at "
+        "the 0.25 floor (raw ratio 0.2409) -- fewer than 100 raw EEOC charges for "
+        "the fiscal year, below this multiplier's reliability threshold. See "
+        "prompts/oh-compensatory-damages-pricing-plan.md, Appendix (finalized "
+        "2026-09-15e), for full derivation.",
+        "EEOC_QCEW_2025_WY",
+    ),
+}
 
 
 def _oh_is_small_employer(headcount, industry: str) -> bool:
@@ -3236,17 +3805,13 @@ def _oh_is_small_employer(headcount, industry: str) -> bool:
     general branch's statutory mechanics are the more conservative
     default to name when headcount can't be confirmed at all.
 
-    Deliberately NOT called by any of the three damages_cap_treatment
-    pricing branches (Clusters 1, 2, 4b) -- both of R.C. 2315.21's
-    branches resolve to the identical QUALITATIVE_ONLY
-    LegalPricingResult today (no compensatory-damages figure exists in
-    this codebase to apply either multiplier to, and net_worth isn't
-    collected regardless of which branch applies), so invoking this
-    helper there would compute a real answer and then discard it. It's
-    a standalone, directly-tested piece of correct logic, ready for
-    whenever a future citation/prose distinction or a real pricing
-    path for either R.C. 2315.21 branch is built and actually consumes
-    it -- not wired into the pricing path prematurely.
+    Called by _oh_compensatory_damages_pricing() (Priority Queue item 9,
+    this session) to route between R.C. 2315.21's two branches, now that
+    a real compensatory-damages base exists (_JURISDICTION_MULTIPLIER_DATA
+    x _INDUSTRY_WAGE_DATA) for both branches to apply their multiplier
+    to. Previously deliberately uncalled -- both branches resolved to
+    the identical QUALITATIVE_ONLY LegalPricingResult, so invoking this
+    helper would have computed a real answer and then discarded it.
     """
     if not isinstance(headcount, (int, float)):
         return False
@@ -3255,10 +3820,95 @@ def _oh_is_small_employer(headcount, industry: str) -> bool:
     return industry == "Manufacturing & Industrial" and headcount <= 500
 
 
+# R.C. 2315.21(D)(2)(b) -- the small-employer/individual-defendant hard
+# ceiling. Confirmed real statutory figure, not a placeholder.
+_OH_SMALL_EMPLOYER_CAP: float = 350_000.0
+
+
+def _oh_compensatory_damages_pricing(
+    industry: str,
+    headcount,
+    coverage_confidence: Literal["CONFIRMED", "FEDERAL_FALLBACK", "NOT_APPLICABLE"],
+    partial_state_flag: bool,
+) -> LegalPricingResult:
+    """
+    Ohio's own R.C. 2315.21 compensatory-damages formula (Priority Queue
+    item 9, this session). Shared by all three call sites that can reach
+    Ohio's state_specific_tiers treatment -- Clusters 1, 2, and 4b (via
+    _cluster_4_curve_for_org_type(), which wraps this into a flat
+    LegalDollarCurve -- see that call site) -- since the underlying legal
+    question (which of R.C. 2315.21's two branches applies, and for how
+    much) doesn't depend on which Legal-scoring taxonomy state triggered
+    the check.
+
+    compensatory_base = _INDUSTRY_WAGE_DATA[industry]'s real BLS OEWS wage
+    x _JURISDICTION_MULTIPLIER_DATA["OH"]'s EEOC/QCEW-derived litigation-
+    risk multiplier (prompts/oh-compensatory-damages-pricing-plan.md).
+    "OH" is hardcoded, not looked up from a jurisdictions list -- this
+    function is only ever reached once _oh_drives_tiers_result() has
+    already confirmed Ohio specifically governs, so the multiplier for
+    the governing jurisdiction is always Ohio's own.
+
+    General employer (_oh_is_small_employer() False): 2x compensatory,
+    uncapped -- is_floor=True, standard semantics (this figure may
+    understate the real answer, same as every other "uncapped" treatment
+    in this file).
+
+    Small employer/individual defendant (True): 2x compensatory, hard-
+    capped at _OH_SMALL_EMPLOYER_CAP. The real statutory cap is
+    min(2x compensatory, 10% of net worth, $350,000) -- net_worth isn't
+    collected at intake, so this omits that third term entirely. The
+    result is is_floor=False (this is a hard ceiling, not a floor) AND
+    may_overstate_for_uncollected_net_worth=True (a low-net-worth
+    organization's real cap could be lower than what's computed here --
+    the opposite direction from every other is_floor=True caveat in this
+    file, which is exactly why this is its own field, not a reused one).
+
+    coverage_confidence/partial_state_flag are threaded through from the
+    caller's own already-resolved coverage gate (or Cluster 4b's own
+    lookup) rather than hardcoded to "NOT_APPLICABLE"/False -- the prior
+    QUALITATIVE_ONLY early-returns this replaces discarded that real
+    information because there was no dollar figure to caveat with it;
+    now that this is PRICED, every other PRICED branch in this function
+    threads it through, and Ohio shouldn't be the one exception.
+
+    Returns DATA_INTEGRITY_GAP if industry isn't a recognized
+    _INDUSTRY_WAGE_DATA key -- should never happen against real
+    IntakeData.industry values (confirmed against the live
+    engine/data/intake.py INTAKE_FIELDS list), so this signals a real
+    data problem rather than an intentional design outcome, same
+    convention as every other DATA_INTEGRITY_GAP in this file.
+    """
+    wage_entry = _INDUSTRY_WAGE_DATA.get(industry)
+    if wage_entry is None:
+        _logger.warning(
+            "OH compensatory-damages pricing data-integrity gap: "
+            "unrecognized industry=%r has no _INDUSTRY_WAGE_DATA entry",
+            industry,
+        )
+        return LegalPricingResult(status=LegalPricingStatus.DATA_INTEGRITY_GAP, dollar_range=None,
+            coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
+    compensatory_base = wage_entry[0] * _JURISDICTION_MULTIPLIER_DATA["OH"][0]
+    if _oh_is_small_employer(headcount, industry):
+        v = min(2.0 * compensatory_base, _OH_SMALL_EMPLOYER_CAP)
+        return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v),
+            coverage_confidence=coverage_confidence, partial_state_flag=partial_state_flag,
+            is_floor=False, may_overstate_for_uncollected_net_worth=True)
+    v = 2.0 * compensatory_base
+    return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v),
+        coverage_confidence=coverage_confidence, partial_state_flag=partial_state_flag,
+        is_floor=True)
+
+
 def _cluster_4_curve_for_org_type(
-    org_type: str, org_size: str, headcount: int, jurisdictions: list[str]
+    org_type: str, org_size: str, headcount: int, jurisdictions: list[str], industry: str,
 ) -> LegalCurveLookup:
     """
+    industry (Priority Queue item 9, this session) is used only by the
+    Ohio state_specific_tiers branch below, to look up
+    _INDUSTRY_WAGE_DATA for _oh_compensatory_damages_pricing(). Every
+    other branch in this function is industry-independent, unchanged.
+
     Addendum 5's three org_type-gated sub-tracks. Status is
     QUALITATIVE_ONLY for "Government" (4c) -- genuinely no dollar figure
     (thin MSPB data), a real, expected outcome, not a data problem.
@@ -3317,15 +3967,37 @@ def _cluster_4_curve_for_org_type(
         # Phase 2a, prompts/damages-cap-treatment-phase2-spec.md.
         treatment = "federal_cap_applies"
     if treatment == "state_specific_tiers" and _oh_drives_tiers_result(jurisdictions):
-        # Same reasoning as Clusters 1/2 -- Ohio's real cap can't be
-        # computed by this codebase today. Returned before the ceiling
-        # lookup below, unlike Colorado's branch above (which relabels
-        # treatment and lets normal resolution continue) -- Ohio has no
-        # substitute number to fall through to. Phase 2b, prompts/
-        # damages-cap-treatment-phase2-spec.md.
+        # Ohio's real formula, wired in (Priority Queue item 9, this
+        # session). Returned before the ceiling lookup below, same shape
+        # as before this build -- Ohio's own formula is independent of
+        # Cluster 4b's headcount-bracket ceiling table entirely.
+        # Converted from _oh_compensatory_damages_pricing()'s
+        # LegalPricingResult into this function's own LegalCurveLookup
+        # shape via a flat curve (floor == ceiling): _legal_score_fraction
+        # (curve, score) = floor * (ceiling/floor)**(score-1) collapses to
+        # exactly `floor` for any score when floor == ceiling (that ratio
+        # is 1, and 1**anything == 1) -- confirmed by reading
+        # _legal_score_fraction()'s own body, not assumed -- so this
+        # formula's dollar figure reaches the final LegalPricingResult
+        # unscaled by score, matching Clusters 1/2's own unscaled
+        # dollar_range=(v, v).
+        oh_result = _oh_compensatory_damages_pricing(
+            industry, headcount, coverage.confidence, coverage.partial_state_flag,
+        )
+        if oh_result.status != LegalPricingStatus.PRICED:
+            return LegalCurveLookup(
+                curve=None, status=oh_result.status,
+                coverage_confidence=oh_result.coverage_confidence,
+                partial_state_flag=oh_result.partial_state_flag,
+            )
+        oh_v = oh_result.dollar_range[0]
         return LegalCurveLookup(
-            curve=None, status=LegalPricingStatus.QUALITATIVE_ONLY,
-            coverage_confidence="NOT_APPLICABLE", partial_state_flag=False,
+            curve=LegalDollarCurve(floor=oh_v, ceiling=oh_v),
+            status=LegalPricingStatus.PRICED,
+            coverage_confidence=oh_result.coverage_confidence,
+            partial_state_flag=oh_result.partial_state_flag,
+            is_floor=oh_result.is_floor,
+            may_overstate_for_uncollected_net_worth=oh_result.may_overstate_for_uncollected_net_worth,
         )
     ceiling = _CLUSTER_4B_CEILING_BY_HEADCOUNT.get(org_size)
     if ceiling is None:
@@ -3419,24 +4091,14 @@ def _single_state_legal_pricing(
             return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
                 coverage_confidence="CONFIRMED", partial_state_flag=coverage.partial_state_flag)
         if treatment == "state_specific_tiers" and _oh_drives_tiers_result(jurisdictions):
-            # Ohio's real cap can't be computed by this codebase today --
-            # confirmed this session: no cluster's dollar curve represents
-            # a compensatory-damages figure (Cluster 1's included), which
-            # both of R.C. 2315.21's branches multiply against, and the
-            # small-employer/individual-defendant branch additionally
-            # needs net_worth, never collected at intake. Real, non-zero
-            # exposure exists -- QUALITATIVE_ONLY, mirroring Cluster 3's
-            # unclassifiable-headcount precedent (a number genuinely
-            # can't be resolved) rather than Cluster 4c's Government case
-            # (no data exists by design) -- confirmed this session these
-            # are two structurally different existing QUALITATIVE_ONLY
-            # consumers, not one. _oh_is_small_employer() computes which
-            # of R.C. 2315.21's two branches would govern, for
-            # correctness and future use -- not called here, since both
-            # branches resolve identically today. Phase 2b, prompts/
-            # damages-cap-treatment-phase2-spec.md.
-            return LegalPricingResult(status=LegalPricingStatus.QUALITATIVE_ONLY, dollar_range=None,
-                coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
+            # Ohio's real formula, wired in (Priority Queue item 9, this
+            # session) -- see _oh_compensatory_damages_pricing()'s own
+            # docstring for the full formula, the small-employer net-
+            # worth caveat, and why coverage_confidence/partial_state_flag
+            # are threaded through here rather than hardcoded.
+            return _oh_compensatory_damages_pricing(
+                industry, headcount, coverage.confidence, coverage.partial_state_flag,
+            )
         flat_cap = _resolve_flat_cap(jurisdictions) if treatment == "state_specific_flat" else None
         curve = _CLUSTER_1_CURVE if flat_cap is None else LegalDollarCurve(
             floor=_CLUSTER_1_CURVE.floor, ceiling=min(_CLUSTER_1_CURVE.ceiling, flat_cap),
@@ -3461,12 +4123,12 @@ def _single_state_legal_pricing(
             return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
                 coverage_confidence="CONFIRMED", partial_state_flag=coverage.partial_state_flag)
         if treatment == "state_specific_tiers" and _oh_drives_tiers_result(jurisdictions):
-            # Same reasoning as Cluster 1 above -- Ohio's real cap can't
-            # be computed by this codebase today (no compensatory-damages
-            # figure exists anywhere, net_worth isn't collected). Phase
-            # 2b, prompts/damages-cap-treatment-phase2-spec.md.
-            return LegalPricingResult(status=LegalPricingStatus.QUALITATIVE_ONLY, dollar_range=None,
-                coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
+            # Same reasoning as Cluster 1 above -- Ohio's real formula,
+            # wired in (Priority Queue item 9, this session). See
+            # _oh_compensatory_damages_pricing()'s own docstring.
+            return _oh_compensatory_damages_pricing(
+                industry, headcount, coverage.confidence, coverage.partial_state_flag,
+            )
         r = _CLUSTER_2_TIER_2A if score == 1 else _CLUSTER_2_TIER_2B
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r,
             coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag)
@@ -3491,14 +4153,15 @@ def _single_state_legal_pricing(
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=r,
             coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
     if cluster == 4:
-        lookup = _cluster_4_curve_for_org_type(org_type, org_size, headcount, jurisdictions)
+        lookup = _cluster_4_curve_for_org_type(org_type, org_size, headcount, jurisdictions, industry)
         if lookup.curve is None:
             return LegalPricingResult(status=lookup.status, dollar_range=None,
                 coverage_confidence=lookup.coverage_confidence, partial_state_flag=lookup.partial_state_flag)
         v = _legal_score_fraction(lookup.curve, score)
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v),
             coverage_confidence=lookup.coverage_confidence, partial_state_flag=lookup.partial_state_flag,
-            is_floor=lookup.is_floor)
+            is_floor=lookup.is_floor,
+            may_overstate_for_uncollected_net_worth=lookup.may_overstate_for_uncollected_net_worth)
     if cluster == 5:
         v = _legal_score_fraction(_CLUSTER_5_CURVE, score)
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v),
