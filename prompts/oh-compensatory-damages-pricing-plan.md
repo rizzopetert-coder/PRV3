@@ -85,40 +85,65 @@ investigation this session).
      Charges" column itself, but worth remembering if a future pass
      ever uses a basis-specific column instead.
 
+## Decided, 2026-09-15c (normalization base + denominator sourcing)
+
+- **Normalization base: BLS employment, not Census population.** Pete's
+  call, over the two options laid out in the prior research pass —
+  reasoning: per-capita population structurally penalizes
+  retirement-heavy states with an artificially low rate (population
+  includes children, retirees, and everyone else who structurally
+  cannot generate a charge, understating real exposure for states with
+  an older population skew), and BLS keeps sourcing consistent with
+  this codebase's existing standard (`_INDUSTRY_WAGE_DATA` is already
+  BLS OEWS).
+- **EEOC charge-population coverage confirmed: private sector + state
+  and local government, excluding federal.** Checked against Table
+  E1b's own file first, per explicit instruction, not assumed from a
+  general EEOC statement — and that file itself (title, column
+  headers, all 8 footnote rows) contains **no explicit scope
+  statement** on this question at all. That's a real documentation gap
+  in the source file, reported plainly rather than glossed over.
+  What corroborates the private + state/local (excl. federal) framing
+  instead, from primary sources independent of Table E1b itself:
+  - EEOC's own "FY 2018-2022 Charge Report Submitted to Congress"
+    repeatedly frames "charges" — the same term Table E1b's title
+    uses — as covering "private sector and state and local government
+    workplaces," not as an isolated marketing line but as that
+    report's core, repeated scope statement.
+  - **Statutory/regulatory structure, independently verifiable:** Title
+    VII's charge-filing mechanism (42 U.S.C. § 2000e-5) governs private
+    and state/local government employers. Federal employees are
+    covered under a categorically separate section (42 U.S.C. §
+    2000e-16) and process (29 C.F.R. Part 1614) that EEOC's own
+    regulations describe using "complaint," not "charge" — federal
+    employees do not file charges with an EEOC field office "in the
+    same manner as private sector employees." This is a structural
+    fact about the two systems, not a phrasing choice on one webpage.
+  Treated as sufficiently confirmed to proceed on this corroboration
+  chain — flagged here precisely because it's inference across primary
+  sources, not a literal sentence inside Table E1b, so a future session
+  (or the Gemini gate) can weigh that evidentiary basis for themselves
+  rather than inheriting it as unconditional fact.
+- **Matching BLS denominator: QCEW 2025 annual averages, Total Covered
+  (`own_code=0`) minus Federal Government (`own_code=1`), all
+  industries (`industry_code='10'`), per state** — i.e. Private + State
+  Government + Local Government, NOT simple "Total Nonfarm" (which
+  would include federal employment Table E1b's charges don't reflect).
+  Sourced via BLS's Open Data CSV API
+  (`https://data.bls.gov/cew/data/api/2025/a/area/{state_fips}000.csv`),
+  one request per state, confirmed live 2026-09-15 (verified against
+  Michigan's own numbers before running all 51: total=4,408,446,
+  federal=55,758, private+state+local=4,352,688 — DC's own numbers
+  also sanity-check: federal is 25% of DC's total employment, as
+  expected for that jurisdiction specifically). **Current availability
+  confirmed, not assumed:** 2025 is the most recent QCEW annual-average
+  year published (file `Last-Modified: 2026-08-21`) — the closest
+  available match to EEOC's FY2025 (Oct 2024–Sep 2025) window, given
+  QCEW's inherent lag. All 51 state/DC pulls returned a real number
+  with an empty `disclosure_code` (zero suppression).
+
 ## Not decided / open
 
-- **Normalization base — not chosen.** State population (Census) vs.
-  state private-sector employment (BLS). Two options, tradeoffs laid
-  out below, not decided:
-  - **Option A — Census state population.** *For:* simplest, single
-    well-known figure per state, no ambiguity about which employment
-    category counts, easy to source and re-verify each cycle.
-    *Against:* an EEOC charge is filed by an employee against an
-    employer — population includes children, retirees, the unemployed,
-    and everyone else who structurally cannot generate a charge. A
-    state with an older or less working-age population would look
-    artificially "safer" by this measure for reasons that have nothing
-    to do with actual employment-litigation exposure.
-  - **Option B — BLS private-sector employment (e.g. QCEW or CES,
-    state-level).** *For:* directly matches the population capable of
-    generating a charge in the first place — closer to a genuine
-    per-employee filing rate, and consistent with this codebase's
-    existing sourcing standard (`_INDUSTRY_WAGE_DATA` is already BLS
-    OEWS). *Against:* introduces a second live BLS dataset to source,
-    verify, and keep in sync on its own refresh cycle, separate from
-    the wage table; "private-sector" vs. "total nonfarm" vs.
-    "civilian labor force" are different BLS series with different
-    scope (e.g. public-sector employees can also file EEOC charges
-    against government employers) — which exact series is the right
-    denominator isn't yet researched, just the general category.
-  Not picked here — Pete/Claude.ai's call.
-- Once a normalization base is chosen: compute the actual per-state
-  rate (FY2025 Total Charges ÷ chosen denominator, per state) and
-  report the numbers with verification notes. No engine integration
-  yet, no Gemini submission yet at that point either — still gated by
-  the Process section below. The raw numerator (FY2025 Total Charges,
-  all 50 states + DC) is already pulled and verified above; only the
-  denominator choice is blocking the actual rate computation.
 - Output framing: given no case-specific data is ever collected, the
   UI-facing presentation needs to read as a rough, heavily-caveated
   range, not anything resembling a real case estimate — exact
@@ -138,8 +163,9 @@ investigation this session).
 Pulled directly from the verified public XLSX (column 566, "FY 2025
 Total Charges"), filtered to the 50 states + DC only (territories
 excluded — see suppression note above). This is the raw numerator
-only — no denominator applied yet, since the normalization base isn't
-chosen. Not yet used anywhere in the engine.
+kept on its own for reference; the normalized version (with the BLS
+denominator applied) is the next Appendix below. Not yet used anywhere
+in the engine.
 
 ```
 AK: 83      HI: 218     MA: 696     NM: 505     SD: 121
@@ -159,17 +185,96 @@ FY2025 US-wide total (all states, DC, and territories, per the file's
 own "Total" row): 88,201 charges. Ohio (`OH`): 2,892 charges, 3.3% of
 the US total for FY2025.
 
+## Appendix — computed per-state rate (EEOC FY2025 charges per 100,000
+## private + state + local employees), verified 2026-09-15c
+
+Numerator: EEOC Table E1b FY2025 Total Charges (Appendix above).
+Denominator: BLS QCEW 2025 annual-average Total Covered minus Federal
+Government employment, per state (this section's own sourcing note
+above). Rate = charges ÷ employment × 100,000. Sorted highest to
+lowest. This is a relative jurisdiction-risk signal only — explicitly
+NOT a dollar figure, per the multiplier-concept decision above. Not
+yet used anywhere in the engine.
+
+| State | Charges | Priv+State+Local emp. | Rate /100k |
+|---|---:|---:|---:|
+| DC | 813 | 556,100 | 146.197 |
+| AR | 1,675 | 1,284,297 | 130.422 |
+| GA | 6,064 | 4,779,581 | 126.873 |
+| MS | 1,300 | 1,146,746 | 113.364 |
+| AL | 2,107 | 2,062,121 | 102.176 |
+| TN | 2,942 | 3,209,041 | 91.678 |
+| NV | 1,396 | 1,547,223 | 90.226 |
+| NC | 4,266 | 4,860,387 | 87.771 |
+| IL | 5,180 | 5,987,775 | 86.510 |
+| MD | 2,146 | 2,603,713 | 82.421 |
+| PA | 4,732 | 5,952,205 | 79.500 |
+| MO | 2,259 | 2,843,602 | 79.441 |
+| LA | 1,337 | 1,896,463 | 70.500 |
+| VA | 2,767 | 3,961,540 | 69.847 |
+| FL | 6,784 | 9,756,081 | 69.536 |
+| TX | 9,360 | 13,887,434 | 67.399 |
+| DE | 310 | 474,967 | 65.268 |
+| AZ | 1,940 | 3,177,231 | 61.059 |
+| OK | 1,004 | 1,648,462 | 60.905 |
+| NM | 505 | 846,777 | 59.638 |
+| IN | 1,876 | 3,150,977 | 59.537 |
+| MI | 2,486 | 4,352,688 | 57.114 |
+| KS | 759 | 1,406,687 | 53.957 |
+| OH | 2,892 | 5,452,486 | 53.040 |
+| SC | 1,177 | 2,283,169 | 51.551 |
+| WA | 1,724 | 3,523,948 | 48.922 |
+| CO | 1,290 | 2,836,914 | 45.472 |
+| NY | 4,132 | 9,679,488 | 42.688 |
+| KY | 805 | 1,955,240 | 41.171 |
+| RI | 185 | 487,812 | 37.924 |
+| NJ | 1,569 | 4,234,240 | 37.055 |
+| MN | 1,078 | 2,911,560 | 37.025 |
+| HI | 218 | 609,478 | 35.768 |
+| WI | 1,002 | 2,915,609 | 34.367 |
+| SD | 121 | 449,014 | 26.948 |
+| CA | 4,750 | 17,962,398 | 26.444 |
+| AK | 83 | 317,705 | 26.125 |
+| UT | 408 | 1,700,830 | 23.988 |
+| ND | 99 | 420,491 | 23.544 |
+| OR | 405 | 1,959,447 | 20.669 |
+| CT | 338 | 1,673,769 | 20.194 |
+| WV | 132 | 669,784 | 19.708 |
+| MA | 696 | 3,589,352 | 19.391 |
+| IA | 267 | 1,540,614 | 17.331 |
+| NE | 157 | 1,004,397 | 15.631 |
+| WY | 38 | 274,439 | 13.846 |
+| NH | 82 | 680,142 | 12.056 |
+| VT | 30 | 301,478 | 9.951 |
+| ME | 58 | 633,951 | 9.149 |
+| MT | 37 | 498,739 | 7.419 |
+| ID | 54 | 860,258 | 6.277 |
+
+51 rows — every state + DC, no omissions, no truncation. Ohio's own
+rate (53.040 per 100k) ranks 24th of 51 — solidly mid-pack, not an
+outlier in either direction. For context: DC's rate (146.197, the
+highest) is driven by an unusually small denominator (DC's
+private+state+local employment is only 556,100 — a quarter of DC's
+total employment is federal, per the QCEW pull above) rather than
+necessarily a higher underlying filing rate — worth flagging as a
+possible edge case if DC is ever surfaced individually rather than as
+part of a full 51-jurisdiction table.
+
 ## Process
 
 - This entire methodology (new pricing capability, new legal-content
   claim) requires the Gemini architecture gate before any code is
   written — not yet submitted.
-- Multiplier research status (2026-09-15): concept resolved (EEOC
-  charge-filing frequency, normalized) and primary source verified
-  (see "Decided, 2026-09-15" above and the Appendix's raw numerator).
-  Still open: normalization base (Census population vs. BLS
-  employment, options laid out above, not chosen) and, once chosen,
-  the actual per-state rate computation. Every claim gets
+- Multiplier research status (2026-09-15c): concept resolved (EEOC
+  charge-filing frequency, normalized), numerator source verified,
+  normalization base chosen (BLS), matching denominator sourced and
+  verified, and the per-state rate computed for all 51
+  jurisdictions — see "Decided, 2026-09-15c" and both Appendices
+  above. This closes the multiplier-sourcing research task. Still
+  open, per "Not decided / open" above: output framing, whether a new
+  result-shape field is needed, and the broader OH-only-vs-
+  jurisdiction-agnostic scope question — all still gated behind the
+  Gemini architecture review, not yet submitted. Every claim was
   independently verified against primary source before use, per
   standing verification discipline, given Gemini's documented pattern
   of citation fabrication in this exact codebase (real source,
