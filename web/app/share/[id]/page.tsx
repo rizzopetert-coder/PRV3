@@ -1,17 +1,19 @@
 import { notFound } from "next/navigation";
-import type { ShareableOutputPayload } from "@/lib/types";
+import { getShareRecord } from "@/lib/share-store";
 import ShareableOutput from "@/components/ShareableOutput";
 
 // Server Component — no "use client".
 // Upstash credentials never reach the browser bundle.
-// All Redis access is via the /api/share/[id] route, server-side only.
-
-function resolveBaseUrl(): string {
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  return "http://localhost:3000";
-}
+//
+// Reads Redis directly via web/lib/share-store.ts, shared with
+// web/app/api/share/[id]/route.ts -- previously this fetched that same
+// route via resolveBaseUrl()/process.env.VERCEL_URL, a server-to-server
+// self-fetch that this project's ssoProtection setting (deploymentType:
+// "all_except_custom_domains") blocks unconditionally, confirmed live via
+// a 302 to Vercel's own auth wall. That made this page show "not found"
+// for every share link regardless of whether the record was valid.
+// Reading Redis directly removes the self-fetch, and that failure mode,
+// entirely.
 
 interface SharePageProps {
   params: Promise<{ id: string }>;
@@ -20,16 +22,9 @@ interface SharePageProps {
 export default async function SharePage({ params }: SharePageProps) {
   const { id } = await params;
 
-  let payload: ShareableOutputPayload;
-  try {
-    const res = await fetch(`${resolveBaseUrl()}/api/share/${id}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      notFound();
-    }
-    payload = (await res.json()) as ShareableOutputPayload;
-  } catch {
+  const payload = await getShareRecord(id);
+
+  if (payload === null) {
     notFound();
   }
 

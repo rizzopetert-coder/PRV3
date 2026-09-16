@@ -1,23 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Redis } from "@upstash/redis";
-import type { ShareableOutputPayload } from "@/lib/types";
-
-const redis = Redis.fromEnv();
+import { getShareRecord } from "@/lib/share-store";
 
 // ---------------------------------------------------------------------------
 // Returns ShareableOutput only.
 // PrivateOutput never exists in this response.
 // Returns 404 when share key is not found or has expired (KV TTL handles expiry).
 //
-// No JSON.parse here, deliberately -- @upstash/redis's automaticDeserialization
-// defaults to true (confirmed in the installed SDK source), so redis.get()
-// already returns the parsed object, not the raw JSON string create/route.ts
-// wrote. A prior version of this route called JSON.parse() on that
-// already-parsed object anyway, which throws (object -> "[object Object]" ->
-// invalid JSON) and surfaced as a permanent "Corrupt record" 500 on every
-// share link ever read -- masked as a generic "not found" by the page
-// component's own !res.ok check. Root-caused live, 2026-09-16: the record
-// was never corrupt, only unreadable by this route's own double-parse.
+// Read logic (the automaticDeserialization-aware Redis get, root-caused live
+// 2026-09-16 after a prior double-JSON.parse bug here produced a permanent
+// "Corrupt record" 500 on every share link ever read) now lives in
+// web/lib/share-store.ts, shared with web/app/share/[id]/page.tsx -- that
+// page previously round-tripped through this exact route via
+// resolveBaseUrl()/process.env.VERCEL_URL, which this project's
+// ssoProtection setting blocks unconditionally (confirmed live: a 302 to
+// Vercel's own auth wall). The page now reads Redis directly instead.
+//
+// This route itself has no other caller left after that change (confirmed
+// by search -- ShareButton.tsx only ever POSTs /api/share/create) but is
+// kept as a standalone public JSON endpoint for the share data, not removed
+// speculatively.
 // ---------------------------------------------------------------------------
 
 export async function GET(
@@ -30,9 +31,9 @@ export async function GET(
     return NextResponse.json({ error: "Invalid share key" }, { status: 400 });
   }
 
-  const payload = await redis.get<ShareableOutputPayload>(`share:${id}`);
+  const payload = await getShareRecord(id);
 
-  if (payload === null || payload === undefined) {
+  if (payload === null) {
     // Not found or expired — KV TTL removes the key automatically after 30 days
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
