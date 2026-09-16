@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.306
+\\\#\\\# MOB v4.307
 
   
 
@@ -5131,3 +5131,82 @@ Services, ~125 employees), the exact link Pete first hit. `tsc
 
 Both items 12 and 13 are now fully closed, share links confirmed
 working end-to-end in production.
+
+## Priority Queue item 14 (NEW, 2026-09-16, post-closeout) -- "Contact
+## us" CTAs never functional -- CLOSED -- MOB v4.306 -> v4.307
+
+Pete reported "Contact us" CTA buttons not functional in production.
+Same discipline as items 12/13 -- diagnosed live before touching
+anything.
+
+**Every contact-style CTA found, by search across the whole `web/`
+tree** (no literal "Contact us" text exists anywhere -- confirmed by
+case-insensitive grep): `web/app/diagnostic/page.tsx`'s self-select
+Phase 4 "Start a conversation" button (`uiCopy.conversationCTA`);
+`web/app/ask/page.tsx`'s standalone "Get in touch" mailto link; the
+homepage's "...if anything sounds familiar, reach out" -- confirmed
+to be plain prose, not a link, attached to nothing. No footer
+component exists anywhere in this app (only `NavBar`/`MobileMenu` are
+rendered in `layout.tsx`), and neither linked to `/ask` before this
+fix -- it was reachable only by typing the URL directly.
+
+**Root cause, confirmed live, NOT tonight's fault:** `git show --stat`
+across every one of tonight's code commits confirmed none touch
+`diagnostic/page.tsx`, `taxonomy.ts`, the homepage, `ask/page.tsx`,
+`NavBar.tsx`, or `MobileMenu.tsx`. Live click-through in production
+confirmed the Phase 4 button did nothing on click -- no navigation, no
+console error, no network request, just silently inert (a bare
+`<button>` with no `onClick` at all does exactly that). `git log
+--follow -p` on `diagnostic/page.tsx`, filtered to every version of
+this specific button across its full history, showed **zero
+`onClick` at every single revision**, back to the button's first
+appearance in `ff178d0`, "web layer init," **2026-06-13** -- the
+project's very first web-layer commit. Every later change to this
+button (multiple theme restyles) only ever touched its `className`.
+This is a different shape of bug than items 12/13: not a regression,
+never implemented, from day one, and never logged anywhere in this
+MOB before now (confirmed by grep).
+
+**Design question surfaced mid-investigation, resolved with Pete
+before implementing, not guessed:** the original plan was to
+substitute the identified condition's name into the mailto body
+(e.g. "I ran the diagnostic and [condition name] is showing up for
+us"). Checked `useSelfSelection()`'s actual scope at the button's
+location before assuming a format: `selectedStates` (full objects
+with a clean `.name`) is in scope, but the count reaching Phase 4 is
+**not reliably one** -- the standard flow enforces a minimum of 2
+selected conditions before Phase 2 can even advance, and "Select all"
+on a whole cluster routinely selects 10+ (confirmed live: 20 selected
+in this session's own verification pass). No dominant/primary
+individual state persists to Phase 4 in current app state either
+(`getDominantSignature`'s result is signature-level, ephemeral,
+discarded after use). Reported this rather than fabricating a
+name-joining convention (first name only? "X and Y"? a count?) --
+**Pete's call: generic phrasing, no condition naming at all,
+multi-selection being the common case made a joining/threshold
+convention not worth the complexity.**
+
+**Fix, commit `023447f`:** new `web/lib/contact.ts` --
+`CONTACT_EMAIL` + `buildMailtoLink(subject, body)`, the single shared
+definition (`pete@principalresolution.com` was previously only an
+inline string in `ask/page.tsx` with no reusable export, so this
+replaces that rather than hardcoding a second instance). Both CTAs
+now build their mailto href from it:
+- `/ask`: subject "Starting a conversation," body "Hi Pete, / Here's
+  what's going on: / (blank) / Best way to reach me:" (no diagnosis
+  context available on this standalone page).
+- `diagnostic/page.tsx` Phase 4: same shape, one added opening line
+  -- "I ran the diagnostic and a few things are showing up for us."
+- `NavBar.tsx` and `MobileMenu.tsx` both now link to `/ask`, labeled
+  "Contact."
+
+**Verified, live production, both CTAs and both nav surfaces:** `tsc
+--noEmit` clean, 99/99 frontend tests. Desktop nav "Contact" link
+confirmed visible and navigates to `/ask`. Mobile menu "Contact"
+confirmed visible and functional. `/ask`'s "Get in touch" mailto href
+decoded and confirmed to match the exact specified subject/body,
+byte for byte. Drove the real self-select flow to Phase 4 live (20
+conditions selected, the realistic common case this fix was designed
+around) and confirmed "Start a conversation" is now a genuine `<a>`
+tag with the exact specified mailto href -- no longer an inert
+`<button>`.
