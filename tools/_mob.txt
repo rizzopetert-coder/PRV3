@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.304
+\\\#\\\# MOB v4.306
 
   
 
@@ -4998,3 +4998,136 @@ Diary write: `tools/prv3_diary.py write --agent claude-code --topic
 "legal-compliance-is-floor-scoping" ...`, this session, covering the
 full arc above. Handoff file: `prompts/session-handoff-v4.304.md`,
 committed alongside this entry.
+
+## Priority Queue item 12 (NEW, 2026-09-16, post-closeout) -- share-link
+## 500 "Corrupt record" -- CLOSED at the API layer -- MOB v4.304 -> v4.305
+
+Pete reported a share link generated live in production
+(`https://www.principalresolution.com/share/qLxYA1Yt078ZwLtKKvuuE`)
+404ing. Investigated live, not speculated: since this landed right
+after tonight's is_floor/OH commits touched the exact result-rendering
+path (`contract.py`, `friction_tax.py`, `types.ts`, `PrivateOutput.tsx`,
+`output-text.ts`), a regression from tonight was treated as a real
+possibility, not dismissed.
+
+**Confirmed NOT tonight's fault.** `git show --stat` on all three of
+tonight's code commits (`2dff83f`, `eec2e1b`, `e643bfd`) shows none
+touch `web/app/api/share/create/route.ts`,
+`web/app/api/share/[id]/route.ts`, `web/app/share/[id]/page.tsx`, or
+`web/components/ShareableOutput.tsx`. Vercel `get_runtime_errors`
+(24h) showed zero recorded errors -- consistent with a controlled
+`notFound()` render, not an uncaught exception. All of tonight's
+deployments show `state: READY` (no build failures).
+
+**Root cause, confirmed live via Vercel runtime logs and a direct API
+hit:** the reported "404" was actually a masked 500. Hitting
+`GET /api/share/qLxYA1Yt078ZwLtKKvuuE` directly returned
+`{"error":"Corrupt record"}` -- the route's own explicit branch for a
+genuinely-missing key returns a plain 404, so this proved the key
+**did** exist in Redis. `@upstash/redis`'s `automaticDeserialization`
+defaults to `true` (confirmed in the installed `1.38.0` SDK source,
+`chunk-2X4SLXT7.mjs:351`), so `redis.get()` already returned the
+parsed object `create/route.ts` wrote via `JSON.stringify()` -- the
+route's own subsequent `JSON.parse(raw)` on that already-parsed
+object throws (`object -> "[object Object]" -> invalid JSON`),
+landing in the catch block. Dated precisely via `git log --follow` on
+`web/app/api/share/[id]/route.ts` (only 3 commits in its history):
+introduced at commit `2d2da5d`, "S39: Upstash migration + route
+handler wiring," **2026-06-13** -- a mechanical `kv.get -> redis.get`
+find-replace that didn't account for the two SDKs' differing default
+deserialization behavior. **Roughly 3 months old, confirmed unrelated
+to tonight.** A working reference implementation for this exact
+Upstash quirk already existed elsewhere in the codebase the whole
+time (`session-store.ts`'s `getSession()`, `dev-diagnostic-preview.ts`'s
+`getDevPreview()`, both using a `typeof raw === "string" ? JSON.parse
+: raw` guard) -- the share routes were the only Redis consumers that
+never picked up that pattern.
+
+**Fix, commit `5e04d4b`:** removed the redundant `JSON.parse(raw)` in
+`web/app/api/share/[id]/route.ts`; typed the read as
+`redis.get<ShareableOutputPayload>(...)` directly. Deliberately did
+NOT set `automaticDeserialization: false` on the shared Redis client,
+per explicit instruction -- that would change behavior for every
+future caller of this client, not just this one route.
+
+**Verified:** `tsc --noEmit` clean, 99/99 frontend tests (no existing
+test coverage for this route, confirmed by search before writing the
+fix -- nothing to run there specifically). Live production round-trip
+after deploy: `POST /api/share/create` -> fresh id, `GET
+/api/share/<fresh-id>` -> 200 with valid parsed JSON; re-tested
+Pete's original id (`qLxYA1Yt078ZwLtKKvuuE`) -> 200, valid content;
+re-tested the id generated during diagnosis
+(`rig38fUVjfEzouQGhe71U`) -> 200, valid content. All three confirm
+the underlying data was never corrupt, only unreadable.
+
+**Closed at the API layer only, this entry.** Verifying the fix at
+the actual `/share/[id]` PAGE (not just the API) surfaced a second,
+independent, pre-existing bug -- logged separately as item 13
+immediately below, not folded into this entry.
+
+## Priority Queue item 13 (NEW, 2026-09-16, post-closeout) -- share
+## PAGE still 404s after item 12's fix -- SSO-blocked internal
+## self-fetch -- CLOSED -- MOB v4.305 -> v4.306
+
+Found while verifying item 12's fix end-to-end at the page level, per
+the standing infrastructure/routing-change rule (live production
+round-trip required, not just an API-layer check) -- the rule locked
+in after the Narrative Modulation `vercel.json` outage. Item 12's fix
+made `GET /api/share/[id]` return 200 with valid content for all
+three tested ids, but navigating to the actual
+`/share/qLxYA1Yt078ZwLtKKvuuE` page still rendered "Diagnostic report
+not found or expired."
+
+**Root cause, confirmed live, independent of item 12:**
+`web/app/share/[id]/page.tsx` fetched its own `/api/share/[id]` route
+server-side via `resolveBaseUrl()`, which resolves to
+`https://${process.env.VERCEL_URL}` -- the deployment's own
+auto-generated hostname, not `principalresolution.com`. This
+project's Deployment Protection is configured with `ssoProtection:
+{enabled: true, deploymentType: "all_except_custom_domains"}`
+(confirmed directly via Vercel's project-settings API) -- every
+non-custom-domain URL, including the deployment's own `VERCEL_URL`,
+requires Vercel SSO auth. Confirmed directly: a plain unauthenticated
+`curl` to that exact URL returns `302` (redirected to Vercel's own
+auth wall), not 200. The page's `!res.ok` check (and its `catch`)
+both collapse to `notFound()`, so this looked identical to a real
+missing/expired share record regardless of whether one existed --
+and would have been failing this way since long before tonight,
+stacked underneath item 12's deserialization bug the whole time. This
+is a plausible, though not separately re-confirmed, explanation for
+why share links may never have worked end-to-end in this app's
+history -- not asserted as certain, since the deserialization bug
+alone was already sufficient to break every read.
+
+**Fix, commit `fd70585`:** new `web/lib/share-store.ts`, a single
+`getShareRecord(id)` now shared by both
+`web/app/api/share/[id]/route.ts` and the page. The page reads Redis
+directly, eliminating the self-fetch (and the SSO failure mode)
+entirely rather than routing around it -- per explicit instruction,
+reusing the read logic rather than writing a second, possibly-
+diverging implementation. The new helper's read matches the same
+defensive `typeof raw === "string" ? JSON.parse(raw) : raw` shape
+already proven correct in `session-store.ts`/`dev-diagnostic-
+preview.ts`, cited in item 12 above.
+
+**`/api/share/[id]` itself has no remaining caller after this**,
+confirmed by searching the full `web/` tree for every reference to
+`api/share` before making this change: `ShareButton.tsx` only ever
+POSTs `/api/share/create`; nothing else calls the `GET` route.
+Reported, not acted on unilaterally -- the route is kept as a
+standalone public JSON endpoint for share data, not deleted
+speculatively. Pete's call whether to remove it.
+
+**Verified, live production, end-to-end -- the real test, not just an
+API 200:** generated a fresh result and share link
+(`u6dyq0p9G0bMWEPFGvTPP`), navigated to
+`https://www.principalresolution.com/share/u6dyq0p9G0bMWEPFGvTPP` --
+renders the full report (state name, severity, resolution pathway).
+Navigated to Pete's original link,
+`https://www.principalresolution.com/share/qLxYA1Yt078ZwLtKKvuuE` --
+now renders correctly too ("The Founder's Grip," Professional
+Services, ~125 employees), the exact link Pete first hit. `tsc
+--noEmit` clean, 99/99 frontend tests, no Python files touched.
+
+Both items 12 and 13 are now fully closed, share links confirmed
+working end-to-end in production.
