@@ -4599,6 +4599,55 @@ via isolated git worktrees, not committed (scratch, cleaned up).
    `compute_legal_compliance_exposure()`'s per-state aggregation loop),
    consistent with existing precedent, not a new gap, but real work for
    whoever builds the output-framing pass.
+
+   **Correction, same session (immediate follow-up investigation) --
+   the degenerate `dollar_range` note above overstated this as an
+   OH-specific finding.** Investigated directly: `low == high` is not
+   new territory OH introduces -- Clusters 1, 4, and 5 already
+   construct `dollar_range=(v, v)` for ANY single Legal-scoring state
+   (`_legal_score_fraction()` returns one float, placed at both tuple
+   positions, regardless of score), and this was already live in
+   production before this build: `the_paper_tiger` in AR/DE/TN already
+   renders `$450,000 – $450,000` today via the generic Cluster 1
+   placeholder ceiling, confirmed directly from this session's own
+   `tools/test_friction_tax.py` assertions (`dollar_range ==
+   (450_000.0, 450_000.0)`), not assumed. OH's case is arguably less
+   arbitrary, since its number is genuinely industry/multiplier-derived
+   rather than a flat unexplained ceiling. Still a real rendering
+   question worth a deliberate decision, but not a new risk this OH
+   build introduces -- pre-existing, unrelated, lower urgency than the
+   original note implied.
+
+   **Addendum, same session -- the UI-framing piece above is now ALSO
+   complete, commit `eec2e1b`.** `has_uncollected_net_worth_caveat`
+   propagated end-to-end: `compute_legal_compliance_exposure()`
+   (OR-across-contributing-states aggregation, identical shape to
+   `has_partial_jurisdictions`) -> `contract.py`'s
+   `legal_tail_risk_exposure` -> `web/lib/types.ts`'s
+   `LegalTailRiskExposure` -> both frontend renderers
+   (`PrivateOutput.tsx` and `web/lib/output-text.ts`, which duplicate
+   each other and both needed the addition). New caveat sentence
+   placed and styled identically to `has_partial_jurisdictions`'s own
+   sentence in both files. The R.C. 2315.21(D)(2)(b) statutory citation
+   this caveat's copy depends on was independently verified against
+   primary source (codes.ohio.gov) this session, not relayed from the
+   earlier citation-table entry unverified -- confirmed verbatim:
+   "the lesser of two times the amount of the compensatory damages
+   awarded to the plaintiff from the defendant or ten per cent of the
+   employer's or individual's net worth when the tort was committed up
+   to a maximum of three hundred fifty thousand dollars," matching what
+   was already coded exactly. Verified before shipping: `npx tsc
+   --noEmit` clean, 189/189 tests pass (22 pre-existing exact-dict
+   assertions needed the new key, OH's own test corrected to expect
+   `True`, ME's to `False`, both independently re-derived), `validate.py`
+   baseline unchanged, both worked-example scenarios confirmed live in
+   the actual rendered UI (not just the data layer) via a dev server
+   with a mocked `/api/result` response.
+
+   `is_floor`'s own equivalent propagation is explicitly NOT part of
+   this addendum -- Pete's call: it would affect 32 states' already-
+   shipped results, not just OH, and is logged here as a distinct,
+   separately-scoped future item, not forgotten.
 10. NAICS-vs-"Manufacturing & Industrial" mapping gap (OH) -- **status
     corrected, this session (2026-09-15): no longer hypothetical.** This
     approximation is now live in a real pricing path for the first
