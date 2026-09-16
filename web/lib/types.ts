@@ -177,6 +177,16 @@ export interface LegalTailRiskExposure {
   // CONFIRMED one and could have changed the coverage determination --
   // see CoverageResult.partial_state_flag in engine/friction_tax.py.
   has_partial_jurisdictions: boolean;
+  // True if any contributing PRICED state's real statutory cap allows
+  // an alternative (e.g. Ohio R.C. 2315.21(D)(2)(b)'s 10%-of-net-worth
+  // option) that this figure doesn't compute, since no individual/
+  // case-specific financial data is ever collected -- the opposite
+  // direction from has_partial_jurisdictions above (this figure may
+  // OVERSTATE the real exposure, not understate it). See
+  // LegalPricingResult.may_overstate_for_uncollected_net_worth in
+  // engine/friction_tax.py. is_floor's own equivalent propagation is
+  // explicitly out of scope -- separately scoped, not added here.
+  has_uncollected_net_worth_caveat: boolean;
 }
 
 /**

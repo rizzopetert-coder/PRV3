@@ -423,6 +423,17 @@ export default function PrivateOutput({
             </p>
           )}
 
+          {legalHasPrice && legal.has_uncollected_net_worth_caveat && (
+            <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">
+              This figure reflects twice the compensatory-damages
+              estimate above, capped at Ohio&apos;s $350,000 ceiling --
+              not the net-worth alternative Ohio law also applies
+              (R.C. 2315.21(D)(2)(b)). Since net worth isn&apos;t
+              collected here, the true cap could be materially lower
+              than what&apos;s reflected here.
+            </p>
+          )}
+
           {legal.unpriced_state_ids.length > 0 && (
             <p className="text-[12px] text-gray-500 leading-relaxed mb-2">
               Real exposure current data can&apos;t price precisely for:{" "}

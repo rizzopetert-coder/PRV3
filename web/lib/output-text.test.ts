@@ -45,6 +45,7 @@ const FULL_PAYLOAD: PrivateOutputPayload = {
     unpriced_state_ids: ["state_b"],
     coverage_basis: "federal_baseline",
     has_partial_jurisdictions: true,
+    has_uncollected_net_worth_caveat: false,
   },
   cascade_risk: 0.42,
   causation_pattern: { pattern: "single_point", dispersion: 0.23, qualified_state_count: 3 },

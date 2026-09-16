@@ -4266,6 +4266,22 @@ def compute_legal_compliance_exposure(
     Legal/Compliance exposure -- has_unpriced_conditions can still be
     True in that case if every identified Legal-scoring state was
     QUALITATIVE_ONLY/DATA_INTEGRITY_GAP.
+
+    has_uncollected_net_worth_caveat (Priority Queue item 9, this
+    session's UI-framing follow-up) is True if any contributing PRICED
+    state set LegalPricingResult.may_overstate_for_uncollected_net_worth
+    -- today, only Ohio's small-employer/individual-defendant branch
+    (_oh_compensatory_damages_pricing()) ever sets that field. Same OR-
+    across-contributing-states aggregation shape as
+    has_partial_jurisdictions immediately below it, deliberately not
+    combined with that flag -- they signal opposite things
+    (has_partial_jurisdictions: the figure may UNDERSTATE, an
+    unverified jurisdiction could set a higher bar; this: the figure
+    may OVERSTATE, a real statutory alternative isn't computed) and
+    is_floor's own propagation is explicitly out of scope for this
+    pass, per Pete's call -- it touches 32 states' already-shipped
+    results, not just Ohio, and deserves its own separately-scoped
+    task.
     """
     headcount = org_size
     jurisdictions = jurisdictions or []
@@ -4274,12 +4290,15 @@ def compute_legal_compliance_exposure(
     unpriced_state_ids: list[str] = []
     coverage_confidences: set[str] = set()
     has_partial_jurisdictions = False
+    has_uncollected_net_worth_caveat = False
     for sid in state_ids:
         result = _single_state_legal_pricing(
             sid, org_size, industry, org_type, headcount, jurisdictions
         )
         if result.status == LegalPricingStatus.PRICED:
             per_state_ranges[sid] = result.dollar_range
+            if result.may_overstate_for_uncollected_net_worth:
+                has_uncollected_net_worth_caveat = True
             if result.coverage_confidence != "NOT_APPLICABLE":
                 coverage_confidences.add(result.coverage_confidence)
                 if result.partial_state_flag:
@@ -4331,6 +4350,7 @@ def compute_legal_compliance_exposure(
             "unpriced_state_ids": unpriced_state_ids,
             "coverage_basis": coverage_basis,
             "has_partial_jurisdictions": has_partial_jurisdictions,
+            "has_uncollected_net_worth_caveat": has_uncollected_net_worth_caveat,
         }
 
     if len(per_state_ranges) == 1:
@@ -4345,6 +4365,7 @@ def compute_legal_compliance_exposure(
             "unpriced_state_ids": unpriced_state_ids,
             "coverage_basis": coverage_basis,
             "has_partial_jurisdictions": has_partial_jurisdictions,
+            "has_uncollected_net_worth_caveat": has_uncollected_net_worth_caveat,
         }
 
     by_cluster: dict[int, list[tuple[float, float]]] = {}
@@ -4368,4 +4389,5 @@ def compute_legal_compliance_exposure(
         "unpriced_state_ids": unpriced_state_ids,
         "coverage_basis": coverage_basis,
         "has_partial_jurisdictions": has_partial_jurisdictions,
+        "has_uncollected_net_worth_caveat": has_uncollected_net_worth_caveat,
     }

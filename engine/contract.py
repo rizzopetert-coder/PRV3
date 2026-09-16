@@ -570,6 +570,7 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
             "unpriced_state_ids":        legal_result["unpriced_state_ids"],
             "coverage_basis":            legal_result["coverage_basis"],
             "has_partial_jurisdictions": legal_result["has_partial_jurisdictions"],
+            "has_uncollected_net_worth_caveat": legal_result["has_uncollected_net_worth_caveat"],
         }
         if legal_result["low"] is not None or legal_result["has_unpriced_conditions"]
         else None

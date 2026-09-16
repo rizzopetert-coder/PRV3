@@ -219,6 +219,11 @@ export function buildResultsText(payload: PrivateOutputPayload): string {
         "State law in this jurisdiction was not independently verified and may set a different threshold than what's reflected here.",
       );
     }
+    if (legalHasPrice && legal.has_uncollected_net_worth_caveat) {
+      lines.push(
+        "This figure reflects twice the compensatory-damages estimate above, capped at Ohio's $350,000 ceiling -- not the net-worth alternative Ohio law also applies (R.C. 2315.21(D)(2)(b)). Since net worth isn't collected here, the true cap could be materially lower than what's reflected here.",
+      );
+    }
     if (legal.unpriced_state_ids.length > 0) {
       const unpricedNames = legal.unpriced_state_ids.map((id) => stateNameById.get(id) ?? id);
       lines.push(`Real exposure current data can't price precisely for: ${joinNames(unpricedNames)}.`);

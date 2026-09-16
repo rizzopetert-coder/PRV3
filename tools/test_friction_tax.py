@@ -842,6 +842,7 @@ check(
     _r_n1 == {
         "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_n1}",
 )
@@ -865,6 +866,7 @@ check(
     _r_cross == {
         "low": _expected_cross, "high": _expected_cross, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"expected low=high={_expected_cross}, got {_r_cross}",
 )
@@ -887,6 +889,7 @@ check(
     _r_decay == {
         "low": _expected_decay, "high": _expected_decay, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"expected low=high={_expected_decay}, got {_r_decay}",
 )
@@ -905,6 +908,7 @@ check(
     _r_tier_2b == {
         "low": 25_000.0, "high": 31_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_tier_2b}",
 )
@@ -919,6 +923,7 @@ check(
     _r_tier_2a == {
         "low": 1_800.0, "high": 2_500.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_tier_2a}",
 )
@@ -948,6 +953,7 @@ check(
     _r_cluster3 == {
         "low": _co_expected_low, "high": _co_expected_high, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"expected low={_co_expected_low}, high={_co_expected_high}, got {_r_cluster3}",
 )
@@ -966,6 +972,7 @@ check(
     _r_4a == {
         "low": 33_000_000.0, "high": 33_000_000.0, "currency": "USD", "band": "Significant",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_4a}",
 )
@@ -980,6 +987,7 @@ check(
     _r_4b == {
         "low": 200_000.0, "high": 200_000.0, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_4b}",
 )
@@ -1000,6 +1008,7 @@ check(
     _r_4b_floor == {
         "low": 25_000.0, "high": 25_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_4b_floor}",
 )
@@ -1015,6 +1024,7 @@ check(
     _r_4c == {
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": True, "unpriced_state_ids": ["hr_capture"], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_4c}",
 )
@@ -1033,6 +1043,7 @@ check(
     _r_never_classified == {
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_never_classified}",
 )
@@ -1055,6 +1066,7 @@ check(
     _r_zero_score == {
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_zero_score}",
 )
@@ -1066,6 +1078,7 @@ check(
     == {
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     "expected None/None for empty state_ids",
 )
@@ -1376,6 +1389,7 @@ check(
     _r_c1_blocked == {
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_c1_blocked}",
 )
@@ -1391,6 +1405,7 @@ check(
     _r_c1_covered == {
         "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_c1_covered}",
 )
@@ -1405,6 +1420,7 @@ check(
     _r_c2_blocked == {
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_c2_blocked}",
 )
@@ -1420,6 +1436,7 @@ check(
     _r_c4b_blocked == {
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_c4b_blocked}",
 )
@@ -1435,6 +1452,7 @@ check(
     _r_c4a_unaffected == {
         "low": 33_000_000.0, "high": 33_000_000.0, "currency": "USD", "band": "Significant",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_c4a_unaffected}",
 )
@@ -1450,6 +1468,7 @@ check(
     _r_c4c_unaffected == {
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": True, "unpriced_state_ids": ["hr_capture"], "coverage_basis": None, "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_c4c_unaffected}",
 )
@@ -1466,6 +1485,7 @@ check(
     _r_c1_ny_covered == {
         "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "state_specific", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_c1_ny_covered}",
 )
@@ -1976,12 +1996,14 @@ _r_oh_aggregate = compute_legal_compliance_exposure(
 check(
     "compute_legal_compliance_exposure(), OH, headcount=20: low=high=189487.75 (rounded), "
     "band='Moderate' ($100,000-$500,000), has_unpriced_conditions=False, unpriced_state_ids=[], "
-    "coverage_basis='state_specific' (CONFIRMED-only), has_partial_jurisdictions=False -- was "
+    "coverage_basis='state_specific' (CONFIRMED-only), has_partial_jurisdictions=False, "
+    "has_uncollected_net_worth_caveat=True (headcount=20 is the small-employer branch) -- was "
     "the all-None/has_unpriced_conditions=True shape before this session's build",
     _r_oh_aggregate == {
         "low": 189487.75, "high": 189487.75, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
         "coverage_basis": "state_specific", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": True,
     },
     f"got {_r_oh_aggregate}",
 )
@@ -2048,6 +2070,7 @@ check(
         "low": 450_000.0, "high": 450_000.0, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
         "coverage_basis": "state_specific", "has_partial_jurisdictions": False,
+        "has_uncollected_net_worth_caveat": False,
     },
     f"got {_r_me_aggregate}",
 )
