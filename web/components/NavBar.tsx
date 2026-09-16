@@ -34,6 +34,12 @@ export function NavBar() {
         >
           The Book
         </Link>
+        <Link
+          href="/ask"
+          className="font-ui text-sm text-(--slate) hover:text-ink transition-colors"
+        >
+          Contact
+        </Link>
         <div
           ref={aboutRef}
           className="relative flex items-center gap-1"

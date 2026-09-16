@@ -26,6 +26,7 @@ const LINKS = [
   { href: "/book/toc", label: "The Book" },
   { href: "/services", label: "Services" },
   { href: "/about", label: "About" },
+  { href: "/ask", label: "Contact" },
 ];
 
 export function MobileMenu() {

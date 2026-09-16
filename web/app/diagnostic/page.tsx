@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import {
   signatures,
   states,
@@ -11,6 +12,7 @@ import {
 import type { State } from "@/data/taxonomy";
 import type { PrivateOutputPayload } from "@/lib/types";
 import type { EnginePayload } from "@/lib/engine-client";
+import { buildMailtoLink } from "@/lib/contact";
 import SignatureCard from "@/components/SignatureCard";
 import AssemblyPanel from "@/components/AssemblyPanel";
 import PrivateOutput from "@/components/PrivateOutput";
@@ -18,6 +20,19 @@ import { StateDrawer } from "@/components/StateDrawer";
 import { SelfSelectionProvider, useSelfSelection } from "@/context/SelfSelectionContext";
 import DiagnosticFlow from "@/components/DiagnosticFlow";
 import SelfSelectIntakeModal from "@/components/SelfSelectIntakeModal";
+
+// Phase 4's "Start a conversation" CTA -- generic phrasing, no condition
+// naming (Pete's call): the common case at this point is multiple
+// selected conditions (the standard flow enforces a minimum of 2 before
+// advancing past Phase 2, and "Select all" on a whole cluster routinely
+// selects 10+), so a single-name or joined-list substitution wasn't
+// worth the complexity. Same buildMailtoLink() pattern as
+// web/app/ask/page.tsx, which has no diagnosis context and uses the
+// same body shape minus this one added line.
+const CONVERSATION_MAILTO_HREF = buildMailtoLink(
+  "Starting a conversation",
+  "Hi Pete,\n\nI ran the diagnostic and a few things are showing up for us.\n\nHere's what's going on:\n\n\nBest way to reach me:\n\n",
+);
 
 type DiagnosticPath = "diagnostic" | "self-select" | null;
 
@@ -296,9 +311,12 @@ function SelfSelectionInterface({
                 >
                   {isLoadingResult ? "Synthesizing…" : uiCopy.diagnosticCTA}
                 </button>
-                <button className="flex-1 border border-charcoal text-charcoal font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                <Link
+                  href={CONVERSATION_MAILTO_HREF}
+                  className="flex-1 border border-charcoal text-charcoal font-ui text-sm font-medium px-5 py-3 rounded-lg hover:bg-gray-100 transition-colors text-center"
+                >
                   {uiCopy.conversationCTA}
-                </button>
+                </Link>
               </div>
             </div>
           )}

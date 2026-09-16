@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTheme } from "@/components/ThemeSwitcher";
 import { HEADING_ACCENT_CLASS, POP_CLASS } from "@/lib/theme-role-tokens";
+import { buildMailtoLink } from "@/lib/contact";
 
 // Dark/Neutral rollout, Gemini-cleared batch (this session, gated on
 // Task 1's claim verification). h1 -> heading accent (Pete's call,
@@ -13,6 +14,16 @@ import { HEADING_ACCENT_CLASS, POP_CLASS } from "@/lib/theme-role-tokens";
 // hardcoded white -- computed contrast, not estimated: white fails WCAG
 // AA against Dark's fuchsia specifically, 3.72:1; each theme's
 // --cta-text clears 4.5:1 against its own pop color, 4.9-7.04).
+//
+// Pre-populated subject/body, Pete-confirmed template -- no diagnosis
+// context available on this standalone page, unlike the diagnostic
+// Phase 4 CTA's version (web/app/diagnostic/page.tsx), which adds one
+// opening line naming the identified condition.
+const MAILTO_HREF = buildMailtoLink(
+  "Starting a conversation",
+  "Hi Pete,\n\nHere's what's going on:\n\n\nBest way to reach me:\n\n",
+);
+
 export default function AskPage() {
   const theme = useTheme();
 
@@ -24,7 +35,7 @@ export default function AskPage() {
         directly.
       </p>
       <Link
-        href="mailto:pete@principalresolution.com"
+        href={MAILTO_HREF}
         className={`inline-block ${POP_CLASS[theme]} text-cta-text font-ui text-sm font-medium px-6 py-3 hover:opacity-90 transition-opacity`}
       >
         Get in touch →
