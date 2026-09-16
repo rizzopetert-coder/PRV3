@@ -4745,3 +4745,166 @@ the specific fix -- that verification is already closed (see below).
   round-trips as sufficient for the IPM vector fix specifically. This
   note is about not repeating the same non-representative check next
   time, not about reopening that call.
+
+## Addendum, 2026-09-16 (same session, direct follow-up to item 9) --
+## is_floor scoping investigation closes with 7 verified per-state
+## caveats, commit `e643bfd`
+
+Item 9's prior addendum above explicitly logged `is_floor`'s own
+propagation as "a distinct, separately-scoped future item, not
+forgotten" -- Pete's call, since it touches 32 states' already-shipped
+results, not just Ohio. This addendum is that item, picked up and
+closed this session, not a new open thread.
+
+**Investigation, report-only, no code changes:** re-confirmed the live
+`is_floor=True` condition (`treatment in ("uncapped",
+"state_specific_tiers") or flat_cap is not None`) at both its call
+sites, then asked the actual question the prior note deferred: can one
+caveat sentence honestly cover every jurisdiction this condition
+fires for. **No -- three genuinely different situations were found
+bundled under one flag, not one mechanism with edge cases:**
+1. `uncapped` (23 states) -- the "may understate" framing is airtight
+   here: no statutory ceiling exists at all, so the generic score-
+   derived curve value (confirmed NOT a flat placeholder --
+   `_legal_score_fraction()`'s exponential interpolation between a
+   cluster's floor and ceiling, keyed to the specific diagnosed
+   state's own legal score) is definitionally a point estimate under
+   an artificial ceiling.
+2. `state_specific_tiers` (9 states) -- weaker justification. A real,
+   specific statutory tier table exists for each of these states; the
+   engine substitutes the same generic curve used for `uncapped`
+   instead of modeling it. That substitution is symmetric risk (the
+   generic figure could land above OR below the real, unused tiered
+   number), not guaranteed to understate -- the "may understate"
+   framing only holds for the subset with a documented, unmodeled
+   carve-out layered on top.
+3. Ohio and Colorado -- structurally exempted from the shared
+   condition entirely, not edge cases of it. Ohio is intercepted
+   before the shared expression by `_oh_drives_tiers_result()` (its
+   own fully-modeled R.C. 2315.21 formula, wired in by item 9 above).
+   Colorado is remapped away from `state_specific_tiers` inside
+   Cluster 4b specifically (`_co_drives_federal_tier_deferral()`,
+   headcount-gated) but NOT inside Cluster 1 -- confirmed this session
+   that Colorado's own `is_floor` outcome genuinely differs by which
+   Cluster the diagnosed taxonomy state belongs to, not just by
+   jurisdiction, a real pre-existing asymmetry this investigation
+   surfaced but did not need to fix.
+
+Separately verified, same investigation pass: `flat_cap is not None`
+(the third disjunct, covering FL/ID/KS/VA) is a different mismatch
+again, not a variant of #2 above. Each of these 4 states' `flat_cap`
+is documented in this codebase's own citation comments as a SINGLE
+damages component -- punitive-only for FL/ID/VA, pain-and-suffering-
+only for KS (confirmed by reading each entry's inline comment
+verbatim; ID's comment already states "actual/economic damages
+available separately, uncapped by this provision"). But
+`_resolve_flat_cap()`'s only two callers clamp the ENTIRE Cluster 1/4b
+exposure curve's ceiling to that single-component number -- a curve
+documented elsewhere (`prompts/friction-tax-legal-compliance-
+methodology.md`) as a bundled, all-damages-types settlement estimate.
+The code's own comments correctly know these caps are component-
+specific; the clamping mechanism doesn't act on that knowledge. This
+is a confirmed structural fact, not a "may" -- at least one other
+legally-uncapped damages component is excluded by the clamp every
+time it binds.
+
+**Carve-outs verified for the 3 tiers states that got specific text:**
+TX (explicit, statute text: `is_floor=True` reasoning depends on the
+sexual-assault/harassment-retaliation carve-out at Tex. Lab. Code
+Sec21.2585(f), not currently modeled by claim type -- already known
+before this pass), AR (Arkansas law does not cap damages for
+retaliation claims specifically), MD (Howard/Montgomery/Prince
+George's counties offer an uncapped alternative to the state cap). All
+three independently verified against primary/statutory description
+before being written into `_SPECIFIC_CAVEAT_TEXT`, not relayed from
+Gemini or an earlier session unverified.
+
+**DE and CO researched and explicitly excluded, not overlooked.**
+Per Pete's own review: DE gets no specific caveat because no carve-out
+was found in either direction (neither confirming nor ruling one out
+-- genuinely undetermined, not "confirmed none exists"). CO gets no
+specific caveat because its own documented mechanism -- a good-faith
+defense capable of eliminating damages entirely -- points the OPPOSITE
+direction from every other caveat in this set (all seven say "the
+real number could be HIGHER than what's shown"; a good-faith defense
+says the real number could be LOWER, or zero). It does not fit this
+design's "may understate" shape at all, not just a lower-priority
+version of it. Logged here so neither state is rediscovered cold and
+mistaken for an oversight.
+
+**Two Gemini review rounds on this specific sub-arc, both independently
+re-verified before being treated as confirmed, per the same discipline
+already applied to the OH build:**
+1. Design review (per-state caveat lookup mechanism, before any code
+   was written) -- confirmed `_resolve_flat_cap()`'s return-type change
+   was low-risk (2 call sites, both internal, zero direct unit tests,
+   confirmed by grep before committing to the change) and confirmed the
+   at-most-one-caveat-per-session guarantee (`jurisdictions` is a single
+   session-level input feeding both resolvers identically for every
+   contributing state in `compute_legal_compliance_exposure()`'s own
+   loop, read directly, not assumed).
+2. Verification pass on two of Gemini's own cited claims, BEFORE
+   treating either as confirmed -- one came back correct
+   (`_DAMAGES_TREATMENT_PRIORITY` exists and governs
+   `resolve_damages_treatment()` exactly as described, quoted verbatim
+   from live code), one needed a real correction:
+   `SEVERITY_TIER_DESCRIPTIONS` is real, but Gemini cited it as living
+   in `contract.py` -- it actually lives in `engine/severity.py`, with
+   `contract.py` only consuming it via `.get()`. This doesn't overturn
+   the design decision (the 7 caveat texts still went into
+   `contract.py`, per the ALSO-real `LEGAL_TAIL_RISK_CAVEAT_TEXT`
+   precedent already in that same file), but it means the evidentiary
+   base for that choice was narrower than first stated, and there is a
+   real, unexercised alternative precedent (engine-layer prose,
+   `severity.py`-style) Pete may want weighed if this pattern recurs.
+   Same overstatement-correction pattern this project has now caught
+   from Gemini twice before (the "credibility over calculation" Locked-
+   Principle framing, the Texas `is_floor` "purpose-built honesty flag"
+   framing) -- a recurring reason every Gemini citation gets re-verified
+   against live source rather than trusted on relay.
+
+**Named risk explicitly caught and guarded against, not just handled:**
+this build has two tie-break rules that look interchangeable but are
+not -- `_resolve_flat_cap()` (MAXIMUM VALUE, order-independent,
+pre-existing/already-shipped for FL/ID/KS/VA) and the new
+`_state_specific_tiers_driver()` (FIRST-ENCOUNTERED-IN-INPUT-LIST,
+matching the existing OH/TX proof pattern). Both were explicitly
+flagged before implementation as a homogenization risk and both were
+independently preserved, then proven distinct with real multi-
+jurisdiction test cases, not just unit-level sanity checks:
+`_resolve_flat_cap(['FL','VA'])` and `(['VA','FL'])` both resolve to
+`(350000.0, 'VA')` (value wins, order does not matter);
+`_state_specific_tiers_driver(['AR','TX'])` resolves to `'AR'` while
+`(['TX','AR'])` resolves to `'TX'` (order wins, matching
+`_oh_drives_tiers_result(['OH','TX'])` vs `(['TX','OH'])`'s already-
+proven shape exactly). Both pairs re-run live (not just recalled from
+an earlier pass) before this addendum was written.
+
+**Shipped, commit `e643bfd`:** new `specific_caveat_jurisdiction:
+Optional[str]` field on `LegalPricingResult`/`LegalCurveLookup`
+(identifier only, no prose in `friction_tax.py`), new
+`_SPECIFIC_CAVEAT_TEXT` dict in `contract.py` (7 entries, resolved to
+`legal_tail_risk_exposure["specific_caveat"]`), `specific_caveat:
+string | null` threaded through `web/lib/types.ts` and rendered
+verbatim (no per-state text duplicated in the frontend, unlike the
+existing `has_partial_jurisdictions`/`has_uncollected_net_worth_caveat`
+pattern). 213/213 Python tests (24 new), `validate.py` baseline
+unchanged (37/4), `tsc --noEmit` clean, 99/99 frontend tests, live UI
+verification through the real self-select intake flow (not mocked
+data alone) for one flat-cap worked example (VA, `$350,000 -
+$350,000`) and one tiers worked example (AR, `$50,000 - $50,000`),
+both caveat sentences confirmed rendering verbatim in the actual
+`PrivateOutput` component.
+
+`is_floor`'s own UI propagation for the remaining ~25 jurisdictions
+this pass did NOT write a specific caveat for (the generic
+`is_floor=True` boolean itself, e.g. for the 23 `uncapped` states) is
+still not surfaced in the UI anywhere -- that gap is unchanged by this
+session and remains exactly as open as item 9's prior addendum left
+it. This session closed the "can one sentence cover all 32/36"
+question and shipped the 7 cases where the answer was a confirmed,
+specific yes -- it did not build a generic `is_floor` caveat for the
+rest, since the investigation's own finding was that a single generic
+sentence would not be honest for the `state_specific_tiers` subset
+without the per-state carve-out research this pass did for only 3 of
+those 9 states.
