@@ -2235,13 +2235,24 @@ class LegalPricingResult:
     pre-existing construction site needs no change; set True only by
     Ohio's small-employer branch. Not yet consumed by any output layer
     -- same "no consumer yet" status is_floor itself already carries;
-    UI-facing framing is explicitly out of scope for this build."""
+    UI-facing framing is explicitly out of scope for this build.
+
+    specific_caveat_jurisdiction (is_floor scoping follow-up, this
+    session) is the 2-letter jurisdiction id that drove a
+    state_specific_flat or state_specific_tiers result, when one of
+    the two has a specific, verified caveat sentence written for it
+    (contract.py's _SPECIFIC_CAVEAT_TEXT) -- None otherwise, including
+    for jurisdictions in those two categories with no specific caveat
+    written. An identifier only, not prose -- same convention as every
+    other field here; the actual sentences live in contract.py.
+    """
     status: LegalPricingStatus
     dollar_range: Optional[tuple[float, float]]
     coverage_confidence: Literal["CONFIRMED", "FEDERAL_FALLBACK", "NOT_APPLICABLE"]
     partial_state_flag: bool
     is_floor: bool = False
     may_overstate_for_uncollected_net_worth: bool = False
+    specific_caveat_jurisdiction: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -2261,13 +2272,17 @@ class LegalCurveLookup:
     may_overstate_for_uncollected_net_worth carries the same meaning as
     LegalPricingResult's own field of that name (Priority Queue item 9,
     this session) -- forwarded the same way, for Ohio's Cluster 4b
-    small-employer branch specifically."""
+    small-employer branch specifically. specific_caveat_jurisdiction
+    carries the same meaning as LegalPricingResult's own field of that
+    name -- forwarded the same way, into the Cluster 4 dispatch's
+    final LegalPricingResult."""
     curve: Optional[LegalDollarCurve]
     status: LegalPricingStatus
     coverage_confidence: Literal["CONFIRMED", "FEDERAL_FALLBACK", "NOT_APPLICABLE"]
     partial_state_flag: bool
     is_floor: bool = False
     may_overstate_for_uncollected_net_worth: bool = False
+    specific_caveat_jurisdiction: Optional[str] = None
 
 
 # Cluster 1 -- Individual/isolated claim (Addendum 1).
@@ -3146,20 +3161,32 @@ def resolve_damages_treatment(jurisdictions: list[str]) -> str:
     return best if best is not None else "federal_cap_applies"
 
 
-def _resolve_flat_cap(jurisdictions: list[str]) -> Optional[float]:
+def _resolve_flat_cap(jurisdictions: list[str]) -> Optional[tuple[float, str]]:
     """
-    Maximum flat_cap among CONFIRMED state_specific_flat jurisdictions
-    in the input -- extends resolve_damages_treatment()'s own
-    highest-exposure-wins principle down to the actual dollar figure,
-    needed because that function returns a category string, not a
-    specific state; with more than one state_specific_flat jurisdiction
-    selected, something has to pick which state's own flat_cap governs.
+    (value, winning jurisdiction id) for the MAXIMUM flat_cap among
+    CONFIRMED state_specific_flat jurisdictions in the input -- extends
+    resolve_damages_treatment()'s own highest-exposure-wins principle
+    down to the actual dollar figure, needed because that function
+    returns a category string, not a specific state; with more than
+    one state_specific_flat jurisdiction selected, something has to
+    pick which state's own flat_cap governs.
+
+    Tie-break is MAXIMUM VALUE, not input order -- pre-existing,
+    already-shipped behavior (Phase 1 item 4), unchanged by adding the
+    jurisdiction id to the return value; the returned jid is whichever
+    entry actually produced the returned max value, tracked in the
+    same pass, not a separately re-derived identity. Deliberately
+    different from _state_specific_tiers_driver()'s first-encountered-
+    wins rule below -- the two are governed by different, independently
+    proven rules and must not be homogenized.
+
     None if no CONFIRMED state_specific_flat jurisdiction is present in
     the input, or if one is present but its flat_cap is unpopulated (a
     data gap, not expected once all 4 real flat_cap states are
     populated).
     """
     best: Optional[float] = None
+    best_jid: Optional[str] = None
     for jid in jurisdictions:
         entry = STATE_COVERAGE_THRESHOLDS.get(jid)
         if entry is None or entry.confidence != "CONFIRMED":
@@ -3170,7 +3197,8 @@ def _resolve_flat_cap(jurisdictions: list[str]) -> Optional[float]:
             continue
         if best is None or entry.flat_cap > best:
             best = entry.flat_cap
-    return best
+            best_jid = jid
+    return (best, best_jid) if best is not None else None
 
 
 def _co_drives_federal_tier_deferral(jurisdictions: list[str], headcount) -> bool:
@@ -3249,6 +3277,45 @@ def _oh_drives_tiers_result(jurisdictions: list[str]) -> bool:
             best_rank = rank
             best_jid = jid
     return best_jid == "OH"
+
+
+def _state_specific_tiers_driver(jurisdictions: list[str]) -> Optional[str]:
+    """
+    The SPECIFIC jurisdiction resolve_damages_treatment() would resolve
+    a state_specific_tiers result from, or None if no state_specific_
+    tiers jurisdiction wins (whether none is present, or a higher-
+    ranked category -- uncapped or state_specific_flat -- wins
+    instead). Same re-derivation of resolve_damages_treatment()'s own
+    priority loop as _oh_drives_tiers_result()/
+    _co_drives_federal_tier_deferral() above, kept standalone rather
+    than consolidated with either -- those two answer a narrower
+    yes/no question about one specific state; this one needs the
+    actual winning jurisdiction id, for the AR/MD/TN per-state caveat
+    lookup (is_floor scoping follow-up, this session).
+
+    Tie-break is FIRST-ENCOUNTERED-IN-INPUT-LIST-WINS, identical to
+    the loop this re-derives -- proven directly by the existing
+    _oh_drives_tiers_result(['OH','TX']) vs (['TX','OH']) test pair
+    (tools/test_friction_tax.py), which this function's own loop shape
+    reproduces exactly, not reinvented. Deliberately NOT the same
+    tie-break as _resolve_flat_cap() (maximum value, order-
+    independent) -- the two are governed by different, independently
+    proven rules and must not be homogenized.
+    """
+    best_jid: Optional[str] = None
+    best_rank = -1
+    for jid in jurisdictions:
+        entry = STATE_COVERAGE_THRESHOLDS.get(jid)
+        if entry is None or entry.confidence != "CONFIRMED":
+            continue
+        rank = _DAMAGES_TREATMENT_PRIORITY.get(entry.damages_cap_treatment, -1)
+        if rank > best_rank:
+            best_rank = rank
+            best_jid = jid
+    if best_jid is None:
+        return None
+    winning_entry = STATE_COVERAGE_THRESHOLDS[best_jid]
+    return best_jid if winning_entry.damages_cap_treatment == "state_specific_tiers" else None
 
 
 # -- Jurisdiction litigation-risk multiplier (Priority Queue item 9, this
@@ -4005,14 +4072,19 @@ def _cluster_4_curve_for_org_type(
             curve=None, status=LegalPricingStatus.DATA_INTEGRITY_GAP,
             coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag,
         )
-    flat_cap = _resolve_flat_cap(jurisdictions) if treatment == "state_specific_flat" else None
+    flat_cap_result = _resolve_flat_cap(jurisdictions) if treatment == "state_specific_flat" else None
+    flat_cap = flat_cap_result[0] if flat_cap_result is not None else None
     final_ceiling = ceiling if flat_cap is None else min(ceiling, flat_cap)
     is_floor = treatment in ("uncapped", "state_specific_tiers") or flat_cap is not None
+    specific_caveat_jurisdiction = flat_cap_result[1] if flat_cap_result is not None else None
+    if specific_caveat_jurisdiction is None and treatment == "state_specific_tiers":
+        specific_caveat_jurisdiction = _state_specific_tiers_driver(jurisdictions)
     return LegalCurveLookup(
         curve=LegalDollarCurve(floor=_CLUSTER_4B_FLOOR, ceiling=final_ceiling),
         status=LegalPricingStatus.PRICED,
         coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag,
         is_floor=is_floor,
+        specific_caveat_jurisdiction=specific_caveat_jurisdiction,
     )
 
 
@@ -4099,15 +4171,19 @@ def _single_state_legal_pricing(
             return _oh_compensatory_damages_pricing(
                 industry, headcount, coverage.confidence, coverage.partial_state_flag,
             )
-        flat_cap = _resolve_flat_cap(jurisdictions) if treatment == "state_specific_flat" else None
+        flat_cap_result = _resolve_flat_cap(jurisdictions) if treatment == "state_specific_flat" else None
+        flat_cap = flat_cap_result[0] if flat_cap_result is not None else None
         curve = _CLUSTER_1_CURVE if flat_cap is None else LegalDollarCurve(
             floor=_CLUSTER_1_CURVE.floor, ceiling=min(_CLUSTER_1_CURVE.ceiling, flat_cap),
         )
         v = _legal_score_fraction(curve, score)
         is_floor = treatment in ("uncapped", "state_specific_tiers") or flat_cap is not None
+        specific_caveat_jurisdiction = flat_cap_result[1] if flat_cap_result is not None else None
+        if specific_caveat_jurisdiction is None and treatment == "state_specific_tiers":
+            specific_caveat_jurisdiction = _state_specific_tiers_driver(jurisdictions)
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v),
             coverage_confidence=coverage.confidence, partial_state_flag=coverage.partial_state_flag,
-            is_floor=is_floor)
+            is_floor=is_floor, specific_caveat_jurisdiction=specific_caveat_jurisdiction)
     if cluster == 2:
         coverage = resolve_coverage_gate(headcount, jurisdictions, claim_type="general")
         if not coverage.applies:
@@ -4161,7 +4237,8 @@ def _single_state_legal_pricing(
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v),
             coverage_confidence=lookup.coverage_confidence, partial_state_flag=lookup.partial_state_flag,
             is_floor=lookup.is_floor,
-            may_overstate_for_uncollected_net_worth=lookup.may_overstate_for_uncollected_net_worth)
+            may_overstate_for_uncollected_net_worth=lookup.may_overstate_for_uncollected_net_worth,
+            specific_caveat_jurisdiction=lookup.specific_caveat_jurisdiction)
     if cluster == 5:
         v = _legal_score_fraction(_CLUSTER_5_CURVE, score)
         return LegalPricingResult(status=LegalPricingStatus.PRICED, dollar_range=(v, v),
@@ -4291,6 +4368,7 @@ def compute_legal_compliance_exposure(
     coverage_confidences: set[str] = set()
     has_partial_jurisdictions = False
     has_uncollected_net_worth_caveat = False
+    specific_caveat_jurisdiction: Optional[str] = None
     for sid in state_ids:
         result = _single_state_legal_pricing(
             sid, org_size, industry, org_type, headcount, jurisdictions
@@ -4299,6 +4377,13 @@ def compute_legal_compliance_exposure(
             per_state_ranges[sid] = result.dollar_range
             if result.may_overstate_for_uncollected_net_worth:
                 has_uncollected_net_worth_caveat = True
+            if specific_caveat_jurisdiction is None and result.specific_caveat_jurisdiction is not None:
+                # First non-None wins -- not a real ambiguity: jurisdictions
+                # is a single session-level input feeding the same pure
+                # resolvers for every contributing state, so any two
+                # non-None values here are guaranteed identical (verified
+                # this session before this patch was written).
+                specific_caveat_jurisdiction = result.specific_caveat_jurisdiction
             if result.coverage_confidence != "NOT_APPLICABLE":
                 coverage_confidences.add(result.coverage_confidence)
                 if result.partial_state_flag:
@@ -4351,6 +4436,7 @@ def compute_legal_compliance_exposure(
             "coverage_basis": coverage_basis,
             "has_partial_jurisdictions": has_partial_jurisdictions,
             "has_uncollected_net_worth_caveat": has_uncollected_net_worth_caveat,
+            "specific_caveat_jurisdiction": specific_caveat_jurisdiction,
         }
 
     if len(per_state_ranges) == 1:
@@ -4366,6 +4452,7 @@ def compute_legal_compliance_exposure(
             "coverage_basis": coverage_basis,
             "has_partial_jurisdictions": has_partial_jurisdictions,
             "has_uncollected_net_worth_caveat": has_uncollected_net_worth_caveat,
+            "specific_caveat_jurisdiction": specific_caveat_jurisdiction,
         }
 
     by_cluster: dict[int, list[tuple[float, float]]] = {}
@@ -4390,4 +4477,5 @@ def compute_legal_compliance_exposure(
         "coverage_basis": coverage_basis,
         "has_partial_jurisdictions": has_partial_jurisdictions,
         "has_uncollected_net_worth_caveat": has_uncollected_net_worth_caveat,
+        "specific_caveat_jurisdiction": specific_caveat_jurisdiction,
     }

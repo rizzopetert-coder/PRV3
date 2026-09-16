@@ -94,6 +94,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
+from engine.contract import _SPECIFIC_CAVEAT_TEXT
 from engine.friction_tax import (
     SEVERITY_SCALAR,
     STATE_MULTIPLIERS,
@@ -843,6 +844,7 @@ check(
         "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_n1}",
 )
@@ -867,6 +869,7 @@ check(
         "low": _expected_cross, "high": _expected_cross, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"expected low=high={_expected_cross}, got {_r_cross}",
 )
@@ -890,6 +893,7 @@ check(
         "low": _expected_decay, "high": _expected_decay, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"expected low=high={_expected_decay}, got {_r_decay}",
 )
@@ -909,6 +913,7 @@ check(
         "low": 25_000.0, "high": 31_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_tier_2b}",
 )
@@ -924,6 +929,7 @@ check(
         "low": 1_800.0, "high": 2_500.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_tier_2a}",
 )
@@ -954,6 +960,7 @@ check(
         "low": _co_expected_low, "high": _co_expected_high, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"expected low={_co_expected_low}, high={_co_expected_high}, got {_r_cluster3}",
 )
@@ -973,6 +980,7 @@ check(
         "low": 33_000_000.0, "high": 33_000_000.0, "currency": "USD", "band": "Significant",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_4a}",
 )
@@ -988,6 +996,7 @@ check(
         "low": 200_000.0, "high": 200_000.0, "currency": "USD", "band": "Moderate",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_4b}",
 )
@@ -1009,6 +1018,7 @@ check(
         "low": 25_000.0, "high": 25_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_4b_floor}",
 )
@@ -1025,6 +1035,7 @@ check(
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": True, "unpriced_state_ids": ["hr_capture"], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_4c}",
 )
@@ -1044,6 +1055,7 @@ check(
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_never_classified}",
 )
@@ -1067,6 +1079,7 @@ check(
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_zero_score}",
 )
@@ -1079,6 +1092,7 @@ check(
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     "expected None/None for empty state_ids",
 )
@@ -1390,6 +1404,7 @@ check(
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_c1_blocked}",
 )
@@ -1406,6 +1421,7 @@ check(
         "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "federal_baseline", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_c1_covered}",
 )
@@ -1421,6 +1437,7 @@ check(
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_c2_blocked}",
 )
@@ -1437,6 +1454,7 @@ check(
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_c4b_blocked}",
 )
@@ -1453,6 +1471,7 @@ check(
         "low": 33_000_000.0, "high": 33_000_000.0, "currency": "USD", "band": "Significant",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_c4a_unaffected}",
 )
@@ -1469,6 +1488,7 @@ check(
         "low": None, "high": None, "currency": "USD", "band": None,
         "has_unpriced_conditions": True, "unpriced_state_ids": ["hr_capture"], "coverage_basis": None, "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_c4c_unaffected}",
 )
@@ -1486,6 +1506,7 @@ check(
         "low": 50_000.0, "high": 50_000.0, "currency": "USD", "band": "Minor",
         "has_unpriced_conditions": False, "unpriced_state_ids": [], "coverage_basis": "state_specific", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_c1_ny_covered}",
 )
@@ -2004,6 +2025,7 @@ check(
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
         "coverage_basis": "state_specific", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": True,
+        "specific_caveat_jurisdiction": None,
     },
     f"got {_r_oh_aggregate}",
 )
@@ -2071,8 +2093,191 @@ check(
         "has_unpriced_conditions": False, "unpriced_state_ids": [],
         "coverage_basis": "state_specific", "has_partial_jurisdictions": False,
         "has_uncollected_net_worth_caveat": False,
+        # ME is state_specific_tiers and drives this result, but ME has no
+        # entry in contract.py's _SPECIFIC_CAVEAT_TEXT (only AR/MD/TN do)
+        # -- friction_tax.py itself doesn't filter by "has a caveat", it
+        # reports the winning jurisdiction id unconditionally whenever
+        # state_specific_flat/tiers governs, so this is "ME", not None.
+        # The None-vs-text split happens one layer up, in contract.py.
+        "specific_caveat_jurisdiction": "ME",
     },
     f"got {_r_me_aggregate}",
+)
+
+
+# -- 50. specific_caveat_jurisdiction -- 7 per-state caveats (is_floor scoping --
+# follow-up, this session). Verifies the two deliberately-different tie-break
+# rules stay different, the field propagates correctly through both Cluster 1
+# and Cluster 4b, and the None-unpacking path added to _resolve_flat_cap()'s
+# two call sites is safe.
+
+# (a) FL+VA together: _resolve_flat_cap()'s own tie-break is MAXIMUM VALUE,
+# order-independent -- pre-existing, already-shipped behavior for FL/ID/KS/VA,
+# unchanged by adding the jurisdiction id to the return value.
+check(
+    "_resolve_flat_cap(['FL','VA']) == (350000.0, 'VA') -- VA's $350,000 beats "
+    "FL's $100,000 by value, FL listed first",
+    _ft._resolve_flat_cap(["FL", "VA"]) == (350_000.0, "VA"),
+    f"got {_ft._resolve_flat_cap(['FL', 'VA'])!r}",
+)
+check(
+    "_resolve_flat_cap(['VA','FL']) == (350000.0, 'VA') -- same result with VA "
+    "listed first, confirming the tie-break is genuinely value-based, not "
+    "input-order (contrast with (c) below)",
+    _ft._resolve_flat_cap(["VA", "FL"]) == (350_000.0, "VA"),
+    f"got {_ft._resolve_flat_cap(['VA', 'FL'])!r}",
+)
+
+# (b) specific_caveat_jurisdiction correctly reports VA as the winner in the
+# FL+VA case, threaded through a real Cluster 1 pricing call. the_paper_tiger
+# (legal score=2) reaches _CLUSTER_1_CURVE's ceiling exactly, so VA's $350,000
+# flat_cap visibly clamps the curve (450,000 -> 350,000) as well as winning
+# the jurisdiction id -- both effects verified in the same assertion.
+_r_fl_va = _ft._single_state_legal_pricing(
+    "the_paper_tiger", org_size="Under 25", industry="Professional Services",
+    org_type="Founder-led", headcount=20, jurisdictions=["FL", "VA"],
+)
+check(
+    "Cluster 1, FL+VA: dollar_range=(350000,350000) (VA's flat_cap clamps the "
+    "curve ceiling down from 450,000), is_floor=True, "
+    "specific_caveat_jurisdiction='VA'",
+    _r_fl_va.status == LegalPricingStatus.PRICED
+    and _r_fl_va.dollar_range == (350_000.0, 350_000.0)
+    and _r_fl_va.is_floor is True
+    and _r_fl_va.specific_caveat_jurisdiction == "VA",
+    f"got {_r_fl_va}",
+)
+
+# (c) AR+TX together: _state_specific_tiers_driver()'s tie-break is FIRST-
+# ENCOUNTERED-IN-INPUT-LIST-WINS, proven via the same pattern as the existing
+# _oh_drives_tiers_result(['OH','TX']) vs (['TX','OH']) test pair above --
+# deliberately the OPPOSITE rule from (a)/(resolve_flat_cap)'s value-based tie-break.
+check(
+    "_state_specific_tiers_driver(['AR','TX']) == 'AR' -- genuine tie (both "
+    "state_specific_tiers, rank 3), AR listed first wins by input order",
+    _ft._state_specific_tiers_driver(["AR", "TX"]) == "AR",
+    f"got {_ft._state_specific_tiers_driver(['AR', 'TX'])!r}",
+)
+check(
+    "_state_specific_tiers_driver(['TX','AR']) == 'TX' -- same tie, opposite "
+    "input order, TX wins instead -- confirms input-order dependence, not "
+    "value-based like _resolve_flat_cap()",
+    _ft._state_specific_tiers_driver(["TX", "AR"]) == "TX",
+    f"got {_ft._state_specific_tiers_driver(['TX', 'AR'])!r}",
+)
+_r_ar_tx = _ft._single_state_legal_pricing(
+    "built_to_fail", org_size="Under 25", industry="Professional Services",
+    org_type="Founder-led", headcount=20, jurisdictions=["AR", "TX"],
+)
+_r_tx_ar = _ft._single_state_legal_pricing(
+    "built_to_fail", org_size="Under 25", industry="Professional Services",
+    org_type="Founder-led", headcount=20, jurisdictions=["TX", "AR"],
+)
+check(
+    "Cluster 1, AR+TX (AR first): specific_caveat_jurisdiction='AR' (AR is one "
+    "of the 3 tiers-caveat states)",
+    _r_ar_tx.specific_caveat_jurisdiction == "AR",
+    f"got {_r_ar_tx.specific_caveat_jurisdiction!r}",
+)
+check(
+    "Cluster 1, TX+AR (TX first): specific_caveat_jurisdiction='TX' -- an "
+    "identifier is still reported even though TX has no entry in "
+    "_SPECIFIC_CAVEAT_TEXT; the None-vs-text split happens in contract.py, "
+    "not friction_tax.py (verified in (e) below)",
+    _r_tx_ar.specific_caveat_jurisdiction == "TX",
+    f"got {_r_tx_ar.specific_caveat_jurisdiction!r}",
+)
+
+# (d) each of the 7 states in isolation produces its own correct caveat text
+# end-to-end through the friction_tax.py -> contract.py dict chain.
+_EXPECTED_CAVEAT_SUBSTRINGS = {
+    "FL": "capped at $100,000 under Fla. Stat. Sec 760.11(5)",
+    "ID": "capped at $1,000 per violation under Idaho Code Sec 67-5908(3)(e)",
+    "KS": "capped at $2,000 under K.S.A. Sec 44-1005(k)",
+    "VA": "capped at $350,000 under Va. Code Sec 8.01-38.1",
+    "AR": "Arkansas law doesn't cap damages for retaliation claims",
+    "MD": "Howard, Montgomery, and Prince George's counties",
+    "TN": "Tennessee law doesn't cap damages for race-discrimination claims",
+}
+for _jid, _substring in _EXPECTED_CAVEAT_SUBSTRINGS.items():
+    _r_solo = _ft._single_state_legal_pricing(
+        "the_paper_tiger", org_size="Under 25", industry="Professional Services",
+        org_type="Founder-led", headcount=20, jurisdictions=[_jid],
+    )
+    _resolved_text = _SPECIFIC_CAVEAT_TEXT.get(_r_solo.specific_caveat_jurisdiction)
+    check(
+        f"{_jid} in isolation: specific_caveat_jurisdiction='{_jid}', and "
+        f"_SPECIFIC_CAVEAT_TEXT['{_jid}'] resolves to real text containing "
+        f"the verified citation/statute substring",
+        _r_solo.specific_caveat_jurisdiction == _jid
+        and _resolved_text is not None
+        and _substring in _resolved_text,
+        f"got specific_caveat_jurisdiction={_r_solo.specific_caveat_jurisdiction!r}, "
+        f"resolved_text={_resolved_text!r}",
+    )
+
+# (e) states with NO specific caveat correctly get None throughout, no crash
+# on the None-unpacking path added to both _resolve_flat_cap() call sites.
+check(
+    "_resolve_flat_cap([]) is None -- empty input, no crash unpacking a bare "
+    "None as a tuple",
+    _ft._resolve_flat_cap([]) is None,
+    f"got {_ft._resolve_flat_cap([])!r}",
+)
+check(
+    "_state_specific_tiers_driver([]) is None -- empty input",
+    _ft._state_specific_tiers_driver([]) is None,
+    f"got {_ft._state_specific_tiers_driver([])!r}",
+)
+for _jid, _label in (
+    ("NY", "uncapped"),
+    ("DE", "state_specific_tiers, no specific caveat written"),
+    ("CO", "state_specific_tiers, no specific caveat written"),
+    ("MO", "state_specific_tiers, no specific caveat written"),
+    ("TX", "state_specific_tiers, no specific caveat written"),
+):
+    _r_none = _ft._single_state_legal_pricing(
+        "built_to_fail", org_size="Under 25", industry="Professional Services",
+        org_type="Founder-led", headcount=20, jurisdictions=[_jid],
+    )
+    check(
+        f"{_jid} ({_label}) via Cluster 1: no crash, status=PRICED, "
+        f"specific_caveat_jurisdiction is {'not None' if _jid in ('DE','CO','MO','TX') else 'None'} "
+        f"and _SPECIFIC_CAVEAT_TEXT.get(...) is None (no text written for this state)",
+        _r_none.status == LegalPricingStatus.PRICED
+        and _SPECIFIC_CAVEAT_TEXT.get(_r_none.specific_caveat_jurisdiction) is None,
+        f"got specific_caveat_jurisdiction={_r_none.specific_caveat_jurisdiction!r}",
+    )
+_r_empty_jurisdictions = _ft._single_state_legal_pricing(
+    "built_to_fail", org_size="Under 25", industry="Professional Services",
+    org_type="Founder-led", headcount=20, jurisdictions=[],
+)
+check(
+    "empty jurisdictions list: no crash, specific_caveat_jurisdiction is None "
+    "(treatment defaults to federal_cap_applies, neither flat_cap nor tiers "
+    "branch fires)",
+    _r_empty_jurisdictions.specific_caveat_jurisdiction is None,
+    f"got {_r_empty_jurisdictions.specific_caveat_jurisdiction!r}",
+)
+# Same None-unpacking safety, Cluster 4b path (the other of the two call sites).
+_r_4b_none = _ft._cluster_4_curve_for_org_type(
+    "Founder-led", "250-499", 300, [], "Professional Services",
+)
+check(
+    "Cluster 4b, empty jurisdictions: no crash, specific_caveat_jurisdiction is None",
+    _r_4b_none.status == LegalPricingStatus.PRICED
+    and _r_4b_none.specific_caveat_jurisdiction is None,
+    f"got {_r_4b_none}",
+)
+_r_4b_va = _ft._cluster_4_curve_for_org_type(
+    "Founder-led", "250-499", 300, ["VA"], "Professional Services",
+)
+check(
+    "Cluster 4b, VA: no crash unpacking the (value, jid) tuple, "
+    "specific_caveat_jurisdiction='VA'",
+    _r_4b_va.status == LegalPricingStatus.PRICED
+    and _r_4b_va.specific_caveat_jurisdiction == "VA",
+    f"got {_r_4b_va}",
 )
 
 

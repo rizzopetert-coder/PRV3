@@ -187,6 +187,21 @@ export interface LegalTailRiskExposure {
   // engine/friction_tax.py. is_floor's own equivalent propagation is
   // explicitly out of scope -- separately scoped, not added here.
   has_uncollected_net_worth_caveat: boolean;
+  // Verified per-state caveat text for one of 7 jurisdictions where the
+  // generic flat_cap/state_specific_tiers mechanism is known to be
+  // materially incomplete (FL/ID/KS/VA: the flat_cap caps only one
+  // damages component -- punitive or pain-and-suffering -- while another
+  // component remains legally uncapped; AR/MD/TN: a documented, unmodeled
+  // carve-out or uncapped alternative exists). null for every other
+  // jurisdiction/treatment, including the other ~29 state_specific_flat/
+  // tiers jurisdictions with no specific caveat written. Resolved server-
+  // side in contract.py (_SPECIFIC_CAVEAT_TEXT) from
+  // LegalPricingResult.specific_caveat_jurisdiction in
+  // engine/friction_tax.py -- the engine layer carries only the
+  // jurisdiction id, never prose. At most one can ever apply per session
+  // (jurisdictions is a single session-level input feeding one
+  // deterministic priority resolution, verified this session).
+  specific_caveat: string | null;
 }
 
 /**

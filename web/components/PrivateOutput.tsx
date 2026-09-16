@@ -434,6 +434,12 @@ export default function PrivateOutput({
             </p>
           )}
 
+          {legalHasPrice && legal.specific_caveat && (
+            <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">
+              {legal.specific_caveat}
+            </p>
+          )}
+
           {legal.unpriced_state_ids.length > 0 && (
             <p className="text-[12px] text-gray-500 leading-relaxed mb-2">
               Real exposure current data can&apos;t price precisely for:{" "}

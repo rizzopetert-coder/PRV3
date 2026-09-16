@@ -39,6 +39,64 @@ LEGAL_TAIL_RISK_CAVEAT_TEXT = (
     "of being challenged. If any of these conditions concern you, this is worth "
     "a conversation with employment counsel, not just this number."
 )
+
+# is_floor scoping follow-up, this session -- 7 verified per-state
+# caveats for the flat_cap component-vs-total mismatch (FL/ID/KS/VA)
+# and the state_specific_tiers unmodeled-carve-out cases (AR/MD/TN).
+# Keyed by the jurisdiction id LegalPricingResult/LegalCurveLookup's
+# specific_caveat_jurisdiction reports -- friction_tax.py carries only
+# that identifier, never prose; this dict is the single source of
+# truth for which jurisdictions have a specific caveat written at all
+# (a jurisdiction id not present here, e.g. any other state_specific_
+# flat/tiers state, resolves to None via .get() below, no separate
+# allow-list needed in friction_tax.py). Texts verbatim, Pete-confirmed,
+# do not alter.
+_SPECIFIC_CAVEAT_TEXT: dict[str, str] = {
+    "FL": (
+        "This figure reflects only punitive damages, capped at $100,000 "
+        "under Fla. Stat. Sec 760.11(5). Compensatory damages are legally "
+        "available in addition and aren't capped by this provision -- the "
+        "real total could be materially higher than what's reflected here."
+    ),
+    "ID": (
+        "This figure reflects only punitive damages, capped at $1,000 per "
+        "violation under Idaho Code Sec 67-5908(3)(e). Actual and economic "
+        "damages, including back pay, are legally available in addition "
+        "and aren't capped by this provision -- the real total could be "
+        "materially higher than what's reflected here."
+    ),
+    "KS": (
+        "This figure reflects only pain-and-suffering damages, capped at "
+        "$2,000 under K.S.A. Sec 44-1005(k). Back pay and other economic "
+        "damages are legally available in addition and aren't capped by "
+        "this provision -- the real total could be materially higher than "
+        "what's reflected here."
+    ),
+    "VA": (
+        "This figure reflects only punitive damages, capped at $350,000 "
+        "under Va. Code Sec 8.01-38.1. Compensatory damages are legally "
+        "available in addition and aren't capped under Virginia law -- "
+        "the real total could be materially higher than what's reflected "
+        "here."
+    ),
+    "AR": (
+        "Arkansas law doesn't cap damages for retaliation claims "
+        "specifically -- if this involves retaliation, the actual limit "
+        "could be materially higher than what's reflected here."
+    ),
+    "MD": (
+        "In Howard, Montgomery, and Prince George's counties, Maryland "
+        "law offers an uncapped alternative to this limit -- if this "
+        "claim would qualify, the actual limit could be materially "
+        "higher than what's reflected here."
+    ),
+    "TN": (
+        "Tennessee law doesn't cap damages for race-discrimination "
+        "claims brought under 42 U.S.C. Sec 1981 -- if this involves "
+        "such a claim, the actual limit could be materially higher than "
+        "what's reflected here."
+    ),
+}
 from engine.output import (
     OutputPackage, OutputRouting, compute_causation_pattern,
     derive_time_to_consequence, synthesize_response_window,
@@ -571,6 +629,7 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
             "coverage_basis":            legal_result["coverage_basis"],
             "has_partial_jurisdictions": legal_result["has_partial_jurisdictions"],
             "has_uncollected_net_worth_caveat": legal_result["has_uncollected_net_worth_caveat"],
+            "specific_caveat": _SPECIFIC_CAVEAT_TEXT.get(legal_result["specific_caveat_jurisdiction"]),
         }
         if legal_result["low"] is not None or legal_result["has_unpriced_conditions"]
         else None
