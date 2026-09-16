@@ -8,6 +8,16 @@ const redis = Redis.fromEnv();
 // Returns ShareableOutput only.
 // PrivateOutput never exists in this response.
 // Returns 404 when share key is not found or has expired (KV TTL handles expiry).
+//
+// No JSON.parse here, deliberately -- @upstash/redis's automaticDeserialization
+// defaults to true (confirmed in the installed SDK source), so redis.get()
+// already returns the parsed object, not the raw JSON string create/route.ts
+// wrote. A prior version of this route called JSON.parse() on that
+// already-parsed object anyway, which throws (object -> "[object Object]" ->
+// invalid JSON) and surfaced as a permanent "Corrupt record" 500 on every
+// share link ever read -- masked as a generic "not found" by the page
+// component's own !res.ok check. Root-caused live, 2026-09-16: the record
+// was never corrupt, only unreadable by this route's own double-parse.
 // ---------------------------------------------------------------------------
 
 export async function GET(
@@ -20,18 +30,11 @@ export async function GET(
     return NextResponse.json({ error: "Invalid share key" }, { status: 400 });
   }
 
-  const raw = await redis.get<string>(`share:${id}`);
+  const payload = await redis.get<ShareableOutputPayload>(`share:${id}`);
 
-  if (raw === null || raw === undefined) {
+  if (payload === null || payload === undefined) {
     // Not found or expired — KV TTL removes the key automatically after 30 days
     return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
-  let payload: ShareableOutputPayload;
-  try {
-    payload = JSON.parse(raw) as ShareableOutputPayload;
-  } catch {
-    return NextResponse.json({ error: "Corrupt record" }, { status: 500 });
   }
 
   // ShareableOutput only. PrivateOutput never exists in this response.
