@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.303
+\\\#\\\# MOB v4.304
 
   
 
@@ -4908,3 +4908,93 @@ rest, since the investigation's own finding was that a single generic
 sentence would not be honest for the `state_specific_tiers` subset
 without the per-state carve-out research this pass did for only 3 of
 those 9 states.
+
+## SESSION CLOSEOUT (2026-09-16, terminal Claude Code) -- full protocol
+## close, promoting the addenda trail above to a version bump -- MOB
+## v4.303 -> v4.304
+
+This session ran long across a single, deep workstream (Legal/
+Compliance is_floor scoping and its OH pricing predecessor), logged
+incrementally as same-session addenda under Priority Queue item 9
+above rather than closed out formally as each piece landed. This entry
+is that formal close -- Section 16 above already carries the full
+command-level evidence for everything below; nothing here overrides
+it, this is the tie-together-and-version-bump pass the addenda trail
+was deferring.
+
+**Priority Queue status, this closeout:**
+
+1. `built_to_fail` false-rank-1 baseline drift -- CLOSED (MOB v4.301,
+   unchanged, restated for completeness).
+2. `built_to_fail`'s 16-profile ripple from `f88a7c2` -- CLOSED (MOB
+   v4.303, unchanged).
+3. AssemblyPanel/Phase-2-CTA merge -- CLOSED (MOB v4.302, unchanged).
+4. IPM's thin question-wiring -- CLOSED (MOB v4.302, unchanged).
+5. `invisible_performance_management`/`the_founders_grip` vector
+   duplicate -- **CLOSED.** Full detail above (2026-09-14 entry):
+   `dimensional_vector` tier-magnitude fix, 175-profile ripple check
+   clean, `validate.py` unchanged.
+6. Diagnostic result export (copy-as-text) -- SHIPPED, unchanged.
+7. Long-screenshot capture on the diagnostic page -- **CLOSED as
+   won't-chase.** Root cause unconfirmed, no repro obtainable in this
+   environment; not worth pursuing given item 6 serves the actual
+   underlying need. Revisit only if Pete confirms the export feature
+   doesn't fully cover the use case -- not an open investigation, a
+   deliberate stop.
+8. Diagnostic self-select back button -- **CLOSED, both paths.** Full
+   detail above (2026-09-14 entry): Phase 5's completed-result view
+   gained the same `onPhaseAdvance(currentPhase - 1)` pattern phases
+   2-4 already used, live-verified in production on the Phase 2 -> 1
+   transition.
+9. **CLOSED -- two distinct pieces of work under one queue number,
+   not one blurred item:**
+   - **OH compensatory-damages pricing (engine + UI framing).** Ohio's
+     real R.C. 2315.21 formula wired into all three reachable call
+     sites (Clusters 1, 2, 4b) via `_oh_compensatory_damages_pricing()`,
+     commit `2dff83f`. `has_uncollected_net_worth_caveat` propagated
+     end-to-end from engine through `contract.py` to both frontend
+     renderers, commit `eec2e1b`. Full detail: the original CLOSED
+     entry and its "Correction, same session" / "Addendum, same
+     session" blocks above.
+   - **`is_floor` scoping -- 7 per-state caveats.** A separate
+     investigation this same session found the original `is_floor`
+     mechanism couldn't honestly cover all 32/36 triggering
+     jurisdictions with one sentence (three genuinely different
+     situations bundled under one flag), leading to a from-scratch
+     design (Gemini-reviewed, one cited claim corrected on
+     verification), then a full implementation: FL/ID/KS/VA's
+     flat_cap component-vs-total mismatch and AR/MD/TN's verified
+     statutory carve-outs, each now surfaced as real, specific caveat
+     text (`specific_caveat_jurisdiction` in `friction_tax.py`,
+     `_SPECIFIC_CAVEAT_TEXT` in `contract.py`), commit `e643bfd`. Full
+     detail: the "Addendum, 2026-09-16" block immediately above this
+     entry.
+   - Both pieces share the same underlying Legal/Compliance module and
+     the same session, which is why they sit under one Priority Queue
+     number -- they are not sequential phases of a single build, and
+     each has its own commit(s) and its own verification trail.
+10. NAICS-vs-"Manufacturing & Industrial" mapping gap (OH) -- **status
+    remains corrected, not resolved** (2026-09-15 correction, unchanged
+    by this closeout): live and consequential in a real pricing path
+    today (OH compensatory-damages routing), not a hypothetical
+    docstring note. The underlying gap itself is untouched -- still no
+    NAICS-level intake data to resolve it precisely.
+11. Quarterly Step-Back -- untouched this session, still due next
+    week per Pete's prior correction. Not overdue.
+
+**Why the addenda trail is unusually long, flagged as context, not a
+concern:** this session covered deep original research (an EEOC
+charge-filing-frequency / BLS QCEW employment data pipeline for the
+OH jurisdiction multiplier, plus primary-source statutory verification
+across 9 `state_specific_tiers` states for the carve-out work) directly
+alongside two rounds of engine builds and a Gemini architecture-gate
+review cycle, all within one continuous session rather than split
+across several. The addendum-per-milestone logging pattern used
+throughout is what that density looks like on paper -- each addendum
+is independently complete and verified, not a sign of scope drift or
+rework.
+
+Diary write: `tools/prv3_diary.py write --agent claude-code --topic
+"legal-compliance-is-floor-scoping" ...`, this session, covering the
+full arc above. Handoff file: `prompts/session-handoff-v4.304.md`,
+committed alongside this entry.
