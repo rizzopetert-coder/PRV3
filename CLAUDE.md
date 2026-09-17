@@ -123,7 +123,7 @@ A full project assessment (workstream status, goal progress, process feedback) s
 **Required format, locked 2026-08-23 (tools/_mob.txt Section 14, MOB v4.225) — supersedes the single-question-resolution style used before this date.** A Quarterly Step-Back is a dual-sourced, source-verified process, not an open-ended single-question session: (1) Claude.ai produces an initial project evaluation — status, business viability, SWOT, recommendations — from whatever context it has; (2) Claude Code independently re-verifies it cold, from direct source only, without reading Claude.ai's version first, producing its own full five-part assessment; (3) discrepancies are resolved against live source, not by deferring to whichever assessment sounds more confident, and the root cause of any error is named; (4) the reconciled, verified picture — not either assessment alone — drives the next work plan. This exists because a conversation-history-based assessment gave Pete at least two materially wrong claims on 2026-08-23 (friction-tax engine status, resolution-family copy status) before an independent, source-verified CC pass caught and corrected both. Full process definition and this run's own trace: `prompts/prv3-quarterly-step-back-2026-08-23.md`. First assessment run to this format: `prompts/prv3-comprehensive-assessment-cc.md`.
 
 - Last step-back: September 16, 2026 (third run under the dual-sourced format. Full record: `prompts/prv3-quarterly-step-back-2026-09-16-cc-independent.md` (independent pass) and `prompts/prv3-quarterly-step-back-2026-09-16-reconciled.md` (reconciliation))
-- Next due: on or near September 30, 2026 (biweekly from this run, per the locked cadence above — flagged to Pete at closeout: his own closeout instruction referenced "~3-week cadence," which doesn't match the currently locked biweekly rule; this date uses the locked rule, not the casual reference, pending Pete's confirmation either way)
+- Next due: on or near September 19, 2026 (locked biweekly cadence, unchanged — corrects this session's own earlier flag: the prior closeout instruction's "~3-week" phrasing was imprecise wording, not a rule change, per Pete's direct confirmation; the 2026-08-28 biweekly lock stands as-is)
 
 ### Outside Human Gap (documented, not yet actioned)
 The entire verification/decision loop currently runs inside Pete + the AI stack. This is strong for factual rigor, structurally weak for judgment about public reception. Before the first truly public, hard-to-reverse Tier 4 action, a second human read — a trusted colleague — is recommended over another internal review pass.
@@ -196,7 +196,7 @@ No session may assert as current fact something it cannot verify from its own en
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.309 |
+| MOB version | v4.310 |
 | Session continuity | Mem0 — see Section 12 |
 | Engine state count | 58 (locked) |
 | Test suite minimum (Phase 1) | 171 profiles across 57 states |
