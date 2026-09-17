@@ -157,7 +157,7 @@ export default function PrivateOutput({
           prominent pattern" (signals rank without claiming exclusivity)
           -- per prompts/category-e-direction3-cluster-display.md. */}
       <div className="pb-4">
-        <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+        <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
           Most prominent pattern
         </p>
         <div className="flex items-center gap-3 flex-wrap mb-2">
@@ -172,11 +172,11 @@ export default function PrivateOutput({
           </span>
         </div>
         {payload.primary_state.descriptive_prose && (
-          <p className="text-[12px] text-gray-400 leading-relaxed mb-2">
+          <p className="text-[12px] text-charcoal leading-relaxed mb-2">
             {payload.primary_state.descriptive_prose}
           </p>
         )}
-        <p className="text-[12px] text-gray-400 leading-relaxed">
+        <p className="text-[12px] text-charcoal leading-relaxed">
           {SEVERITY_ANCHOR[payload.severity]}
         </p>
       </div>
@@ -207,77 +207,70 @@ export default function PrivateOutput({
       </div>
       <Rule />
 
-      {/* Block 2 — Observable indicators (omit entirely if empty) */}
-      {observableIndicators.length > 0 && (
-        <>
-          <div className="py-4">
-            <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+      {/* Blocks 2/2b/2c/3 — Observable indicators, liability condition,
+          framing text, and the asset resolution anchor now render as one
+          continuous narrative block (cohesion pass, this session) --
+          previously each sub-block had its own <Rule/>, which gave a
+          short, isolated line like framingText the visual weight of a
+          pull-quote it was never meant to carry. No rule between any of
+          these four sub-blocks; a single rule closes the whole section. */}
+      <div className="pb-4 space-y-4">
+        {observableIndicators.length > 0 && (
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
               Observable indicators
             </p>
             <ul className="space-y-1">
               {observableIndicators.map((indicator, i) => (
-                <li key={i} className="flex gap-2 text-[13px] leading-[1.6] text-gray-500">
+                <li key={i} className="flex gap-2 text-[13px] leading-[1.6] text-charcoal">
                   <span className="text-gray-300 shrink-0" aria-hidden>—</span>
                   <span>{indicator}</span>
                 </li>
               ))}
             </ul>
           </div>
-          <Rule />
-        </>
-      )}
+        )}
 
-      {/* Block 2b — Liability condition */}
-      <div className="py-4">
         <p className="text-sm leading-[1.65] text-charcoal">
           {liabilityText || payload.resolution_routing}
         </p>
-      </div>
-      <Rule />
 
-      {/* Block 2c — Framing text (omit entirely if empty) */}
-      {framingText && (
-        <>
-          <div className="py-4">
-            <p className="text-sm leading-[1.65] text-charcoal">{framingText}</p>
-          </div>
-          <Rule />
-        </>
-      )}
+        {framingText && (
+          <p className="text-sm leading-[1.65] text-charcoal">{framingText}</p>
+        )}
 
-      {/* Block 3 — Asset resolution anchor + primary asset domain (omit entirely if both empty) */}
-      {(anchorText || primaryAssetDomain) && (
-        <>
-          <div className="py-4">
+        {(anchorText || primaryAssetDomain) && (
+          <div>
             {primaryAssetDomain && (
-              <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+              <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
                 Primary asset domain: {primaryAssetDomain}
               </p>
             )}
             {anchorText && (
-              <p className="text-[13px] text-gray-500">{anchorText}</p>
+              <p className="text-[13px] text-charcoal">{anchorText}</p>
             )}
           </div>
-          <Rule />
-        </>
-      )}
+        )}
+      </div>
+      <Rule />
 
       {/* Block 4 — Resolution pathway */}
-      <div className="py-4 space-y-1">
-        <p className="text-[11px] uppercase tracking-wide text-gray-400">
+      <div className="pb-4 space-y-1">
+        <p className="text-[11px] uppercase tracking-wide text-slate">
           Resolution pathway
         </p>
         <p className="text-[13px] font-medium text-charcoal">
           {payload.resolution_family}
         </p>
         {resolutionFramingText ? (
-          <p className="text-[13px] text-gray-500">{resolutionFramingText}</p>
+          <p className="text-[13px] text-charcoal">{resolutionFramingText}</p>
         ) : (
           !usedRoutingInBlock2 && payload.resolution_routing && (
-            <p className="text-[13px] text-gray-500">{payload.resolution_routing}</p>
+            <p className="text-[13px] text-charcoal">{payload.resolution_routing}</p>
           )
         )}
       </div>
+      <Rule />
 
       {/* Block 4b — Core cluster of co-occurring conditions (Direction
           3, this session). Replaces the flat "Also present" bulleted
@@ -296,7 +289,7 @@ export default function PrivateOutput({
           patch script's own docstring for the full rationale. */}
       {payload.secondary_states.length > 0 && (
         <div className="py-4">
-          <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-3">
+          <p className="text-[11px] uppercase tracking-wide text-slate mb-3">
             Co-occurring conditions
           </p>
           <ul className="space-y-4">
@@ -309,7 +302,7 @@ export default function PrivateOutput({
                   {s.name}
                 </a>
                 {s.descriptive_prose && (
-                  <p className="text-[12px] text-gray-500 leading-relaxed mt-0.5">
+                  <p className="text-[12px] text-charcoal leading-relaxed mt-0.5">
                     {firstSentence(s.descriptive_prose)}
                   </p>
                 )}
@@ -317,7 +310,7 @@ export default function PrivateOutput({
             ))}
           </ul>
           {overflowCount > 0 && (
-            <p className="font-ui text-[12px] text-gray-400 mt-3">
+            <p className="font-ui text-[12px] text-slate mt-3">
               +{overflowCount} co-occurring condition{overflowCount === 1 ? "" : "s"}
             </p>
           )}
@@ -339,7 +332,7 @@ export default function PrivateOutput({
           design, not gated to multi-state only. */}
       {payload.severity_by_state && payload.severity_by_state.length > 0 && (
         <div className="py-4">
-          <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-3">
+          <p className="text-[11px] uppercase tracking-wide text-slate mb-3">
             Severity across conditions
           </p>
           <ul className="space-y-3">
@@ -371,7 +364,7 @@ export default function PrivateOutput({
               );
             })}
           </ul>
-          <p className="text-[11px] text-gray-400 mt-3 leading-relaxed">
+          <p className="text-[11px] text-slate mt-3 leading-relaxed">
             A short bar at Emerging reflects a real finding, not a
             partial or uncertain one — Emerging is the floor of the
             severity scale.
@@ -393,7 +386,7 @@ export default function PrivateOutput({
           behind them is never surfaced to the user. */}
       {legal && (
         <div className="py-4">
-          <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+          <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
             Legal/Compliance exposure
           </p>
 
@@ -416,7 +409,7 @@ export default function PrivateOutput({
           )}
 
           {legalHasPrice && legal.has_partial_jurisdictions && (
-            <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">
+            <p className="text-[11px] text-slate mt-1 mb-2 leading-relaxed">
               State law in this jurisdiction was not independently
               verified and may set a different threshold than what's
               reflected here.
@@ -424,7 +417,7 @@ export default function PrivateOutput({
           )}
 
           {legalHasPrice && legal.has_uncollected_net_worth_caveat && (
-            <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">
+            <p className="text-[11px] text-slate mt-1 mb-2 leading-relaxed">
               This figure reflects twice the compensatory-damages
               estimate above, capped at Ohio&apos;s $350,000 ceiling --
               not the net-worth alternative Ohio law also applies
@@ -435,19 +428,19 @@ export default function PrivateOutput({
           )}
 
           {legalHasPrice && legal.specific_caveat && (
-            <p className="text-[11px] text-gray-400 mt-1 mb-2 leading-relaxed">
+            <p className="text-[11px] text-slate mt-1 mb-2 leading-relaxed">
               {legal.specific_caveat}
             </p>
           )}
 
           {legal.unpriced_state_ids.length > 0 && (
-            <p className="text-[12px] text-gray-500 leading-relaxed mb-2">
+            <p className="text-[12px] text-slate leading-relaxed mb-2">
               Real exposure current data can&apos;t price precisely for:{" "}
               {joinNames(unpricedStateNames)}.
             </p>
           )}
 
-          <p className="text-[11px] text-gray-400 mt-1 leading-relaxed">
+          <p className="text-[11px] text-slate mt-1 leading-relaxed">
             {legal.caveat}
           </p>
         </div>
@@ -477,7 +470,7 @@ export default function PrivateOutput({
           suppression pattern exactly (see prop doc comment above). */}
       {enableEngage && (
         <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-3">
+          <p className="text-[11px] uppercase tracking-wide text-slate mb-3">
             Ready to move on this?
           </p>
           <Link
