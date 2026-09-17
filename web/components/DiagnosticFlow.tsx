@@ -128,7 +128,7 @@ export function HeadcountStepper({
 // rather than a separately hand-maintained list that could drift.
 export const INDUSTRY_OPTIONS = [
   "Professional Services", "Healthcare & Life Sciences", "Financial Services",
-  "Technology", "Manufacturing & Industrial", "Retail & Hospitality",
+  "Technology", "Manufacturing", "Retail & Hospitality",
   "Nonprofit & Education", "Government & Public Sector", "Other",
 ];
 const ROLE_LEVEL_OPTIONS = [

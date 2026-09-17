@@ -94,7 +94,7 @@ INDUSTRIES: tuple[str, ...] = (
     "Healthcare & Life Sciences",
     "Financial Services",
     "Technology",
-    "Manufacturing & Industrial",
+    "Manufacturing",
     "Retail & Hospitality",
     "Nonprofit & Education",
     "Government & Public Sector",
@@ -255,7 +255,7 @@ _INDUSTRY_WAGE_DATA: dict[str, tuple[float, str, str]] = {
         "not independently confirmed this pass. Usable now, worth refining later.",
         "BLS_OEWS_2023_sector51_information",
     ),
-    "Manufacturing & Industrial": (
+    "Manufacturing": (
         64440.0,
         "BLS OEWS May 2023 mean annual wage: $64,440. Sectors 31-33 (Manufacturing), "
         "All Occupations. CONFIRMED exact match to original claim.",
@@ -2046,7 +2046,7 @@ def compute_friction_tax(
 # INDUSTRY_NON_EXEMPT_RATIO[industry].
 
 INDUSTRY_NON_EXEMPT_RATIO: dict[str, float] = {
-    "Manufacturing & Industrial": 0.557,
+    "Manufacturing": 0.557,
     "Healthcare & Life Sciences": 0.560,
     "Financial Services": 0.285,
     "Professional Services": 0.227,
@@ -2794,12 +2794,16 @@ STATE_COVERAGE_THRESHOLDS.update({
         # organization; flagged via
         # LegalPricingResult.may_overstate_for_uncollected_net_worth, not
         # silently accepted. Small-employer routing (see
-        # _oh_is_small_employer()) uses this app's "Manufacturing &
-        # Industrial" industry bucket as an approximation of Ohio's
-        # NAICS-manufacturing test -- confirmed this session that the two
-        # are not identical (the app bucket may sweep in adjacent
-        # non-manufacturing industrial activity like utilities or
-        # mining); flagged here, not resolved, since no NAICS-level
+        # _oh_is_small_employer()) uses this app's "Manufacturing"
+        # industry bucket as an approximation of Ohio's NAICS-
+        # manufacturing test. Renamed from "Manufacturing & Industrial"
+        # this session (Priority Queue item 10) to close most of the
+        # ambiguity flagged here previously -- "Industrial" no longer
+        # actively invites mining/utilities orgs into this bucket, since
+        # those carry their own separate wage entries under "Other" now.
+        # Self-selection accuracy still isn't guaranteed (a business can
+        # misjudge its own NAICS classification regardless of label
+        # wording); flagged here, not resolved, since no NAICS-level
         # intake data exists to resolve it precisely.
         damages_cap_treatment="state_specific_tiers",
         confidence="CONFIRMED",
@@ -3859,14 +3863,20 @@ def _oh_is_small_employer(headcount, industry: str) -> bool:
     """
     Ohio's own small-employer/individual-defendant gate, R.C.
     2315.21(D)(2)(b): <=100 full-time employees generally, <=500 if
-    NAICS-manufacturing-classified. Uses this app's "Manufacturing &
-    Industrial" INTAKE_FIELDS["industry"] bucket as an approximation of
-    the real NAICS test -- confirmed NOT identical this session: the
-    app bucket may sweep in adjacent non-manufacturing industrial
-    activity (utilities, mining) that wouldn't actually qualify under
-    Ohio's statute. No NAICS-level intake data exists to resolve this
-    precisely; flagged here and in STATE_COVERAGE_THRESHOLDS["OH"]'s
-    own citation comment, not resolved by this helper.
+    NAICS-manufacturing-classified. Uses this app's "Manufacturing"
+    INTAKE_FIELDS["industry"] bucket as an approximation of the real
+    NAICS test. Renamed from "Manufacturing & Industrial" this session
+    (Priority Queue item 10) specifically to close the ambiguity this
+    docstring used to flag here: the word "Industrial" no longer
+    actively invites mining/utilities orgs (which carry their own
+    separate wage entries under "Other") to self-select into this
+    bucket. Still not a guarantee -- a business can misjudge its own
+    NAICS classification regardless of label wording, so self-selection
+    accuracy against the real NAICS 31-33 test remains approximate,
+    just no longer actively misleading. No NAICS-level intake data
+    exists to resolve this precisely; flagged here and in
+    STATE_COVERAGE_THRESHOLDS["OH"]'s own citation comment, not
+    resolved by this helper.
 
     Non-numeric headcount (unclassifiable input) returns False -- the
     general branch's statutory mechanics are the more conservative
@@ -3884,7 +3894,7 @@ def _oh_is_small_employer(headcount, industry: str) -> bool:
         return False
     if headcount <= 100:
         return True
-    return industry == "Manufacturing & Industrial" and headcount <= 500
+    return industry == "Manufacturing" and headcount <= 500
 
 
 # R.C. 2315.21(D)(2)(b) -- the small-employer/individual-defendant hard

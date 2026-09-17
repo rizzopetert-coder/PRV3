@@ -285,7 +285,7 @@ INTAKE_FIELDS = {
         "Healthcare & Life Sciences",
         "Financial Services",
         "Technology",
-        "Manufacturing & Industrial",
+        "Manufacturing",
         "Retail & Hospitality",
         "Nonprofit & Education",
         "Government & Public Sector",
@@ -324,7 +324,7 @@ INTAKE_FIELDS = {
 
 # Industries that trigger the high-hazard Safety & Wellbeing multiplier
 HIGH_HAZARD_INDUSTRIES = {
-    "Manufacturing & Industrial", "Healthcare & Life Sciences",
+    "Manufacturing", "Healthcare & Life Sciences",
     "Construction", "Transportation & Warehousing",
 }
 
