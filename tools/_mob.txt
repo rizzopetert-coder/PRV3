@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.308
+\\\#\\\# MOB v4.309
 
   
 
@@ -1503,7 +1503,7 @@ Files to attach next session, categorized by likely next task:
 
 Explicitly parked, not on this list, do not resurface unless Pete reopens: attorney review of engagement agreement Section 3, LinkedIn 19-week content calendar, Category E Direction 2 (shelved), **Real Transaction Path Phase 2 (the Dropbox Sign webhook) and pricing/checkout display -- parked indefinitely 2026-08-29, Pete's explicit decision (Phase 1 itself already shipped 2026-08-25 and needs no further work to keep functioning; only what remained unbuilt is parked).** Individual-coaching confidentiality template field wording stays off this list -- confirmed already CLOSED (Section 16, MOB v4.74).
 
-Calibration status as of session close: unchanged since the 2026-08-24 rewrite (no engine/calibration files touched this session beyond the test_main.py fixture fix, which the calibration harness does not exercise). Friction Tax Sets 1-3 and the multi-state compounding design remain closed and live, unchanged. Full calibration suite re-run fresh this session: 166/175 (matches the documented post-SCD-WCS-Phase-5 baseline, not a regression).
+Calibration status as of session close: unchanged since the 2026-08-24 rewrite (no engine/calibration files touched this session beyond the test_main.py fixture fix, which the calibration harness does not exercise). Friction Tax Sets 1-3 and the multi-state compounding design remain closed and live, unchanged. Full calibration suite re-run fresh this session: 166/175 (matches the documented post-SCD-WCS-Phase-5 baseline, not a regression). **CORRECTED 2026-09-16 (Quarterly Step-Back reconciliation) -- this line went stale, not previously re-flagged:** three subsequent, individually-documented fixes (the_paper_tiger primary_dimension, a second batch fix, and the IPM/the_founders_grip vector-differentiation fix, commit 09ed822, 2026-09-14) moved the real figure 166->169->170->171 well before this step-back. **171/175 is the current confirmed baseline**, live-verified fresh during this same step-back session. Full correction trail: prompts/prv3-quarterly-step-back-2026-09-16-reconciled.md.
 
 Last updated: This session (Claude Code), 2026-09-07 -- full resequencing per Pete's explicit 4-item priority order (Legal/Compliance wiring, PARTIAL coverage-threshold verification, extreme_high_confidence investigation, v2 token migration), issued at session closeout after this session's ssoProtection/Redis/domain/homepage-dark-theme closures. Previously-tracked still-open items not in that list carried forward separately, not dropped. (Prior update: 2026-09-04 -- STATE_CAUSATION_OVERRIDES closed.)
 
@@ -5317,3 +5317,100 @@ Diary write: `tools/prv3_diary.py write --agent claude-code --topic
 "legal-compliance-is-floor-scoping" ...`, this session, covering the
 full arc above including items 12-14. Handoff file:
 `prompts/session-handoff-v4.308.md`, committed alongside this entry.
+
+## SESSION CLOSEOUT (2026-09-16, terminal Claude Code, continuation
+## session) -- Quarterly Step-Back #3 completed, dual-sourced,
+## reconciled -- MOB v4.308 -> v4.309
+
+Third Quarterly Step-Back run under the dual-sourced format locked
+2026-08-23. Claude.ai produced an initial project evaluation from
+conversation-history context; Claude Code independently re-verified it
+cold, from direct source only, without reading the Claude.ai draft
+first, per the standing process -- full independent pass:
+`prompts/prv3-quarterly-step-back-2026-09-16-cc-independent.md`.
+Reconciliation against the Claude.ai draft: `prompts/prv3-quarterly-
+step-back-2026-09-16-reconciled.md`.
+
+**Where the two assessments agreed:** both landed on the same core
+technical read -- the engine and taxonomy are mature (58 locked
+states, 171/175 calibration, full test coverage) and not the
+project's bottleneck; both converged on a real commercial-viability
+gap despite substantial published content (87 /book pieces) and
+research groundwork (the seven-experiments corpus).
+
+**Corrected finding, the significant one this run:** Claude.ai's
+initial draft incorrectly treated Loureiro as a completed, paid
+Principal Resolution engagement and cited a $22-25K figure from it as
+a proven PR pricing data point. Per Pete's direct correction and
+Claude Code's independent confirmation (Loureiro does not appear
+anywhere in this repository -- confirmed via ripgrep across all file
+types, direct `.docx`-content extraction, and full git commit-message
+history), this was wrong. **Stated plainly for the record: zero
+closed Principal Resolution revenue exists** -- not unconfirmed,
+genuinely absent from the full MOB session log, git history, and
+documents/. The $22-25K figure must not be used as a PR pricing
+anchor going forward; the real price point is genuinely unestablished.
+Root cause: a conversation-history-based draft repeating a framing it
+was never source-checked against -- the same failure mode this
+dual-sourced process was created to catch after the 2026-08-23
+precedent.
+
+**Two net-new findings the Claude.ai draft missed entirely**, both
+requiring direct code/MOB cross-reference a conversation-history draft
+wouldn't reach: (1) the `/engage` transaction path's Dropbox Sign
+credentials (`DROPBOX_SIGN_API_KEY`/`DROPBOX_SIGN_TEMPLATE_ID`) have no
+MOB record confirming they were ever provisioned in Vercel, unlike
+every other credential this project uses -- compounded by
+`testMode = process.env.VERCEL_ENV !== "production"` meaning a real
+Production request is not sandboxed by default, and no evidence of a
+live round-trip test for this route exists anywhere in the record.
+Not resolved here -- Pete's call, logged as an open recommendation.
+(2) CLAUDE.md's own Key References table was stale (`v4.303` against
+an actual current `v4.308`) -- fixed as part of this closeout.
+
+**Reconciled bottom line:** engine and content mature; commercial
+viability entirely unproven. The two highest-leverage go-to-market
+levers -- the LinkedIn campaign (19 weeks, 57 posts, ready) and the
+engagement agreement (drafted, ready for review) -- are both gated on
+one open-ended attorney review sitting directly atop a currently-
+active OneDigital covenant situation (Sections 2/8/9 confirmed live
+obligations right now, not future contingencies, per direct read of
+`documents/linkedin-covenant-landscape.md`). Not a technology problem;
+closing it needs a legal-review decision and a real test of
+willingness-to-pay, not more engine work.
+
+**Leading near-term recommendation:** use the Tier 4 pilot mechanism
+(share with 2-3 trusted people) before the attorney-review gate opens,
+not after -- tests real willingness-to-pay and public reception at
+near-zero exposure, via a channel this project's governance model
+already defines but has never used, independent of when the attorney
+review resolves. Not acted on here -- Pete's call, logged as a
+recommendation only, same as the attorney-review gate itself and the
+Dropbox Sign provisioning check.
+
+**Staleness fixes, this closeout (both confirmed and flagged, not
+silently overwritten):** (1) this Section 13b's own `166/175`
+calibration line (see the CORRECTED note added directly above it) --
+real current baseline is 171/175, live-verified fresh this session,
+traced to three individually-documented fixes between the 2026-08-24
+rewrite and 2026-09-14 that never got reflected in that line. (2)
+CLAUDE.md's Key References MOB version (`v4.303` -> `v4.309`).
+
+**Quarterly Step-Back cadence fields updated:** last step-back
+2026-09-16 (this session), next due on or near 2026-09-30 (biweekly
+from this run, per the locked cadence). **Flagged, not silently
+resolved:** Pete's own closeout instruction for this session referred
+to a "~3-week cadence," which doesn't match the currently locked
+biweekly (2-week) rule from the 2026-08-28 correction -- the date
+above uses the locked rule, not the casual reference. Pete to confirm
+which is actually intended; not changed unilaterally here.
+
+Diary write: `tools/prv3_diary.py write --agent claude-code --topic
+"quarterly-step-back-3-reconciled" ...`, this session, covering the
+full reconciliation arc above. Handoff file: `prompts/session-handoff-
+v4.309.md`, committed alongside this entry per CLAUDE.md Step 2a
+("fires every session without exception") -- flagged rather than
+silently included: Pete's closeout instruction for this task named
+four files to commit, which would not have counted this one; generated
+it anyway given the protocol's own no-exception language, rather than
+inferring Pete meant to suspend that rule. Pete to confirm either way.
