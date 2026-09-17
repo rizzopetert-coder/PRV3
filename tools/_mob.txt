@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.310
+\\\#\\\# MOB v4.311
 
   
 
@@ -1443,6 +1443,8 @@ Three additional governance ideas were considered and explicitly declined by Pet
 Zero regression in Warm/Neutral, both bugs fixed in Dark. A dev-server file-watcher/build-cache staleness issue (unrelated to the fix itself) cost two separate kill/clear-`.next`/restart cycles before the served CSS actually matched source -- confirmed via raw network fetch each time, not assumed from a process restart alone. | This session (Claude Code), 2026-09-07 | Closed -- no further check-in. If a new theme-reactivity gap surfaces on the homepage or elsewhere, treat it as a new incident, not a reopening of this row. |
 
 | Homepage full contrast audit (following the Sept 7 dark-theme fix and the same-session v2-token re-examination) found three more fixed, non-theme-reactive Tailwind colors, all confirmed WCAG AA failures -- CTA button, footer text, avatar circle text | N/A -- infrastructure/accessibility bug, live-verified, closed | CLOSED this session -- three separate fixes, all margin-searched (not guessed) and live-verified via `getComputedStyle` plus canvas-normalized contrast computation across all three themes | Full audit of `page.tsx`/`WayfindingGrid.tsx` for hardcoded `bg-*`/`text-*`/`border-*`/`hover:*` utilities not backed by a `--home-*` or existing reactive token, requested after the Sept 7 fix and the same-session v2-token re-examination both surfaced the general pattern. First verification pass caught its own bug before reporting: Tailwind v4 emits `lab()` color functions, not plain `rgb()` -- a first regex-based parser misread `lab()` channel values as raw RGB, producing garbage numbers (e.g. a false `#420108` reading for `text-gray-400`); caught and replaced with a canvas-`getImageData` normalization (draws each computed color to a 1x1 canvas, reads back real RGB, robust to any CSS color-function format) before any real numbers were reported or acted on.
+| Gemini fabrication pattern -- PrivateOutput.tsx/ConstellationField.tsx, 4th confirmed instance this session | N/A -- verification-discipline tracker, not a Tier 1-4 workflow item | Confirmed pattern, no action beyond the standing verification discipline already in force -- this row consolidates 4 instances for the first time; none were previously logged in one place, each was corrected inline within its own session's own work | **This is the first time these four are gathered into a single record -- consolidating existing history, not asserting a pre-existing tracker row that didn't exist.** (1) Category E Direction 1, 2026-08-11: Gemini's motion-code snippet used `data-emphasis="primary"\|"dimmed"` -- "dimmed" appears nowhere in the codebase, confirmed via the live CSS utility and real usage; the actual enum is `"primary"\|"secondary"\|"receded"`. (2) Category E Direction 3, 2026-08-11: Gemini cited a nonexistent `web/app/diagnostic/` location for `PrivateOutput.tsx` -- wrong path, corrected before any code was written. (3) Neutral-theme `--slate` contrast-gap recon, 2026-08-29: Gemini claimed a "Terminology Guide badges" usage of `--slate` -- confirmed via full-codebase grep that no such usage exists anywhere; the same pass directly examined `ConstellationField.tsx`/`PrivateOutput.tsx`'s `severityAccentTokens()` and confirmed it consumes the separate, fixed v1 `--color-slate` token, zero exposure to the claim either way. (4) This session's cohesion-fix architecture-gate review: Gemini claimed narrative fields render as raw strings with visible bold text traceable to unstripped Markdown from the LLM synthesis engine -- confirmed false on direct read: zero Markdown-handling mechanism (`dangerouslySetInnerHTML`, a parser, a regex-replace) exists anywhere in `PrivateOutput.tsx`, and `engine/output_synthesis.py`'s system prompt explicitly states "No markdown" in its output-format section. The real mechanism was a single static `font-medium` className on the `headline` field alone -- nothing to do with LLM output. **Standing recommendation, updated for a 4th instance:** the existing "verify every Gemini claim against live source before writing any diff" discipline (already standing project-wide, reconfirmed correct after 3 instances) is not weakened by a 4th -- it is the reason all four were caught before shipping, not despite it. No process change is warranted; a genuine change would be warranted only if a 5th instance shipped uncaught, which has not happened. | This session (Claude Code), 2026-09-17 | No forced check-in -- informational pattern record. Revisit if a 5th instance surfaces on this same component pair, to judge whether the pattern is component-specific (this file pair's real complexity/cross-referencing) or general Gemini-review noise. |
+| PrivateOutput.tsx Block 4d (Legal/Compliance tail-risk exposure) may benefit from its own cohesion pass -- flagged, not scheduled | 3 | Open, no urgency, no forced check-in | Surfaced as a byproduct of this session's PrivateOutput.tsx/ShareableOutput.tsx cohesion fix, not investigated in its own right. Block 4d carries a real caveat-line density -- the pricing figure, a coverage-basis caveat, a partial-jurisdictions caveat, an uncollected-net-worth caveat, a specific_caveat, and the general legal.caveat can all render stacked in sequence for a single state -- and none of that text existed before item 9 (OH R.C. 2315.21 compensatory pricing, this same session's earlier work). This cohesion pass touched only the color tokens inside Block 4d (gray-400/500 -> slate, to get to zero remaining occurrences project-wide) and deliberately left `LEGAL_BAND_WEIGHT`'s font-weight table untouched, per explicit scope. Whether the stacked-caveat density itself reads well, or needs its own visual treatment now that real content populates it for the first time, was never evaluated -- flagged for a future dedicated look, not diagnosed here. | This session (Claude Code), 2026-09-17 | No forced check-in -- Pete's call whenever this block's real content (now that item 9 populates it) gets its own design review. |
 
 **Bug 1 -- CTA button** (`page.tsx` `CloserSection`, was `bg-charcoal text-white hover:bg-gray-700`, all three fixed non-reactive values): computed 1.18:1 button-vs-page contrast in Dark (`#26241F` on `#171512`, both near-black) -- a severe failure, confirmed visually via screenshot (the button box has no visible boundary against the page; only its white text is legible). WCAG's own contrast formula proves this can't be patched with a lighter background alone while keeping white text: the luminance range required for "bg clears 4.5:1 against `#171512`" (>= ~0.207) and the range required for "white text still clears 4.5:1 against that same bg" (<= ~0.183) don't overlap -- a light bg with dark text is the only mathematically viable shape for a Dark-theme CTA here, not a stylistic choice. New tokens `--home-cta-bg`/`--home-cta-text`: Warm/Neutral unchanged (`#26241F`/`#FFFFFF`, zero visual change, already passing at 13.90:1/15.50:1). Dark: `#5B9BD9` (reuses `--home-slate`'s own already-vetted Dark value, not a new hue) / `#26241F` (reuses `--color-charcoal`) -- computed 6.19:1 button-vs-page, 5.27:1 text-vs-button, both clearing 4.5:1 with real margin. Hover state changed from `hover:bg-gray-700` (also fixed/non-reactive, and only 1.77:1 in Dark even as a hover state) to `hover:opacity-90`, matching `WayfindingGrid.tsx`'s own existing card-hover convention already used elsewhere on this same page.
 
@@ -5506,3 +5508,92 @@ Diary write: `tools/prv3_diary.py write --agent claude-code --topic
 "item-10-manufacturing-rename-closed" ...`, this session, covering the
 full item 10 arc above plus the cadence-language correction from the
 prior entry.
+
+## SESSION CLOSEOUT (2026-09-17, terminal Claude Code, continuation
+## session) -- PrivateOutput.tsx/ShareableOutput.tsx cohesion fix
+## shipped -- MOB v4.310 -> v4.311
+
+**Color hierarchy fix.** `text-gray-400`/`text-gray-500` replaced across
+both files, classified per-occurrence against real usage rather than
+blanket-replaced: `text-slate` for genuine meta/label content (eyebrows,
+caveats, the header timestamp), `text-charcoal` for primary narrative
+fields (`liabilityText`, `framingText`, observable indicators, the
+state's `descriptive_prose`, `SEVERITY_ANCHOR` copy, the asset anchor
+text, co-occurring state prose, and -- in `ShareableOutput.tsx` -- the
+primary state name itself, since it's diagnosis content there, not a
+label). Zero `text-gray-400`/`text-gray-500` remain in either file,
+grep-confirmed before and after.
+
+**Divider reduction.** `<Rule/>` count 5 -> 3 in both files. Observable
+indicators, liability condition, framing text, and the asset resolution
+anchor (`PrivateOutput.tsx`) -- and condition-identified, headline,
+framing text, and observable indicators (`ShareableOutput.tsx`) -- now
+render as one continuous block each instead of being split across
+several individually-ruled sections. This is the specific fix for the
+false pull-quote effect: a short, isolated line like `framingText` was
+picking up visual weight purely from sitting alone between two rules,
+not from any real emphasis styling -- confirmed directly, it carries
+zero font-weight difference from the surrounding prose.
+
+**No padding values changed.** The improved vertical rhythm around the
+`ConstellationField` radar block is a side effect of removing the
+stacked rules around it, not a separate spacing change -- the existing
+`pb-4`/`py-4` pattern was already internally consistent.
+
+**Gemini architecture-gate cleared, all 5 claims independently
+re-verified against live source before build** (full verification
+record: this session's own earlier turns). One of the five was a
+confirmed fabrication -- the Markdown-leakage explanation for the bold
+text, refuted on direct read: no Markdown-handling mechanism exists
+anywhere in either component, and `engine/output_synthesis.py`'s system
+prompt explicitly forbids Markdown output. This is the fourth confirmed
+Gemini fabrication/wrong-citation instance touching this component
+pair, now consolidated into its own Decision Register row for the first
+time (Section 13a, "Gemini fabrication pattern -- PrivateOutput.tsx/
+ConstellationField.tsx" row, new) -- the other three (a fabricated
+`data-emphasis` enum value, a wrong file-path citation, and a fabricated
+"Terminology Guide" `--slate` usage claim) were previously logged inline
+within their own sessions' work, never gathered into one place before.
+Standing recommendation unchanged, not weakened by a 4th instance: the
+existing verify-before-diff discipline is why all four were caught
+before shipping, not despite it.
+
+**Visual verification, beyond the standard suite.** Pete flagged that
+the color change wasn't visually obvious comparing the before/after
+full-page screenshots -- rather than assume the fix was cosmetically
+real and move on, ran a direct computed-style check
+(`getComputedStyle()` via Playwright) confirming the narrative element's
+live color is `#26241f` (exact match to `--color-charcoal`) and a
+control eyebrow's is `#4a6b85` (exact match to `--color-slate`), then
+went further and sampled the actual pixel values already baked into the
+saved screenshot PNGs at the same region (`#99a1af` before, matching
+Tailwind's real `gray-400`, vs `#26241f` after) -- confirming the fix
+was correctly rendered in the screenshots themselves, not just live in
+the DOM, and that the visibility gap was a viewing-scale/legibility
+issue with two full-page screenshots, not a broken fix. A 2x-zoomed
+crop of just the affected text region was produced and sent for a
+clear side-by-side. Dev server restarted fresh (`.next` cache cleared,
+new process) before this check, to rule out a stale build as an
+alternative explanation before trusting the computed-style result.
+
+**Verified throughout:** `tsc --noEmit` clean, vitest 99/99 unchanged,
+zero console errors during screenshot capture.
+
+**New Decision Register item, flagged not scheduled:** Block 4d (Legal/
+Compliance tail-risk exposure) carries real stacked-caveat density now
+that item 9's pricing/caveat text populates it for the first time --
+this pass only fixed its color tokens (to reach zero gray-400/500
+project-wide), deliberately left `LEGAL_BAND_WEIGHT`'s font-weight table
+untouched per explicit scope, and never evaluated whether the block's
+overall density needs its own design review. Logged as its own,
+separate, unscheduled Decision Register row.
+
+**Commits, pushed to main (no Preview environment exists, confirmed
+prior sessions):** `f320bc3` (PrivateOutput.tsx), `dd08b8b`
+(ShareableOutput.tsx). Per-file, not a blanket add, per standing
+discipline. Pete reviewed both the before/after screenshots and the
+computed-style/pixel proof before approving.
+
+Diary write: `tools/prv3_diary.py write --agent claude-code --topic
+"privateoutput-shareableoutput-cohesion-fix-shipped" ...`, this session,
+covering the full cohesion-fix arc above.
