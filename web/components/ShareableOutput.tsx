@@ -64,17 +64,17 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
         <span className="text-[12px] font-medium text-charcoal">
           Principal Resolution
         </span>
-        <span className="text-[11px] text-gray-400">{clientIdentifier}</span>
+        <span className="text-[11px] text-slate">{clientIdentifier}</span>
       </div>
       <Rule />
 
-      {/* Block 2 — Condition identified */}
-      <div className="py-4">
-        <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
-          Condition identified
-        </p>
+      {/* Blocks 2/2b — Condition identified + headline, one continuous
+          block (cohesion pass, this session -- mirrors PrivateOutput.tsx's
+          same restructuring). No rule between the state name and the
+          headline; a single rule closes the whole block. */}
+      <div className="py-4 space-y-4">
         <div className="flex items-center flex-wrap gap-2">
-          <span className="text-[13px] font-medium text-gray-500">
+          <span className="text-[13px] font-medium text-charcoal">
             {payload.primary_state.name}
           </span>
           <span
@@ -84,59 +84,51 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
             {payload.severity}
           </span>
         </div>
+        {payload.synthesis.headline && (
+          <p className="text-base font-medium leading-relaxed text-charcoal">
+            {payload.synthesis.headline}
+          </p>
+        )}
       </div>
       <Rule />
 
-      {/* Block 2b — Headline (omit entirely if empty) */}
-      {payload.synthesis.headline && (
-        <>
-          <div className="py-4">
-            <p className="text-base font-medium leading-relaxed text-charcoal">
-              {payload.synthesis.headline}
-            </p>
-          </div>
-          <Rule />
-        </>
-      )}
-
-      {/* Block 3 — Framing text */}
-      <div className="py-4">
+      {/* Blocks 3/4 — Framing text + observable indicators, one
+          continuous narrative block. No rule between framingText and the
+          indicators list -- previously each had its own <Rule/>, giving
+          framingText the isolated, pull-quote-like weight it was never
+          meant to carry. */}
+      <div className="py-4 space-y-4">
         <p className="text-sm leading-[1.65] text-charcoal">
           {payload.synthesis.framing_text}
         </p>
-      </div>
-      <Rule />
-
-      {/* Block 4 — Observable indicators (omit entirely if empty) */}
-      {observableIndicators.length > 0 && (
-        <>
-          <div className="py-4">
-            <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+        {observableIndicators.length > 0 && (
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
               Observable indicators
             </p>
             <ul className="space-y-1">
               {observableIndicators.map((indicator, i) => (
-                <li key={i} className="flex gap-2 text-[13px] leading-[1.6] text-gray-500">
+                <li key={i} className="flex gap-2 text-[13px] leading-[1.6] text-charcoal">
                   <span className="text-gray-300 shrink-0" aria-hidden>—</span>
                   <span>{indicator}</span>
                 </li>
               ))}
             </ul>
           </div>
-          <Rule />
-        </>
-      )}
+        )}
+      </div>
+      <Rule />
 
       {/* Block 5 — Resolution pathway */}
       <div className="py-4 space-y-1">
-        <p className="text-[11px] uppercase tracking-wide text-gray-400">
+        <p className="text-[11px] uppercase tracking-wide text-slate">
           Resolution pathway
         </p>
         <p className="text-[13px] font-medium text-charcoal">
           {payload.resolution_family}
         </p>
         {payload.synthesis.resolution_framing_text && (
-          <p className="text-[13px] text-gray-500">
+          <p className="text-[13px] text-charcoal">
             {payload.synthesis.resolution_framing_text}
           </p>
         )}
@@ -144,7 +136,7 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
 
       {/* Block 6 — Attribution */}
       <div className="mt-6 pt-4" style={{ borderTop: "0.5px solid #e5e7eb" }}>
-        <p className="text-[11px] text-gray-400">
+        <p className="text-[11px] text-slate">
           Assessed using the PRV3 diagnostic instrument. This document was generated
           from the principal&apos;s responses and is intended for senior leadership review.
         </p>
