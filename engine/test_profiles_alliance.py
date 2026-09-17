@@ -206,7 +206,7 @@ ALL_SI_01 = TestCase(
     target_state="silosolation",
     intake={
         "headcount":          328,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["none"],

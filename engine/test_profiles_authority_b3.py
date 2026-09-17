@@ -121,7 +121,7 @@ AUT_PS_01 = TestCase(
     target_state="paper_shield",
     intake={
         "headcount":          152,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["none"],

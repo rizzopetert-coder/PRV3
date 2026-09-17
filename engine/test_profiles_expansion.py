@@ -199,7 +199,7 @@ EXP_DIA_01 = TestCase(
     target_state="disparate_impact_architecture",
     intake={
         "headcount":          692,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Publicly traded",
         "jurisdictions":      [],
         "significant_events": ["external_legal_claim"],

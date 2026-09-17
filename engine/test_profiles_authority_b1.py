@@ -119,7 +119,7 @@ AUT_EX_01 = TestCase(
     target_state="the_exposed",
     intake={
         "headcount":          152,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["leadership_departure"],
@@ -202,7 +202,7 @@ AUT_HC_01 = TestCase(
     target_state="hr_capture",
     intake={
         "headcount":          152,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["external_legal_claim"],
@@ -369,7 +369,7 @@ AUT_TV_01 = TestCase(
     target_state="the_tolerated_violation",
     intake={
         "headcount":          328,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["external_legal_claim"],

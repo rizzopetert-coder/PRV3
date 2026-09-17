@@ -82,7 +82,7 @@ APT_UL_03 = TestCase(
     target_state="the_unformed_leader",
     intake={
         "headcount":          45,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["none"],
@@ -270,7 +270,7 @@ APT_BF_01 = TestCase(
     target_state="built_to_fail",
     intake={
         "headcount":          328,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["none"],

@@ -203,7 +203,7 @@ ATT_BC_01 = TestCase(
     target_state="the_burned_credibility",
     intake={
         "headcount":          152,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["none"],
@@ -371,7 +371,7 @@ ATT_BS_01 = TestCase(
     target_state="the_basement_standard",
     intake={
         "headcount":          152,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["none"],
@@ -630,7 +630,7 @@ ATT_GD_01 = TestCase(
     target_state="groundhog_day",
     intake={
         "headcount":          152,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["none"],

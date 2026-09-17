@@ -123,7 +123,7 @@ ATT_UH_01 = TestCase(
     target_state="the_unreported_hazard",
     intake={
         "headcount":          152,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["none"],
@@ -151,7 +151,7 @@ ATT_UH_02 = TestCase(
     target_state="the_unreported_hazard",
     intake={
         "headcount":          152,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["none"],
@@ -176,7 +176,7 @@ ATT_UH_03 = TestCase(
     target_state="the_unreported_hazard",
     intake={
         "headcount":          45,
-        "industry":           "Manufacturing & Industrial",
+        "industry":           "Manufacturing",
         "org_type":           "Privately held professional leadership",
         "jurisdictions":      [],
         "significant_events": ["none"],
