@@ -841,7 +841,7 @@ check("Scenario D: protected_activity_sources empty",
       flag_d.get("trigger_conditions", {}).get("protected_activity_sources") == [])
 
 
-# ── engine/contract.py:574 legal_tail_risk_exposure guard -- OH QUALITATIVE_ONLY (Phase 2b) ────
+# ── engine/contract.py:574 legal_tail_risk_exposure guard -- OH small-employer/$350k-capped branch (post-item-9 pricing) ────
 
 def _make_rankings_for(dominant_sid, top_score=0.9):
     """Same shape as make_rankings() above, parametrized by dominant state --
@@ -885,31 +885,99 @@ check(
 )
 oh_legal = oh_out.get("private_output", {}).get("legal_tail_risk_exposure")
 check(
-    "engine/contract.py:574 guard -- OH's QUALITATIVE_ONLY result (low=None, "
-    "has_unpriced_conditions=True) still renders a non-null legal_tail_risk_exposure block, "
-    "exercised directly through assemble_output() rather than inferred from the Government/"
-    "hr_capture case's already-proven shape",
+    "engine/contract.py:574 guard -- OH's small-employer/$350k-capped result (headcount=20 "
+    "<=100 short-circuits _oh_is_small_employer() to True regardless of industry) still "
+    "renders a non-null legal_tail_risk_exposure block, exercised directly through "
+    "assemble_output() rather than inferred from the Government/hr_capture case's "
+    "already-proven shape",
     oh_legal is not None,
     f"got {oh_legal!r}",
 )
 check(
-    "OH legal_tail_risk_exposure: low/high/band all None, has_unpriced_conditions=True, "
-    "unpriced_state_ids=['the_paper_tiger'] -- the exact real-pipeline shape that satisfies the "
-    "guard's second OR operand rather than its first",
+    "OH legal_tail_risk_exposure, small-employer/$350k-capped branch: real computed "
+    "R.C. 2315.21 shape post-item-9 pricing -- 2x Professional Services compensatory base "
+    "x OH's jurisdiction multiplier, uncapped by the $350k ceiling at this wage/multiplier "
+    "combo (189487.75 < 350000), has_uncollected_net_worth_caveat=True since the "
+    "small-employer branch omits the 'OR 10% of net worth' alternative and net_worth isn't "
+    "collected at intake",
     oh_legal is not None
-    and oh_legal.get("low") is None
-    and oh_legal.get("high") is None
-    and oh_legal.get("band") is None
-    and oh_legal.get("has_unpriced_conditions") is True
-    and oh_legal.get("unpriced_state_ids") == ["the_paper_tiger"],
+    and oh_legal.get("low") == 189487.75
+    and oh_legal.get("high") == 189487.75
+    and oh_legal.get("band") == "Moderate"
+    and oh_legal.get("has_unpriced_conditions") is False
+    and oh_legal.get("unpriced_state_ids") == []
+    and oh_legal.get("coverage_basis") == "state_specific"
+    and oh_legal.get("has_partial_jurisdictions") is False
+    and oh_legal.get("has_uncollected_net_worth_caveat") is True
+    and oh_legal.get("specific_caveat") is None,
     f"got {oh_legal}",
 )
 check(
     "OH legal_tail_risk_exposure carries the same caveat text as any other rendered block -- "
-    "confirms this isn't a special-cased or truncated object, just the normal dict with "
-    "low/high absent",
+    "confirms this isn't a special-cased or truncated object, just the normal priced dict "
+    "with low/high populated and has_uncollected_net_worth_caveat set instead",
     oh_legal is not None and oh_legal.get("caveat") == LEGAL_TAIL_RISK_CAVEAT_TEXT,
     f"got caveat={oh_legal.get('caveat')!r}",
+)
+
+# ── engine/contract.py:574 legal_tail_risk_exposure guard -- OH general/uncapped branch (headcount>100, non-Manufacturing) ────
+from engine.friction_tax import _oh_is_small_employer as _oh_small_check
+
+check(
+    "sanity: _oh_is_small_employer(250, 'Healthcare & Life Sciences') is False -- confirms this "
+    "fixture actually reaches the general/uncapped branch before asserting anything else about it",
+    _oh_small_check(250, "Healthcare & Life Sciences") is False,
+    f"got {_oh_small_check(250, 'Healthcare & Life Sciences')!r}",
+)
+oh_gen_intake = IntakeData(
+    headcount=250,
+    industry="Healthcare & Life Sciences",
+    org_type="Founder-led",
+    jurisdictions=["OH"],
+    significant_events=["none"],
+    principal_role="C-suite",
+)
+oh_gen_rankings = _make_rankings_for("the_paper_tiger", top_score=floor_val + 0.05)
+oh_gen_pkg = out_engine.build(oh_gen_rankings, sev)
+oh_gen_session = SessionData(
+    session_id=SessionData.new_session_id(),
+    intake=oh_gen_intake,
+    final_rankings=oh_gen_rankings,
+    accumulated_vector=acc_vector,
+    output_package=oh_gen_pkg,
+    severity_result=sev,
+)
+oh_gen_out = assemble_output(oh_gen_session)
+oh_gen_identified = oh_gen_out.get("identified_states", [])
+check(
+    "sanity: the_paper_tiger is the single identified state for the OH general-branch session",
+    len(oh_gen_identified) == 1 and oh_gen_identified[0].get("state_id") == "the_paper_tiger",
+    f"got {oh_gen_identified}",
+)
+oh_gen_legal = oh_gen_out.get("private_output", {}).get("legal_tail_risk_exposure")
+check(
+    "OH legal_tail_risk_exposure, general/uncapped branch: real computed R.C. 2315.21 shape "
+    "post-item-9 pricing -- 2x Healthcare & Life Sciences compensatory base x OH's jurisdiction "
+    "multiplier, uncapped (no $350k ceiling applies to the general-employer branch), "
+    "has_uncollected_net_worth_caveat=False since the general-employer branch never sets it "
+    "(unlike the small-employer branch's capped case above)",
+    oh_gen_legal is not None
+    and oh_gen_legal.get("low") == 124245.79
+    and oh_gen_legal.get("high") == 124245.79
+    and oh_gen_legal.get("band") == "Moderate"
+    and oh_gen_legal.get("has_unpriced_conditions") is False
+    and oh_gen_legal.get("unpriced_state_ids") == []
+    and oh_gen_legal.get("coverage_basis") == "state_specific"
+    and oh_gen_legal.get("has_partial_jurisdictions") is False
+    and oh_gen_legal.get("has_uncollected_net_worth_caveat") is False
+    and oh_gen_legal.get("specific_caveat") is None,
+    f"got {oh_gen_legal}",
+)
+check(
+    "OH legal_tail_risk_exposure, general/uncapped branch carries the same caveat text as any "
+    "other rendered block",
+    oh_gen_legal is not None and oh_gen_legal.get("caveat") == LEGAL_TAIL_RISK_CAVEAT_TEXT,
+    f"got caveat={oh_gen_legal.get('caveat')!r}",
 )
 
 
