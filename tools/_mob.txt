@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.309
+\\\#\\\# MOB v4.310
 
   
 
@@ -5247,10 +5247,12 @@ closeout covers everything discovered and shipped after that point
      per-state-caveat lookup design, before any code was written.
      Second: the verification pass that caught the
      `SEVERITY_TIER_DESCRIPTIONS` misattribution (below).
-10. Status remains corrected, not resolved -- unchanged since v4.304:
-    live and consequential in a real pricing path today, the
-    underlying NAICS-vs-"Manufacturing & Industrial" gap itself still
-    unresolved.
+10. **CLOSED, this session (2026-09-16, continuation).** The
+    NAICS-vs-"Manufacturing & Industrial" gap resolved via a UI-string
+    rename ("Manufacturing & Industrial" -> "Manufacturing") across the
+    industry enum and its dependents, narrowing (not eliminating) the
+    self-selection ambiguity the gap named. Full detail: this session's
+    own Section 16 entry below.
 11. Untouched this session, still due next week per Pete's prior
     correction. Not overdue.
 12. **CLOSED -- share-link 500 "Corrupt record."** `@upstash/redis`'s
@@ -5397,13 +5399,13 @@ rewrite and 2026-09-14 that never got reflected in that line. (2)
 CLAUDE.md's Key References MOB version (`v4.303` -> `v4.309`).
 
 **Quarterly Step-Back cadence fields updated:** last step-back
-2026-09-16 (this session), next due on or near 2026-09-30 (biweekly
-from this run, per the locked cadence). **Flagged, not silently
-resolved:** Pete's own closeout instruction for this session referred
-to a "~3-week cadence," which doesn't match the currently locked
-biweekly (2-week) rule from the 2026-08-28 correction -- the date
-above uses the locked rule, not the casual reference. Pete to confirm
-which is actually intended; not changed unilaterally here.
+2026-09-16 (this session), next due on or near 2026-09-19. **Correction
+to this same entry's original text, same closeout arc:** the "~3-week
+cadence" language flagged above was Pete's own imprecise phrasing in
+the closeout prompt, not a governance rule change -- confirmed directly
+by Pete. The 2026-08-28 biweekly lock stands as-is, unchanged. Next-due
+reverted to 2026-09-19 accordingly, not recalculated fresh from this
+session's date.
 
 Diary write: `tools/prv3_diary.py write --agent claude-code --topic
 "quarterly-step-back-3-reconciled" ...`, this session, covering the
@@ -5414,3 +5416,93 @@ silently included: Pete's closeout instruction for this task named
 four files to commit, which would not have counted this one; generated
 it anyway given the protocol's own no-exception language, rather than
 inferring Pete meant to suspend that rule. Pete to confirm either way.
+
+## SESSION CLOSEOUT (2026-09-16, terminal Claude Code, continuation
+## session) -- Priority Queue item 10 CLOSED -- MOB v4.309 -> v4.310
+
+Separate closeout entry for item 10 (NAICS-vs-"Manufacturing &
+Industrial" mapping gap, OH), work done earlier this same session,
+committed and logged here on Pete's explicit instruction after the
+Quarterly Step-Back entry above.
+
+**The gap.** `_oh_is_small_employer()` (Ohio's R.C. 2315.21(D)(2)(b)
+small-employer/individual-defendant gate) used this app's
+"Manufacturing & Industrial" `INTAKE_FIELDS["industry"]` bucket as an
+approximation of Ohio's real NAICS-manufacturing test -- confirmed not
+identical, since the word "Industrial" invited adjacent
+non-manufacturing activity (utilities, mining) to self-select into a
+bucket meant to approximate NAICS Sectors 31-33 specifically.
+
+**Gemini architecture-gate response, verified before any code was
+written.** Cited a file called `friction_tax_2.py` -- confirmed
+fabricated, does not exist anywhere in this repository (only
+`engine/friction_tax.py` and its `.pyc` caches). The substance behind
+the fabricated citation was independently confirmed accurate against
+the real file: `_INDUSTRY_WAGE_DATA["Manufacturing & Industrial"]` did
+map exclusively to NAICS Sectors 31-33 (no other sectors mixed in), and
+the `"Other"` bucket's nine-component residual wage calculation did
+include Sector 21 (Mining) and Sector 22 (Utilities) exactly as
+claimed. `_oh_is_small_employer()`'s industry check was confirmed to
+read from the same `"Manufacturing & Industrial"` bucket key as the
+wage table -- same classification, not a different one, contrary to
+what a naive read of "the wage table is clean" might have suggested.
+
+**Resolution: rename, not a data-mixing fix.** "Manufacturing &
+Industrial" -> "Manufacturing" across 13 live files (grepped
+repo-wide before editing, not assumed exhaustive): `INTAKE_FIELDS`
+(engine/data/intake.py, plus `HIGH_HAZARD_INDUSTRIES`),
+`_INDUSTRY_WAGE_DATA`/`INDUSTRY_NON_EXEMPT_RATIO`/
+`_oh_is_small_employer()` (engine/friction_tax.py), the sole frontend
+source `INDUSTRY_OPTIONS` (DiagnosticFlow.tsx, reused by
+CondensedDiagnosticFlow.tsx, confirmed no second hand-maintained list
+exists), all 8 `engine/test_profiles*.py` calibration fixture files
+(15 occurrences), and `tools/test_friction_tax.py`/
+`tools/test_accumulation.py`. Explicitly out of scope, not touched:
+`tools/_mob.txt`, all `tools/patch_*.py` (historical audit-trail
+scripts), all `prompts/*.md`/`session-handoff-v*.md` (dated historical
+records), and a coincidental unrelated bare-word "Manufacturing"
+heading in a /book memo piece. Two wrapped-across-lines occurrences
+(a docstring, a code comment) survived the initial single-line
+`replace_all` pass and were caught and fixed in a follow-up sweep.
+
+**Docstring narrowed, not stripped.** `_oh_is_small_employer()`'s
+docstring and its `STATE_COVERAGE_THRESHOLDS["OH"]` citation comment
+both rewritten to state plainly that the rename closes most of the
+self-selection ambiguity (mining/utilities orgs no longer actively
+invited into this bucket by the word "Industrial") while keeping the
+caveat that self-selection accuracy still isn't guaranteed -- a
+business can still misjudge its own NAICS classification regardless of
+label wording.
+
+**test_contract.py fixed and extended.** The existing OH fixture
+(headcount=20, small-employer/$350k-capped branch) had a stale
+assertion left over from before item 9 (OH R.C. 2315.21 compensatory
+pricing, this session) moved OH out of QUALITATIVE_ONLY -- rewritten to
+the real computed shape, pulled from an actual re-run, not hand-derived.
+A new fixture (headcount=250, "Healthcare & Life Sciences") added to
+cover the general/uncapped branch of `_oh_is_small_employer()` for the
+first time at the `assemble_output()`/contract-dict-shape level --
+branch reach confirmed via a direct sanity check before asserting
+anything else, real values captured the same way. `test_contract.py`:
+144 -> 148 passed.
+
+**Verified throughout, at each step, not just at the end:** full
+11-script engine suite clean; `tsc --noEmit` clean; 175-profile
+calibration suite confirmed unchanged at 171/175 via a git-stash A/B
+comparison against the pre-rename code (byte-identical `RESULT` line
+and confusion matrix in both runs) -- the rename introduced zero
+calibration drift.
+
+**Committed this session, 4 logical groups, not a blanket add:**
+`cae07ae` (core rename: friction_tax.py, intake.py, DiagnosticFlow.tsx),
+`6bf0bf4` (8 calibration fixture files), `532edf9` (test_friction_tax.py
++ test_accumulation.py), `ab2b015` (test_contract.py fixture fix + new
+general-branch fixture).
+
+**Priority Queue item 10 marked CLOSED** (see the corrected status line
+earlier in this section, this session).
+
+Diary write: `tools/prv3_diary.py write --agent claude-code --topic
+"item-10-manufacturing-rename-closed" ...`, this session, covering the
+full item 10 arc above plus the cadence-language correction from the
+prior entry.
