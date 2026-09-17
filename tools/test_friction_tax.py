@@ -739,7 +739,7 @@ check(
     f"got {set(INDUSTRY_NON_EXEMPT_RATIO.keys())}",
 )
 _EXPECTED_NON_EXEMPT_RATIOS = {
-    "Manufacturing & Industrial": 0.557,
+    "Manufacturing": 0.557,
     "Healthcare & Life Sciences": 0.560,
     "Financial Services": 0.285,
     "Professional Services": 0.227,
@@ -936,21 +936,21 @@ check(
 
 
 # -- 29. Cluster 3 per-capita math ------------------------------------------------
-# cultural_overtime, real legal score=2 (Manufacturing & Industrial,
+# cultural_overtime, real legal score=2 (Manufacturing,
 # 250-499 headcount): affected = headcount_midpoint x non_exempt_ratio x
 # scope_fraction(score=2 -> 0.75); low/high = affected x admin/litigation
 # rate.
 
 _co_score = STATE_MULTIPLIERS["cultural_overtime"].criteria["legal"].score
 _co_midpoint = HEADCOUNT_MIDPOINTS["250-499"].employees_per_firm
-_co_ratio = INDUSTRY_NON_EXEMPT_RATIO["Manufacturing & Industrial"]
+_co_ratio = INDUSTRY_NON_EXEMPT_RATIO["Manufacturing"]
 _co_affected = _co_midpoint * _co_ratio * (0.75 if _co_score == 2 else 0.25)
 _co_expected_low = round(_co_affected * 1_465.0, 2)
 _co_expected_high = round(_co_affected * 2_930.0, 2)
 _r_cluster3 = compute_legal_compliance_exposure(
     state_ids=["cultural_overtime"],
     org_size=328,
-    industry="Manufacturing & Industrial",
+    industry="Manufacturing",
     org_type="Founder-led",
 )
 check(
@@ -1870,10 +1870,10 @@ check(
     f"got {_ft._oh_is_small_employer(50, 'Professional Services')!r}",
 )
 check(
-    "_oh_is_small_employer(150, 'Manufacturing & Industrial') is True -- exceeds the general "
+    "_oh_is_small_employer(150, 'Manufacturing') is True -- exceeds the general "
     "100 threshold but still clears the manufacturing-specific <=500 threshold",
-    _ft._oh_is_small_employer(150, "Manufacturing & Industrial") is True,
-    f"got {_ft._oh_is_small_employer(150, 'Manufacturing & Industrial')!r}",
+    _ft._oh_is_small_employer(150, "Manufacturing") is True,
+    f"got {_ft._oh_is_small_employer(150, 'Manufacturing')!r}",
 )
 check(
     "_oh_is_small_employer(150, 'Professional Services') is False -- same headcount as the check "
@@ -1882,16 +1882,16 @@ check(
     f"got {_ft._oh_is_small_employer(150, 'Professional Services')!r}",
 )
 check(
-    "_oh_is_small_employer(600, 'Manufacturing & Industrial') is False -- exceeds even the "
+    "_oh_is_small_employer(600, 'Manufacturing') is False -- exceeds even the "
     "manufacturing-specific 500 threshold, general branch governs",
-    _ft._oh_is_small_employer(600, "Manufacturing & Industrial") is False,
-    f"got {_ft._oh_is_small_employer(600, 'Manufacturing & Industrial')!r}",
+    _ft._oh_is_small_employer(600, "Manufacturing") is False,
+    f"got {_ft._oh_is_small_employer(600, 'Manufacturing')!r}",
 )
 check(
-    "_oh_is_small_employer('', 'Manufacturing & Industrial') is False -- non-numeric/unclassifiable "
+    "_oh_is_small_employer('', 'Manufacturing') is False -- non-numeric/unclassifiable "
     "headcount defaults to the general branch's more conservative statutory mechanics",
-    _ft._oh_is_small_employer("", "Manufacturing & Industrial") is False,
-    f"got {_ft._oh_is_small_employer('', 'Manufacturing & Industrial')!r}",
+    _ft._oh_is_small_employer("", "Manufacturing") is False,
+    f"got {_ft._oh_is_small_employer('', 'Manufacturing')!r}",
 )
 
 # -- 48b. _oh_drives_tiers_result() -- mirrors section 47's CO helper tests --
@@ -1980,8 +1980,8 @@ _r_oh_c4b = _ft._cluster_4_curve_for_org_type(
     "Founder-led", "250-499", 300, ["OH"], "Professional Services",
 )
 check(
-    "Cluster 4b, OH, headcount=300 (general employer -- 300 > 100, not Manufacturing & "
-    "Industrial): PRICED, flat curve floor==ceiling==189487.752 (2x compensatory, uncapped -- "
+    "Cluster 4b, OH, headcount=300 (general employer -- 300 > 100, not Manufacturing): "
+    "PRICED, flat curve floor==ceiling==189487.752 (2x compensatory, uncapped -- "
     "same number as the small-employer case above by coincidence of this industry/multiplier "
     "combo, not because the branches collapse), is_floor=True (standard 'uncapped' semantics, no "
     "direction mismatch), may_overstate_for_uncollected_net_worth=False (general-employer branch "

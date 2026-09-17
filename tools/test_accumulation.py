@@ -255,11 +255,11 @@ check("Q18-E non-hazard: all other fields 0.00",
 
 
 # ── 10. Q18-E conditional — high-hazard industry ──────────────────────────────
-print("\n10. Q18-E conditional — high-hazard industry (Manufacturing & Industrial)")
+print("\n10. Q18-E conditional — high-hazard industry (Manufacturing)")
 
 INTAKE_Q18_HIGH = IntakeData(
     headcount=152,
-    industry="Manufacturing & Industrial",
+    industry="Manufacturing",
     org_type="Privately held professional leadership",
     jurisdictions=["TX"],
     significant_events=["none"],
