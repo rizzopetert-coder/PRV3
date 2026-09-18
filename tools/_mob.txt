@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.311
+\\\#\\\# MOB v4.312
 
   
 
@@ -5597,3 +5597,96 @@ computed-style/pixel proof before approving.
 Diary write: `tools/prv3_diary.py write --agent claude-code --topic
 "privateoutput-shareableoutput-cohesion-fix-shipped" ...`, this session,
 covering the full cohesion-fix arc above.
+
+## SESSION LOG (2026-09-18, terminal Claude Code) -- Pete-reported
+## "25,000-25,000" display bug root-caused and fixed -- MOB v4.311 ->
+## v4.312
+
+**Report.** Pete saw a Dx report render a Legal/Compliance figure as
+"25,000-25,000" -- a range with identical low and high -- reproduction
+inputs not remembered.
+
+**Investigation, gated before any code change per Pete's explicit
+instruction (steps 1-2 were a checkpoint, not scoped through Gemini).**
+Confirmed the path is `compute_legal_compliance_exposure()`, not
+`compute_friction_tax()` (that one's `high = low * 1.4` lock makes this
+shape structurally impossible there, as Pete's own hypothesis predicted).
+Traced every `{low, high}`-shaped return in `engine/friction_tax.py`:
+Clusters 1, 4 (all sub-tracks, including the FL/ID/KS/VA flat-cap clamp
+and the OH-tiers reroute), and 5, plus both of Ohio's own R.C. 2315.21
+branches, each compute one scalar `v` and return `dollar_range=(v, v)` --
+the literal same float in both tuple slots, at four call sites
+(`friction_tax.py:4194`, `4247`, `4254`, `3971`/`3975`). Only Cluster 2
+(discrete tiers) and Cluster 3 (per-worker admin/litigation rates) ever
+produce a genuinely distinct low/high. Root cause confirmed as **(a) TRUE
+EQUALITY, not (b) rounding collapse** -- these clusters price a single
+point on a severity curve by design, not a real spread; the bug is
+entirely in *display*, which always rendered a dash-range regardless.
+Pete's exact "25,000-25,000" traced to `_CLUSTER_4B_FLOOR = 25_000.0`
+(`friction_tax.py:2314`) -- `_legal_score_fraction(curve, score=1)`
+collapses to `curve.floor` exactly (`ratio**0 == 1`), so any Cluster 4b
+state at legal score 1 reproduces this verbatim, reached either via the
+N=1 guard (`friction_tax.py:4452-4466`) or a multi-state aggregate where
+every contributing state happens to be Cluster 1/4/5/OH (never 2 or 3).
+
+**Scope correction, independently confirmed by Pete against
+`web/lib/types.ts` before proceeding:** `LegalTailRiskExposure` (the
+dollar-figure type) exists only on `PrivateOutputPayload` --
+`ShareableOutputPayload` carries only the qualitative
+`legal_tail_risk_band`, confirmed zero references to the dollar field
+anywhere in `ShareableOutput.tsx`. Fix is single-file, not the two-file
+cohesion-fix pattern from earlier this session.
+
+**Fix (Step 3).** `web/components/PrivateOutput.tsx:393-409` -- added an
+exact-equality (`legal.low === legal.high`, no tolerance/threshold)
+branch rendering "Estimated exposure: $X" (matching the existing
+"Estimated cost..." label convention already used in
+`CondensedOutput.tsx`) instead of "$X - $X" when the figure is a true
+point value. Non-degenerate ranges render unchanged.
+
+**Regression coverage (Step 4).** `tools/test_contract.py` -- new fixture
+exercising the PLAIN Cluster 4b headcount-bracket path (org_type not
+Publicly-traded/Government, no OH-tiers/CO-tiers/flat-cap jurisdiction,
+`jurisdictions=[]` falls to the federal threshold) with `the_basement_
+standard` (Cluster 4, legal score 1) as the sole identified state --
+deliberately distinct from the two pre-existing OH fixtures directly
+above it, which reach the same `(v, v)` shape through Ohio's own
+compensatory formula, not this formula's floor-at-score-1 collapse.
+Asserts `low == high == 25000.0` exactly, `band == "Minor"`,
+`coverage_basis == "federal_baseline"` -- the real, reproduced contract
+shape, not a hypothetical. 148 -> 150 passed, 0 failed.
+
+**Verified (Step 5).** Full 11-script engine suite clean (unchanged
+counts throughout); `tsc --noEmit` clean; 175-profile calibration suite
+confirmed unchanged at **171/175 exactly** -- this was a display/
+contract-shape-test-only change, zero calibration drift, as expected.
+**Live UI verification, same bar as the prior PrivateOutput/
+ShareableOutput cohesion session:** local dev's `/api/result` route is
+known-broken in this environment (`ERR_INVALID_URL`, DATED NOTE
+2026-09-14, unrelated to this fix) so real Path B/self-select
+round-trips can't be driven locally -- used the same documented
+workaround (mocked `window.fetch` for `/api/result`) to feed
+`PrivateOutput.tsx` the exact real engine-computed payload for this
+scenario (`low: 25000.0, high: 25000.0, band: "Minor", coverage_basis:
+"federal_baseline"`, taken directly from a live `assemble_output()` run
+against the same Cluster 4b/score=1 scenario the new fixture covers, not
+hand-invented). Rendered result, confirmed via `get_page_text` and a
+screenshot: "LEGAL/COMPLIANCE EXPOSURE ... Estimated exposure: $25,000"
+-- no dash, no duplicated figure.
+
+**Files changed:** `web/components/PrivateOutput.tsx`,
+`tools/test_contract.py`. Not yet committed -- Pete to review the diff
+before staging, per standing practice.
+
+**Environment note, same session:** `gh` CLI confirmed genuinely absent
+from this machine (not a PATH issue -- no `gh.exe` found in a disk
+search, winget confirms not installed), contradicting CLAUDE.md's
+Session Environments table. A `winget install --id GitHub.cli` attempt
+from this non-interactive session failed with exit 1602 ("user cancelled
+installation") -- almost certainly a UAC elevation prompt with nobody
+present to click it. Left for Pete to run interactively; Step 3a's `gh
+pr list` check remains unverifiable from this session until then.
+
+Diary write: `tools/prv3_diary.py write --agent claude-code --topic
+"legal-tail-risk-exposure-low-eq-high-display-bug-fixed" ...`, this
+session, covering the full arc above.
