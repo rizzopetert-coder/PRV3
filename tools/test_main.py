@@ -492,6 +492,97 @@ with mock.patch.dict("sys.modules", {"anthropic": None}):
     )
 
 
+# ── 29+  _build_signal_map_context / _replay_partial_vector — option_ids
+# (list) wire format regression. AnswerLogEntry was widened from a
+# singular option_id to option_ids: string[] during this session's A.2
+# (Q06 weighted_multi_select) work -- these two functions still read
+# entry.get("option_id") until this fix, silently dropping every real
+# answers_log entry (signal_map_context always "", trajectory always the
+# zero vector) since that widening shipped, with zero prior automated
+# coverage catching it. ────────────────────────────────────────────────────
+print("\n" + "=" * 64)
+print("_build_signal_map_context / _replay_partial_vector -- option_ids list format")
+print("=" * 64)
+
+from engine.main import _build_signal_map_context, _replay_partial_vector
+from engine.accumulation import IntakeData
+from engine.data.questions import QUESTION_LIBRARY
+
+_SIGNAL_MAP_INTAKE = IntakeData(
+    headcount=152,
+    industry="Technology",
+    org_type="Founder-led",
+    jurisdictions=["CA"],
+    significant_events=["none"],
+    principal_role="C-suite",
+)
+
+# Q01/B is a real, live QUESTION_LIBRARY entry confirmed (not assumed) to
+# carry authored observation_text -- so a "" result below means the entry
+# was silently dropped, not that no option in the profile has text yet.
+_signal_map_option = next(
+    o for o in QUESTION_LIBRARY["Q01"].answer_options if o.option_id == "B"
+)
+check(
+    "sanity: Q01/B carries authored observation_text -- needed for the checks "
+    "below to mean what they claim",
+    bool(_signal_map_option.observation_text),
+    f"got {_signal_map_option.observation_text!r}",
+)
+
+_option_ids_log = [{"question_id": "Q01", "option_ids": ["B"]}]
+_stale_option_id_log = [{"question_id": "Q01", "option_id": "B"}]
+
+context = _build_signal_map_context(_option_ids_log, _SIGNAL_MAP_INTAKE, "built_to_fail")
+check(
+    "_build_signal_map_context: current option_ids (list) wire format is read "
+    "correctly",
+    context == _signal_map_option.observation_text,
+    f"got {context!r}",
+)
+check(
+    "_build_signal_map_context: the OLD singular option_id key (no longer sent "
+    "on the wire) is correctly ignored rather than silently matched -- confirms "
+    "this test would have caught the pre-fix bug, not just confirmed the new "
+    "path works",
+    _build_signal_map_context(_stale_option_id_log, _SIGNAL_MAP_INTAKE, "built_to_fail") == "",
+    "expected '' for a non-list option_ids entry",
+)
+
+_replayed = _replay_partial_vector(_option_ids_log, _SIGNAL_MAP_INTAKE)
+_zero_replay = _replay_partial_vector(_stale_option_id_log, _SIGNAL_MAP_INTAKE)
+check(
+    "_replay_partial_vector: option_ids (list) wire format actually accumulates "
+    "a nonzero vector -- the stale singular-key read silently replays to the "
+    "zero vector for every slice, every time",
+    any(v != 0.0 for v in _replayed.values()),
+    f"got {_replayed}",
+)
+check(
+    "_replay_partial_vector: the OLD singular option_id key replays to the zero "
+    "vector, confirming this is the actual pre-fix failure mode, not a "
+    "hypothetical",
+    all(v == 0.0 for v in _zero_replay.values()),
+    f"got {_zero_replay}",
+)
+
+# Multi-select (Q06 weighted_multi_select's own real shape, the actual
+# reason option_ids was widened from a scalar this session): an entry
+# with 2+ option_ids must contribute EVERY selected option, not just the
+# first.
+_multi_log = [{"question_id": "Q06", "option_ids": ["A", "C"]}]
+_single_log = [{"question_id": "Q06", "option_ids": ["A"]}]
+_multi_replay = _replay_partial_vector(_multi_log, _SIGNAL_MAP_INTAKE)
+_single_replay = _replay_partial_vector(_single_log, _SIGNAL_MAP_INTAKE)
+check(
+    "_replay_partial_vector: a multi-select entry (option_ids=['A', 'C']) "
+    "accumulates differently than replaying option 'A' alone -- confirms every "
+    "selected option is read, not just the first",
+    _multi_replay != _single_replay,
+    f"2-option replay {_multi_replay} == 1-option replay {_single_replay}",
+)
+
+
 # ── Results ───────────────────────────────────────────────────────────────────
 
 print(f"\nPASS: {len(PASS)}   FAIL: {len(FAIL)}")
