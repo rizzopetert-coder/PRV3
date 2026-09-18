@@ -396,9 +396,18 @@ export default function PrivateOutput({
                 LEGAL_BAND_WEIGHT[legal.band ?? "Minor"]
               }`}
             >
-              {legal.currency === "USD" ? "$" : ""}
-              {legal.low!.toLocaleString()} – {legal.currency === "USD" ? "$" : ""}
-              {legal.high!.toLocaleString()}
+              {legal.low === legal.high ? (
+                <>
+                  Estimated exposure: {legal.currency === "USD" ? "$" : ""}
+                  {legal.low!.toLocaleString()}
+                </>
+              ) : (
+                <>
+                  {legal.currency === "USD" ? "$" : ""}
+                  {legal.low!.toLocaleString()} – {legal.currency === "USD" ? "$" : ""}
+                  {legal.high!.toLocaleString()}
+                </>
+              )}
             </p>
           )}
 
