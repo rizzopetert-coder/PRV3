@@ -643,26 +643,29 @@ def _build_signal_map_context(
     scored: list = []
     for entry in answers_log:
         question_id = entry.get("question_id") if isinstance(entry, dict) else None
-        option_id = entry.get("option_id") if isinstance(entry, dict) else None
+        option_ids = entry.get("option_ids") if isinstance(entry, dict) else None
+        if not isinstance(option_ids, list):
+            continue
         question = QUESTION_LIBRARY.get(question_id)
         if question is None:
             continue
-        option = next(
-            (o for o in question.answer_options if o.option_id == option_id),
-            None,
-        )
-        if option is None:
-            continue
+        for option_id in option_ids:
+            option = next(
+                (o for o in question.answer_options if o.option_id == option_id),
+                None,
+            )
+            if option is None:
+                continue
 
-        scratch = AccumulationSession()
-        accumulate_answer(scratch, option, intake_data, question_id)
-        contribution = scratch.accumulated_vector
+            scratch = AccumulationSession()
+            accumulate_answer(scratch, option, intake_data, question_id)
+            contribution = scratch.accumulated_vector
 
-        weight = sum(
-            contribution.get(f, 0.0) * salience.get(f, 0.0)
-            for f in DIMENSIONAL_FIELDS
-        )
-        scored.append((weight, option))
+            weight = sum(
+                contribution.get(f, 0.0) * salience.get(f, 0.0)
+                for f in DIMENSIONAL_FIELDS
+            )
+            scored.append((weight, option))
 
     scored.sort(key=lambda pair: pair[0], reverse=True)
 
@@ -698,17 +701,20 @@ def _replay_partial_vector(answers_log_slice: list, intake_data: IntakeData) -> 
     scratch = AccumulationSession()
     for entry in answers_log_slice:
         question_id = entry.get("question_id") if isinstance(entry, dict) else None
-        option_id = entry.get("option_id") if isinstance(entry, dict) else None
+        option_ids = entry.get("option_ids") if isinstance(entry, dict) else None
+        if not isinstance(option_ids, list):
+            continue
         question = QUESTION_LIBRARY.get(question_id)
         if question is None:
             continue
-        option = next(
-            (o for o in question.answer_options if o.option_id == option_id),
-            None,
-        )
-        if option is None:
-            continue
-        accumulate_answer(scratch, option, intake_data, question_id)
+        for option_id in option_ids:
+            option = next(
+                (o for o in question.answer_options if o.option_id == option_id),
+                None,
+            )
+            if option is None:
+                continue
+            accumulate_answer(scratch, option, intake_data, question_id)
     return scratch.accumulated_vector
 
 
@@ -816,12 +822,15 @@ def run_accumulated_engine(
     fell through to before this parameter existed.
 
     answers_log (Path 1 only): optional list of {"question_id": str,
-    "option_id": str} dicts, mirroring web/lib/session-store.ts's
-    AnswerLogEntry -- the session's full answer history. None or [] (the
-    default) preserves prior behavior exactly (empty signal_map_context).
-    Used only to build signal_map_context via _build_signal_map_context()
-    below; not accumulated again here (accumulated_vector already reflects
-    every answer by the time this function is called).
+    "option_ids": list[str]} dicts, mirroring web/lib/session-store.ts's
+    AnswerLogEntry (widened from a singular "option_id" during this
+    session's A.2 Q06 weighted_multi_select work -- every entry, including
+    every pre-existing single-select one, now carries a 1+-element list).
+    the session's full answer history. None or [] (the default) preserves
+    prior behavior exactly (empty signal_map_context). Used only to build
+    signal_map_context via _build_signal_map_context() below; not
+    accumulated again here (accumulated_vector already reflects every
+    answer by the time this function is called).
 
     asset_score / liability_score: computed here, before synthesize(), via
     _compute_asset_score()/_compute_liability_score() -- previously
