@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.312
+\\\#\\\# MOB v4.313
 
   
 
@@ -5690,3 +5690,102 @@ pr list` check remains unverifiable from this session until then.
 Diary write: `tools/prv3_diary.py write --agent claude-code --topic
 "legal-tail-risk-exposure-low-eq-high-display-bug-fixed" ...`, this
 session, covering the full arc above.
+
+## SESSION LOG (2026-09-18, terminal Claude Code) -- signal_map_context /
+## Trajectory silent-failure bug found during friction tax ledger
+## pre-build check, root-caused and fixed -- MOB v4.312 -> v4.313
+
+**Context.** Surfaced as Pete's explicit Step 0 prerequisite check before
+scoping the new friction tax ledger feature, not found incidentally --
+he named the exact suspect (`_build_signal_map_context()` and
+`_replay_partial_vector()` in `engine/main.py` reading `entry.get(
+"option_id")` singular) and asked for direct confirmation against
+`AnswerLogEntry`'s current shape before either function was trusted as a
+reuse target for the ledger's own answer-ranking mechanism.
+
+**Confirmed live, not hypothetical.** Traced the full chain: `AnswerLogEntry`
+(`web/lib/session-store.ts:139-142`) and the wire type in
+`web/lib/engine-client.ts:197` both carry `option_ids: string[]` only --
+widened from a singular `option_id` during this same session's A.2 Q06
+weighted_multi_select work, every entry including every pre-existing
+single-select one now carrying a 1+-element list. `api/engine.py:163`
+passes `answers_log` straight through to `run_accumulated_engine()` with
+no adapter or normalization step. So both Python functions were reading a
+key that no longer exists on the wire -- `entry.get("option_id")` always
+returned `None`, the option lookup always failed, and the entry was
+silently skipped via the existing `continue`, for every single
+answers_log entry, every live session, since A.2 shipped this session.
+
+**Real consequence, not a typo.** `_build_signal_map_context()` always
+returned `""` -- `signal_map_context` has been silently omitted from
+every synthesis prompt since A.2 landed. `_replay_partial_vector()`
+always replayed to the zero vector for both session halves --
+`compute_trajectory()`'s delta has been exactly `0.0` every time, so the
+live Trajectory/Directionality feature has been silently reporting a
+flat, uninformative result regardless of the real answer pattern.
+Neither bug touches `accumulated_vector` itself or state ranking --
+confirmed both by the mechanism (narrative/framing-only consumers,
+`accumulated_vector` already fully computed before either function runs)
+and empirically by the unchanged 171/175 calibration baseline after the
+fix, re-run fresh this session.
+
+**Coverage gap found and closed.** Despite the working assumption that
+"existing signal_map_context test coverage" existed, a full grep across
+every `test_*.py` in the 11-script suite confirmed **zero** prior
+automated coverage of either function -- this bug could not have been
+caught by the existing suite at any point since it shipped. Fixed rather
+than left as a gap: 6 new checks added to `tools/test_main.py`, each
+proving the OLD singular `option_id` key produces the actual degenerate
+failure mode (`""` / all-zero vector) and the NEW `option_ids` list
+format produces real output -- so the tests demonstrably would have
+caught this, not just confirm the new path works. Also covers the real
+Q06 multi-select case directly (`option_ids=["A", "C"]` must accumulate
+differently than `["A"]` alone -- confirms every selected option is
+read, not just the first, the actual reason `option_ids` was widened
+this session).
+
+**Fix.** `engine/main.py` -- both `_build_signal_map_context()` and
+`_replay_partial_vector()` now read `entry.get("option_ids")` as a list
+and loop over every id in it (falling through to `continue` if the value
+isn't a list at all, covering both a missing key and a stale singular
+value), instead of reading a single `option_id`. `_build_signal_map_
+context()`'s per-option scratch-session/weight computation is unchanged
+in shape, just applied to each id in the entry's `option_ids` rather
+than to one bare value -- byte-identical behavior for the common
+single-select case (a 1-element list), correctly extended for Q06's
+real multi-select case (each selected option scored as its own ranking
+candidate, same as if logged as separate answers). `_replay_partial_
+vector()`'s shared-scratch-per-slice accumulation is likewise unchanged
+in shape, just iterating every option in every entry into the same
+running scratch. Docstring at `engine/main.py`'s `run_accumulated_engine()`
+(previously documenting the stale `{"option_id": str}` shape) corrected
+to `{"option_ids": list[str]}`, with the A.2 widening noted directly so
+this doesn't drift stale again silently.
+
+**Verified.** Full 11-script engine suite clean (`test_main.py` 36 -> 42
+passed with the new checks integrated, not just passing in isolation --
+confirmed by running the complete suite, not just the one file). `tsc
+--noEmit` clean. 175-profile calibration suite re-run fresh, confirmed
+**171/175 exactly** -- zero drift, as expected for a narrative/framing-
+only consumer with no path into `accumulated_vector` or state ranking,
+confirmed empirically rather than only asserted from the mechanism.
+
+**Files changed:** `engine/main.py` (the fix, both functions plus the
+docstring correction), `tools/test_main.py` (6 new regression checks),
+`tools/_mob.txt` (this entry, MOB v4.312 -> v4.313), `CLAUDE.md` (version
+cross-reference). Committed and pushed on its own, separate from the
+friction tax ledger build this was discovered ahead of -- per-file
+commits, no blanket add, per Pete's explicit instruction not to start
+the ledger build until this lands on its own.
+
+**Open items carried forward:** the friction tax ledger build itself
+(FrictionTaxLedgerEntry[] on PrivateOutputPayload, per-condition risk/
+dollar/top-contributing-answers, shared methodology footnote, Gemini-
+cleared across two rounds) is queued to start now that this prerequisite
+fix is confirmed clean and shipped -- not started this entry, Pete's
+explicit instruction was to stop and verify/commit this fix in isolation
+first.
+
+Diary write: `tools/prv3_diary.py write --agent claude-code --topic
+"signal-map-context-trajectory-option-ids-bug-fixed" ...`, this session,
+covering the full arc above.
