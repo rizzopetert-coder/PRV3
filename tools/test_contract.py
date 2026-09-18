@@ -980,6 +980,69 @@ check(
     f"got caveat={oh_gen_legal.get('caveat')!r}",
 )
 
+# ── engine/friction_tax.py Cluster 4b / score=1 N=1 low==high regression -- the
+# "25,000-25,000" display bug Pete reported. Root cause confirmed: every Cluster
+# 1/4/5 (and Ohio's own R.C. 2315.21) pricing branch computes a single scalar `v`
+# and returns dollar_range=(v, v) -- a TRUE equality, not a rounding collapse --
+# because these clusters price one point on a severity curve, not a genuine
+# low/high spread (unlike Cluster 2's discrete tiers or Cluster 3's affected-
+# worker rates). _legal_score_fraction(curve, score=1) collapses to curve.floor
+# exactly (ratio**0 == 1), so any Cluster-4b state at legal score 1 reproduces
+# this verbatim. This fixture takes the PLAIN Cluster 4b headcount-bracket path
+# (org_type not Publicly-traded/Government, no OH-tiers/CO-tiers/flat-cap
+# jurisdiction in play, jurisdictions=[] falls to the federal coverage
+# threshold) -- deliberately distinct from the two OH fixtures above, which
+# reach dollar_range=(v, v) via Ohio's own compensatory formula, not this
+# formula's floor==ceiling-at-score-1 collapse. The UI-side fix lives in
+# web/components/PrivateOutput.tsx's legal.low === legal.high fallback --
+# this fixture only pins the contract-level shape it depends on.
+the_basement_standard_rankings = _make_rankings_for("the_basement_standard", top_score=floor_val + 0.05)
+cluster4b_pkg = out_engine.build(the_basement_standard_rankings, sev)
+cluster4b_intake = IntakeData(
+    headcount=250,
+    industry="Professional Services",
+    org_type="Founder-led",
+    jurisdictions=[],
+    significant_events=["none"],
+    principal_role="C-suite",
+)
+cluster4b_session = SessionData(
+    session_id=SessionData.new_session_id(),
+    intake=cluster4b_intake,
+    final_rankings=the_basement_standard_rankings,
+    accumulated_vector=acc_vector,
+    output_package=cluster4b_pkg,
+    severity_result=sev,
+)
+cluster4b_out = assemble_output(cluster4b_session)
+cluster4b_identified = cluster4b_out.get("identified_states", [])
+check(
+    "sanity: the_basement_standard (Cluster 4, legal score 1) is the single identified state "
+    "for the Cluster 4b N=1 session -- needed for the checks below to mean what they claim",
+    len(cluster4b_identified) == 1 and cluster4b_identified[0].get("state_id") == "the_basement_standard",
+    f"got {cluster4b_identified}",
+)
+cluster4b_legal = cluster4b_out.get("private_output", {}).get("legal_tail_risk_exposure")
+check(
+    "Cluster 4b plain headcount-bracket path at legal score 1: low == high == "
+    "_CLUSTER_4B_FLOOR (25000.0) exactly -- this is the real, reproduced shape of Pete's "
+    "'25,000-25,000' report, not a hypothetical -- band is Minor (25000 < 100000), "
+    "coverage_basis is federal_baseline since jurisdictions=[] falls to the federal threshold, "
+    "and neither the OH net-worth caveat nor a specific_caveat_jurisdiction applies here",
+    cluster4b_legal is not None
+    and cluster4b_legal.get("low") == 25000.0
+    and cluster4b_legal.get("high") == 25000.0
+    and cluster4b_legal.get("low") == cluster4b_legal.get("high")
+    and cluster4b_legal.get("band") == "Minor"
+    and cluster4b_legal.get("has_unpriced_conditions") is False
+    and cluster4b_legal.get("unpriced_state_ids") == []
+    and cluster4b_legal.get("coverage_basis") == "federal_baseline"
+    and cluster4b_legal.get("has_partial_jurisdictions") is False
+    and cluster4b_legal.get("has_uncollected_net_worth_caveat") is False
+    and cluster4b_legal.get("specific_caveat") is None,
+    f"got {cluster4b_legal}",
+)
+
 
 # ── Summary ────────────────────────────────────────────────────────────────────
 print("\n" + "=" * 64)
