@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.314
+\\\#\\\# MOB v4.315
 
   
 
@@ -5950,3 +5950,108 @@ explicit reconsideration in the file itself, not silently folded in, and
 flagged there as higher-risk/higher-review-burden than Options 1/2, not
 equivalent effort. Documentation only, no code touched, no Gemini gate
 needed for this step.
+
+## SESSION LOG (2026-09-19, terminal Claude Code) -- Quarterly Step-Back
+## #4 complete, dual-sourced, reconciled, no correction needed this
+## cycle -- MOB v4.314 -> v4.315
+
+**Process.** Full dual-sourced Quarterly Step-Back per the locked
+2026-08-23 format: Claude Code produced an independent, cold pass
+(`prompts/prv3-quarterly-step-back-2026-09-19-cc-independent.md`)
+without reading Claude.ai's draft first, then both were reconciled
+(`prompts/prv3-quarterly-step-back-2026-09-19-reconciled.md`). Unlike
+Step-Back #3 (which caught and corrected the Loureiro-as-closed-revenue
+error), **both passes agreed on every substantive finding this cycle --
+no correction required.**
+
+**Ground truth reconfirmed, all fresh not carried forward:** calibration
+171/175 exact, zero drift. 26 commits since Step-Back #3 (2026-09-16),
+all already logged, none touching calibration/taxonomy/`vercel.json`.
+**`tools/_mob.txt`/`CLAUDE.md` MOB-version cross-reference: clean for the
+first time across three dual-sourced step-backs** -- the drift pattern
+Step-Back #3 flagged did not recur this cycle. Zero closed Principal
+Resolution revenue reconfirmed via a fresh repo-wide search, not a
+re-read of the prior conclusion.
+
+**Convergent, not copied:** both passes independently connected this
+session's two silent-failure bugs (the legal-exposure display bug, the
+`signal_map_context`/Trajectory `option_ids` bug) to the "ALL DATA IS
+USEFUL" candidate principle's core claim -- a silently-null computed
+value is an active loss, not a harmless edge case -- without
+cross-contamination. Real signal the principle describes an actual
+pattern in this project, not a post-hoc framing.
+
+**Two findings doubly-verified, independently, this cycle:** (1) the
+Dropbox Sign env-var-listing question -- Claude Code's pass called
+`filter_project_envs` against `prv-3` and got `403 Forbidden`; Claude.ai
+ran the identical call and got the same error verbatim. The underlying
+provisioning question is unchanged from Step-Back #3; what's new is
+"cannot check from here" is now confirmed twice, independently, not a
+single session's tooling gap. (2) `prv-3`'s Vercel `framework` field
+reports `"fastapi"`, not a Next.js preset -- observed independently by
+both passes (Claude Code while investigating storage, Claude.ai
+unprompted in an earlier turn). Plausibly reflects the co-deployed
+Python FastAPI engine backend rather than a misconfiguration; not
+confirmed either way, flagged for whoever next touches project-level
+Vercel settings.
+
+**The Vercel storage notification -- resolved this cycle, not carried
+forward open.** Both independent passes narrowed but could not fully
+resolve this (no record of the originating alert anywhere in this MOB --
+a real logging gap in its own right). Pete supplied the actual
+notification during reconciliation: **"Function Storage (10 GB)" at
+100% of the Hobby-tier free allowance.** This is a different resource
+than the 2026-09-05 incident (which was deployment *count*, fixed via
+retention policies and confirmed still holding this cycle at 11/11
+deployments on `prv-3`/`prv-2`) -- Function Storage is the cumulative
+on-disk size of retained Serverless Function bundles, a *size* problem
+the count-based retention fix was never built to address. Most plausible
+driver, not yet confirmed via a per-deployment size breakdown: the
+co-deployed Python FastAPI backend's function bundle (`api/engine.py`)
+is characteristically much larger than a Next.js function bundle, and
+every one of the 11 retained deployments carries its own full copy.
+Real, live issue, needs an owner action (see open items) -- not actioned
+this session.
+
+**Reconciled bottom line, unchanged in substance from Step-Back #3:**
+engine and content mature and now further proven (a real feature build
+plus two bug fixes, all re-verified at 171/175 with zero drift this
+cycle alone). Commercial viability entirely unproven, zero net movement
+in either direction across three days of real, substantial engineering
+work -- not a criticism of that work, a direct observation that it
+didn't touch the actual bottleneck. Attorney-review gate and the
+OneDigital covenant situation beneath it: no change from Step-Back #3.
+
+**Files changed:** `prompts/prv3-quarterly-step-back-2026-09-19-cc-
+independent.md` (new), `prompts/prv3-quarterly-step-back-2026-09-19-
+reconciled.md` (new), `tools/_mob.txt` (this entry, MOB v4.314 ->
+v4.315). **Not touched, flagged rather than assumed in scope:**
+`CLAUDE.md`'s own "Last step-back" / "Next due" lines (currently still
+reading September 16 / 19) -- outside this task's named relevant files,
+left for Pete or a future session to update explicitly rather than
+edited unrequested.
+
+**Open items carried forward, none actioned here, all Pete's calls:**
+(1) Function Storage remediation -- reduce `deploymentsToKeep` further
+and/or audit the Python engine backend's dependency footprint, confirm
+via the Vercel dashboard's Functions/Usage view which deployments
+actually drive the 10GB figure before choosing a fix. (2) Log
+infrastructure alerts the moment they're seen going forward -- flagged
+as a real gap in this session's own handling (the Function Storage
+notification reached Pete at some point this session and wasn't logged
+anywhere findable until this reconciliation), not a general reminder.
+(3) Dropbox Sign provisioning -- Pete checking the Vercel dashboard
+directly resolves what two consecutive step-backs (four independent
+passes total) could not from the AI side. (4) Watch the MOB/CLAUDE.md
+cross-reference discipline for one more cycle before calling the clean
+result a fixed pattern. (5) Unchanged leading recommendation: use the
+Tier 4 pilot mechanism before the attorney-review gate opens -- the
+friction tax ledger now gives it a more concrete artifact to show than
+existed at the last step-back.
+
+**Next Quarterly Step-Back due: 2026-10-03** (locked biweekly cadence,
+unchanged).
+
+Diary write: `tools/prv3_diary.py write --agent claude-code --topic
+"quarterly-step-back-4-reconciled" ...`, this session, covering the full
+arc above.
