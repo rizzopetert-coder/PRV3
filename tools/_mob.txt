@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.313
+\\\#\\\# MOB v4.314
 
   
 
@@ -5789,3 +5789,144 @@ first.
 Diary write: `tools/prv3_diary.py write --agent claude-code --topic
 "signal-map-context-trajectory-option-ids-bug-fixed" ...`, this session,
 covering the full arc above.
+
+## SESSION LOG (2026-09-18, terminal Claude Code) -- friction tax ledger
+## shipped + org_type threading fix, both architecture-gated (2 Gemini
+## rounds) and independently verified -- MOB v4.313 -> v4.314
+
+**Friction tax ledger.** `FrictionTaxLedgerEntry[]` added as
+`friction_tax_ledger?:` on `PrivateOutputPayload` -- sibling to
+`friction_tax_estimate`, not a replacement. Per-condition/state row:
+`risk_label` reuses that state's own severity tier from `severity.by_state`
+(no new risk classification), `dollar_exposure` reuses
+`compute_friction_tax()` called with a single-element `state_ids` list
+(that function's own N=1 aggregation collapses to the state's untouched
+criterion scores, cross-checked directly against a live call, not
+assumed), `top_contributing_answers` duplicates `_build_signal_map_
+context()`'s replay-and-rank technique (can't import across
+engine/main.py <-> engine/contract.py, so duplicated per the existing
+`_replay_partial_vector()` precedent, not extracted into a shared
+helper). One shared footnote at the bottom of the ledger, not per-row.
+`answers_log` threaded as a new optional `assemble_output()` parameter --
+every pre-existing caller (calibration_runner.py, this file's other
+fixtures) keeps working unchanged, degrading to `top_contributing_
+answers: []` per row while `risk_label`/`dollar_exposure` still populate.
+`ShareableOutputPayload` untouched.
+
+**Two decisions Pete resolved this session, both previously flagged
+rather than decided unilaterally:**
+- **UI shape (Gemini's Q5 finding, 7-32 rows/profile, exact distribution
+  unverified):** default-open accordion. No existing accordion pattern
+  lived in `PrivateOutput.tsx` itself -- the only one anywhere in this
+  codebase is native `<details>/<summary>` in `DiagnosticFixturePicker.tsx`
+  (collapsed by default there), reused rather than inventing a new
+  interaction pattern, `open` set as an uncontrolled default. Confirmed
+  at the DOM level, not just visually: `hasAttribute('open') === true` on
+  load, and clicking the summary genuinely collapses it.
+- **Footnote copy:** the initial draft was cross-checked word-for-word
+  against `prompts/friction-tax-client-copy.md` and found to diverge in
+  several real ways (named sources not in the approved doc, a missing
+  severity-scaling step, a different "why a range" justification) -- that
+  diff was reported, not silently fixed. Pete's final corrected text
+  (fixing a "Sources sources" duplicate in his own draft) is now shipped
+  verbatim -- confirmed via `innerText` extraction matching exactly, not
+  just eyeballed.
+
+**org_type threading fix (Part 1 of this pass).** Phase 1's intake form
+never collected `org_type` at all -- hardcoded `""` at the
+`<PrivateOutput>` render call (Session 71 architecture decision) and in
+`_locked_intake_to_engine_intake()` (`engine/main.py`). This meant
+`compute_friction_tax()` returned `calibration_complete=False` for every
+real Path 1 session, silently nulling both the pre-existing aggregate
+`friction_tax_estimate` and this session's new per-state ledger
+`dollar_exposure` alike -- found and flagged as out-of-scope during the
+ledger build, fixed this pass as a dedicated Part 1. Added a real
+"Organization type" dropdown to `DiagnosticFlow.tsx` (same 6 values
+`SelfSelectIntakeModal.tsx` already uses), made it required in
+`validateIntake()` (`session/start/route.ts`, same enforcement level as
+industry/role_level), threaded it through both independently-duplicated
+`mapIntake()` functions (`result/route.ts`, `share/create/route.ts`), and
+added it to `ShareableIntakeEcho` itself (not just the private type) so
+it flows into the shareable payload too -- intentional, consistent with
+that type's existing purpose of grounding `friction_tax_estimate` for an
+external audience. `_locked_intake_to_engine_intake()`'s `.get("org_type",
+"")` fallback verified safe for old in-flight Redis sessions by
+construction (dict.get() never raises on a missing key, and "" reproduces
+exactly the pre-fix no-op behavior since the founder-led axis modifier
+only fires on the literal string "Founder-led") -- not assumed, reasoned
+through the actual mechanism.
+
+**Fallout from making `org_type` required, fixed in the same pass:**
+6 pre-existing object-literal construction sites across 4 files broke
+`tsc` once `ShareableIntakeEcho`/`PrivateIntakeEcho` required the new
+field -- `web/app/api/diagnostic/condensed/answer/route.ts`,
+`web/components/DiagnosticFixturePicker.tsx`, and 6 literal occurrences
+across `web/lib/engine-client.test.ts` (one shared `BASE_INTAKE` fixture)
+and `web/lib/output-text.test.ts` (two payload fixtures) -- each given a
+minimal value matching that site's own existing convention. Committed in
+the same commit as `web/lib/types.ts`'s field addition that caused them,
+not split into separate isolated commits, per Pete's explicit instruction.
+
+**Verified, full pass together:** 11-script engine suite clean
+(`test_contract.py` 150 -> 157 across the ledger + org_type work, no
+count regressions anywhere else), `tsc --noEmit` clean (after the fallout
+fix), 175-profile calibration confirmed **171/175 exactly** -- zero
+drift, re-run fresh, not assumed for a real contract addition. Live
+proof `dollar_exposure` now populates: a direct `run_accumulated_engine()`
+call with `org_type: "Founder-led"` returns a real, non-null ledger
+figure (`$3,698,686.75` low, cross-checked independently against the
+locked `high = low * 1.4` rule: `3698686.75 * 1.4 = 5178161.45`, exact
+match to the computed high), where it was unconditionally null before
+this fix. Real browser confirmation of the new "Organization type"
+dropdown: filling it satisfied the intake form's completeness gate, and
+the real submit reached `/api/diagnostic/session/start` and passed
+`validateIntake()` -- it failed only after that, at Redis session
+persistence, on a newly discovered, pre-existing, unrelated local-env gap
+(separate entry below, not conflated with this one).
+
+**Files changed:** `engine/contract.py`, `engine/main.py`,
+`tools/test_contract.py`, `web/lib/types.ts`, `web/lib/engine-client.ts`,
+`web/lib/diagnostic-completion.ts`, `web/app/api/result/route.ts`,
+`web/app/api/share/create/route.ts`,
+`web/app/api/diagnostic/session/start/route.ts`,
+`web/app/api/diagnostic/condensed/answer/route.ts`,
+`web/components/DiagnosticFixturePicker.tsx`,
+`web/components/DiagnosticFlow.tsx`, `web/components/PrivateOutput.tsx`,
+`web/lib/engine-client.test.ts`, `web/lib/output-text.test.ts`. Pushed to
+main, per-file commits (fallout bundled with its causing type change),
+per Pete's explicit sign-off -- no live-prod-facing risk beyond what's
+already verified here, no un-Gemini-reviewed structural decision left
+open.
+
+Diary write: `tools/prv3_diary.py write --agent claude-code --topic
+"friction-tax-ledger-org-type-threading-shipped" ...`, this session,
+covering the full arc above.
+
+## DATED NOTE (2026-09-18) -- local dev Upstash Redis credentials missing,
+## no real Path 1 session can be started from this environment
+
+Found as a side effect of live-verifying the org_type fix above, not the
+target of this session's work -- logged here per standing discipline so a
+future session doesn't re-diagnose it from scratch. `UPSTASH_REDIS_REST_URL`
+and `UPSTASH_REDIS_REST_TOKEN` are not set in this local dev environment's
+`.env.local` (or wherever this checkout resolves them from) -- confirmed
+directly via the real server log: `createSession()`
+(`web/lib/session-store.ts:498`) throws `TypeError: Failed to parse URL
+from /pipeline` the moment a real Phase 1 intake form submission reaches
+`redis.set()`, with the Upstash client itself logging "Unable to find
+environment variable" for both vars immediately before that. This is
+distinct from the two previously-logged local-dev gaps (2026-09-14: the
+`/api/interpret` invalid-API-key issue and the `/api/result`
+`ERR_INVALID_URL` issue) -- this one blocks session CREATION itself, so no
+real Path 1 session of any kind (not just the multi-signature/self-select
+paths those two notes cover) can be started end-to-end from this
+environment until these two vars are provisioned locally. **No forced
+urgency** -- production already has these vars provisioned (Session 39's
+Upstash migration, confirmed in Section 14's locked-decisions log), so
+this is a local-development-convenience gap only, not a live-site risk.
+Confirmed the actual intake-form/`validateIntake()` path itself works
+correctly up to this point -- the org_type fix's own live verification
+(session log entry above) relied on this fact directly: the request
+reached the server and failed only at this unrelated persistence step,
+never at validation. Not actioned this session -- Pete's call whether/when
+to provision local Redis credentials.
