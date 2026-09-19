@@ -20,7 +20,12 @@ from typing import Optional
 
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.data.jurisdiction import resolve_jurisdiction_flags
-from engine.accumulation import IntakeData, StateRanking, compute_cascade_risk
+from engine.data.questions import QUESTION_LIBRARY
+from engine.data.salience import SALIENCE_PROFILES
+from engine.accumulation import (
+    IntakeData, StateRanking, compute_cascade_risk,
+    AccumulationSession, accumulate_answer,
+)
 from engine.checkpoint import CheckpointResult
 from engine.narrative import NarrativeExtractionResult
 from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
@@ -381,12 +386,160 @@ def _assemble_monitoring_metadata(session: SessionData) -> dict:
     }
 
 
-def assemble_output(session: SessionData, synthesis_result=None, trajectory_result=None) -> dict:
+# ── Friction Tax Ledger (per-condition risk/dollar/top-contributing-answers,
+# Gemini-cleared across two rounds) ─────────────────────────────────────────
+
+# Build-time default, not a locked spec figure -- flagged for Pete alongside
+# the row-count/UI-shape decision (Gemini's Q5 finding). Caps each ledger
+# row's own answer list independently of how many state rows the ledger
+# carries.
+_LEDGER_TOP_ANSWERS_MAX = 3
+
+
+def _build_friction_tax_ledger(
+    identified_states: list,
+    by_state: list,
+    answers_log: list,
+    intake_data: IntakeData,
+) -> list:
+    """
+    Per-condition/state friction tax ledger row: risk label, dollar
+    exposure, and a ranked top-contributing-answers list -- one row per
+    entry in identified_states, in that same order.
+
+    risk_label reuses each state's own severity tier from `by_state`
+    (already computed by assemble_output() above) rather than a new
+    risk-classification mechanism -- least-disruptive-contract, per
+    Gemini's cleared architecture.
+
+    dollar_exposure reuses compute_friction_tax() called with a single-
+    element state_ids list, using THIS state's own tier (not the lead
+    state's, unlike the aggregate friction_tax_estimate above) -- with
+    exactly one identified state, compute_friction_tax()'s own combined-
+    criterion aggregation collapses to that state's untouched criterion
+    scores (confirmed by that function's own docstring and
+    tools/test_friction_tax.py's continuity assertions), so this is a
+    real per-state standalone estimate, not an approximation. None when
+    that single-state call isn't calibration_complete (same null
+    contract as friction_tax_estimate itself).
+
+    top_contributing_answers reuses _build_signal_map_context()'s own
+    replay technique (engine/main.py) -- a fresh scratch
+    AccumulationSession per candidate option, salience-weighted dot
+    product against SALIENCE_PROFILES[state_id] -- duplicated here
+    rather than imported, since engine/main.py imports FROM this module
+    and importing back would be circular; same "duplicate the technique,
+    don't extract a cross-module helper" precedent
+    _replay_partial_vector() already established alongside
+    _build_signal_map_context() itself. answers_log entries carry
+    option_ids (a list, widened from a singular option_id this session's
+    A.2 Q06 weighted_multi_select work) -- every id in every entry is
+    scored as its own independent candidate, matching
+    _build_signal_map_context()'s per-option ranking unit exactly, not a
+    per-entry combined score. Skip-and-backfill: an option with no
+    authored observation_text is skipped outright, never padded with raw
+    option_text -- same convention as _build_signal_map_context(). []
+    when answers_log is empty (Path B/self-select has no real per-
+    question answer history) or the state has no SALIENCE_PROFILES
+    entry.
+
+    [] when identified_states is empty (no_signal output_type) -- same
+    "nothing to show" convention as friction_tax_estimate=None and
+    severity.by_state=[].
+    """
+    if not identified_states:
+        return []
+
+    tier_by_state = {s["state_id"]: s["tier"] for s in by_state}
+
+    ledger: list = []
+    for s in identified_states:
+        state_id = s["state_id"]
+        risk_label = tier_by_state.get(state_id, "Emerging")
+
+        friction_result = compute_friction_tax(
+            state_ids=[state_id],
+            severity_tier=risk_label,
+            org_size=intake_data.headcount,
+            industry=intake_data.industry,
+            org_type=intake_data.org_type,
+        )
+        dollar_exposure = (
+            {
+                "low":      friction_result["low"],
+                "high":     friction_result["high"],
+                "currency": friction_result["currency"],
+            }
+            if friction_result["calibration_complete"]
+            else None
+        )
+
+        salience = SALIENCE_PROFILES.get(state_id)
+        scored: list = []
+        if salience and answers_log:
+            for entry in answers_log:
+                question_id = entry.get("question_id") if isinstance(entry, dict) else None
+                option_ids = entry.get("option_ids") if isinstance(entry, dict) else None
+                if not isinstance(option_ids, list):
+                    continue
+                question = QUESTION_LIBRARY.get(question_id)
+                if question is None:
+                    continue
+                for option_id in option_ids:
+                    option = next(
+                        (o for o in question.answer_options if o.option_id == option_id),
+                        None,
+                    )
+                    if option is None:
+                        continue
+
+                    scratch = AccumulationSession()
+                    accumulate_answer(scratch, option, intake_data, question_id)
+                    contribution = scratch.accumulated_vector
+
+                    weight = sum(
+                        contribution.get(f, 0.0) * salience.get(f, 0.0)
+                        for f in DIMENSIONAL_FIELDS
+                    )
+                    scored.append((weight, option))
+
+        scored.sort(key=lambda pair: pair[0], reverse=True)
+
+        top_contributing_answers: list = []
+        for _, option in scored:
+            if option.observation_text:
+                top_contributing_answers.append(option.observation_text)
+            if len(top_contributing_answers) == _LEDGER_TOP_ANSWERS_MAX:
+                break
+
+        ledger.append({
+            "state_id":                 state_id,
+            "state_name":               s["state_name"],
+            "risk_label":               risk_label,
+            "dollar_exposure":          dollar_exposure,
+            "top_contributing_answers": top_contributing_answers,
+        })
+
+    return ledger
+
+
+def assemble_output(
+    session: SessionData, synthesis_result=None, trajectory_result=None, answers_log=None,
+) -> dict:
     """
     Assemble the complete VII.1 engine output object from session data.
 
     Returns a dict that serializes directly to the contract-compliant JSON.
     Key names, data types, and field presence are immutable per spec VII.1.
+
+    answers_log (Path 1 only, friction tax ledger build): optional list of
+    {"question_id": str, "option_ids": list[str]} dicts, the same
+    AnswerLogEntry shape run_accumulated_engine() (engine/main.py) threads
+    through to _build_signal_map_context(). None or [] (the default)
+    preserves every pre-existing caller's behavior exactly -- the ledger's
+    risk_label/dollar_exposure per row are still computed (they don't
+    depend on answers_log), only top_contributing_answers falls back to
+    [] per row.
 
     LLM-generated text fields (private_output.liability_block, etc.) are
     empty strings in the assembled output. The application layer populates
@@ -634,10 +787,14 @@ def assemble_output(session: SessionData, synthesis_result=None, trajectory_resu
         if legal_result["low"] is not None or legal_result["has_unpriced_conditions"]
         else None
     )
+    friction_tax_ledger = _build_friction_tax_ledger(
+        identified_states, by_state, answers_log or [], session.intake,
+    )
     private_output = {
         "opening_text":            priv.state_name if priv else "",
         "resolution_routing":      effective_resolution_routing,
         "friction_tax_estimate":   friction_tax_estimate,
+        "friction_tax_ledger":     friction_tax_ledger,
         "legal_tail_risk_exposure": legal_tail_risk_exposure,
         "cascade_risk":            compute_cascade_risk(session.accumulated_vector),
         "causation_pattern":       causation_pattern_obj,
@@ -752,8 +909,8 @@ _JURISDICTION_FLAGS_FIELDS = {
 }
 _PRIVATE_OUTPUT_FIELDS = {
     "opening_text", "resolution_routing", "friction_tax_estimate",
-    "legal_tail_risk_exposure", "cascade_risk", "causation_pattern", "trajectory",
-    "urgency_window",
+    "friction_tax_ledger", "legal_tail_risk_exposure", "cascade_risk",
+    "causation_pattern", "trajectory", "urgency_window",
 }
 _SHAREABLE_OUTPUT_FIELDS = {
     "attribution_text",
