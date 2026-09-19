@@ -181,11 +181,23 @@ def _locked_intake_to_engine_intake(intake: dict) -> IntakeData:
     (defensive -- the validated web path always sends a non-empty list, but
     this adapter has no way to enforce that on its own callers).
 
-    org_type has no locked-spec intake equivalent -- unrelated to
-    significant_events, unchanged: still defaults to "" (Session 71
-    architecture decision) -- the org_type_founder_led axis modifier only
-    fires on the literal value "Founder-led", so any other string
-    (including "") is a safe no-op.
+    org_type is now collected by Phase 1's intake form (this session,
+    org_type threading fix) -- read via .get("org_type", "") rather than
+    the prior hardcoded "" (Session 71 architecture decision, now
+    superseded). The "" default is kept, not removed, for a real
+    backward-compatibility reason: any Redis session created before this
+    fix shipped has an intake dict with no "org_type" key at all (Redis
+    stores exactly what createSession() wrote at session-start time, and
+    old sessions were written under the old validateIntake() that never
+    required it) -- .get()'s default is what keeps an in-flight old
+    session's later /session/answer calls from raising a KeyError mid-
+    flow instead of degrading to the pre-fix "" behavior it already had.
+    New sessions always have a real value here, since
+    web/app/api/diagnostic/session/start/route.ts's validateIntake() now
+    requires org_type as a string, same enforcement level as industry/
+    role_level. The org_type_founder_led axis modifier only fires on the
+    literal value "Founder-led", so "" (old sessions) remains a safe
+    no-op, unchanged from before.
 
     tenure_in_role and direct_reports have no IntakeData equivalent at all --
     stored in the session for calibration/analytics purposes only (Task 1),
@@ -195,7 +207,7 @@ def _locked_intake_to_engine_intake(intake: dict) -> IntakeData:
     return IntakeData(
         headcount=intake.get("organization_size", 0),
         industry=intake.get("industry", ""),
-        org_type="",
+        org_type=intake.get("org_type", ""),
         jurisdictions=[jurisdiction] if jurisdiction else [],
         significant_events=intake.get("significant_events") or ["none"],
         principal_role=intake.get("role_level", ""),
@@ -974,7 +986,10 @@ def run_accumulated_engine(
         checkpoint_q27=checkpoint_result_from_wire("Q27", checkpoint_results.get("q27")),
     )
 
-    return assemble_output(session_data, synthesis_result=synthesis_result, trajectory_result=trajectory_result)
+    return assemble_output(
+        session_data, synthesis_result=synthesis_result, trajectory_result=trajectory_result,
+        answers_log=answers_log,
+    )
 
 
 def run_condensed_engine(
