@@ -40,6 +40,7 @@ function validateIntake(body: unknown): body is PrivateIntakeEcho {
   return (
     validOrgSize &&
     typeof b.industry === "string" &&
+    typeof b.org_type === "string" &&
     typeof b.role_level === "string" &&
     typeof b.tenure_in_role === "string" &&
     typeof b.direct_reports === "string" &&
