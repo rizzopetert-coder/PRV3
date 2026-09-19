@@ -72,6 +72,7 @@ function mapIntake(engineIntake: Record<string, unknown>): ShareableIntakeEcho {
   return {
     organization_size: toOrgSize(engineIntake.org_size),
     industry: (engineIntake.industry as string) ?? "",
+    org_type: (engineIntake.org_type as string) ?? "",
     role_level: (engineIntake.principal_role as string) ?? "",
     tenure_in_role: "",
     direct_reports: "",
