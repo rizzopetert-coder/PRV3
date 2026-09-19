@@ -6158,3 +6158,60 @@ Diary write: `tools/prv3_diary.py write --agent claude-code --topic
 session -- **executed via Bash and independently re-confirmed present
 via a fresh diary read afterward, not just a printed success message**,
 directly addressing the reliability gap found in Part 1 above.
+
+## DATED NOTE (2026-09-19) -- Mem0 diary-write reliability bug, open,
+## informational, not urgent
+
+Distinct from the three retroactive diary-write corrections logged
+above -- this is the underlying tool-reliability finding itself, tracked
+as its own standing item, same class as the org_type gap and the
+`signal_map_context`/Trajectory bug (something that looked fine until
+someone actually checked it). `tools/prv3_diary.py write` for topic
+`quarterly-step-back-4-reconciled` returned an apparent success response
+(`WROTE: {'results': [{'id': ..., 'event': 'ADD', ...}]}`) via a real
+Bash invocation, but the entry **does not surface via `prv3_diary.py
+read` even 20+ minutes and several intervening tool calls later** -- a
+deliberate recheck, not a one-off glance, specifically to rule out a
+transient indexing/embedding delay before calling this a real bug rather
+than a timing artifact. **CORRECTION, same pass, caught before this
+entry was first committed:** this note originally said the failure was
+NOT reproduced a second time, citing the very next write (this
+session's own diary-integrity-audit entry) as verified present within
+seconds. That part was true. What's added here because it happened
+immediately after: **the write for THIS DATED NOTE's own diary entry
+(topic `diary-reliability-bug-tracked-numpy-removal-gated-future-task`)
+also returned an apparent success response and also failed to surface**
+on two rechecks (an immediate one and one after an additional ~8-second
+wait). That makes **2 of the 4 real `prv3_diary.py write` invocations
+this entire session unretrievable** despite each reporting success --
+a 50% non-persistence rate on real attempts, not a rare one-off. Revising
+the characterization accordingly: this is a real, recurring reliability
+problem, not an isolated blip -- still not blocking (tools/_mob.txt
+remains authoritative and this session's actual decisions are not lost),
+but "not urgent" should not be read as "rare." **No forced urgency, no
+action taken** -- flagged so a future session that hits a "confirmed"
+diary write that later turns out to be silently absent doesn't have to
+re-diagnose this from scratch. Standing recommendation, now with more
+weight behind it: verify every diary write against a fresh read before
+treating it as durable, not just spot-check occasionally -- at this
+failure rate, assuming success from the printed response alone is a coin
+flip.
+
+## DATED NOTE (2026-09-19) -- numpy removal from engine/accumulation.py
+## captured as a gated candidate future task, not actioned
+
+`prompts/candidate-future-task-numpy-removal.md` (new) -- full detail
+there, not reproduced here. Summary: `numpy`'s only import site
+(`engine/accumulation.py:14`) and all 8 call sites (basic 8-element
+vector arithmetic for the SCD-WCS cosine-similarity calc) are captured,
+along with why this is a plausible Function Storage lever (numpy is the
+heaviest of `requirements.txt`'s four packages, bundled into every
+deployed Python function). **Explicitly not actioned this session, per
+Pete's direct instruction** -- `engine/accumulation.py` untouched, no
+code changes this pass. **Gated on two conditions before it can be
+picked up:** (a) an actual confirmed per-deployment storage number
+showing this would help, not the plausible-but-unverified case made this
+session; (b) its own full calibration re-run when picked up, not bundled
+into unrelated cleanup -- Tier 1 engine code, same discipline as any
+other accumulation-engine change, regardless of how simple the
+arithmetic looks.
