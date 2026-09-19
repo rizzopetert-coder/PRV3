@@ -38,6 +38,24 @@ function tierFillPercent(tier: SeverityTier, score: number): number {
   return Math.max(0, Math.min(1, fraction)) * 100;
 }
 
+// Friction tax ledger -- Block 4f. One shared footnote for the whole
+// ledger, not per-row (per spec) -- hardcoded here rather than sent over
+// the wire since it's invariant across every session, same convention as
+// this component's other static section labels. Pete-approved final copy
+// (supersedes the earlier draft, which was cross-checked against
+// prompts/friction-tax-client-copy.md and found to diverge in several
+// ways -- named sources, a missing severity-scaling step, a different
+// "why a range" justification -- all resolved in this final text).
+const FRICTION_TAX_LEDGER_FOOTNOTE =
+  "Estimates are calculated from your organization's size, industry, and " +
+  "structure, then scaled to how deeply organizational risk conditions " +
+  "have taken root. The financial risk range draws on published research " +
+  "including public wage and compensation data and studies on turnover, " +
+  "disengagement, and lost productivity. Sources include McKinsey, SHRM, " +
+  "Gallup, and other widely-recognized credible sources. Figures shown as " +
+  "a range reflect the actual uncertainty identified in your diagnostic " +
+  "result, and are not indicative of imprecision in the diagnosis.";
+
 // Legal/Compliance tail-risk exposure -- Block 4d. Typographic
 // differentiation only (font-weight/size) by band, no color ramp --
 // --color-rust is reserved for genuine Endemic severity signaling
@@ -133,6 +151,14 @@ export default function PrivateOutput({
   const unpricedStateNames = legal
     ? legal.unpriced_state_ids.map((id) => stateNameById.get(id) ?? id)
     : [];
+
+  // Block 4f -- friction tax ledger. One row per condition, in the
+  // array's own order (same as identified_states/severity_by_state
+  // above). Gemini's Q5 finding (7-32 rows per profile, exact
+  // distribution unverified) raised a real flat-list-vs-accordion
+  // question -- resolved by Pete: default-open accordion, rendered
+  // below via <details open>.
+  const frictionTaxLedger = payload.friction_tax_ledger ?? [];
 
   return (
     <div className="max-w-2xl">
@@ -453,6 +479,76 @@ export default function PrivateOutput({
             {legal.caveat}
           </p>
         </div>
+      )}
+
+      {/* Block 4f — Friction tax ledger (per-condition risk/dollar/
+          top-contributing-answers). Omitted entirely when the ledger is
+          empty, same idiom as every other optional block in this
+          component. Accordion, defaulting OPEN (Pete's decision) --
+          native <details open>/<summary>, the only accordion pattern
+          already established anywhere in this codebase
+          (DiagnosticFixturePicker.tsx), reused rather than a new
+          interaction pattern invented for this one block. `open` is an
+          uncontrolled default here, not tracked in React state -- the
+          user can still collapse it, this only sets the initial render
+          state. Risk label reuses severityAccentTokens for visual
+          consistency with the "Severity across conditions" block above,
+          since risk_label IS that same severity tier, not a new scale. */}
+      {frictionTaxLedger.length > 0 && (
+        <details open className="py-4">
+          <summary className="text-[11px] uppercase tracking-wide text-slate mb-3 cursor-pointer">
+            Friction tax ledger
+          </summary>
+          <ul className="space-y-4 mt-3">
+            {frictionTaxLedger.map((row) => {
+              const rowAccent = severityAccentTokens(row.risk_label);
+              return (
+                <li key={row.state_id}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[13px] text-charcoal">
+                      {stateNameById.get(row.state_id) ?? row.state_name}
+                    </span>
+                    <span
+                      className="text-[10px] rounded-md px-1.5 py-0.5 border"
+                      style={{ borderColor: rowAccent.stroke, color: rowAccent.text }}
+                    >
+                      {row.risk_label}
+                    </span>
+                  </div>
+                  <p className="text-[13px] text-charcoal mb-1">
+                    {row.dollar_exposure ? (
+                      row.dollar_exposure.low === row.dollar_exposure.high ? (
+                        <>
+                          Estimated exposure: {row.dollar_exposure.currency === "USD" ? "$" : ""}
+                          {row.dollar_exposure.low.toLocaleString()}
+                        </>
+                      ) : (
+                        <>
+                          {row.dollar_exposure.currency === "USD" ? "$" : ""}
+                          {row.dollar_exposure.low.toLocaleString()} –{" "}
+                          {row.dollar_exposure.currency === "USD" ? "$" : ""}
+                          {row.dollar_exposure.high.toLocaleString()}
+                        </>
+                      )
+                    ) : (
+                      <span className="text-slate">Estimate not available for this condition.</span>
+                    )}
+                  </p>
+                  {row.top_contributing_answers.length > 0 && (
+                    <ul className="text-[12px] text-slate leading-relaxed list-disc pl-4 space-y-0.5">
+                      {row.top_contributing_answers.map((text, i) => (
+                        <li key={i}>{text}</li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <p className="text-[11px] text-slate mt-3 leading-relaxed">
+            {FRICTION_TAX_LEDGER_FOOTNOTE}
+          </p>
+        </details>
       )}
 
       {/* Block 4e — Copy results as text (this session). Comprehensive
