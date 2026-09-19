@@ -1044,6 +1044,132 @@ check(
 )
 
 
+# ── engine/contract.py's _build_friction_tax_ledger() / assemble_output()'s
+# new answers_log parameter -- friction tax ledger (per-condition risk/
+# dollar/top-contributing-answers, Gemini-cleared across two rounds) ────────
+from engine.friction_tax import compute_friction_tax
+
+ledger_answers_log = [
+    {"question_id": "Q01", "option_ids": ["B"]},
+    {"question_id": "Q06", "option_ids": ["A", "C"]},
+]
+ledger_rankings = _make_rankings_for("the_basement_standard", top_score=floor_val + 0.05)
+ledger_pkg = out_engine.build(ledger_rankings, sev)
+ledger_intake = IntakeData(
+    headcount=250,
+    industry="Professional Services",
+    org_type="Founder-led",
+    jurisdictions=[],
+    significant_events=["none"],
+    principal_role="C-suite",
+)
+ledger_session = SessionData(
+    session_id=SessionData.new_session_id(),
+    intake=ledger_intake,
+    final_rankings=ledger_rankings,
+    accumulated_vector=acc_vector,
+    output_package=ledger_pkg,
+    severity_result=sev,
+)
+ledger_out = assemble_output(ledger_session, answers_log=ledger_answers_log)
+ledger_identified = ledger_out.get("identified_states", [])
+check(
+    "sanity: the_basement_standard is the single identified state for the ledger session",
+    len(ledger_identified) == 1 and ledger_identified[0].get("state_id") == "the_basement_standard",
+    f"got {ledger_identified}",
+)
+
+friction_tax_ledger = ledger_out.get("private_output", {}).get("friction_tax_ledger")
+check(
+    "friction_tax_ledger: present as a list with exactly one row, matching "
+    "identified_states 1:1",
+    isinstance(friction_tax_ledger, list) and len(friction_tax_ledger) == 1,
+    f"got {friction_tax_ledger}",
+)
+
+ledger_row = friction_tax_ledger[0] if friction_tax_ledger else {}
+ledger_risk_label = ledger_row.get("risk_label")
+check(
+    "friction_tax_ledger row: state_id/state_name match identified_states, "
+    "risk_label reuses severity.by_state's own tier for this state (least- "
+    "disruptive-contract reuse, not a new risk classification)",
+    ledger_row.get("state_id") == "the_basement_standard"
+    and ledger_row.get("state_name") == "The Basement Standard"
+    and ledger_risk_label == ledger_out["severity"]["by_state"][0]["tier"],
+    f"got {ledger_row}, by_state={ledger_out['severity']['by_state']}",
+)
+
+# Cross-check dollar_exposure against a direct compute_friction_tax() call --
+# the ledger must reuse that function's real output for this one state, not
+# a separately-derived number.
+_expected_friction = compute_friction_tax(
+    state_ids=["the_basement_standard"],
+    severity_tier=ledger_risk_label,
+    org_size=250,
+    industry="Professional Services",
+    org_type="Founder-led",
+)
+check(
+    "friction_tax_ledger row: dollar_exposure matches a direct single-state "
+    "compute_friction_tax() call exactly -- confirms real reuse, not an "
+    "independently-derived figure",
+    ledger_row.get("dollar_exposure") == {
+        "low": _expected_friction["low"],
+        "high": _expected_friction["high"],
+        "currency": _expected_friction["currency"],
+    },
+    f"got {ledger_row.get('dollar_exposure')}, expected from direct call: {_expected_friction}",
+)
+
+check(
+    "friction_tax_ledger row: top_contributing_answers is non-empty and ranked "
+    "-- Q01/B's real authored observation_text must appear (both Q01 and Q06 "
+    "were logged, capped at _LEDGER_TOP_ANSWERS_MAX=3)",
+    isinstance(ledger_row.get("top_contributing_answers"), list)
+    and 0 < len(ledger_row["top_contributing_answers"]) <= 3
+    and "Bigger decisions get complicated here even when smaller ones don't." in ledger_row["top_contributing_answers"],
+    f"got {ledger_row.get('top_contributing_answers')}",
+)
+
+# Backward compatibility: every pre-existing assemble_output() call site in
+# this file (and calibration_runner.py) never passes answers_log at all --
+# risk_label/dollar_exposure must still populate (they don't depend on
+# answers_log), only top_contributing_answers should fall back to [].
+ledger_out_no_answers = assemble_output(ledger_session)
+no_answers_ledger = ledger_out_no_answers.get("private_output", {}).get("friction_tax_ledger")
+check(
+    "friction_tax_ledger: with no answers_log argument at all (every "
+    "pre-existing call site's real shape), the row still populates risk_label "
+    "and dollar_exposure, only top_contributing_answers degrades to []",
+    isinstance(no_answers_ledger, list)
+    and len(no_answers_ledger) == 1
+    and no_answers_ledger[0].get("risk_label") == ledger_risk_label
+    and no_answers_ledger[0].get("dollar_exposure") == ledger_row.get("dollar_exposure")
+    and no_answers_ledger[0].get("top_contributing_answers") == [],
+    f"got {no_answers_ledger}",
+)
+
+# no_signal case: identified_states empty -> friction_tax_ledger == [], same
+# "nothing to show" convention as friction_tax_estimate=None.
+empty_rankings = []
+empty_pkg = out_engine.build(empty_rankings, sev)
+empty_session = SessionData(
+    session_id=SessionData.new_session_id(),
+    intake=ledger_intake,
+    final_rankings=empty_rankings,
+    accumulated_vector=acc_vector,
+    output_package=empty_pkg,
+    severity_result=sev,
+)
+empty_ledger_out = assemble_output(empty_session, answers_log=ledger_answers_log)
+check(
+    "friction_tax_ledger: [] for a no_signal (empty identified_states) session, "
+    "even with a real answers_log present",
+    empty_ledger_out.get("private_output", {}).get("friction_tax_ledger") == [],
+    f"got {empty_ledger_out.get('private_output', {}).get('friction_tax_ledger')}",
+)
+
+
 # ── Summary ────────────────────────────────────────────────────────────────────
 print("\n" + "=" * 64)
 print(f"RESULT: {len(PASS)} passed, {len(FAIL)} failed")
