@@ -158,6 +158,12 @@ interface IntakeFormState {
   // handled separately in isComplete below since [] !== "" trivially.
   organization_size: number | "";
   industry: string;
+  // org_type (this session) -- previously not collected by Phase 1's
+  // intake form at all, hardcoded "" at the PrivateOutput render call
+  // below (Session 71 architecture decision). Same 6-value list Path B's
+  // SelfSelectIntakeModal.tsx already uses, source of truth
+  // engine/data/intake.py's INTAKE_FIELDS["org_type"].
+  org_type: string;
   role_level: string;
   tenure_in_role: string;
   direct_reports: string;
@@ -168,9 +174,25 @@ interface IntakeFormState {
   significant_event_elaboration: string;
 }
 
+// Source of truth is engine/friction_tax.py's ORG_TYPE_SCALARS keys,
+// same list web/components/SelfSelectIntakeModal.tsx already carries as
+// its own separately-declared constant (that file's own docstring notes
+// it must be kept in sync manually) -- duplicated here rather than
+// consolidated into a shared export, matching this codebase's existing
+// accepted duplication precedent, not a new pattern.
+const ORG_TYPE_OPTIONS = [
+  "Founder-led",
+  "PE or VC-backed",
+  "Privately held professional leadership",
+  "Nonprofit",
+  "Publicly traded",
+  "Government",
+];
+
 const EMPTY_INTAKE: IntakeFormState = {
   organization_size: "",
   industry: "",
+  org_type: "",
   role_level: "",
   tenure_in_role: "",
   direct_reports: "",
@@ -236,6 +258,7 @@ function IntakeForm({
   const isComplete =
     intake.organization_size !== "" &&
     intake.industry !== "" &&
+    intake.org_type !== "" &&
     intake.role_level !== "" &&
     intake.tenure_in_role !== "" &&
     intake.direct_reports !== "" &&
@@ -359,6 +382,7 @@ function IntakeForm({
         onChange={(next) => onChange({ ...intake, organization_size: next })}
       />
       {field("Industry", "industry", INDUSTRY_OPTIONS)}
+      {field("Organization type", "org_type", ORG_TYPE_OPTIONS)}
       {field("Your role level", "role_level", ROLE_LEVEL_OPTIONS)}
       {field("Tenure in this role", "tenure_in_role", TENURE_OPTIONS)}
       {field("Direct reports", "direct_reports", DIRECT_REPORTS_OPTIONS)}
@@ -856,10 +880,11 @@ export default function DiagnosticFlow() {
           intake={{
             headcount: String(intake.organization_size),
             industry: intake.industry,
-            // Not collected by Phase 1's intake form -- matches the locked
-            // server-side default (_locked_intake_to_engine_intake(),
-            // engine/main.py, Session 71 architecture decision).
-            orgType: "",
+            // Now collected by Phase 1's intake form (this session) --
+            // previously hardcoded "" here, matching the server-side
+            // default that existed before this fix
+            // (_locked_intake_to_engine_intake(), engine/main.py).
+            orgType: intake.org_type,
             jurisdictions: intake.jurisdiction ? [intake.jurisdiction] : [],
             // Not collected by Phase 1's intake form -- matches the locked
             // server-side sentinel exactly (same function/decision as
