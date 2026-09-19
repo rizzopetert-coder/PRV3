@@ -5930,3 +5930,23 @@ correctly up to this point -- the org_type fix's own live verification
 reached the server and failed only at this unrelated persistence step,
 never at validation. Not actioned this session -- Pete's call whether/when
 to provision local Redis credentials.
+
+## DATED NOTE (2026-09-18) -- two durable planning docs written, no
+## build state changed, no version bump
+
+`prompts/candidate-principle-all-data-is-useful.md` (new) -- candidate
+governing principle, Provisional Hold not Locked, Pete's exact wording
+"ALL DATA IS USEFUL" (not the weaker "data must be useful" framing,
+explicitly rejected). Not added to CLAUDE.md's Governing Principles list
+or the Principal Brief until Pete locks it. `prompts/asset-integration-
+into-resolution-scope.md` (new) -- scope decision on working identified
+assets into proposed solutions: Options 1 (synthesis-level) and 2
+(ledger-level parity, same weight class as the friction tax ledger, its
+own future Gemini gate) in scope, no build sequencing decided. **Option 3
+(service-routing level, touching `engine/resolution_families.py`'s
+condition/liability-only routing logic) was originally scoped OUT this
+session, then reinstated by Pete directly mid-session** -- recorded as an
+explicit reconsideration in the file itself, not silently folded in, and
+flagged there as higher-risk/higher-review-burden than Options 1/2, not
+equivalent effort. Documentation only, no code touched, no Gemini gate
+needed for this step.
