@@ -55,6 +55,7 @@ const FULL_PAYLOAD: PrivateOutputPayload = {
   intake: {
     organization_size: 152,
     industry: "Professional Services",
+    org_type: "Founder-led",
     role_level: "C-suite",
     tenure_in_role: "1-3 years",
     direct_reports: "6-15",
@@ -89,6 +90,7 @@ const MINIMAL_PAYLOAD: PrivateOutputPayload = {
   intake: {
     organization_size: 50,
     industry: "Technology",
+    org_type: "Founder-led",
     role_level: "Manager",
     tenure_in_role: "Less than 1 year",
     direct_reports: "0",

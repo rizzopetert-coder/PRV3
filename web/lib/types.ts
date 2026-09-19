@@ -100,6 +100,14 @@ export const SIGNIFICANT_EVENT_OPTIONS: readonly SignificantEventOption[] = [
 export interface ShareableIntakeEcho {
   organization_size: number;
   industry: string;
+  // Now collected by Phase 1's intake form (this session) -- previously
+  // hardcoded "" server-side (_locked_intake_to_engine_intake(),
+  // engine/main.py, Session 71 architecture decision). Placed on
+  // ShareableIntakeEcho itself, not just PrivateIntakeEcho, so it flows
+  // into the public shareable payload too -- intentional, consistent
+  // with this type's existing purpose of grounding friction_tax_estimate
+  // for an external audience. PrivateIntakeEcho inherits it automatically.
+  org_type: string;
   role_level: string;
   tenure_in_role: string;
   direct_reports: string;
@@ -135,6 +143,37 @@ export interface FrictionTaxEstimate {
   low: number;
   high: number;
   currency: string;
+}
+
+/**
+ * Friction tax ledger row -- one per condition/state in identified_states,
+ * same order. Sibling to friction_tax_estimate on PrivateOutputPayload, not
+ * a replacement -- friction_tax_estimate stays the aggregate figure, this
+ * is the per-condition breakdown behind it. Gemini-cleared architecture,
+ * built engine/contract.py's _build_friction_tax_ledger().
+ *
+ * risk_label reuses the state's own severity tier (same value StateSeverityEntry
+ * carries) -- no new risk classification invented.
+ *
+ * dollar_exposure reuses compute_friction_tax() called for this one state
+ * alone. null under the same calibration_complete=false conditions
+ * friction_tax_estimate itself can be null under (e.g. Path 1's org_type
+ * gap -- session.intake.org_type is always "" for Path 1 today, a
+ * pre-existing condition this field inherits, not a new gap).
+ *
+ * top_contributing_answers is a ranked list of authored
+ * AnswerOption.observation_text strings (skip-and-backfill: an unauthored
+ * option is omitted, never padded with raw option_text), reusing
+ * _build_signal_map_context()'s replay-and-rank technique against this
+ * state's own SALIENCE_PROFILES entry. [] when answers_log was empty
+ * (Path B/self-select) or nothing authored yet.
+ */
+export interface FrictionTaxLedgerEntry {
+  state_id: string;
+  state_name: string;
+  risk_label: SeverityTier;
+  dollar_exposure: { low: number; high: number; currency: string } | null;
+  top_contributing_answers: string[];
 }
 
 /**
@@ -300,6 +339,13 @@ export interface PrivateOutputPayload {
 
   // Economic (nullable)
   friction_tax_estimate: FrictionTaxEstimate | null;
+
+  // Per-condition friction tax ledger (nullable/optional) -- sibling to
+  // friction_tax_estimate above, not a replacement. Optional (not just
+  // nullable) for the same DevDiagnosticPreviewPayload structural-typing
+  // reason severity_by_state below is optional -- that near-mirror type
+  // predates this field and omits every field added after it was written.
+  friction_tax_ledger?: FrictionTaxLedgerEntry[];
 
   // Legal/Compliance tail-risk exposure (nullable) -- Addendum 11.
   legal_tail_risk_exposure: LegalTailRiskExposure | null;

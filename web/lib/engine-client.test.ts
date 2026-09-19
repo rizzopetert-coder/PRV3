@@ -15,6 +15,7 @@ import { ZERO_VECTOR } from "./session-store";
 const BASE_INTAKE = {
   organization_size: 150,
   industry: "Technology",
+  org_type: "Founder-led",
   role_level: "CEO",
   tenure_in_role: "",
   direct_reports: "",

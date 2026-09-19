@@ -170,6 +170,7 @@ export default function DiagnosticFixturePicker() {
     intake: {
       organization_size: 0,
       industry: "",
+      org_type: "",
       role_level: "",
       tenure_in_role: "",
       direct_reports: "",

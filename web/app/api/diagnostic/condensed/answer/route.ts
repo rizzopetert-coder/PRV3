@@ -61,6 +61,7 @@ function toPrivateIntakeEchoShape(industry: string): PrivateIntakeEcho {
   return {
     organization_size: 0,
     industry,
+    org_type: "",
     role_level: "",
     tenure_in_role: "",
     direct_reports: "",
