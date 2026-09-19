@@ -65,6 +65,7 @@ function mapIntake(engineIntake: Record<string, unknown>): PrivateIntakeEcho {
     // fallback for any caller still on the pre-Phase-1 engine shape.
     organization_size: parseOrgSize(engineIntake.headcount ?? engineIntake.org_size),
     industry: (engineIntake.industry as string) ?? "",
+    org_type: (engineIntake.org_type as string) ?? "",
     role_level: (engineIntake.principal_role as string) ?? "",
     tenure_in_role: "",
     direct_reports: "",
@@ -178,6 +179,7 @@ export async function POST(request: NextRequest) {
     resolution_routing: engineResult.private_output.resolution_routing,
 
     friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
+    friction_tax_ledger: engineResult.private_output.friction_tax_ledger,
     legal_tail_risk_exposure: engineResult.private_output.legal_tail_risk_exposure,
 
     // causation_pattern -- new plumbing this build. Confirmed real,
