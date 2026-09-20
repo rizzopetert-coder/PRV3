@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.315
+\\\#\\\# MOB v4.316
 
   
 
@@ -6215,3 +6215,116 @@ session; (b) its own full calibration re-run when picked up, not bundled
 into unrelated cleanup -- Tier 1 engine code, same discipline as any
 other accumulation-engine change, regardless of how simple the
 arithmetic looks.
+
+## SESSION LOG (2026-09-20, terminal Claude Code) -- tools/prv3_diary.py
+## Bug A root cause was WRONG on first pass, corrected before shipping;
+## real root cause found, both bugs fixed and empirically verified;
+## local-Qdrant architecture confirmed intentional -- MOB v4.315 -> v4.316
+
+**Investigation went through two rounds -- the first diagnosis was
+incomplete and the fix built on it gave false confidence. Recorded
+here as it actually happened, not cleaned up after the fact.**
+
+**Round 1 (wrong): write-path/shutdown theory.** Traced the `infer=False`
+write path to Qdrant local-mode's `persist()`, confirmed it calls a real
+synchronous SQLite `commit()` inside the same call that returns to
+`write_entry()` -- verified directly by writing a marker and querying
+`storage.sqlite` with plain `sqlite3` in a separate process, bypassing
+mem0 entirely. The row was there. Also found, 100% reproducible: an
+unrelated, already-known cosmetic defect -- `QdrantLocal.close()`,
+reached only via `__del__` during interpreter shutdown, fails inside
+`portalocker.unlock()` because CPython has already torn down the module
+system by then (the exact `ImportError`/`ModuleNotFoundError` already
+logged as cosmetic at the 2026-08-26 MemPalace retirement graduation
+test, Decision Register). Shipped an initial Bug B fix using `Memory.get(id)`
+(a direct point lookup) as the read-after-write check, and an initial
+Bug A fix adding an explicit `m.vector_store.client.close()` call. Both
+looked clean in testing -- **because the verification method itself
+was blind to the real bug** (see below).
+
+**Round 2 (correct): found while re-verifying the shipped fix.**
+Immediately after the round-1 fix, a real diary write's own new
+`m.get(id)` check reported `verified: True` -- but a fresh, independent
+`read` still could not find that same entry. This contradiction is what
+exposed the real bug: **`Memory.get_all()` has an undocumented-at-the-
+call-site default of `top_k=20`.** `read_recent()` called `m.get_all()`
+with no `top_k` override at all, silently capping every read at 20
+candidates, in whatever order Qdrant's local-mode filtered scroll
+returns them -- not guaranteed to be the 20 most recent. Confirmed the
+real scale directly: the `claude-code` agent already has **29** real
+diary entries, meaning **9 have been silently invisible to every plain
+`read` call**, not intermittently -- deterministically, for whichever
+entries didn't happen to land in that unordered top-20 slice. Confirmed
+by direct lookup with an explicit high `top_k`: **both entries this
+session that were reported as "unretrievable" -- `quarterly-step-back-
+4-reconciled` and `diary-reliability-bug-tracked-numpy-removal-gated-
+future-task` -- were present, correctly timestamped, in correct
+chronological order, the entire time.** There was never any write
+non-persistence and never any data loss. The round-1 close() defect is
+real but unrelated to the reported symptom.
+
+**Corrected, this pass, before anything was reported as final:**
+- `_GET_ALL_TOP_K = 5000` added as a module constant -- generous for
+  this diary's real per-agent volume (dozens of entries, not thousands)
+  without scanning the full 72,795+-point collection (inherited from
+  the old MemPalace migration) on every read.
+- `read_recent()` now passes `top_k=_GET_ALL_TOP_K` to `get_all()` --
+  the actual fix. Confirmed via the real CLI: `read --last-n 30` now
+  returns all 29 real entries, in correct order, including both
+  previously-invisible ones.
+- `write_entry()`'s Bug B verification rewritten to check membership in
+  the SAME `get_all(..., top_k=_GET_ALL_TOP_K)` call `read_recent()`
+  actually uses, not `Memory.get(id)` -- the direct-lookup version is
+  documented in the docstring as a rejected first attempt and why: it
+  bypasses `get_all()`'s own cap entirely, so it could never have
+  detected this exact bug. This version can.
+- Bug A's explicit `m.vector_store.client.close()` call kept in both
+  functions -- it's a real, verified-clean improvement (confirmed
+  idempotent: called twice deliberately in the same process, no error
+  either time) even though it wasn't the actual fix for the reported
+  symptom.
+
+**Residual, confirmed cosmetic, not re-chased:** the `__del__`-time
+`ImportError`/`ModuleNotFoundError` still fires at process exit even
+with the explicit close() in place, traced to a second reference to the
+same object being garbage-collected independently at shutdown, not a
+double-close bug in the explicit path (tested clean, twice, in-process).
+Matches the 2026-08-26 graduation test's own characterization of this
+exact symptom as cosmetic. Not pursued further -- out of scope for this
+pass and demonstrated to have zero effect on data correctness in every
+trial run.
+
+**Empirical verification, real CLI path end to end, both rounds:**
+Round 1's 6 pre-fix trials (never reproduced the symptom -- expected,
+now that the real mechanism is understood: a 20-item cap only bites
+once an agent has >20 entries, which `diag-test`-style fresh test
+users never do). Round 2, post-real-fix: 5 rapid real
+`python tools/prv3_diary.py write` subprocess invocations, each
+independently reporting `verified: True`, followed by a fresh,
+independent `read` correctly returning all 5. Separately, the real
+`claude-code` diary confirmed at 29/29 entries visible via
+`read --last-n 30`, both previously-hidden entries now included in
+correct chronological position. All test/diagnostic entries (`diag-test`,
+`diag-test2`, `diag-cli-test`, `diag-final-test` user_ids) deleted from
+the store after verification.
+
+**Architecture question, answered plainly, sourced not assumed:** local
+Qdrant (embedded, on-disk), fastembed local embedder, no cloud
+dependency, is confirmed **intentional**, not a gap against the
+2026-08-26 "MemPalace retirement" record. That record's own Decision
+Register row states this exact configuration was "verified in
+`prompts/mempalace-alternative-trial-cognee-mem0.md` and confirmed live
+through two full cross-session verification cycles before this
+retirement proceeded" -- Gemini-reviewed, tested for real before being
+wired into the protocol. **No correction note needed against that
+record.**
+
+**Files changed:** `tools/prv3_diary.py` (both fixes, corrected version).
+No calibration re-run -- isolated continuity tool, outside the
+engine/calibration-critical path.
+
+Diary write: `tools/prv3_diary.py write --agent claude-code --topic
+"diary-tool-bug-a-b-fixed-and-verified"`, this session -- verified
+present via a fresh read using the tool's own corrected verification
+logic, then independently re-confirmed via a separate `read --last-n 30`
+call showing all 29 real entries in place.
