@@ -68,6 +68,27 @@ from mem0.vector_stores.configs import VectorStoreConfig
 STORE_PATH = "C:/mem0_trial_venv/qdrant_data"
 COLLECTION = "prv3_trial"  # reserved for diary continuity -- see COLLISION MITIGATION above
 
+# Root cause of the 2026-09-20 "writes sometimes unretrievable" investigation,
+# found AFTER an initial (wrong) diagnosis: Memory.get_all()'s own default is
+# `top_k: int = 20` -- read_recent() below called it with no top_k override at
+# all, so it silently truncated to at most 20 candidates before this file's
+# own last_n slicing/sorting ever ran. Confirmed directly: as of this fix,
+# the claude-code agent already has 29 real entries -- 9 already past the
+# silent cap -- and two entries this same session had been reported as
+# "unretrievable" (quarterly-step-back-4-reconciled,
+# diary-reliability-bug-tracked-numpy-removal-gated-future-task) were BOTH
+# proven present, correctly timestamped, sitting just past position 20 in an
+# unordered scroll, the entire time -- there was never any data loss or write
+# non-persistence; the write path's own synchronous SQLite commit (persist(),
+# qdrant_client/local/persistence.py) was already durable and reliable. This
+# constant is generously sized for this diary's real, low-volume, per-agent
+# usage pattern (dozens of entries per agent, not thousands) -- not set to
+# the collection's own total point count (72,795+, inherited from the old
+# MemPalace migration) since a get_all() scan of that size on every read
+# would trade a truncation bug for a real performance cost this diary never
+# needs to pay.
+_GET_ALL_TOP_K = 5000
+
 _memory_instance: Memory | None = None
 
 
@@ -101,6 +122,22 @@ def write_entry(agent_name: str, entry: str, topic: str = "general") -> dict:
     display, entry -> the raw note text, stored verbatim (infer=False, so
     no LLM rewrites or extracts "facts" from it -- what you write is
     byte-for-byte what gets embedded and stored).
+
+    Read-after-write verification (2026-09-20, Bug B fix): `m.add()`
+    returning successfully only means the Python call didn't raise: it was
+    never checked against an independent read. Verifies via the SAME path
+    read_recent() actually uses (`m.get_all(filters={"user_id": ...},
+    top_k=_GET_ALL_TOP_K)`), not `Memory.get(id)` -- a direct point lookup
+    was tried first and rejected, because it bypasses get_all()'s own
+    top_k truncation entirely and so cannot detect the real failure mode
+    (see `_GET_ALL_TOP_K`'s own comment above): a first version of this
+    fix used `m.get(id)`, which reported every write as "verified" even
+    for ids that read_recent() could not actually surface, since a direct
+    lookup was never subject to the same cap. Any id not found in that
+    same-path check is recorded in the returned dict's new `verified`/
+    `unverified_ids` keys -- additive fields only, so any other caller of
+    this function relying on the pre-existing `results` shape is
+    unaffected.
     """
     m = _get_memory()
     timestamp = datetime.now(timezone.utc).isoformat()
@@ -110,6 +147,14 @@ def write_entry(agent_name: str, entry: str, topic: str = "general") -> dict:
         metadata={"topic": topic, "type": "diary", "written_at": timestamp},
         infer=False,
     )
+    written_ids = [r["id"] for r in result.get("results", []) if r.get("id")]
+    all_for_agent = m.get_all(filters={"user_id": agent_name}, top_k=_GET_ALL_TOP_K)
+    all_items = all_for_agent.get("results", all_for_agent) if isinstance(all_for_agent, dict) else all_for_agent
+    retrievable_ids = {i.get("id") for i in all_items}
+    unverified_ids = [mid for mid in written_ids if mid not in retrievable_ids]
+    result["verified"] = len(unverified_ids) == 0
+    result["unverified_ids"] = unverified_ids
+    m.vector_store.client.close()
     return result
 
 
@@ -120,6 +165,19 @@ def read_recent(agent_name: str, last_n: int = 10) -> list[dict]:
     most-recent-first, sorted by the real created_at timestamp Mem0
     assigns at write time (not assumed to already be in order -- get_all()
     makes no ordering guarantee, sorted explicitly here).
+
+    Bug A fix (2026-09-20): `m.get_all()` below now passes an explicit
+    `top_k=_GET_ALL_TOP_K`. Without it, `Memory.get_all()`'s own default
+    (`top_k: int = 20`) silently truncated the candidate pool to at most
+    20 matches BEFORE this function's own last_n slicing/sorting ever ran
+    -- confirmed this was the true, complete root cause of "a write
+    reports success but the entry doesn't show up on read" (not a write-
+    persistence bug: the write path's own SQLite commit was already
+    durable, and both entries this session that were reported missing
+    were proven present, correctly timestamped, sitting just past
+    position 20 in an unordered scroll, the entire time). See
+    `_GET_ALL_TOP_K`'s own comment for why this value and not the
+    collection's full point count.
     """
     m = _get_memory()
     # NOTE: a server-side nested filter (filters={"user_id": ...,
@@ -128,10 +186,11 @@ def read_recent(agent_name: str, last_n: int = 10) -> list[dict]:
     # it matched zero results with no error raised. Plain user_id filtering
     # is confirmed working, so the type=diary distinction is applied
     # client-side only, below.
-    result = m.get_all(filters={"user_id": agent_name})
+    result = m.get_all(filters={"user_id": agent_name}, top_k=_GET_ALL_TOP_K)
     items = result.get("results", result) if isinstance(result, dict) else result
     diary_items = [i for i in items if (i.get("metadata") or {}).get("type") == "diary"]
     diary_items.sort(key=lambda i: i.get("created_at", ""), reverse=True)
+    m.vector_store.client.close()
     return diary_items[:last_n]
 
 
@@ -152,7 +211,14 @@ def _cli():
 
     if args.command == "write":
         result = write_entry(args.agent, args.entry, args.topic)
-        print(f"WROTE: {result}")
+        if result.get("verified", True):
+            print(f"WROTE: {result}")
+        else:
+            print(
+                f"WARNING: write call succeeded but read-after-write "
+                f"verification FAILED for id(s) {result.get('unverified_ids')} "
+                f"-- this entry may not be retrievable. Full response: {result}"
+            )
     elif args.command == "read":
         entries = read_recent(args.agent, args.last_n)
         print(f"=== {len(entries)} recent entries for agent '{args.agent}' ===")
