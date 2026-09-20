@@ -6328,3 +6328,73 @@ Diary write: `tools/prv3_diary.py write --agent claude-code --topic
 present via a fresh read using the tool's own corrected verification
 logic, then independently re-confirmed via a separate `read --last-n 30`
 call showing all 29 real entries in place.
+
+## SESSION CLOSEOUT (2026-09-20, terminal Claude Code) -- full arc index,
+## no new decisions this entry -- MOB stays v4.316
+
+**Session-level index only.** Seven distinct workstreams this session,
+each already fully detailed in its own Section 16 entry above with its
+own version bump where a real decision landed -- this entry indexes
+them for a fast next-session read, it does not restate their detail or
+bump the version further (pure session-log summary, per the closeout
+protocol's own "leave unchanged for session log entries only" rule).
+
+1. **Legal exposure "25,000-25,000" display bug** -- root-caused (TRUE
+   EQUALITY, not rounding), fixed, regression-tested. MOB v4.312.
+2. **`signal_map_context`/Trajectory silent-failure bug** -- this
+   session's own earlier `option_ids` widening left `engine/main.py`
+   reading a stale key, silently nulling synthesis context and
+   trajectory for every real Path 1 session. Fixed, 6 new checks. MOB
+   v4.313.
+3. **Friction tax ledger shipped** (Gemini-gated, 2 rounds) plus the
+   org_type threading fix it surfaced -- Phase 1 never collected
+   org_type at all, silently nulling `friction_tax_estimate` and the
+   new ledger's `dollar_exposure` for every real session. Both UI
+   decisions (accordion default-open, footnote copy) resolved by Pete
+   mid-arc. MOB v4.314.
+4. **Two candidate planning docs** -- "ALL DATA IS USEFUL" (Provisional
+   Hold) and asset-integration-into-resolution-scope.md (Option 3
+   explicitly reinstated after being cut). Documentation only, no
+   version bump.
+5. **Quarterly Step-Back #4** -- independent pass + reconciliation, no
+   correction needed this cycle (unlike #3's Loureiro correction).
+   Convergent ALL-DATA-IS-USEFUL finding across both passes, two
+   doubly-verified findings (Dropbox Sign 403, `fastapi` framework
+   field). Vercel "10GB" mystery fully resolved: Function Storage
+   (bundle size), not deployment count. MOB v4.315.
+6. **Diary-write integrity audit** -- 3 entries this session found
+   falsely claiming a write happened, corrected in place with dated
+   amendments. Numpy removal from `engine/accumulation.py` captured as
+   a gated future task (two gates, neither satisfied), not actioned.
+7. **`tools/prv3_diary.py` Bug A/B** -- genuine self-correction: first
+   diagnosis (write-path/shutdown theory) was wrong, caught via the
+   fix's own internal contradiction before being shipped as final. Real
+   cause: `Memory.get_all()`'s undocumented `top_k=20` default, silently
+   hiding 9 of 29 real entries deterministically. Fixed properly,
+   verified end to end via the real CLI. Local-Qdrant/no-cloud
+   architecture confirmed intentional against the 2026-08-26 retirement
+   record. MOB v4.316.
+
+**Open items carried forward, all Pete's calls, none forced:** `gh` CLI
+still not installed (a `winget` attempt this session failed on a UAC
+prompt with nobody present to approve -- Pete needs to run it
+interactively). Local dev Upstash Redis credentials missing
+(informational only, production already has them). Function Storage
+remediation not executed (dashboard-only `deploymentsToKeep` reduction,
+and/or the gated numpy removal). Dropbox Sign provisioning still
+unconfirmed -- a `403` on env-var listing, now confirmed twice
+independently across two step-backs; Pete checking the dashboard
+directly is the fastest remaining close. Attorney-review gate and the
+pilot-mechanism recommendation unchanged from Step-Back #3. Next
+Quarterly Step-Back due **2026-10-03**.
+
+**Repo state at closeout:** every substantive change this session is
+already committed and pushed to `main` individually, not batched into
+one closeout commit -- `git log` from `f932cf8` forward covers the full
+arc. Working tree clean except the pre-existing, untouched
+`tools/_salience_pilot_*`/`tools/gemini_prompts/`/`tools/gemini_responses/`
+scratch pile, unrelated to this session's work throughout.
+
+Diary write: `tools/prv3_diary.py write --agent claude-code --topic
+"session-closeout-2026-09-20-full-arc"`, this session -- verified
+present via the tool's own newly-fixed read-after-write check.
