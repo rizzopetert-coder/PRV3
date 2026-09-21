@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.316
+\\\#\\\# MOB v4.317
 
   
 
@@ -468,6 +468,8 @@ Service offering names, pricing, UX, marketing site, instrument delivery interfa
 | Advisory | \*\*Executive Advisory\*\* |
 
 \*\*Diagnostic is unaffected\*\* — remains branded, sits above the four as the entry-point layer per the Session 33 two-tier lock. Nothing about Diagnostic's name, position, or treatment changed.
+
+\*\*CORRECTION, September 2026 (commercial-name correction session) — the two tables above no longer reflect the current standing name set for "First Call."\*\* Both tables say First Call was renamed to "Intervention" per the S47 lock — that was accurate at the time it was written, but Pete's later, final, confirmed decision (this session, full record in Section 14 and Section 16) is a deliberate PARTIAL adoption of the S47 set: People Tactics and Strategy (now spelled "People Tactics & Strategy"), Training & Development, and Executive Advisory are confirmed as S47 locked them, but First Call is retained as First Call going forward — "Intervention" is not the live commercial name for that service. Do not read these two tables as current for that one row; the corrected mapping is Groundwork -> People Tactics & Strategy, Development -> Training & Development, First Call -> First Call (unchanged), Advisory -> Executive Advisory.
 
 \*\*Individual coaching as a service offering — locked, full decision record in Section 16 (MOB v4.19), not duplicated here:\*\* Nested as a delivery mode within Executive Advisory, not a fifth named service — no change to the five service names above. Confidentiality boundary (fixed-category, open-content reporting template) and its final verbatim client-facing field wording closed out August 2026 — see the "June 2026 — Individual Coaching Service Offering" and "August 2026 — Individual coaching" Section 16 entries for the complete decision and execution detail.
 
@@ -1682,6 +1684,8 @@ Last updated: This session (Claude Code), 2026-09-07 -- full resequencing per Pe
 | **August 2026 -- P-13 gets a standing site-wide mechanism: Contextual Orientation Affordance shipped** | Third application of the already-locked P-13 principle (Section 14, 2026-08-19 row above), and the first built as a reusable, standing component rather than a one-off per-surface build like the two precedents that row names (ConstellationField's gestalt-interpretability addendum, /book/toc's Terminology Guide) -- not a new P-## and not a rewording of P-13 itself, matching the exact convention that row already established for a new application. New component web/components/ContextOrientation.tsx (polymorphic: inline/floating/modal-drawer variants; desktop hover/focus resolves an anchored panel using the real, already-shipped [data-emphasis] recede/resolve utilities, untouched by this build; mobile taps open a vaul bottom drawer, exact shape copied from the Terminology Guide's own Drawer.Root/Portal/Overlay/Content/Title pattern, not reinvented) plus web/data/orientation-copy.ts (net-new, hand-authored static registry + two templated helpers, getBookPieceOrientation(contentType, voice) and getResultsOrientation(severityTier, resolutionFamily)). Wired across 5 surfaces: diagnostic flow (floating, templated by the real FlowState shape -- intake/question/checkpoint-via-spliced-label/narrative, not the literal "checkpoint phase" the original spec named, since no such phase exists in DiagnosticFlow.tsx), /book/toc (inline, deliberately distinct from and not duplicating the existing Terminology Guide), /book/[type]/[slug] articles (inline, above the H1, templated by contentType/voice), and both output screens (PrivateOutput.tsx/ShareableOutput.tsx, inline, above the first content block, templated by severity/resolution_family -- substituted for a "routingMode" field that doesn't exist on PrivateOutputPayload). Homepage confirmed to already carry its own hand-authored orientation copy (shipped a prior session, web/app/page.tsx lines 43-68) -- no new affordance added there. Architecture verified against live source across two independent passes before any code was written (component/dependency/token claims, then transition-spec/Terminology-Guide claims) -- zero open discrepancies at build time; full record prompts/context-orientation-build-plan.md, which also flags 6 places the original spec's field/state names didn't map 1:1 onto real code and how each was resolved. Copy written against P-14's locked wording verbatim, plain operational language throughout -- no state names, dimension names, or taxonomy terms in the orientation copy itself. Hard token constraint enforced and grep-swept before every commit: --color-rust/--urgency/--urgency-text never used anywhere in this component or data file -- confirmed zero non-comment matches (the only 3 grep hits across all touched files were this component's own comment declaring the prohibition, plus two pre-existing, unrelated comments in PrivateOutput.tsx/ShareableOutput.tsx describing severityAccentTokens()'s legitimate, untouched severity-badge usage). Verified clean: tsc --noEmit 0 errors, vitest 45/45 (no regression), eslint 0 new errors (4 pre-existing DiagnosticFlow.tsx react-hooks/set-state-in-effect errors confirmed identical before/after via git-stash-diff, same baseline this project has carried since Narrative Modulation shipped). No visual/browser check possible in this environment, same documented limitation as every prior theme-rollout session -- flagged, not silently skipped. | This session (Claude Code), 2026-08-28 | MOB v4.261 |
 
 | **Homepage restructure -- scoped local-palette isolation pattern locked; NavBar.tsx confirmed permanently out of scope for this build** | Two related architectural decisions, both confirmed directly by Pete mid-build, not defaulted to. **Isolation pattern:** any future homepage-only palette work follows the `.home-scope`-wrapper-plus-`--home-*`-prefixed-token pattern established this session (`web/app/globals.css`), not bare token names matching existing v2/v1 names -- a bare name would shadow the real sitewide token of the same name for any descendant that consumes it, confirmed load-bearing here specifically because `--slate` (v2, `#5C6B66`) and this build's own Option-A `--slate` (`#2458A4`) are different colors that happen to share a name. **NavBar.tsx boundary:** `NavBar.tsx`'s real global nav (Book + About dropdown, `aboutOpen`/`aboutRef` state machine, click-outside handler) is confirmed off-limits for the homepage restructure specifically, not a general prohibition on ever touching that file -- Pete's instruction corrected an earlier build-plan reading that would have replaced the dropdown with a flat five-item nav sitewide. `MobileMenu.tsx` (new, real gap -- no mobile menu existed anywhere in this codebase before this session) established the pattern for adding chrome-adjacent functionality without editing `NavBar.tsx` itself: a fully self-contained component (own trigger + overlay) mounted as a sibling to `<NavBar />` in `web/app/layout.tsx`. Full build record, including the mid-build scope correction and its rationale: `prompts/homepage-restructure-plan.md`. Section 13a Decision Register row (same title) carries the full build/verification detail -- this row is the architectural-decision record specifically, not a duplicate. | This session (Claude Code), 2026-08-29 | MOB v4.266 |
+
+| **Commercial-name correction (partial S47 adoption) + service route renaming, both live-verified** | LOCKED: `engine/resolution_families.py`'s `ENGINE_TO_COMMERCIAL_NAME` corrected -- "People Tactics and Strategy" -> "People Tactics & Strategy" (ampersand), "Intervention" -> "First Call". Engine-internal routing keys (`STATE_CAUSATION_OVERRIDES`' "Intervention" values, `engine/data/states.py`'s per-state `resolution_family` defaults) are explicitly UNCHANGED -- only the commercial/display translation changed. **This is a deliberate PARTIAL adoption of the Session 47 rename set**, correcting the Section 1 "Five service names" and "Resolution service renaming" tables (both flagged inline where they live): People Tactics & Strategy, Training & Development, and Executive Advisory are confirmed as S47 locked them, but First Call is retained rather than adopting "Intervention" for that one service -- Pete's final, explicit decision this session. All 19 `RESOLUTION_FALLBACK_COPY` entries (keys + prose, not a subset) updated in lockstep, mirrored exactly in `web/lib/resolution-family.ts` and `web/lib/types.ts`. Two additional real hardcoded occurrences found and fixed beyond the originally scoped file list: `web/data/orientation-copy.ts`'s `RESULTS_FAMILY_DETAIL` (a silent-fallback risk -- a stale key there would have degraded every First-Call-routed result to generic copy without ever erroring) and `web/components/DiagnosticFixturePicker.tsx` (caught twice -- once by search, once by `tsc` itself catching a second hardcoded literal the search missed). Two published book essays corrected mechanically (ampersand spelling only, zero voice change). **Route renaming (Fix 1, separate decision, don't conflate):** three temporary route slugs renamed to match the corrected commercial names literally -- `/groundwork` -> `/people-tactics-and-strategy`, `/development` -> `/training-and-development`, `/advisory` -> `/executive-advisory` (`/first-call` unchanged) -- Pete's explicit choice. Sidebar and landing-page visible labels also unified to the same commercial names (a live mid-build confirmation from Pete, since the sidebar's own earlier-approved teaser copy had used different working names). **`/about/services`' 4 anchor ids left deliberately UNCHANGED** (`#people-tactics-and-strategy`, `#training-development`, `#intervention`, `#executive-advisory`) -- decoupled from both the new route slugs and the corrected display names, since `web/app/book/toc/page.tsx` links 97 real state badges to these exact ids (`RESOLUTION_FAMILY_ANCHORS`) and renaming them for cosmetic consistency would require updating all 97 for zero user-visible benefit. A future session should not "fix" this apparent id/label mismatch without also updating book/toc's own map. **Verified, not just dict-inspected:** full 11-script engine suite pass, `tools/test_resolution_families.py` 119/119, `tsc --noEmit` clean, vitest 99/99, 175-profile calibration 171/175 (exact match to the documented baseline, confirmed unaffected). Real end-to-end proof: the actual `engine/main.py` `run_engine()` entrypoint called live for `culture_drift` (a genuine Intervention-default state, not a synthetic fixture) confirmed raw `resolution_routing` stays `'Intervention'` while the same translation function the live API layer calls now returns `'First Call'`. This session also shipped the persistent four-section `ServiceSidebar` (`web/components/ServiceSidebar.tsx`, layout-level, suppressed on `/diagnostic` in favor of an in-flow "SERVICES" top-nav strip -- a `fixed`-position first attempt was tried and rejected after live browser verification showed it overlapping `AssemblyPanel`'s sticky right-column heading once Phase 2 rendered), First Call's section carrying a permanent `bg-rust` fill as a deliberate, Pete-approved, sidebar-scoped exception to rust's standing Endemic-severity-only reservation elsewhere in the product. First Call intake form's Personnel disclaimer corrected to two plain sentences, zero em dashes. | This session (Claude Code), 2026-09-20 | MOB v4.317 |
 
 
 
@@ -6398,3 +6402,172 @@ scratch pile, unrelated to this session's work throughout.
 Diary write: `tools/prv3_diary.py write --agent claude-code --topic
 "session-closeout-2026-09-20-full-arc"`, this session -- verified
 present via the tool's own newly-fixed read-after-write check.
+
+
+## SESSION LOG (2026-09-20, terminal Claude Code, continuation) -- service
+tier landing pages, persistent sidebar, route renaming, commercial-name
+correction
+
+Four items shipped this session, in sequence. Items 2 and 3 are two
+independent fixes done in the same pass -- kept explicitly separate below
+per Pete's own instruction not to conflate them.
+
+**1. Service tier landing pages + persistent sidebar.** New layout-level
+`ServiceSidebar.tsx`, mounted in `web/app/layout.tsx` wrapping `{children}`
+directly (owns its own flex wiring rather than layout.tsx hardcoding one
+shape, since the two modes below need genuinely different structure).
+Renders a four-section stacked sidebar on every route except `/diagnostic`
+-- confirmed necessary via direct read of `AssemblyPanel.tsx` (sticky w-72
+aside) and `StateDrawer.tsx` (fixed w-80 drawer), both already claiming the
+right edge there and both switching to Vaul bottom sheets on mobile; a
+third persistent column would fight both for space and z-index, separate
+from the diagnostic's own case for staying free of a persistent sales nav
+during a private, reflective flow. On `/diagnostic`, collapses to a
+discreet "SERVICES" trigger. **First attempt used `fixed` positioning and
+was wrong** -- looked fine on the gate screen, then visibly overlapped
+AssemblyPanel's sticky heading the moment Phase 2 rendered, caught by live
+browser verification, not assumed correct from the code alone. Rebuilt as
+an in-flow thin strip directly below NavBar instead, removing the
+collision by construction. Re-verified clean through a real Phase 2
+selection flow. First Call's sidebar section carries a permanent `bg-rust`
+fill at all times, not just on hover -- a deliberate, Pete-approved,
+sidebar-scoped exception to `--color-rust`'s standing reservation for
+genuine Endemic-severity signaling elsewhere in the product
+(`ConstellationField.tsx`, `PrivateOutput.tsx`, `ShareableOutput.tsx` all
+still enforce that reservation unchanged; this sidebar is the only place
+`bg-rust` is used as a background fill anywhere in the codebase). Verified
+live across Warm, Dark, and Neutral themes (`data-theme` confirmed via JS
+each time) -- reads clearly and intentionally in all three, checked by
+screenshot, not computed contrast math alone. `/first-call`'s existing
+crisis-intake page already satisfied the "landing copy + form on one page"
+merge requirement -- no structural change needed there. `/about/services`
+shrunk to a brief overview linking out to the four landing pages; its four
+section ids were flagged as a live dependency BEFORE editing (web/app/
+book/toc/page.tsx links 97 real state badges to these exact anchors,
+confirmed via direct grep) and kept unchanged on Pete's explicit
+confirmation, see item 3 below for why this decoupling matters going
+forward.
+
+**2. Route renaming (Fix 1).** `/groundwork` -> `/people-tactics-and-
+strategy`, `/development` -> `/training-and-development`, `/advisory` ->
+`/executive-advisory` (`/first-call` unchanged) -- Pete's explicit choice,
+route matches the final commercial name literally. All internal links
+updated (`ServiceSidebar.tsx`, `ServicesPageContent.tsx`'s four outbound
+links); `NavBar.tsx` and `WayfindingGrid.tsx` confirmed via direct grep to
+carry zero references to any of these routes, before or after. Old routes
+confirmed live to 404 cleanly. **Mid-task clarifying question asked and
+answered:** the sidebar/landing-page visible labels still read
+"Groundwork"/"Development"/"Advisory" (Pete's own earlier-approved sidebar
+teaser copy) while the routes were becoming the engine's commercial-name
+slugs -- Pete confirmed unifying the visible labels too, so the sidebar,
+the three landing pages, and `/about/services`' outbound link text all now
+read People Tactics & Strategy / Training & Development / First Call /
+Executive Advisory, matching the routes exactly.
+
+**3. Commercial-name correction (Fix 2), kept independent of Fix 1.**
+`engine/resolution_families.py`'s `ENGINE_TO_COMMERCIAL_NAME` values
+corrected: "People Tactics and Strategy" -> "People Tactics & Strategy"
+(ampersand), "Intervention" -> "First Call". Dict **keys** (the raw engine
+routing names) and every engine-internal use of "Intervention" as a
+routing key (`STATE_CAUSATION_OVERRIDES`, `engine/data/states.py`'s
+per-state defaults) are explicitly untouched -- confirmed methodically,
+not assumed, by tracing every remaining "Intervention" string after the
+edit and classifying each one as raw-engine-key space (left alone) or
+commercial-name space (changed). All 19 `RESOLUTION_FALLBACK_COPY`
+entries (12 single + 7 compound -- **flagging: the actual count is 19, not
+26 as stated in this task's brief; 19 matches this session's own earlier
+MOB record, so 26 appears to be a misremembering, not something forced to
+fit**) updated, keys and prose both, mirrored exactly in `web/lib/
+resolution-family.ts` and `web/lib/types.ts`. **A stated fact in the task
+brief didn't hold up:** the brief pointed at a hardcoded `getPrimaryFamily()`
+fallback in `result/route.ts`/`share/create/route.ts` -- confirmed via
+repo-wide grep that function no longer exists anywhere in the codebase
+(the header comment in `resolution-family.ts` itself already documents its
+removal); both routes already call the shared `translateResolutionFamily()`.
+No edit was made there since none was needed, rather than forcing one to
+match a stale instruction. **Two additional real hardcoded occurrences**
+found via the explicitly-requested "anywhere else in web/" search, beyond
+the brief's own file list: `web/data/orientation-copy.ts`'s
+`RESULTS_FAMILY_DETAIL` (a silent-fallback risk -- a stale key there
+degrades every First-Call-routed result to generic orientation copy
+without ever erroring, same failure class as this session's earlier
+ALL-DATA-IS-USEFUL findings) and `web/components/DiagnosticFixturePicker.tsx`
+(caught twice -- once by the search, once independently by `tsc` itself
+catching a second hardcoded literal the search had missed). Two published
+book essays (`organizational-assessment-methodology.md`,
+`organizational-assessment-sop.md`) corrected mechanically -- ampersand
+spelling only, zero voice or content change.
+
+**`/about/services`' 4 anchor ids left deliberately UNCHANGED**
+(`#people-tactics-and-strategy`, `#training-development`, `#intervention`,
+`#executive-advisory`) -- decoupled from both the new route slugs (item 2)
+and the corrected display names (item 3), since `web/app/book/toc/page.tsx`
+links 97 real state badges to these exact ids
+(`RESOLUTION_FAMILY_ANCHORS`) and renaming them for cosmetic consistency
+would require updating all 97 for zero user-visible benefit. **Flagging
+explicitly so a future session doesn't "fix" this apparent mismatch by
+mistake:** the id string and the display text it points to are allowed to
+differ, on purpose, going forward.
+
+**Correcting the record on the disputed "Session 47 -> Intervention"
+entries.** Section 1's "Five service names" and "Resolution service
+renaming" tables both read as if "Intervention" were still the live
+commercial name for First Call -- corrected in place with a dated
+inline note (not rewritten; the original S47 record was accurate when
+written). **Pete's final, confirmed standing name set, effective this
+session:** People Tactics & Strategy, Training & Development, First Call,
+Executive Advisory -- a deliberate PARTIAL adoption of the S47 rename set.
+Three of the four S47 names are confirmed as locked; First Call is
+retained rather than adopting "Intervention" for that one service. Full
+locked-decision record in Section 14 (new row, this session).
+
+**4. First Call intake form -- Personnel disclaimer em-dash fix.** Bundled
+fix: the disclaimer text now reads as two plain sentences ("We do not
+handle union organizing, collective bargaining, or decertification. We
+will refer you to labor counsel.") with zero em dashes, matching the
+standing copy rule. Verified live.
+
+**Verification, all real, not assumed:** full 11-script engine suite
+pass; `tools/test_resolution_families.py` 119/119; `tsc --noEmit` clean;
+vitest 99/99 (full 57-state gold-master table in
+`resolution-family.test.ts` included); 175-profile calibration **171/175**,
+exact match to the documented baseline, confirmed unaffected (this was a
+text/copy change, zero scoring-logic impact, and the run proves it, not
+just asserts it). **Live output proof, not just dict inspection:** called
+the actual `run_engine()` entrypoint -- the same function `api/engine.py`
+calls in production -- end to end for `culture_drift` (a real
+Intervention-default state, not a synthetic fixture). Raw
+`resolution_routing` correctly stayed `'Intervention'` (internal key
+untouched); the same translation function the live API layer calls now
+correctly returns `'First Call'`. Route renames and sidebar/landing-page
+display all verified live in the browser preview across the affected
+routes, `/diagnostic`'s suppressed-sidebar and in-flow trigger, and
+`/about/services`' preserved anchors.
+
+**Files touched, git status confirmed before this entry:** `engine/
+resolution_families.py`, `tools/test_resolution_families.py`, `web/
+.env.local.example` (untouched this pass, listed for completeness --
+no new env var), `web/app/about/services/page.tsx`, `web/app/layout.tsx`,
+`web/components/DiagnosticFixturePicker.tsx`, `web/components/
+ServicesPageContent.tsx`, `web/content/book/methodology/
+organizational-assessment-methodology.md`, `web/content/book/methodology/
+organizational-assessment-sop.md`, `web/data/orientation-copy.ts`, `web/
+lib/output-text.test.ts`, `web/lib/resolution-family.test.ts`, `web/lib/
+resolution-family.ts`, `web/lib/types.ts` (all modified); `web/app/
+executive-advisory/`, `web/app/first-call/`, `web/app/
+people-tactics-and-strategy/`, `web/app/training-and-development/`,
+`web/components/ServiceSidebar.tsx` (all new, untracked pending this
+closeout's commit). `web/app/api/first-call/` and `web/lib/
+first-call-admin-session.ts` also still untracked from an earlier pass
+this same continuation, not yet committed -- included in this closeout.
+
+**Open items carried forward, unchanged from the prior closeout:** `gh`
+CLI still not installed, local dev Upstash Redis credentials missing
+(informational only), Function Storage remediation not executed, Dropbox
+Sign provisioning still unconfirmed, attorney-review gate and pilot-
+mechanism recommendation unchanged. Next Quarterly Step-Back due
+**2026-10-03**, unchanged. **New open item:** full body copy for the four
+landing pages (beyond the approved sidebar teaser lines) is an explicit,
+separate follow-up pass, not started this session by design.
+
+MOB v4.317.
