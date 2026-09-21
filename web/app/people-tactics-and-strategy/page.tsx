@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
-// Landing page shell (this session). Structure and the sidebar teaser copy
-// only -- full body copy is an explicit separate follow-up pass, see
-// tools/_mob.txt. Corrects the /about/services-era description
+// Landing page shell and body copy shipped MOB v4.317 -- see
+// tools/_mob.txt Section 16. Corrects the /about/services-era description
 // ("structural diagnosis and resolution," not group training -- that's
 // Training & Development's territory). Route slug and display name both
 // match engine/resolution_families.py's commercial name for this service
@@ -23,9 +23,39 @@ export default function PeopleTacticsAndStrategyPage() {
           We find the organizational conditions producing your problems and
           resolve them at the structure, not just the symptom.
         </h1>
-        <p className="font-ui text-sm text-(--slate)">
-          Full detail on this page is coming soon.
-        </p>
+        <div className="space-y-4">
+          <p className="font-ui text-sm text-(--slate) leading-relaxed">
+            People challenges are rarely a simple, single problem to solve.
+            A manager who can&apos;t hold a team together is a web of
+            nuanced storylines. By the time it escalates to a
+            decision-maker&apos;s desk, each of those storylines is a
+            compounding problem for the business. The best-case solution
+            requires hours of effort, patience, and expertise. That&apos;s
+            where we come in.
+          </p>
+          <p className="font-ui text-sm text-(--slate) leading-relaxed">
+            We work inside your organization alongside the people who have
+            to live with the outcome, building the structural fix rather
+            than handing you a slide deck and a bill. This is embedded
+            work, not a report. Engagements are scoped to what&apos;s
+            actually in front of you, priced by the work required rather
+            than a fixed package, with day rates available when the work
+            calls for us on-site.
+          </p>
+          <p className="font-ui text-sm text-(--slate) leading-relaxed">
+            If you&apos;re not sure whether what you&apos;re facing is a
+            People Tactics &amp; Strategy problem or something else,
+            that&apos;s what the diagnostic is for. Fifteen minutes tells
+            you which of the four conditions applies before you commit to
+            any of them.
+          </p>
+        </div>
+        <Link
+          href="/diagnostic"
+          className="inline-block mt-8 font-ui text-sm font-medium text-ink underline hover:opacity-90 transition-opacity"
+        >
+          Take the diagnostic →
+        </Link>
       </div>
     </main>
   );
