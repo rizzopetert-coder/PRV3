@@ -10,6 +10,7 @@ import {
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
 import { MobileMenu } from "@/components/MobileMenu";
+import { ServiceSidebar } from "@/components/ServiceSidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -97,7 +98,13 @@ export default function RootLayout({
             self-contained (own fixed trigger + overlay), so this is the
             only wiring point needed. */}
         <MobileMenu />
-        {children}
+        {/* Persistent service sidebar (this session) -- ServiceSidebar owns
+            the flex wiring itself (row w/ right column normally, column
+            w/ a thin top strip on /diagnostic) since the two modes need
+            genuinely different structure, not just a different sidebar
+            child. See ServiceSidebar.tsx's own header comment, including
+            why the /diagnostic trigger is in-flow rather than `fixed`. */}
+        <ServiceSidebar>{children}</ServiceSidebar>
       </body>
     </html>
   );
