@@ -120,7 +120,7 @@ export function ServiceSidebar({ children }: { children: ReactNode }) {
     return (
       <div className="flex flex-col flex-1 min-h-0">
         <div className="relative border-b border-line bg-field shrink-0 z-40">
-          <div className="flex justify-end px-6 py-1.5">
+          <div className="flex justify-start px-6 py-1.5">
             <button
               type="button"
               onClick={() => setIsOpen((o) => !o)}
@@ -133,7 +133,7 @@ export function ServiceSidebar({ children }: { children: ReactNode }) {
             </button>
           </div>
           {isOpen && (
-            <div className="absolute right-6 top-full bg-field border border-line py-1 min-w-[200px] shadow-sm z-50">
+            <div className="absolute left-6 top-full bg-field border border-line py-1 min-w-[200px] shadow-sm z-50">
               <ServiceDropdownLinks onNavigate={() => setIsOpen(false)} />
             </div>
           )}
@@ -145,13 +145,12 @@ export function ServiceSidebar({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex flex-1">
-      <div className="flex-1 min-w-0">{children}</div>
-      <aside className="hidden md:flex md:flex-col w-72 shrink-0 border-l border-line bg-field sticky top-0 h-screen">
+      <aside className="hidden md:flex md:flex-col w-72 shrink-0 border-r border-line bg-field sticky top-0 h-screen">
         {SERVICES.map((s) => (
           <Link
             key={s.id}
             href={s.href}
-            className={`flex-1 flex flex-col justify-center px-6 border-b border-line last:border-b-0 transition-colors ${
+            className={`flex-1 flex flex-col justify-center px-6 py-6 border-b-8 border-field last:border-b-0 transition-colors ${
               s.rust ? "bg-rust text-white hover:opacity-90" : "text-(--slate) hover:bg-field-raise hover:text-ink"
             }`}
           >
@@ -163,6 +162,7 @@ export function ServiceSidebar({ children }: { children: ReactNode }) {
           </Link>
         ))}
       </aside>
+      <div className="flex-1 min-w-0">{children}</div>
     </div>
   );
 }
