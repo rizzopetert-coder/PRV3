@@ -145,7 +145,7 @@ export function ServiceSidebar({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex flex-1">
-      <aside className="hidden md:flex md:flex-col w-72 shrink-0 border-r border-line bg-field sticky top-0 h-screen">
+      <aside className="hidden md:flex md:flex-col w-72 shrink-0 border-r border-line bg-field sticky top-0 h-screen overflow-y-auto">
         {SERVICES.map((s) => (
           <Link
             key={s.id}
