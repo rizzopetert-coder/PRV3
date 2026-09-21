@@ -1037,6 +1037,15 @@ Superseded by the Mem0 configuration above. **RETIRED 2026-08-26** — MemPalace
 | **MOB in palace** | Palace MOB content is v1.8 (pre-Session 12). Treated as supplementary context only. Drive MOB governed. |
 | **Diary** | Session diary: write at close, read at open. Agent name: claude-code. |
 
+---
+
+## Cross-assistant operational bridge (2026-09-21)
+
+- **Principal Resolution — Practice Journal** (Google Docs, Gemini-maintained): day-to-day practice pulse, client pipeline status, inbound triage state. NOT a technical source of truth: service names, pricing, and architecture are defined in the MOB/engine and referenced there, never redefined there.
+- **The Home Journal** (Google Docs, Gemini-maintained): household/family operational log, out of PRV3 scope entirely, noted here only because Gemini now holds both.
+- **Gemini's role expanded 2026-09-21, Pete's explicit authorization**: beyond audit/propose on structural decisions, Gemini now monitors inbound prospect leads and maintains both journals as a persistent operational assistant.
+- **Practice Journal taxonomy error, corrected**: initially pulled a stale/incorrect 5-tier service taxonomy on creation (Stability Support, Executive Counsel, The Intervention, The Roadmap, Development) that did not match the confirmed 4-service set (People Tactics & Strategy, Training & Development, First Call, Executive Advisory). Corrected same-day on the Gemini side; verified directly against the live document, not just reported. One residual noted separately for cleanup: the Journal's Intake Protocols line still referenced "five engagement tiers" as of the fix.
+
 \\---
 
   
