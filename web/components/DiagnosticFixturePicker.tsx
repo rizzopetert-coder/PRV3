@@ -26,9 +26,9 @@ import PrivateOutput from "@/components/PrivateOutput";
 
 const SEVERITY_TIERS: SeverityTier[] = ["Emerging", "Entrenched", "Endemic"];
 const RESOLUTION_FAMILIES: SingleResolutionFamily[] = [
-  "People Tactics and Strategy",
+  "People Tactics & Strategy",
   "Training & Development",
-  "Intervention",
+  "First Call",
   "Executive Advisory",
 ];
 
@@ -87,7 +87,7 @@ export default function DiagnosticFixturePicker() {
   const [secondaryCount, setSecondaryCount] = useState(5);
   const [secondarySpacing, setSecondarySpacing] = useState(0.03);
 
-  const [resolutionFamily, setResolutionFamily] = useState<SingleResolutionFamily>("Intervention");
+  const [resolutionFamily, setResolutionFamily] = useState<SingleResolutionFamily>("First Call");
   const [resolutionRouting, setResolutionRouting] = useState(
     "Fixture placeholder resolution routing text -- edit freely.",
   );

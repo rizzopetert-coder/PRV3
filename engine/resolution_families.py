@@ -49,11 +49,20 @@ RESOLUTION_FAMILY_DESCRIPTIONS: dict[str, dict] = {
 # Maps resolution_family engine names (as they appear in engine/data/states.py)
 # to commercial service names used in client-facing output.
 # Locked Session 42. Supersedes Session 32 lock (Formation, Practicum, Counsel, Navigation).
+#
+# Commercial-name correction (this session): "People Tactics and Strategy" ->
+# "People Tactics & Strategy" (ampersand), "Intervention" -> "First Call".
+# The dict KEYS below (the raw engine routing names, e.g. "Intervention") are
+# UNCHANGED and never renamed -- engine/data/states.py's per-state
+# resolution_family values and STATE_CAUSATION_OVERRIDES below both still use
+# "Intervention" as an internal routing key. Only the commercial/display
+# VALUE for that key changes. Mirrored exactly in
+# web/lib/resolution-family.ts -- keep both in lockstep.
 
 ENGINE_TO_COMMERCIAL_NAME: dict[str, str] = {
-    "Roadmap":           "People Tactics and Strategy",
+    "Roadmap":           "People Tactics & Strategy",
     "Development":       "Training & Development",
-    "Intervention":      "Intervention",
+    "Intervention":      "First Call",
     "Executive Counsel": "Executive Advisory",
 }
 
@@ -211,22 +220,30 @@ def apply_causation_override(
 # Used when output_synthesis.py LLM call times out or fails.
 # Keyed by (commercial_name, severity_tier). Compound keys use severity_tier=None.
 # Source: documents/PRV3_Resolution_Families_Copy_v3.0.docx — Session 42.
+#
+# Commercial-name correction (this session): every key and prose value below
+# using "People Tactics and Strategy" or "Intervention" as a commercial/
+# display name is updated to "People Tactics & Strategy" / "First Call".
+# This dict is entirely commercial-name space (its own docstring: "Keyed by
+# (commercial_name, severity_tier)") -- unlike STATE_CAUSATION_OVERRIDES
+# above, nothing here is a raw engine key, so every occurrence in this block
+# was safe to rename.
 
 RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
 
-    # People Tactics and Strategy — engine: Roadmap
-    ("People Tactics and Strategy", "Emerging"): (
-        "A structural problem requires structural work. People Tactics and Strategy brings in the right expertise, "
+    # People Tactics & Strategy — engine: Roadmap
+    ("People Tactics & Strategy", "Emerging"): (
+        "A structural problem requires structural work. People Tactics & Strategy brings in the right expertise, "
         "targeted at what the diagnostic found, before it has time to settle in deeper."
     ),
-    ("People Tactics and Strategy", "Entrenched"): (
+    ("People Tactics & Strategy", "Entrenched"): (
         "The conditions producing this live in how your organization is designed, not in the people "
-        "navigating it. People Tactics and Strategy addresses that level directly — expert, targeted, and aimed "
+        "navigating it. People Tactics & Strategy addresses that level directly — expert, targeted, and aimed "
         "at the architecture rather than the symptoms."
     ),
-    ("People Tactics and Strategy", "Endemic"): (
+    ("People Tactics & Strategy", "Endemic"): (
         "When a condition becomes the environment, adjusting what happens inside it is not enough. "
-        "People Tactics and Strategy is the structural redesign — expert work at the level where the problem actually lives."
+        "People Tactics & Strategy is the structural redesign — expert work at the level where the problem actually lives."
     ),
 
     # Training & Development — engine: Development
@@ -244,17 +261,17 @@ RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
         "skill. It is about rebuilding the practices that determine whether any skill takes root."
     ),
 
-    # Intervention — engine: Intervention
-    ("Intervention", "Emerging"): (
-        "The situation requires someone in it, not advising from outside it. Intervention is that presence "
+    # First Call — engine: Intervention
+    ("First Call", "Emerging"): (
+        "The situation requires someone in it, not advising from outside it. First Call is that presence "
         "— engaged with what is happening while there is still room to shape it."
     ),
-    ("Intervention", "Entrenched"): (
-        "What is live right now requires more than a plan. Intervention means someone in the room, "
+    ("First Call", "Entrenched"): (
+        "What is live right now requires more than a plan. First Call means someone in the room, "
         "with the expertise and authority to move the situation, until it resolves."
     ),
-    ("Intervention", "Endemic"): (
-        "This does not respond to a plan or a program. Intervention is direct, immersive engagement "
+    ("First Call", "Endemic"): (
+        "This does not respond to a plan or a program. First Call is direct, immersive engagement "
         "— inside the situation, not above it, for as long as it takes."
     ),
 
@@ -274,30 +291,30 @@ RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
     ),
 
     # Compound copy — tier-agnostic
-    ("People Tactics and Strategy + Intervention", None): (
+    ("People Tactics & Strategy + First Call", None): (
         "The structure needs redesigning and the situation it created is live right now. "
-        "People Tactics and Strategy addresses the architecture. Intervention addresses the present."
+        "People Tactics & Strategy addresses the architecture. First Call addresses the present."
     ),
-    ("Intervention + People Tactics and Strategy", None): (
-        "Intervention handles what is active. People Tactics and Strategy follows — so what produced it does not reassemble."
+    ("First Call + People Tactics & Strategy", None): (
+        "First Call handles what is active. People Tactics & Strategy follows — so what produced it does not reassemble."
     ),
-    ("Executive Advisory + Intervention", None): (
-        "Executive Advisory provides the honest read on what the situation requires. Intervention executes it."
+    ("Executive Advisory + First Call", None): (
+        "Executive Advisory provides the honest read on what the situation requires. First Call executes it."
     ),
-    ("Intervention + Executive Advisory", None): (
-        "Intervention is present in the work. Executive Advisory is the confidential relationship running alongside it "
+    ("First Call + Executive Advisory", None): (
+        "First Call is present in the work. Executive Advisory is the confidential relationship running alongside it "
         "for the decisions the work produces."
     ),
-    ("Training & Development + People Tactics and Strategy", None): (
-        "Training & Development addresses the capability gap. People Tactics and Strategy addresses the structural conditions "
+    ("Training & Development + People Tactics & Strategy", None): (
+        "Training & Development addresses the capability gap. People Tactics & Strategy addresses the structural conditions "
         "that keep recreating it."
     ),
-    ("People Tactics and Strategy + Training & Development", None): (
-        "People Tactics and Strategy redesigns the environment. Training & Development follows — because capability built "
+    ("People Tactics & Strategy + Training & Development", None): (
+        "People Tactics & Strategy redesigns the environment. Training & Development follows — because capability built "
         "inside a broken structure does not hold."
     ),
-    ("Training & Development + Intervention", None): (
-        "Intervention addresses what is live. Training & Development addresses what the organization needs to be "
+    ("Training & Development + First Call", None): (
+        "First Call addresses what is live. Training & Development addresses what the organization needs to be "
         "able to do once it is through."
     ),
 }

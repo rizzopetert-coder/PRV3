@@ -32,7 +32,7 @@ const FULL_PAYLOAD: PrivateOutputPayload = {
     { state_id: "the_paper_tiger", tier: "Entrenched", score_0_100: 62 },
     { state_id: "state_b", tier: "Emerging", score_0_100: 20 },
   ],
-  resolution_family: "People Tactics and Strategy",
+  resolution_family: "People Tactics & Strategy",
   resolution_routing: "Routing description text.",
   friction_tax_estimate: { low: 50000, high: 120000, currency: "USD" },
   legal_tail_risk_exposure: {
@@ -83,7 +83,7 @@ const MINIMAL_PAYLOAD: PrivateOutputPayload = {
   primary_state: { id: "the_paper_tiger", name: "The Paper Tiger", weight: 1.0 },
   secondary_states: [],
   severity: "Emerging",
-  resolution_family: "People Tactics and Strategy",
+  resolution_family: "People Tactics & Strategy",
   resolution_routing: "Routing description text.",
   friction_tax_estimate: null,
   legal_tail_risk_exposure: null,
@@ -130,7 +130,7 @@ describe("buildResultsText -- full payload, every field present", () => {
   });
 
   it("includes the resolution pathway", () => {
-    expect(text).toContain("Resolution pathway: People Tactics and Strategy");
+    expect(text).toContain("Resolution pathway: People Tactics & Strategy");
     expect(text).toContain("The resolution framing text.");
   });
 

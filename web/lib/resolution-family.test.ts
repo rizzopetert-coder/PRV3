@@ -8,71 +8,71 @@ import { translateResolutionFamily, ENGINE_TO_COMMERCIAL_NAME } from "./resoluti
 // mirror produces byte-for-byte identical output to the Python source of
 // truth across every state, both single and compound.
 const REAL_STATE_TRANSLATIONS: Array<{ state_id: string; raw: string; translated: string }> = [
-  { state_id: "built_to_fail", raw: "Roadmap + Intervention", translated: "People Tactics and Strategy + Intervention" },
-  { state_id: "compression_crisis", raw: "Roadmap", translated: "People Tactics and Strategy" },
-  { state_id: "cultural_overtime", raw: "Intervention + Roadmap", translated: "Intervention + People Tactics and Strategy" },
-  { state_id: "culture_drift", raw: "Intervention", translated: "Intervention" },
-  { state_id: "decision_blindness", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "decision_paralysis", raw: "Roadmap + Intervention", translated: "People Tactics and Strategy + Intervention" },
-  { state_id: "disparate_impact_architecture", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "distributed_culture_fragmentation", raw: "Development + Intervention", translated: "Training & Development + Intervention" },
-  { state_id: "dueling_narratives", raw: "Executive Counsel + Roadmap", translated: "Executive Advisory + People Tactics and Strategy" },
-  { state_id: "groundhog_day", raw: "Roadmap + Executive Counsel", translated: "People Tactics and Strategy + Executive Advisory" },
-  { state_id: "heard_and_ignored", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "hr_capture", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "human_displacement_anxiety", raw: "Development + Intervention", translated: "Training & Development + Intervention" },
-  { state_id: "identity_erosion", raw: "Intervention", translated: "Intervention" },
-  { state_id: "invisible_burnout", raw: "Development + Intervention", translated: "Training & Development + Intervention" },
-  { state_id: "invisible_influence_architecture", raw: "Roadmap + Executive Counsel", translated: "People Tactics and Strategy + Executive Advisory" },
-  { state_id: "invisible_performance_management", raw: "Development + Roadmap", translated: "Training & Development + People Tactics and Strategy" },
-  { state_id: "leadership_continuity_risk", raw: "Roadmap + Development", translated: "People Tactics and Strategy + Training & Development" },
+  { state_id: "built_to_fail", raw: "Roadmap + Intervention", translated: "People Tactics & Strategy + First Call" },
+  { state_id: "compression_crisis", raw: "Roadmap", translated: "People Tactics & Strategy" },
+  { state_id: "cultural_overtime", raw: "Intervention + Roadmap", translated: "First Call + People Tactics & Strategy" },
+  { state_id: "culture_drift", raw: "Intervention", translated: "First Call" },
+  { state_id: "decision_blindness", raw: "Intervention + Executive Counsel", translated: "First Call + Executive Advisory" },
+  { state_id: "decision_paralysis", raw: "Roadmap + Intervention", translated: "People Tactics & Strategy + First Call" },
+  { state_id: "disparate_impact_architecture", raw: "Intervention + Executive Counsel", translated: "First Call + Executive Advisory" },
+  { state_id: "distributed_culture_fragmentation", raw: "Development + Intervention", translated: "Training & Development + First Call" },
+  { state_id: "dueling_narratives", raw: "Executive Counsel + Roadmap", translated: "Executive Advisory + People Tactics & Strategy" },
+  { state_id: "groundhog_day", raw: "Roadmap + Executive Counsel", translated: "People Tactics & Strategy + Executive Advisory" },
+  { state_id: "heard_and_ignored", raw: "Intervention + Executive Counsel", translated: "First Call + Executive Advisory" },
+  { state_id: "hr_capture", raw: "Intervention + Executive Counsel", translated: "First Call + Executive Advisory" },
+  { state_id: "human_displacement_anxiety", raw: "Development + Intervention", translated: "Training & Development + First Call" },
+  { state_id: "identity_erosion", raw: "Intervention", translated: "First Call" },
+  { state_id: "invisible_burnout", raw: "Development + Intervention", translated: "Training & Development + First Call" },
+  { state_id: "invisible_influence_architecture", raw: "Roadmap + Executive Counsel", translated: "People Tactics & Strategy + Executive Advisory" },
+  { state_id: "invisible_performance_management", raw: "Development + Roadmap", translated: "Training & Development + People Tactics & Strategy" },
+  { state_id: "leadership_continuity_risk", raw: "Roadmap + Development", translated: "People Tactics & Strategy + Training & Development" },
   { state_id: "leadership_deafness", raw: "Executive Counsel", translated: "Executive Advisory" },
-  { state_id: "motivational_architecture_failure", raw: "Intervention + Roadmap", translated: "Intervention + People Tactics and Strategy" },
-  { state_id: "narrative_lock", raw: "Executive Counsel + Intervention", translated: "Executive Advisory + Intervention" },
-  { state_id: "paper_shield", raw: "Roadmap", translated: "People Tactics and Strategy" },
-  { state_id: "pay_exposure", raw: "Roadmap", translated: "People Tactics and Strategy" },
-  { state_id: "planning_authority_gap", raw: "Roadmap + Executive Counsel", translated: "People Tactics and Strategy + Executive Advisory" },
-  { state_id: "sequential_decision_blindness", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "silosolation", raw: "Roadmap", translated: "People Tactics and Strategy" },
-  { state_id: "the_arbitrary_standard", raw: "Intervention + Roadmap", translated: "Intervention + People Tactics and Strategy" },
-  { state_id: "the_basement_standard", raw: "Intervention + Roadmap", translated: "Intervention + People Tactics and Strategy" },
+  { state_id: "motivational_architecture_failure", raw: "Intervention + Roadmap", translated: "First Call + People Tactics & Strategy" },
+  { state_id: "narrative_lock", raw: "Executive Counsel + Intervention", translated: "Executive Advisory + First Call" },
+  { state_id: "paper_shield", raw: "Roadmap", translated: "People Tactics & Strategy" },
+  { state_id: "pay_exposure", raw: "Roadmap", translated: "People Tactics & Strategy" },
+  { state_id: "planning_authority_gap", raw: "Roadmap + Executive Counsel", translated: "People Tactics & Strategy + Executive Advisory" },
+  { state_id: "sequential_decision_blindness", raw: "Intervention + Executive Counsel", translated: "First Call + Executive Advisory" },
+  { state_id: "silosolation", raw: "Roadmap", translated: "People Tactics & Strategy" },
+  { state_id: "the_arbitrary_standard", raw: "Intervention + Roadmap", translated: "First Call + People Tactics & Strategy" },
+  { state_id: "the_basement_standard", raw: "Intervention + Roadmap", translated: "First Call + People Tactics & Strategy" },
   { state_id: "the_broken_compass", raw: "Executive Counsel", translated: "Executive Advisory" },
-  { state_id: "the_burned_credibility", raw: "Intervention", translated: "Intervention" },
-  { state_id: "the_culture_that_wasnt", raw: "Intervention", translated: "Intervention" },
-  { state_id: "the_diversity_ceiling", raw: "Intervention", translated: "Intervention" },
-  { state_id: "the_dormant_talent", raw: "Executive Counsel + Intervention", translated: "Executive Advisory + Intervention" },
-  { state_id: "the_exposed", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "the_founders_grip", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "the_fracture", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "the_inside_track", raw: "Intervention + Roadmap", translated: "Intervention + People Tactics and Strategy" },
-  { state_id: "the_lost_map", raw: "Roadmap + Development", translated: "People Tactics and Strategy + Training & Development" },
-  { state_id: "the_overloaded_manager", raw: "Development + Roadmap", translated: "Training & Development + People Tactics and Strategy" },
-  { state_id: "the_paper_tiger", raw: "Development + Roadmap", translated: "Training & Development + People Tactics and Strategy" },
-  { state_id: "the_pay_fog", raw: "Roadmap", translated: "People Tactics and Strategy" },
-  { state_id: "the_policy_lag", raw: "Roadmap", translated: "People Tactics and Strategy" },
-  { state_id: "the_second_close", raw: "Development + Intervention", translated: "Training & Development + Intervention" },
-  { state_id: "the_suppression_filter", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "the_tolerated_violation", raw: "Intervention + Executive Counsel", translated: "Intervention + Executive Advisory" },
-  { state_id: "the_undefined_role", raw: "Roadmap", translated: "People Tactics and Strategy" },
-  { state_id: "the_unexamined_algorithm", raw: "Roadmap + Executive Counsel", translated: "People Tactics and Strategy + Executive Advisory" },
+  { state_id: "the_burned_credibility", raw: "Intervention", translated: "First Call" },
+  { state_id: "the_culture_that_wasnt", raw: "Intervention", translated: "First Call" },
+  { state_id: "the_diversity_ceiling", raw: "Intervention", translated: "First Call" },
+  { state_id: "the_dormant_talent", raw: "Executive Counsel + Intervention", translated: "Executive Advisory + First Call" },
+  { state_id: "the_exposed", raw: "Intervention + Executive Counsel", translated: "First Call + Executive Advisory" },
+  { state_id: "the_founders_grip", raw: "Intervention + Executive Counsel", translated: "First Call + Executive Advisory" },
+  { state_id: "the_fracture", raw: "Intervention + Executive Counsel", translated: "First Call + Executive Advisory" },
+  { state_id: "the_inside_track", raw: "Intervention + Roadmap", translated: "First Call + People Tactics & Strategy" },
+  { state_id: "the_lost_map", raw: "Roadmap + Development", translated: "People Tactics & Strategy + Training & Development" },
+  { state_id: "the_overloaded_manager", raw: "Development + Roadmap", translated: "Training & Development + People Tactics & Strategy" },
+  { state_id: "the_paper_tiger", raw: "Development + Roadmap", translated: "Training & Development + People Tactics & Strategy" },
+  { state_id: "the_pay_fog", raw: "Roadmap", translated: "People Tactics & Strategy" },
+  { state_id: "the_policy_lag", raw: "Roadmap", translated: "People Tactics & Strategy" },
+  { state_id: "the_second_close", raw: "Development + Intervention", translated: "Training & Development + First Call" },
+  { state_id: "the_suppression_filter", raw: "Intervention + Executive Counsel", translated: "First Call + Executive Advisory" },
+  { state_id: "the_tolerated_violation", raw: "Intervention + Executive Counsel", translated: "First Call + Executive Advisory" },
+  { state_id: "the_undefined_role", raw: "Roadmap", translated: "People Tactics & Strategy" },
+  { state_id: "the_unexamined_algorithm", raw: "Roadmap + Executive Counsel", translated: "People Tactics & Strategy + Executive Advisory" },
   { state_id: "the_unformed_leader", raw: "Development", translated: "Training & Development" },
-  { state_id: "the_uninitiated", raw: "Intervention", translated: "Intervention" },
-  { state_id: "the_unlocked_door", raw: "Development + Intervention", translated: "Training & Development + Intervention" },
-  { state_id: "the_unreported_hazard", raw: "Intervention", translated: "Intervention" },
-  { state_id: "the_unsolved_problem", raw: "Intervention + Roadmap", translated: "Intervention + People Tactics and Strategy" },
-  { state_id: "the_untouchable", raw: "Executive Counsel + Intervention", translated: "Executive Advisory + Intervention" },
-  { state_id: "the_wrong_reward", raw: "Intervention + Roadmap", translated: "Intervention + People Tactics and Strategy" },
-  { state_id: "transition_paralysis", raw: "Intervention + Roadmap", translated: "Intervention + People Tactics and Strategy" },
-  { state_id: "wellbeing_theater", raw: "Intervention", translated: "Intervention" },
-  { state_id: "what_nobody_says", raw: "Intervention", translated: "Intervention" },
+  { state_id: "the_uninitiated", raw: "Intervention", translated: "First Call" },
+  { state_id: "the_unlocked_door", raw: "Development + Intervention", translated: "Training & Development + First Call" },
+  { state_id: "the_unreported_hazard", raw: "Intervention", translated: "First Call" },
+  { state_id: "the_unsolved_problem", raw: "Intervention + Roadmap", translated: "First Call + People Tactics & Strategy" },
+  { state_id: "the_untouchable", raw: "Executive Counsel + Intervention", translated: "Executive Advisory + First Call" },
+  { state_id: "the_wrong_reward", raw: "Intervention + Roadmap", translated: "First Call + People Tactics & Strategy" },
+  { state_id: "transition_paralysis", raw: "Intervention + Roadmap", translated: "First Call + People Tactics & Strategy" },
+  { state_id: "wellbeing_theater", raw: "Intervention", translated: "First Call" },
+  { state_id: "what_nobody_says", raw: "Intervention", translated: "First Call" },
 ];
 
 describe("ENGINE_TO_COMMERCIAL_NAME", () => {
   it("mirrors engine/resolution_families.py's mapping exactly (4 entries)", () => {
     expect(ENGINE_TO_COMMERCIAL_NAME).toEqual({
-      Roadmap: "People Tactics and Strategy",
+      Roadmap: "People Tactics & Strategy",
       Development: "Training & Development",
-      Intervention: "Intervention",
+      Intervention: "First Call",
       "Executive Counsel": "Executive Advisory",
     });
   });
@@ -86,18 +86,18 @@ describe("translateResolutionFamily", () => {
   });
 
   it("translates each single base name correctly", () => {
-    expect(translateResolutionFamily("Roadmap")).toBe("People Tactics and Strategy");
+    expect(translateResolutionFamily("Roadmap")).toBe("People Tactics & Strategy");
     expect(translateResolutionFamily("Development")).toBe("Training & Development");
-    expect(translateResolutionFamily("Intervention")).toBe("Intervention");
+    expect(translateResolutionFamily("Intervention")).toBe("First Call");
     expect(translateResolutionFamily("Executive Counsel")).toBe("Executive Advisory");
   });
 
   it("translates a compound in either order", () => {
     expect(translateResolutionFamily("Roadmap + Intervention")).toBe(
-      "People Tactics and Strategy + Intervention"
+      "People Tactics & Strategy + First Call"
     );
     expect(translateResolutionFamily("Intervention + Roadmap")).toBe(
-      "Intervention + People Tactics and Strategy"
+      "First Call + People Tactics & Strategy"
     );
   });
 

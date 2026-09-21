@@ -21,10 +21,15 @@
 
 import type { ResolutionFamily } from "@/lib/types";
 
+// Commercial-name correction (this session): "People Tactics and Strategy"
+// -> "People Tactics & Strategy" (ampersand), "Intervention" -> "First Call".
+// Dict KEYS (raw engine routing names) are unchanged -- only the VALUES.
+// Mirrors engine/resolution_families.py's ENGINE_TO_COMMERCIAL_NAME exactly;
+// keep both in lockstep.
 export const ENGINE_TO_COMMERCIAL_NAME: Record<string, string> = {
-  Roadmap:           "People Tactics and Strategy",
+  Roadmap:           "People Tactics & Strategy",
   Development:       "Training & Development",
-  Intervention:      "Intervention",
+  Intervention:      "First Call",
   "Executive Counsel": "Executive Advisory",
 };
 

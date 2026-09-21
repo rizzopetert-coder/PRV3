@@ -18,7 +18,7 @@
 
 ## What This Document Is
 
-This is the master SOP for a People Tactics and Strategy engagement scoped to organizational assessment. It covers the full engagement sequence, the judgment that connects the phases, and the circumstances that require a different approach. Each phase has its own dedicated SOP. This document is what you read before those — and what you return to when something in the engagement doesn't fit the expected pattern.
+This is the master SOP for a People Tactics & Strategy engagement scoped to organizational assessment. It covers the full engagement sequence, the judgment that connects the phases, and the circumstances that require a different approach. Each phase has its own dedicated SOP. This document is what you read before those — and what you return to when something in the engagement doesn't fit the expected pattern.
 
 ---
 
@@ -38,7 +38,7 @@ The phases are sequential. Analysis cannot begin honestly until investigation is
 
 ## What Makes This Engagement Different
 
-The practitioner conducting a People Tactics and Strategy assessment is not a consultant in the conventional sense. There is no ongoing relationship to protect, no follow-on engagement to position for, no organizational politics to navigate carefully. The assessment is the engagement. What that means in practice:
+The practitioner conducting a People Tactics & Strategy assessment is not a consultant in the conventional sense. There is no ongoing relationship to protect, no follow-on engagement to position for, no organizational politics to navigate carefully. The assessment is the engagement. What that means in practice:
 
 You are the only person in the room with nothing to lose from an honest finding. Every person you interview has something at stake in what you conclude. The leader who commissioned the engagement has a picture of the organization they have been living inside — and some part of that picture is wrong, or you would not be there. Your job is to find what is wrong with the picture without being captured by it.
 

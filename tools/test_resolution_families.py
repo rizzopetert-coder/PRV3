@@ -53,9 +53,9 @@ check(
     f"got {len(ENGINE_TO_COMMERCIAL_NAME)}",
 )
 _expected_mapping = {
-    "Roadmap":           "People Tactics and Strategy",
+    "Roadmap":           "People Tactics & Strategy",
     "Development":       "Training & Development",
-    "Intervention":      "Intervention",
+    "Intervention":      "First Call",
     "Executive Counsel": "Executive Advisory",
 }
 for engine_name, commercial_name in _expected_mapping.items():
@@ -69,23 +69,23 @@ for engine_name, commercial_name in _expected_mapping.items():
 # ── 13. translate_resolution_family ──────────────────────────────────────────
 
 check(
-    "translate_resolution_family: single 'Roadmap' -> 'People Tactics and Strategy'",
-    translate_resolution_family("Roadmap") == "People Tactics and Strategy",
+    "translate_resolution_family: single 'Roadmap' -> 'People Tactics & Strategy'",
+    translate_resolution_family("Roadmap") == "People Tactics & Strategy",
     f"got {translate_resolution_family('Roadmap')}",
 )
 check(
-    "translate_resolution_family: single 'Intervention' -> 'Intervention'",
-    translate_resolution_family("Intervention") == "Intervention",
+    "translate_resolution_family: single 'Intervention' -> 'First Call'",
+    translate_resolution_family("Intervention") == "First Call",
     f"got {translate_resolution_family('Intervention')}",
 )
 check(
     "translate_resolution_family: compound 'Roadmap + Intervention'",
-    translate_resolution_family("Roadmap + Intervention") == "People Tactics and Strategy + Intervention",
+    translate_resolution_family("Roadmap + Intervention") == "People Tactics & Strategy + First Call",
     f"got {translate_resolution_family('Roadmap + Intervention')}",
 )
 check(
     "translate_resolution_family: compound 'Executive Counsel + Intervention'",
-    translate_resolution_family("Executive Counsel + Intervention") == "Executive Advisory + Intervention",
+    translate_resolution_family("Executive Counsel + Intervention") == "Executive Advisory + First Call",
     f"got {translate_resolution_family('Executive Counsel + Intervention')}",
 )
 check(
@@ -98,27 +98,27 @@ check(
 # ── 14. RESOLUTION_FALLBACK_COPY structure ────────────────────────────────────
 
 _SINGLE_KEYS = [
-    ("People Tactics and Strategy", "Emerging"),
-    ("People Tactics and Strategy", "Entrenched"),
-    ("People Tactics and Strategy", "Endemic"),
+    ("People Tactics & Strategy", "Emerging"),
+    ("People Tactics & Strategy", "Entrenched"),
+    ("People Tactics & Strategy", "Endemic"),
     ("Training & Development",      "Emerging"),
     ("Training & Development",      "Entrenched"),
     ("Training & Development",      "Endemic"),
-    ("Intervention",                "Emerging"),
-    ("Intervention",                "Entrenched"),
-    ("Intervention",                "Endemic"),
+    ("First Call",                  "Emerging"),
+    ("First Call",                  "Entrenched"),
+    ("First Call",                  "Endemic"),
     ("Executive Advisory",          "Emerging"),
     ("Executive Advisory",          "Entrenched"),
     ("Executive Advisory",          "Endemic"),
 ]
 _COMPOUND_KEYS = [
-    ("People Tactics and Strategy + Intervention",           None),
-    ("Intervention + People Tactics and Strategy",           None),
-    ("Executive Advisory + Intervention",                    None),
-    ("Intervention + Executive Advisory",                    None),
-    ("Training & Development + People Tactics and Strategy", None),
-    ("People Tactics and Strategy + Training & Development", None),
-    ("Training & Development + Intervention",                None),
+    ("People Tactics & Strategy + First Call",              None),
+    ("First Call + People Tactics & Strategy",              None),
+    ("Executive Advisory + First Call",                     None),
+    ("First Call + Executive Advisory",                     None),
+    ("Training & Development + People Tactics & Strategy",  None),
+    ("People Tactics & Strategy + Training & Development",  None),
+    ("Training & Development + First Call",                 None),
 ]
 _all_expected_keys = _SINGLE_KEYS + _COMPOUND_KEYS
 
@@ -138,14 +138,14 @@ for key in _all_expected_keys:
 # ── 15. get_fallback_copy: lookups ────────────────────────────────────────────
 
 check(
-    "get_fallback_copy: single-service People Tactics and Strategy/Entrenched returns non-empty string",
-    len(get_fallback_copy("People Tactics and Strategy", "Entrenched")) > 0,
+    "get_fallback_copy: single-service People Tactics & Strategy/Entrenched returns non-empty string",
+    len(get_fallback_copy("People Tactics & Strategy", "Entrenched")) > 0,
     "returned empty string",
 )
 check(
     "get_fallback_copy: compound returns tier-agnostic copy",
-    get_fallback_copy("People Tactics and Strategy + Intervention", "Entrenched") ==
-    RESOLUTION_FALLBACK_COPY[("People Tactics and Strategy + Intervention", None)],
+    get_fallback_copy("People Tactics & Strategy + First Call", "Entrenched") ==
+    RESOLUTION_FALLBACK_COPY[("People Tactics & Strategy + First Call", None)],
     "compound key lookup failed",
 )
 check(
