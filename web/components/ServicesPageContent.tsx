@@ -37,7 +37,7 @@ const OVERVIEW_ITEMS = [
     id: "training-development",
     name: "Training & Development",
     teaser:
-      "Training built around what your people actually need: individual coaching, group sessions, or work co-led with your own leaders.",
+      "Training built around what your people actually need: we coach individuals, run group sessions, or work co-led with your own leaders.",
     href: "/training-and-development",
   },
   {
