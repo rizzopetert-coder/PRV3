@@ -305,7 +305,7 @@ function StateCard({ entry }: { entry: BookStateEntry }) {
           return (
             <span
               key={sigId}
-              className="font-mono text-[10px] uppercase tracking-wide text-slate border border-slate rounded-full px-2 py-0.5"
+              className="font-mono text-[10px] uppercase tracking-wide text-(--slate) border border-(--slate) rounded-full px-2 py-0.5"
             >
               {sig.name}
             </span>
@@ -384,12 +384,12 @@ export default function StatesTocPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-16">
-      <h1 className="font-display text-3xl text-charcoal mb-4">All States</h1>
-      <p className="font-ui text-base text-gray-600 mb-4">
+      <h1 className="font-display text-3xl text-ink mb-4">All States</h1>
+      <p className="font-ui text-base text-oxide-text mb-4">
         The full set of organizational conditions the diagnostic identifies. Filter by dimension,
         by signature, or both.
       </p>
-      <p className="font-ui text-base text-gray-600 mb-4">{LAYER1_ADDITION}</p>
+      <p className="font-ui text-base text-oxide-text mb-4">{LAYER1_ADDITION}</p>
 
       {/* Contextual orientation affordance -- a distinct, separately-scoped
           trigger from the Terminology Guide below. That one explains what
@@ -427,7 +427,7 @@ export default function StatesTocPage() {
           type="button"
           aria-label={TERMS_GUIDE_TRIGGER_TEXT}
           aria-expanded={termsHovered || termsTapped}
-          className="font-ui text-sm text-gray-500 hover:text-hover-ink transition-colors underline decoration-dotted underline-offset-2"
+          className="font-ui text-sm text-oxide-text hover:text-hover-ink transition-colors underline decoration-dotted underline-offset-2"
           onMouseEnter={() => setTermsHovered(true)}
           onFocus={() => setTermsHovered(true)}
           onBlur={() => setTermsHovered(false)}
@@ -542,7 +542,7 @@ export default function StatesTocPage() {
 
       <div className="mb-10 space-y-4">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-oxide-text mb-2">
             Dimension
           </p>
           <div className="flex flex-wrap gap-2">
@@ -576,7 +576,7 @@ export default function StatesTocPage() {
         </div>
 
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-wide text-gray-400 mb-2">
+          <p className="font-mono text-[11px] uppercase tracking-wide text-oxide-text mb-2">
             Signature
           </p>
           <div className="flex flex-wrap gap-2">
@@ -615,14 +615,14 @@ export default function StatesTocPage() {
               setDimensionFilters(new Set());
               setSignatureFilters(new Set());
             }}
-            className="font-ui text-xs text-gray-500 hover:text-hover-ink underline"
+            className="font-ui text-xs text-oxide-text hover:text-hover-ink underline"
           >
             Clear filters
           </button>
         )}
       </div>
 
-      <p className="font-ui text-sm text-gray-400 mb-6">
+      <p className="font-ui text-sm text-oxide-text mb-6">
         {filtered.length} of {BOOK_STATE_INDEX.length} conditions
       </p>
 
@@ -633,7 +633,7 @@ export default function StatesTocPage() {
       </div>
 
       {filtered.length === 0 && (
-        <p className="font-ui text-sm text-gray-500 mt-8">
+        <p className="font-ui text-sm text-oxide-text mt-8">
           No conditions match the selected filters.
         </p>
       )}
