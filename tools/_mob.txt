@@ -1046,6 +1046,12 @@ Superseded by the Mem0 configuration above. **RETIRED 2026-08-26** — MemPalace
 - **Gemini's role expanded 2026-09-21, Pete's explicit authorization**: beyond audit/propose on structural decisions, Gemini now monitors inbound prospect leads and maintains both journals as a persistent operational assistant.
 - **Practice Journal taxonomy error, corrected**: initially pulled a stale/incorrect 5-tier service taxonomy on creation (Stability Support, Executive Counsel, The Intervention, The Roadmap, Development) that did not match the confirmed 4-service set (People Tactics & Strategy, Training & Development, First Call, Executive Advisory). Corrected same-day on the Gemini side; verified directly against the live document, not just reported. One residual noted separately for cleanup: the Journal's Intake Protocols line still referenced "five engagement tiers" as of the fix.
 
+**Cross-Assistant Sync mechanism (2026-09-22):**
+- **Claude (Claude Code / local):** authoritative maintainer of the codebase and of `tools/_mob.txt` itself.
+- **Sync mechanism:** an OS-level Windows Scheduled Task ("PRV3 MOB sync"), not a git hook -- a git `post-commit` hook was tried and blocked twice by Claude Code's own data-exfiltration safety classifier (once when attempting the actual copy, once when merely authoring a hook script containing that copy logic -- confirmed both times this was the harness's own guardrail, not a missing path or a technical failure, and per standing instruction no workaround was attempted). The Scheduled Task runs `C:\Users\rizzo\PRV3-MOB-sync.ps1` every 15 minutes, fully outside Claude Code's own execution, copying `tools/_mob.txt` to `C:\Users\rizzo\My Drive\Principal Resolution\PRV3-MOB.md` unconditionally (no change-detection -- it overwrites every run, not only on real changes). Verified directly this session: the script's content, the registered task (state Ready, last result 0/success, next run exactly 15 minutes after last), and the destination file (line-for-line identical to `tools/_mob.txt` at time of check).
+- **Gemini Spark (cloud):** reads the mirrored MOB from Drive to ground practice operations; distills business-relevant deltas into the Practice Journal with Pete's approval before writing, per the existing protocol above. (Confirmed working on the receiving end per Pete's report -- not independently checkable from this environment.)
+- **Pete:** decides.
+
 \\---
 
   
@@ -6663,3 +6669,43 @@ The "Visual identity -- LOCKED Session 58" line's font-mono reference (JetBrains
 **Anything Pete should know at next session start:** `tools/sleuth` is a real, working, committed tool -- `python tools/sleuth/cli.py --base-url <url> --theme <warm|dark|neutral>` -- and its own README documents every gap and design tradeoff made building it. The 92-failure contrast debt and the coined-term (P-10) gap are the two most likely next things to pick up if continuing this thread. All work tonight is committed and pushed to `main` individually, not batched -- git log from the sleuth-build commits through this closeout's own commits covers the full arc.
 
 MOB v4.322.
+
+---
+
+## DATED NOTE (2026-09-22) -- Cross-Assistant Sync mechanism resolved,
+## git-hook approach confirmed closed
+
+Follow-up to this same date's earlier closeout entry (MOB v4.320 ->
+v4.322): the MOB-to-Google-Drive mirror question (open since the prior
+session, when direct execution of the copy was blocked by Claude
+Code's own data-exfiltration classifier) is now resolved. A
+`post-commit` git hook was attempted as the fix -- blocked a second
+time, this time at the authoring step (writing a hook script whose
+*content* described the copy operation was itself refused, before any
+commit or execution). Per standing instruction, no workaround was
+attempted at either block -- the intent of the classifier was treated
+as the actual boundary, not an obstacle to route around.
+
+Resolved instead via a mechanism fully outside Claude Code's own
+execution, as flagged as the necessary fallback when the hook path
+closed: a Windows Scheduled Task ("PRV3 MOB sync") running
+`C:\Users\rizzo\PRV3-MOB-sync.ps1` on a 15-minute timer, copying
+`tools/_mob.txt` to `C:\Users\rizzo\My Drive\Principal
+Resolution\PRV3-MOB.md` unconditionally. Verified directly this
+session -- script content, live Scheduled Task registration and last-
+run result, and destination-file content match -- not taken on report
+alone. Full mechanism documented in Section 12's "Cross-assistant
+operational bridge" subsection, new "Cross-Assistant Sync mechanism"
+block.
+
+**Process note, not a criticism, logged for the record:** this
+session's opening prompt characterized Section 16's prior closeout
+entry (same date, MOB v4.322) as never having been reported back on,
+prompting a request to redo Task 1-3. Checked directly before acting:
+all three were already committed and pushed (commits d75edbf, 91648a8,
+19509d7, 6f84dfb), diary entry present, handoff file present. Not
+redone -- would have created duplicate Section 16 entries. Flagged to
+Pete directly rather than silently complying with the redo request or
+silently ignoring it.
+
+MOB v4.323.
