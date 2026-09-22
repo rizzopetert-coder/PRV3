@@ -155,7 +155,7 @@ export function ServiceSidebar({ children }: { children: ReactNode }) {
             }`}
           >
             <h2 className="font-display text-lg font-semibold mb-2">{s.name}</h2>
-            <p className={`font-ui text-sm leading-relaxed mb-3 ${s.rust ? "" : "opacity-80"}`}>
+            <p className="font-ui text-sm leading-relaxed mb-3">
               {s.teaser}
             </p>
             <span className="font-ui text-sm font-medium">{s.cta}</span>
