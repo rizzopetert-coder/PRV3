@@ -16,7 +16,7 @@ export default function MethodPageContent() {
         <div className="divide-y divide-gray-100">
 
           <section className="pb-16">
-            <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Evidence</p>
+            <p className="font-ui text-xs tracking-widest uppercase text-(--slate) mb-2">The Evidence</p>
             <h2 className={heading}>It Kept Showing Up</h2>
             <p className="font-ui text-base text-oxide-text leading-relaxed mb-5">
               I noticed these patterns before I ever called myself a consultant, in my own work, watching the same dynamics play out under different names in different rooms.
@@ -36,7 +36,7 @@ export default function MethodPageContent() {
           </section>
 
           <section className="pt-16">
-            <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">What This Isn&apos;t</p>
+            <p className="font-ui text-xs tracking-widest uppercase text-(--slate) mb-2">What This Isn&apos;t</p>
             <h2 className={heading}>Not a Framework to Learn</h2>
             <p className="font-ui text-base text-oxide-text leading-relaxed mb-5">
               None of this is a system you need to study before I can help you. The pattern came first, from years of direct observation, then confirmed against sources that had every reason to disagree with each other.

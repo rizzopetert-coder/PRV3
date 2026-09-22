@@ -21,7 +21,7 @@ export default function StoryPageContent() {
         <div className="divide-y divide-gray-100">
 
           <section className="pb-16">
-            <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Work</p>
+            <p className="font-ui text-xs tracking-widest uppercase text-(--slate) mb-2">The Work</p>
             <h2 className={heading}>Telling the Truth</h2>
             <p className="font-ui text-base text-oxide-text leading-relaxed mb-5">
               In almost every organization I&apos;ve worked with, the people who can see a problem most clearly are usually the ones with the most to lose by saying so. The manager who&apos;d have to call out a peer. The board member who&apos;s known the founder for twenty years. The HR director who already raised this once and watched what happened to the next person who raised it twice.
@@ -38,7 +38,7 @@ export default function StoryPageContent() {
           </section>
 
           <section className="py-16">
-            <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Practice</p>
+            <p className="font-ui text-xs tracking-widest uppercase text-(--slate) mb-2">The Practice</p>
             <h2 className={heading}>Twenty-Five Years</h2>
             <p className="font-ui text-base text-oxide-text leading-relaxed mb-5">
               There&apos;s twenty-five years behind this, split between conference rooms and forest trails.
@@ -61,7 +61,7 @@ export default function StoryPageContent() {
           </section>
 
           <section className="py-16">
-            <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Method</p>
+            <p className="font-ui text-xs tracking-widest uppercase text-(--slate) mb-2">The Method</p>
             <h2 className={heading}>How This Works</h2>
             <p className="font-ui text-base text-oxide-text leading-relaxed mb-5">
               Most firms do one of two things. They hand you a framework before they&apos;ve heard your actual situation, because the framework is what they&apos;re selling. Or they sell you an associate&apos;s time on the engagement and a partner&apos;s name on the proposal, and you spend the first month re-explaining yourself to whoever actually shows up.
@@ -78,7 +78,7 @@ export default function StoryPageContent() {
           </section>
 
           <section className="py-16">
-            <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Relationship</p>
+            <p className="font-ui text-xs tracking-widest uppercase text-(--slate) mb-2">The Relationship</p>
             <h2 className={heading}>What Compounds</h2>
             <p className="font-ui text-base text-oxide-text leading-relaxed mb-5">
               A single engagement is worth something on its own: a problem gets named, a plan gets built, something expensive gets resolved.
@@ -98,7 +98,7 @@ export default function StoryPageContent() {
           </section>
 
           <section className="pt-16">
-            <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">The Standard</p>
+            <p className="font-ui text-xs tracking-widest uppercase text-(--slate) mb-2">The Standard</p>
             <h2 className={heading}>What to Expect</h2>
             <p className="font-ui text-base text-oxide-text leading-relaxed mb-5">
               I spent years as a teambuilding professional, which taught me the real value of experiential learning. A shared experience can be a kind of catalyst, breaking down barriers, strengthening communication and trust, in a way conversation alone rarely manages.

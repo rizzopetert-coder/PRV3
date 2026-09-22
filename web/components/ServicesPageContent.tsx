@@ -85,7 +85,7 @@ export default function ServicesPageContent() {
           ))}
         </div>
 
-        <p className="font-ui text-sm text-gray-400 leading-relaxed mt-12">
+        <p className="font-ui text-sm text-(--slate) leading-relaxed mt-12">
           Most engagements use one of these. Some diagnosed conditions call for two working together. That combination gets recommended directly, not guessed at from a menu.
         </p>
 
