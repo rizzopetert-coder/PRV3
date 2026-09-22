@@ -67,7 +67,7 @@ const SERVICES: ServiceLink[] = [
     id: "training-and-development",
     name: "Training & Development",
     teaser:
-      "Training built around what your people actually need: individual coaching, group sessions, or work co-led with your own leaders.",
+      "Training built around what your people actually need: we coach individuals, run group sessions, or work co-led with your own leaders.",
     cta: "Learn more →",
     href: "/training-and-development",
   },
