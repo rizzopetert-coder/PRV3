@@ -7,9 +7,9 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="bg-paper min-h-screen">
+    <main className="bg-background min-h-screen">
       <div className="max-w-3xl mx-auto px-6 py-16 md:py-24">
-        <h1 className="font-display text-3xl text-charcoal mb-4">About</h1>
+        <h1 className="font-display text-3xl text-ink mb-4">About</h1>
         <p className="font-ui text-base text-oxide-text mb-12">
           You came here with a question. These three pages each answer a different version of it.
         </p>
