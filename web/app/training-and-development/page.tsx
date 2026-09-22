@@ -21,8 +21,9 @@ export default function TrainingAndDevelopmentPage() {
           Training &amp; Development
         </p>
         <h1 className="font-display text-3xl md:text-4xl leading-tight text-ink mb-6">
-          Training built around what your people actually need: individual
-          coaching, group sessions, or work co-led with your own leaders.
+          Training built around what your people actually need: we coach
+          individuals, run group sessions, or work co-led with your own
+          leaders.
         </h1>
         <div className="space-y-4">
           <p className="font-ui text-sm text-(--slate) leading-relaxed">
