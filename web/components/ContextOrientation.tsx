@@ -134,7 +134,6 @@ export default function ContextOrientation({
       className={`${variant === "floating" ? "fixed z-30" : "relative inline-block"} ${
         className ?? ""
       }`}
-      data-emphasis={resolved ? "primary" : "receded"}
     >
       <button
         {...triggerCommon}
