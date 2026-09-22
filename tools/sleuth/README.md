@@ -30,6 +30,43 @@ Other flags: `--skip-build` (reuse the existing `web/.next` build instead of
 running `npm run build` first), `--concurrency` (default 3), `--max-pages`
 (default 400), `--per-page-timeout-ms` (default 20000).
 
+### `--skip-build` and stale builds
+
+Without `--skip-build`, sleuth always runs `npm run build` before crawling
+(`route_manifest.build_route_manifest`), so the crawl can never be stale --
+this is the default for exactly that reason.
+
+`--skip-build` exists to save the build step on repeat runs, but it opens a
+real gap: if source changed after the existing build was produced, sleuth
+would crawl and report on content that no longer exists, with nothing
+distinguishing that from a real live finding. This happened for real: a
+`--skip-build` crawl reported 110 "coaching used as a noun" hits against a
+build that was about 16 hours older than three commits that had already
+reworded the exact sentence being flagged. Every one of those 110 findings
+was against text that no longer existed in source. Nothing caught it until
+a human noticed the findings didn't match the live repo.
+
+`cli.py` now checks this whenever `--skip-build` is passed: it compares
+`web/.next/BUILD_ID`'s mtime against the latest commit touching
+`web/app`, `web/components`, `web/lib`, or `web/content`, and **fails fast**
+(non-zero exit, no crawl attempted) if the build predates that commit.
+
+Fail-fast rather than sleuth silently running `npm run build` itself on your
+behalf: `--skip-build` is an explicit request to skip the build step, and
+sleuth has stayed read-only/non-invasive everywhere else in its design (it
+crawls and reports on the site under test, it never modifies it or the
+process running it). Quietly overriding that flag would replace an explicit
+choice with a guess, and `next build` can take long enough that surprising
+the caller with one mid-command is worse than a clear, actionable error.
+The error message tells you to either run `npm run build` yourself or drop
+`--skip-build`.
+
+Known limitation, matching the scope this check was asked to cover: it
+compares against the latest **commit**, not the working tree, so uncommitted
+edits to a watched path aren't caught. A stricter working-tree check would
+need a different mechanism (e.g. hashing watched files), not implemented
+here.
+
 ### Outputs
 
 Written to `tools/sleuth/output/` (gitignored, regenerated each run):

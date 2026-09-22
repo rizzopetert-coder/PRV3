@@ -108,9 +108,92 @@ def run_crawl(args: argparse.Namespace, extra_headers: dict[str, str], output_di
     return json.loads(raw_output_path.read_text(encoding="utf-8"))
 
 
+# The built surface --skip-build reuses: if a commit touches any of these
+# paths after web/.next/BUILD_ID was produced, the existing build no longer
+# reflects current source. Matches the scope Pete specified when this check
+# was requested (web/app, web/components, web/lib, plus web/content since
+# /book piece markdown is part of what gets rendered).
+BUILD_WATCHED_PATHS = ["web/app", "web/components", "web/lib", "web/content"]
+
+
+def check_build_freshness() -> None:
+    """Fail fast if the existing web/.next build predates the latest commit
+    touching BUILD_WATCHED_PATHS. Only called when --skip-build is passed --
+    the default path already runs `npm run build` fresh every time (see
+    route_manifest.build_route_manifest), so staleness can't occur there.
+
+    Fail-fast over auto-rebuild, deliberately: --skip-build is an explicit
+    user opt-out of the build step, and sleuth has stayed read-only/non-
+    invasive everywhere else in its design (it crawls and reports, it never
+    modifies the site under test). Silently rebuilding behind that flag would
+    override an explicit choice instead of honoring it, and a `next build`
+    can take long enough that surprising the caller with one mid-command is
+    worse than a clear error telling them what to do.
+
+    Real bug this closes: a --skip-build crawl this session served content
+    from a build ~16 hours older than three commits that reworded a sentence
+    the crawl was checking -- the stale build's pre-reword text was reported
+    as 110 live findings, none of which still existed in source. Nothing
+    caught it until a human noticed the findings didn't match the repo.
+
+    Known limitation: compares against the latest COMMIT touching these
+    paths, not the working tree -- uncommitted edits aren't caught. That
+    matches the scope specified when this check was requested; a stricter
+    working-tree check would need a different mechanism (e.g. hashing).
+    """
+    build_id_path = WEB_DIR / ".next" / "BUILD_ID"
+    if not build_id_path.exists():
+        print(
+            "[sleuth] ERROR: --skip-build was passed but web/.next/BUILD_ID does "
+            "not exist -- there is no existing build to reuse. Run `npm run build` "
+            "in web/ first, or drop --skip-build to let sleuth build fresh.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    build_mtime = build_id_path.stat().st_mtime
+
+    result = subprocess.run(
+        ["git", "log", "-1", "--format=%ct", "--", *BUILD_WATCHED_PATHS],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+    commit_ts_str = result.stdout.strip()
+    if result.returncode != 0 or not commit_ts_str:
+        print(
+            "[sleuth] WARNING: could not determine the latest commit timestamp "
+            f"for {BUILD_WATCHED_PATHS} (git exit {result.returncode}) -- skipping "
+            "the build-freshness check rather than blocking the crawl over a "
+            "check that itself failed.",
+            file=sys.stderr,
+        )
+        return
+
+    commit_ts = int(commit_ts_str)
+    if build_mtime < commit_ts:
+        build_dt = datetime.fromtimestamp(build_mtime, tz=timezone.utc).isoformat()
+        commit_dt = datetime.fromtimestamp(commit_ts, tz=timezone.utc).isoformat()
+        print(
+            "[sleuth] ERROR: --skip-build was passed but web/.next/BUILD_ID "
+            f"({build_dt}) predates the latest commit touching "
+            f"{', '.join(BUILD_WATCHED_PATHS)} ({commit_dt}). The existing build "
+            "does not reflect current source -- crawling it would report stale "
+            "content as live. Run `npm run build` in web/ first, or drop "
+            "--skip-build to let sleuth build fresh.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    print("[sleuth] build freshness check passed -- build is newer than the latest relevant commit.")
+
+
 def main() -> int:
     args = parse_args()
     output_dir = Path(args.output_dir)
+
+    if args.skip_build:
+        check_build_freshness()
 
     extra_headers: dict[str, str] = {}
     if args.bypass_secret:
