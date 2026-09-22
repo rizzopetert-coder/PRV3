@@ -35,6 +35,36 @@ from tools.sleuth.rules.finding import Category, Finding, Tier
 # run, where 15 of 17 hits were exactly that pattern, not appositive lists.
 _APPOSITIVE_EMDASH_RE = re.compile(r"—([^—.]*,[^—.]*)(—|\.)")
 _MIN_COMMAS_FOR_APPOSITIVE_LIST = 2
+
+# Finite-verb detection for the appositive-list heuristic below: any one
+# of these matching within a comma-segment means that segment is its own
+# clause, not a noun/adjective-phrase list item. See module docstring for
+# the reasoning and the before/after count verified against real crawl data.
+_FINITE_AUX_MODAL_RE = re.compile(
+    r"\b(am|is|are|was|were|be|been|being|has|have|had|"
+    r"do|does|did|will|would|shall|should|can|could|may|might|must|"
+    r"get|gets|got|getting)\b",
+    re.IGNORECASE,
+)
+_RELATIVE_CLAUSE_RE = re.compile(
+    r"\b(who|whom|whose|which|that|what|where|when|why|how)\s+\S",
+    re.IGNORECASE,
+)
+_PRONOUN_VERB_RE = re.compile(
+    r"\b(it|they|he|she|we|i|this|these|those|everything|nothing|something|"
+    r"someone|somebody|there)\s+(?:\w+\s+){0,2}?\w+(?:ed|s)\b",
+    re.IGNORECASE,
+)
+
+
+def _segment_has_finite_verb(segment: str) -> bool:
+    return bool(
+        _FINITE_AUX_MODAL_RE.search(segment)
+        or _RELATIVE_CLAUSE_RE.search(segment)
+        or _PRONOUN_VERB_RE.search(segment)
+    )
+
+
 _COACHING_NOUN_RE = re.compile(
     r"\b(a|the|some|individual|group|executive|one-on-one)\s+coaching\b"
     r"|\bcoaching\s+(session|program|call|engagement|package)\b",
@@ -78,6 +108,8 @@ def check(crawl: dict) -> list[Finding]:
             span_text = m.group(1)
             if span_text.count(",") < _MIN_COMMAS_FOR_APPOSITIVE_LIST:
                 continue  # a single comma is almost always a two-clause interruption, not a list
+            if any(_segment_has_finite_verb(seg) for seg in span_text.split(",")):
+                continue  # a segment carries its own clause -- parallel-clause rhetoric, not a list
             findings.append(Finding(
                 tier=Tier.CANDIDATE, category=Category.STYLE,
                 rule_id="appositive-emdash-list",
