@@ -69,16 +69,20 @@ here.
 
 ### Outputs
 
-Written to `tools/sleuth/output/` (gitignored, regenerated each run):
+Written to `tools/sleuth/output/`:
 
 - `sleuth_raw.json` -- full crawl extract (every page's rendered text,
   computed styles on real text-bearing elements, full link graph, HTTP
-  status/redirect chain, axe-core violations). Re-running the rule engines
-  against a saved `sleuth_raw.json` without re-crawling is possible by
-  importing `tools.sleuth.rules.*` directly against loaded JSON.
+  status/redirect chain, axe-core violations). Gitignored -- large,
+  fully-regeneratable raw data, never worth tracking. Re-running the rule
+  engines against a saved `sleuth_raw.json` without re-crawling is possible
+  by importing `tools.sleuth.rules.*` directly against loaded JSON.
 - `sleuth_report.md` -- findings grouped structural -> brand ->
   content/principle -> style, deterministic findings first within each
-  group, candidate findings clearly marked as review-only.
+  group, candidate findings clearly marked as review-only. **Tracked and
+  committed deliberately, not gitignored** -- Pete's explicit call,
+  2026-09-22 (commit `47aca05`): a regenerated report is committed as
+  evidence of a specific fix, not automatically on every run.
 
 Exit code: non-zero if any deterministic-tier finding exists anywhere in
 the crawl, zero otherwise (candidate-tier findings never affect it,
