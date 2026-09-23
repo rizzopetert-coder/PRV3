@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.324
+\\\#\\\# MOB v4.325
 
   
 
@@ -1496,7 +1496,7 @@ Forward-looking session state, confirmed with Pete at closeout. Updated at each 
 Priority order for next session, in sequence. **Rewritten wholesale 2026-09-23** (full verification pass against live repo state and the last three Section 16 closeouts, Pete's explicit sequencing -- full detail in Section 16's 2026-09-23 dated note):
 
 1. Severity follow-on state-scoping gate -- live production defect. `severity_trigger` fires without awareness of the respondent's destination state. Two gate designs falsified on real data. Next step: third design proposal through Gemini gate, not a build.
-2. 92 pre-existing WCAG AA contrast failures (`.text-gray-400`/`.text-gray-500` eyebrow labels, `/about/*` and `/book/memo|case_pattern/*`). Likely single shared-component fix. Verify via `tools/sleuth` before/after.
+2. 92 pre-existing WCAG AA contrast failures (`.text-gray-400`/`.text-gray-500` eyebrow labels, `/about/*` and `/book/memo|case_pattern/*`). Likely single shared-component fix. **Precondition, added 2026-09-23:** the committed baseline (`tools/sleuth/output/sleuth_report.md`, commit `47aca05`) could not be independently confirmed fresh -- its crawl's build state is unrecoverable (`.next/BUILD_ID` is overwritten on every build, no historical snapshot survives) and the build-freshness check (commit `99d9834`) postdates that crawl and only runs when `--skip-build` is passed, not automatically on every run. Circumstantial signals lean trustworthy (its 92-count matches this item's own figure exactly, with no apparent ServiceSidebar contamination, and its commit message describes a deliberate before/after verification), but circumstantial isn't verified. **Run a fresh `tools/sleuth` crawl against a freshly-rebuilt `.next` before touching this fix, and treat that fresh crawl -- not `47aca05` -- as the real before/after baseline.**
 3. Training & Development teaser -- consolidate the three hardcoded copies (`ServiceSidebar.tsx`, `training-and-development/page.tsx`, `ServicesPageContent.tsx`) into one shared source.
 4. sleuth P-10 coined-term scan -- gated on Pete authoring the enumerated term list.
 5. book-manifest.ts -- 55 remaining teaser em-dashes, voice pass requiring Pete's review.
@@ -1532,8 +1532,9 @@ Closed since the 2026-09-07 rewrite, dropped from the active list entirely -- fu
 Files to attach next session, categorized by likely next task:
 - Always: tools/_mob.txt (current version).
 - If resuming the transaction path (parked indefinitely, not an active queue item -- see Explicitly parked above): prompts/real-transaction-path-phase1-gemini-request.md, web/app/engage/page.tsx, web/app/api/engage/initiate/route.ts.
+- If resuming book-manifest.ts's teaser em-dash pass (item 5): prompts/book-manifest-emdash-scan-2026-09-23.md, web/lib/book-manifest.ts.
 
-Last updated: This session (Claude Code), 2026-09-23 -- full wholesale rewrite following a complete verification pass of the prior 2026-09-07 priority order against live repo state and the last three Section 16 closeouts (all four numbered items confirmed genuinely closed; open items reconciled against Section 13 and recent closeouts; two framing errors retired). Full detail: Section 16's 2026-09-23 dated note. (Prior update: 2026-09-07 -- full resequencing per Pete's explicit 4-item priority order.)
+Last updated: This session (Claude Code), 2026-09-23 (closeout pass) -- item 2 amended with the sleuth-baseline-trust precondition, item 5's files-to-attach entry added, per the first live run of CLAUDE.md's Step 1a (Section 13b Currency Check). Supersedes the same-day wholesale rewrite earlier this session (full verification pass of the prior 2026-09-07 priority order against live repo state and the last three Section 16 closeouts -- all four numbered items confirmed genuinely closed; open items reconciled against Section 13 and recent closeouts; two framing errors retired). Full detail: Section 16's 2026-09-23 closeout entry. (Prior update: 2026-09-07 -- full resequencing per Pete's explicit 4-item priority order.)
 
 \\---
 
@@ -6738,3 +6739,53 @@ Section 13b (Session Priority Queue) sat unrewritten from 2026-09-07 through thi
 **Process gap named plainly:** 13b was not rewritten at any closeout between 2026-09-07 and 2026-09-23 despite four separate closures landing against it in that window -- the standing "rewritten wholesale each time it's updated" convention held for the rewrite mechanics once triggered, but nothing was checking whether a rewrite was due in the first place. **Closeout protocol amended: a Section 13b currency check added to CLAUDE.md's Closeout Protocol (new Step 1a, ahead of Step 2's Section 16 write), to prevent a recurrence of this 2026-09-07 to 2026-09-23 staleness gap.** Checked directly for any restatement of the closeout protocol elsewhere in this MOB (e.g. Section 12) that would also need the matching step -- none exists; Section 12 only cross-references CLAUDE.md's own Startup/Closeout Protocol steps, it doesn't restate them. Nothing else to amend.
 
 MOB v4.324.
+
+---
+
+## SESSION CLOSEOUT (2026-09-23, terminal Claude Code) -- Section 13b
+## verified and rewritten, closeout protocol amended, session leftovers
+## disposed of -- MOB v4.324 -> v4.325
+
+**One-line summary:** Section 13b (Session Priority Queue) verified against live repo state and rewritten wholesale after sitting stale 2026-09-07 -> 2026-09-23; the gap that allowed that is closed with a new CLAUDE.md closeout step; every leftover file from tonight's work was individually disposed of, not left to accumulate; and a sleuth-baseline trustworthiness question was investigated and resolved as "unverified, add a precondition" rather than asserted either way.
+
+### 1. Section 13b verification and rewrite (commit `4584ae9`)
+
+All four of Section 13b's 2026-09-07 numbered priority items independently verified against live source, not re-read from the MOB's own prior claims: **#1 Legal/Compliance wiring** closed via commit `fba8f62` (Block 4d renders `legal_tail_risk_exposure`, confirmed live in `PrivateOutput.tsx`). **#2 PARTIAL coverage-threshold verification** closed 2026-09-09, 51/51 jurisdictions CONFIRMED, enforced by a module-load `assert` at `engine/friction_tax.py:2933`, independently counted via direct import. **#3 `extreme_high_confidence`** closed via `the_paper_tiger`'s stale `primary_dimension` fix, reconfirmed with a fresh calibration run: `extreme_high_confidence OK`, 171/175 overall. **#4 v2 token migration** closed as "decided not to migrate," not a completed migration -- `--home-ink` deliberately kept isolated from `--ink`, confirmed still distinct in live `globals.css`. The ADA/FMLA/OSHA headcount-gating sub-item was retired outright: its framing never matched the code -- the 2026-09-05 gate build covered Clusters 1, 2, 4b, and Cluster 5 (the actual safety/regulatory cluster) uses a separate statutory-max-curve mechanism by design, never in scope for that gate. 13b rewritten wholesale with Pete's 5-item priority order (severity follow-on gate, 92-failure contrast debt, T&D teaser consolidation, sleuth P-10 scan, book-manifest.ts em-dashes), open items reconciled against Section 13 and the last three closeouts.
+
+### 2. Closeout protocol amended (commit `3dbecff`)
+
+New CLAUDE.md Step 1a -- Section 13b Currency Check -- inserted between Step 1 (Diary Write) and Step 2 (Update MOB), so it shapes the Section 16 entry rather than just following it. Exists to close the exact gap that let 13b sit unrewritten for 16 days while four closures landed against it with nothing checking whether a rewrite was due. Checked Section 12 directly for any restatement of the closeout protocol that would also need the matching step -- none exists.
+
+### 3. Diagnostic question audit regenerated (commit `8985560`)
+
+`tools/diagnostic_question_audit_output.md` was stale since 2026-08-11. Fresh run: CORE 42 -> 47, UNREACHABLE 22 -> 17, flagged 96 -> 94 of 101. Q35-Q39 moved UNREACHABLE -> CORE (commit `e8f82a8` wired Q35's stale branch, pulling Q36-39 with it); Q05 lost its missing-option flag (commit `369c1c9`). SEVER-09/Q27A unchanged, reconfirmed still genuinely unreachable.
+
+### 4. Section 13 stale-row closures (folded into commit `4584ae9`)
+
+Four rows marked `**CLOSED**` in place, not deleted: `FullInstrumentPlaceholder copy` and `TransitionBar threshold` -- both components have zero grep matches anywhere in the codebase, confirmed gone. `Service-specific path design` -- superseded by the four live service landing pages (`/people-tactics-and-strategy`, `/training-and-development`, `/executive-advisory`, `/first-call`, confirmed via `ls web/app`), body copy shipped in `bdd5624`/`7604da5`/`fcce77f`, routes created in `f4568c7`. `Menu execution layout` -- superseded by `ServiceSidebar.tsx` (also `f4568c7`), which renders full weight on every route except `/diagnostic`, where it collapses to a "SERVICES" trigger -- the exact weight/position question the row asked, confirmed directly in that commit's own message.
+
+### 5. Session leftovers disposed of individually (commits `bc61f38`, `7fca29e`, `9b4885d`, `355b425`, `47ad4f6`, `44d9a0b`)
+
+`bc61f38`/`7fca29e` -- the two patch scripts behind tonight's MOB/CLAUDE.md writes, committed per the established convention that these scripts are tracked, not scratch. `9b4885d` -- `book-manifest-emdash-scan.md` relocated to `prompts/book-manifest-emdash-scan-2026-09-23.md` as a dated working input for item 5. `355b425` -- `tools/generate_candidate_review_packet.py` committed after fixing a real reusability defect first: its report header hardcoded `"Warm theme, 107 pages"` as a literal string instead of reading `theme`/`pageCount` from the crawl JSON, which would have silently mislabeled any future run against a different crawl. Now derives both fields live. `47ad4f6` -- `tools/sleuth/README.md:72` corrected; it read `"(gitignored, regenerated each run)"`, which was true when written but went stale the moment commit `47aca05` deliberately started tracking `sleuth_report.md`. `44d9a0b` -- `.gitignore` gained an entry for the three per-theme scratch crawl dirs (`tools/sleuth/output_{warm,dark,neutral}/`) generated during tonight's investigation, verified via `git check-ignore -v` before committing that the pattern does not touch the tracked `tools/sleuth/output/` directory. The stale, superseded `content-candidate-review-packet.md` was deleted outright (untracked, served no open item, regenerable on demand by the now-fixed generator).
+
+### 6. The sleuth-tracking question, and why it was correctly a dead end
+
+Proposed stopping tracking of `sleuth_report.md` as regenerable churn, per the general instinct that crawl output shouldn't live in git. Checked before acting, per standing discipline: both commit `47aca05`'s own message and a dated `.gitignore` comment (lines 27-31) record this as Pete's deliberate 2026-09-22 call -- a regenerated report is committed as evidence of a specific fix, not automatically. Correctly stopped, nothing touched. The README's stale line (item 5 above) is what generated the question in the first place -- the actual policy was never in doubt once the commit history and `.gitignore` comment were checked directly.
+
+### 7. The restored crawl, and the baseline-trust investigation it triggered
+
+Earlier this session, a fresh 3-theme sleuth crawl was run and `tools/sleuth/output/sleuth_report.md` was promoted from one of those crawls, overwriting the committed version locally. That promotion was never committed and was investigated, not assumed clean: deterministic findings read 216 -> 230 (up) and candidate findings read 247 -> 190 (down) against the committed baseline. The deterministic increase is **not a regression** -- it traces to the crawl having been served from the stale `.next` build (mtime 2026-09-21 23:38:23 UTC) that predated the ServiceSidebar contrast fix (`3d82192`, 2026-09-22 15:11:49 UTC), the exact staleness class the build-freshness check (commit `99d9834`) was built to catch. The candidate decrease genuinely does trace to commit `c739571` (the finite-verb heuristic tightening), which operates on already-crawled text regardless of build freshness. Because half the artifact was unreliable, none of it was committed as evidence -- `git restore` returned the file to the `47aca05` baseline.
+
+That restoration raised a sharper question, investigated as this closeout's pre-step: is the **committed** `47aca05` baseline itself trustworthy for 13b item 2's before/after? **Verdict: unrecoverable, not confirmed clean.** `.next/BUILD_ID` is overwritten on every build -- there is no way to retroactively confirm what build `47aca05`'s crawl was served from, and the build-freshness check postdates that crawl entirely (it did not exist yet) and in any case only fires when `--skip-build` is explicitly passed, never automatically. Circumstantial signals lean toward trustworthy: its real-AA-finding count (92) matches this item's own separately-tracked figure exactly with no apparent ServiceSidebar contamination, and the commit message describes a deliberate before/after verification methodology ("clears every page the ServiceSidebar teaser renders on, not just the one checked first"). But circumstantial isn't verified, and this session's own standing discipline is not to assert freshness without being able to check it directly. Section 13b item 2 now carries an explicit precondition: a fresh crawl against a freshly-rebuilt `.next` is required before that fix proceeds, and that fresh crawl -- not `47aca05` -- is the real before/after baseline.
+
+### 8. Section 13b Currency Check (Step 1a), first live run
+
+**13b checked, and amended** -- not "no change." Two edits landed against the same-day rewrite: item 2 gained the baseline-trust precondition above; the "Files to attach" list gained an entry for item 5 (`prompts/book-manifest-emdash-scan-2026-09-23.md`, `web/lib/book-manifest.ts`). No other closure or new open item from tonight's work required a 13b change beyond these two -- checked explicitly, not assumed.
+
+**Files changed, git-confirmed:** `tools/_mob.txt` (this closeout's full pass, v4.324 -> v4.325), `CLAUDE.md` (MOB version cross-reference), `prompts/session-handoff-v4.325.md` (new).
+
+**Open items carried forward:** unchanged from Section 13b's 2026-09-23 rewrite except the two amendments above. Next Quarterly Step-Back due **2026-10-03**, unchanged.
+
+**Anything Pete should know at next session start:** this is the first live run of Step 1a -- worth confirming at the next closeout that it actually caught what it was built to catch, rather than becoming a rubber-stamped "no change" by habit. 13b item 2 is now gated on a fresh sleuth crawl against a freshly-rebuilt `.next` -- do not reuse `47aca05` as the before baseline for that fix.
+
+MOB v4.325.
