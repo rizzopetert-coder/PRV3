@@ -55,6 +55,9 @@ Run `C:\mem0_trial_venv\Scripts\python.exe tools\prv3_diary.py write --agent cla
 
 If the write fails, do not silently omit it — log `[DIARY WRITE GAP: <reason>]` at the top of the Section 16 entry and proceed with closeout.
 
+### Step 1a — Section 13b Currency Check
+Confirm Section 13b (Session Priority Queue) reflects every closure, new open item, and resequencing landed this session. If anything closed that 13b still lists as active, or anything opened that 13b doesn't carry, update 13b in the same closeout pass and name the change in the Section 16 entry. If 13b needs no change, state that explicitly in the Section 16 entry ("13b checked, no change") rather than omitting it.
+
 ### Step 2 — Update MOB
 Write the updated MOB content to `tools/_mob.txt`.
 
@@ -196,7 +199,7 @@ No session may assert as current fact something it cannot verify from its own en
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.323 |
+| MOB version | v4.324 |
 | Session continuity | Mem0 — see Section 12 |
 | Engine state count | 58 (locked) |
 | Test suite minimum (Phase 1) | 171 profiles across 57 states |
