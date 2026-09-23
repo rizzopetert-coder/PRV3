@@ -29,3 +29,6 @@ gemini_export/
 # Pete's explicit call, 2026-09-22: a regenerated report is committed
 # deliberately, as evidence of a specific fix, not on every run.
 tools/sleuth/output/sleuth_raw.json
+# Per-theme scratch crawl dirs (output_warm/, output_dark/, output_neutral/)
+# -- ad hoc multi-theme runs, regenerable, never the tracked output/ dir above. 2026-09-23.
+tools/sleuth/output_*/
