@@ -307,7 +307,7 @@ export type ShareableSynthesisFields = Omit<
 // NEVER written to KV. NEVER serialized to persistent storage.
 // Three-layer structure: synthesis → state blocks → resolution direction.
 
-// HRdiagnostic.com only. Assembled server-side at session completion
+// hr-dx.com only. Assembled server-side at session completion
 // (web/lib/diagnostic-completion.ts) from session.answers_log's TC-*
 // entries -- never part of the Python engine's own PrivateOutputPayload,
 // since these questions carry zero scoring signal and the engine has no
