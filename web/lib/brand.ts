@@ -13,8 +13,8 @@ export type Brand = "principal_resolution" | "hr_diagnostic";
 export const BRAND_HEADER = "x-prv3-brand";
 
 const HR_DIAGNOSTIC_HOSTS = new Set([
-  "hrdiagnostic.com",
-  "www.hrdiagnostic.com",
+  "hr-dx.com",
+  "www.hr-dx.com",
 ]);
 
 export function resolveBrand(host: string | null | undefined): Brand {
