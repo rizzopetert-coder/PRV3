@@ -1,5 +1,5 @@
 /**
- * HRdiagnostic.com-only. Minimal per-question metadata that has NO home
+ * hr-dx.com-only. Minimal per-question metadata that has NO home
  * in the Python engine -- "intent" is explicitly not a QuestionDefinition
  * field (confirmed with Pete), and question_set_id/section grouping is
  * frontend-only bookkeeping the engine has no concept of. Deliberately
