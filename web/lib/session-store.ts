@@ -21,6 +21,8 @@ import { Redis } from "@upstash/redis";
 import { nanoid } from "nanoid";
 import type { PrivateIntakeEcho } from "@/lib/types";
 import type { SeverityInputPayload } from "@/lib/engine-client";
+import type { Brand } from "@/lib/brand";
+import { TACTICAL_QUESTION_META } from "@/data/tactical-question-meta";
 
 const redis = Redis.fromEnv();
 
@@ -168,6 +170,13 @@ export interface CheckpointResult {
 
 export interface DiagnosticSession {
   session_id: string;
+  // Resolved once at createSession() time from the request's Host header
+  // and persisted for the session's full lifetime (a multi-request flow) --
+  // re-deriving it per request would be redundant and risks inconsistency
+  // if a request ever arrived without the header. Drives whether TC-*
+  // questions are appended to question_sequence below and whether
+  // diagnostic-completion.ts resolves tactical_results.
+  brand: Brand;
   intake: PrivateIntakeEcho;
   next_question_id: string;
   accumulated_vector: AccumulatedVector;
@@ -469,18 +478,40 @@ export function resolveQuestionLabel(
 // Session CRUD
 // ---------------------------------------------------------------------------
 
-export async function createSession(intake: PrivateIntakeEcho): Promise<DiagnosticSession> {
+export async function createSession(
+  intake: PrivateIntakeEcho,
+  // Defaulted, not required -- session-store.test.ts and
+  // session/undo/route.test.ts call createSession(FAKE_INTAKE) at 8 sites
+  // with no brand argument, exercising undo logic that has nothing to do
+  // with brand/TC behavior. Forcing a required param would mean editing
+  // 8 unrelated test call sites for no behavioral gain; the real
+  // production caller (session/start/route.ts) always passes an explicit
+  // resolved brand, so this default is never silently relied on in the
+  // actual request path.
+  brand: Brand = "principal_resolution",
+): Promise<DiagnosticSession> {
+  // TC-* module appended only for hr_diagnostic -- the base
+  // PHASE_1_QUESTION_SEQUENCE template is never mutated, matching its own
+  // "never mutated" doc comment above. Order matches the JSON's own
+  // question_sets array order (10 sections x 4 questions), not
+  // re-sorted or interleaved.
+  const questionSequence =
+    brand === "hr_diagnostic"
+      ? [...PHASE_1_QUESTION_SEQUENCE, ...Object.keys(TACTICAL_QUESTION_META)]
+      : [...PHASE_1_QUESTION_SEQUENCE];
+
   const session: DiagnosticSession = {
     session_id: nanoid(),
+    brand,
     intake,
-    next_question_id: PHASE_1_QUESTION_SEQUENCE[0],
+    next_question_id: questionSequence[0],
     accumulated_vector: { ...ZERO_VECTOR },
     answers_log: [],
     status: "in_progress",
     checkpoint_q11: null,
     checkpoint_q19: null,
     checkpoint_q27: null,
-    question_sequence: [...PHASE_1_QUESTION_SEQUENCE],
+    question_sequence: questionSequence,
     severity_inputs: [],
     severity_follow_on_origins: {},
     question_labels: {},
