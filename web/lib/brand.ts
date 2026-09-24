@@ -22,3 +22,30 @@ export function resolveBrand(host: string | null | undefined): Brand {
   const bare = host.split(":")[0].toLowerCase();
   return HR_DIAGNOSTIC_HOSTS.has(bare) ? "hr_diagnostic" : "principal_resolution";
 }
+
+// Debug-only override for testing the hr_diagnostic path against a live
+// Vercel Preview deployment without a DNS/domain change -- Host-header
+// spoofing fails against real Vercel infrastructure (edge routing rejects
+// any Host not registered as a real alias for the deployment, confirmed
+// directly, before the request ever reaches this code). Gated on
+// VERCEL_ENV, Vercel's own auto-injected var ("production" | "preview" |
+// "development", no custom var needed) -- same convention already used at
+// web/lib/dev-diagnostic-preview.ts's isPreviewEnvironment(),
+// web/app/api/dev/diagnostic-preview/route.ts, and
+// web/app/api/engage/initiate/route.ts's testMode. Inlined here rather
+// than importing isPreviewEnvironment() from dev-diagnostic-preview.ts --
+// core brand resolution depending on a dev-preview-specific utility file
+// is the wrong dependency direction. Exact header value required (not a
+// boolean) so it's self-documenting in request logs. Never reachable in
+// Production regardless of header value.
+const DEBUG_BRAND_HEADER = "x-debug-brand";
+
+export function resolveBrandForRequest(headers: Headers): Brand {
+  if (
+    process.env.VERCEL_ENV !== "production" &&
+    headers.get(DEBUG_BRAND_HEADER) === "hr_diagnostic"
+  ) {
+    return "hr_diagnostic";
+  }
+  return resolveBrand(headers.get("host"));
+}
