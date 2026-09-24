@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
-// resolveTacticalResults() (HRdiagnostic.com only), this session.
+// resolveTacticalResults() (hr-dx.com only), this session.
 //
 // Substitutes for a genuine live end-to-end session completion, which is
 // currently blocked in this local environment: .env.local's own comment
