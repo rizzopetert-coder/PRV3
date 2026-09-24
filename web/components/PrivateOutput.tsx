@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import type { PrivateOutputPayload, SeverityTier, LegalTailRiskBand } from "@/lib/types";
+import type {
+  PrivateOutputPayload,
+  SeverityTier,
+  LegalTailRiskBand,
+  TacticalSectionResult,
+} from "@/lib/types";
 import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
 import CopyResultsButton from "@/components/CopyResultsButton";
@@ -10,6 +15,7 @@ import { stateIdToSlug } from "@/lib/state-slug";
 import ContextOrientation from "@/components/ContextOrientation";
 import { getResultsOrientation } from "@/data/orientation-copy";
 import { firstSentence, buildCoreCluster, joinNames } from "@/lib/output-text";
+import { useBrand } from "@/components/BrandContext";
 
 // Tier-based LOCKED copy — mirrors engine/severity.py SEVERITY_TIER_DESCRIPTIONS.
 const SEVERITY_ANCHOR: Record<SeverityTier, string> = {
@@ -79,6 +85,10 @@ function Rule() {
 
 interface PrivateOutputProps {
   payload: PrivateOutputPayload;
+  // HRdiagnostic.com only -- undefined for every principal_resolution
+  // session, and for hr_diagnostic sessions where no TC-* question was
+  // ever reached (shouldn't happen in practice, but not assumed).
+  tacticalResults?: TacticalSectionResult[];
   selectedStateIds: string[];
   intake: EnginePayload["intake"];
   // Path 1 (Session 71, Phase 1): ShareButton re-invokes /api/share/create
@@ -98,11 +108,19 @@ interface PrivateOutputProps {
 
 export default function PrivateOutput({
   payload,
+  tacticalResults,
   selectedStateIds,
   intake,
   enableSharing = true,
   enableEngage = true,
 }: PrivateOutputProps) {
+  const brand = useBrand();
+  // enableEngage defaults true and DiagnosticFlow.tsx never overrides it --
+  // the Engage CTA below links to /engage, which middleware.ts blocks
+  // entirely on hr_diagnostic. Same dead-link class as the self-select
+  // gate found and fixed last pass -- suppressed here rather than left
+  // visibly broken.
+  const showEngageCta = enableEngage && brand !== "hr_diagnostic";
   const liabilityText = payload.synthesis.liability_condition_text;
   const anchorText = payload.synthesis.asset_resolution_anchor_text;
   const resolutionFramingText = payload.synthesis.resolution_framing_text;
@@ -321,12 +339,18 @@ export default function PrivateOutput({
           <ul className="space-y-4">
             {coreCluster.map((s) => (
               <li key={s.id}>
-                <a
-                  href={`/book/toc#${stateIdToSlug(s.id)}`}
-                  className="font-display text-lg text-charcoal hover:underline"
-                >
-                  {s.name}
-                </a>
+                {brand === "hr_diagnostic" ? (
+                  <span className="font-display text-lg text-charcoal">
+                    {s.name}
+                  </span>
+                ) : (
+                  <a
+                    href={`/book/toc#${stateIdToSlug(s.id)}`}
+                    className="font-display text-lg text-charcoal hover:underline"
+                  >
+                    {s.name}
+                  </a>
+                )}
                 {s.descriptive_prose && (
                   <p className="text-[12px] text-charcoal leading-relaxed mt-0.5">
                     {firstSentence(s.descriptive_prose)}
@@ -573,7 +597,7 @@ export default function PrivateOutput({
           result data forward — Dropbox Sign's hosted signing flow needs
           nothing from this payload. enableEngage mirrors enableSharing's
           suppression pattern exactly (see prop doc comment above). */}
-      {enableEngage && (
+      {showEngageCta && (
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-[11px] uppercase tracking-wide text-slate mb-3">
             Ready to move on this?
@@ -588,6 +612,44 @@ export default function PrivateOutput({
       )}
 
       {/* Block 7 — friction_tax_estimate: null in Path B — render nothing */}
+
+      {/* Block 8 -- Tactical & Compliance results (HRdiagnostic.com only).
+          MVP: plain question/selected-answer list per section, each
+          section headed by its OneDigital referral chips. Does not match
+          the core diagnostic's narrative styling by design -- Pete's
+          explicit instruction, a different report shape for a different
+          purpose. */}
+      {tacticalResults && tacticalResults.length > 0 && (
+        <div className="mt-8 pt-8 border-t border-gray-200">
+          <p className="text-[11px] uppercase tracking-wide text-slate mb-4">
+            Tactical &amp; compliance review
+          </p>
+          <div className="space-y-6">
+            {tacticalResults.map((section) => (
+              <div key={section.question_set_id}>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {section.referral.map((r) => (
+                    <span
+                      key={r}
+                      className="text-[10px] uppercase tracking-wide bg-gray-100 text-charcoal rounded-full px-2 py-0.5"
+                    >
+                      {r}
+                    </span>
+                  ))}
+                </div>
+                <ul className="space-y-3">
+                  {section.answers.map((a) => (
+                    <li key={a.question_id}>
+                      <p className="text-sm font-medium text-charcoal">{a.question_text}</p>
+                      <p className="text-sm text-slate">{a.selected_option_text}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
