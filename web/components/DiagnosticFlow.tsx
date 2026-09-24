@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import type { PrivateOutputPayload } from "@/lib/types";
+import type { PrivateOutputPayload, TacticalSectionResult } from "@/lib/types";
 import { SIGNIFICANT_EVENT_OPTIONS } from "@/lib/types";
 import PrivateOutput from "@/components/PrivateOutput";
 import ContextOrientation from "@/components/ContextOrientation";
@@ -228,7 +228,7 @@ type FlowState =
   // Narrative modulation (Phase 3) -- returned by session/answer or
   // session/resume in place of the next question, once, per session.
   | { phase: "narrative"; sessionId: string; prompt: string }
-  | { phase: "complete"; result: PrivateOutputPayload }
+  | { phase: "complete"; result: PrivateOutputPayload; tacticalResults?: TacticalSectionResult[] }
   | { phase: "error"; message: string };
 
 const ERROR_COPY = "Something went wrong. Please try again.";
@@ -749,7 +749,11 @@ export default function DiagnosticFlow() {
       ]);
       const data = await res.json();
       if (data.status === "complete") {
-        setState({ phase: "complete", result: data.result as PrivateOutputPayload });
+        setState({
+          phase: "complete",
+          result: data.result as PrivateOutputPayload,
+          tacticalResults: data.tactical_results as TacticalSectionResult[] | undefined,
+        });
       } else if (data.status === "narrative") {
         setState({ phase: "narrative", sessionId, prompt: data.prompt });
       } else {
@@ -838,7 +842,11 @@ export default function DiagnosticFlow() {
       }
       const data = await res.json();
       if (data.status === "complete") {
-        setState({ phase: "complete", result: data.result as PrivateOutputPayload });
+        setState({
+          phase: "complete",
+          result: data.result as PrivateOutputPayload,
+          tacticalResults: data.tactical_results as TacticalSectionResult[] | undefined,
+        });
       } else {
         setState({
           phase: "question",
@@ -868,11 +876,12 @@ export default function DiagnosticFlow() {
   }
 
   if (state.phase === "complete") {
-    const { result } = state;
+    const { result, tacticalResults } = state;
     return (
       <div className="max-w-2xl mx-auto px-6 py-16">
         <PrivateOutput
           payload={result}
+          tacticalResults={tacticalResults}
           selectedStateIds={[
             result.primary_state.id,
             ...result.secondary_states.map((s) => s.id),
