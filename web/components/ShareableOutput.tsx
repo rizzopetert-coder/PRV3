@@ -8,6 +8,7 @@ import type { ShareableOutputPayload } from "@/lib/types";
 import { severityAccentTokens } from "@/components/ConstellationField";
 import ContextOrientation from "@/components/ContextOrientation";
 import { getResultsOrientation } from "@/data/orientation-copy";
+import { useBrand } from "@/components/BrandContext";
 
 function Rule() {
   return (
@@ -20,6 +21,7 @@ interface ShareableOutputProps {
 }
 
 export default function ShareableOutput({ payload }: ShareableOutputProps) {
+  const brand = useBrand();
   const createdDate = new Date(payload.created_at).toLocaleDateString("en-US", {
     month: "short",
     year: "numeric",
@@ -62,7 +64,7 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
       {/* Block 1 — Header bar */}
       <div className="flex items-center justify-between pb-3">
         <span className="text-[12px] font-medium text-charcoal">
-          Principal Resolution
+          {brand === "hr_diagnostic" ? "HR Diagnostic" : "Principal Resolution"}
         </span>
         <span className="text-[11px] text-slate">{clientIdentifier}</span>
       </div>
