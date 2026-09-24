@@ -307,6 +307,28 @@ export type ShareableSynthesisFields = Omit<
 // NEVER written to KV. NEVER serialized to persistent storage.
 // Three-layer structure: synthesis → state blocks → resolution direction.
 
+// HRdiagnostic.com only. Assembled server-side at session completion
+// (web/lib/diagnostic-completion.ts) from session.answers_log's TC-*
+// entries -- never part of the Python engine's own PrivateOutputPayload,
+// since these questions carry zero scoring signal and the engine has no
+// concept of "section" or "referral." question_text/selected_option_text
+// come from a live invokeQuestionCopy() call per answer, matching this
+// codebase's standing principle that question copy is never hand-
+// duplicated in TypeScript -- only intent (no engine-side existence at
+// all) and referral (a pure frontend/business concern) are TS-native.
+export interface TacticalAnswerResult {
+  question_id: string;
+  question_text: string;
+  selected_option_text: string;
+  intent: string;
+}
+
+export interface TacticalSectionResult {
+  question_set_id: string;
+  referral: string[];
+  answers: TacticalAnswerResult[];
+}
+
 export interface PrivateOutputPayload {
   // Layer 1 — synthesis
   // Five-field struct from Python engine (output_synthesis.py).
