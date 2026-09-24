@@ -5,7 +5,7 @@ import { BRAND_HEADER, resolveBrandForRequest } from "@/lib/brand";
  * hr_diagnostic is walled off to the diagnostic flow only -- no /book,
  * /about, service pages, or any other PRV3 content is reachable on that
  * hostname. principal_resolution (the default -- everything not
- * explicitly hrdiagnostic.com) is completely unaffected: every path
+ * explicitly hr-dx.com) is completely unaffected: every path
  * falls through to the single NextResponse.next() at the bottom.
  *
  * Allowed on hr_diagnostic: "/" (rewritten to /diagnostic so the
