@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSession, resolveQuestionLabel } from "@/lib/session-store";
+import { resolveBrand } from "@/lib/brand";
 import { invokeQuestionCopy } from "@/lib/engine-client";
 import { SIGNIFICANT_EVENT_OPTIONS, type PrivateIntakeEcho } from "@/lib/types";
 
@@ -63,7 +64,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid intake payload" }, { status: 400 });
   }
 
-  const session = await createSession(body);
+  const brand = resolveBrand(request.headers.get("host"));
+  const session = await createSession(body, brand);
   const firstQuestion = await invokeQuestionCopy(session.next_question_id);
   const label = resolveQuestionLabel(session.next_question_id, session.question_labels);
 
