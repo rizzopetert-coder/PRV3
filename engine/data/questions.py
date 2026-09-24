@@ -1674,7 +1674,7 @@ _QDATA = [
         ["the_culture_that_wasnt", "identity_erosion", "culture_drift"],
         False,
     ),
-    # -- Tactical & Compliance module (TC-*), hrdiagnostic.com only --------
+    # -- Tactical & Compliance module (TC-*), hr-dx.com only --------
     # 40 questions across 10 sections, all zero-signal (dict(_z) on every
     # option -- see _opt_contrib below), state_targets=[] for all. Source:
     # tactical-compliance-questions-schema-compliant.json.
@@ -3449,7 +3449,7 @@ QUESTION_LIBRARY: "dict[str, QuestionDefinition]" = _build_library()
 
 CORE_SEQUENCE_IDS = [f"Q{i:02d}" for i in range(1, 40)]   # Q01-Q39
 SEVERITY_FOLLOW_ON_IDS = [f"SEVER-{i:02d}" for i in range(1, 14)]  # SEVER-01 to SEVER-13
-TACTICAL_QUESTION_IDS = ["TC-HRPOL-01", "TC-HRPOL-02", "TC-HRPOL-03", "TC-HRPOL-04", "TC-HIRE-01", "TC-HIRE-02", "TC-HIRE-03", "TC-HIRE-04", "TC-PAY-01", "TC-PAY-02", "TC-PAY-03", "TC-PAY-04", "TC-COMPC-01", "TC-COMPC-02", "TC-COMPC-03", "TC-COMPC-04", "TC-BEN-01", "TC-BEN-02", "TC-BEN-03", "TC-BEN-04", "TC-LEAVE-01", "TC-LEAVE-02", "TC-LEAVE-03", "TC-LEAVE-04", "TC-SAFE-01", "TC-SAFE-02", "TC-SAFE-03", "TC-SAFE-04", "TC-REC-01", "TC-REC-02", "TC-REC-03", "TC-REC-04", "TC-TECH-01", "TC-TECH-02", "TC-TECH-03", "TC-TECH-04", "TC-PERF-01", "TC-PERF-02", "TC-PERF-03", "TC-PERF-04"]  # TC-* module, hrdiagnostic.com only, 40 total
+TACTICAL_QUESTION_IDS = ["TC-HRPOL-01", "TC-HRPOL-02", "TC-HRPOL-03", "TC-HRPOL-04", "TC-HIRE-01", "TC-HIRE-02", "TC-HIRE-03", "TC-HIRE-04", "TC-PAY-01", "TC-PAY-02", "TC-PAY-03", "TC-PAY-04", "TC-COMPC-01", "TC-COMPC-02", "TC-COMPC-03", "TC-COMPC-04", "TC-BEN-01", "TC-BEN-02", "TC-BEN-03", "TC-BEN-04", "TC-LEAVE-01", "TC-LEAVE-02", "TC-LEAVE-03", "TC-LEAVE-04", "TC-SAFE-01", "TC-SAFE-02", "TC-SAFE-03", "TC-SAFE-04", "TC-REC-01", "TC-REC-02", "TC-REC-03", "TC-REC-04", "TC-TECH-01", "TC-TECH-02", "TC-TECH-03", "TC-TECH-04", "TC-PERF-01", "TC-PERF-02", "TC-PERF-03", "TC-PERF-04"]  # TC-* module, hr-dx.com only, 40 total
 
 DISTINGUISHER_CLUSTER_PREFIXES = {
     "C-Manager":  "DIST-CM",
