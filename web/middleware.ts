@@ -32,7 +32,19 @@ const HR_DIAGNOSTIC_ALLOWED_EXACT = new Set([
   "/api/diagnostic/session/undo",
 ]);
 
+// TEMPORARY diagnostic, this session -- remove in the same round as the
+// real fix, once the raw host divergence (if any) between Edge Middleware
+// and Node-runtime call sites is identified. Echoes the exact,
+// unnormalized values back as response headers on every return path, so
+// the raw string is visible directly rather than inferred from behavior.
+function withDebugHeaders(response: NextResponse, rawHost: string | null, brand: string): NextResponse {
+  response.headers.set("x-debug-mw-host", rawHost ?? "(null)");
+  response.headers.set("x-debug-mw-brand", brand);
+  return response;
+}
+
 export function middleware(request: NextRequest) {
+  const rawHost = request.headers.get("host");
   const brand = resolveBrandForRequest(request.headers);
   const { pathname } = request.nextUrl;
 
@@ -42,16 +54,20 @@ export function middleware(request: NextRequest) {
       url.pathname = "/diagnostic";
       const rewritten = NextResponse.rewrite(url);
       rewritten.headers.set(BRAND_HEADER, brand);
-      return rewritten;
+      return withDebugHeaders(rewritten, rawHost, brand);
     }
     if (!HR_DIAGNOSTIC_ALLOWED_EXACT.has(pathname)) {
-      return new NextResponse(null, { status: 404 });
+      return withDebugHeaders(new NextResponse(null, { status: 404 }), rawHost, brand);
     }
   }
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(BRAND_HEADER, brand);
-  return NextResponse.next({ request: { headers: requestHeaders } });
+  return withDebugHeaders(
+    NextResponse.next({ request: { headers: requestHeaders } }),
+    rawHost,
+    brand,
+  );
 }
 
 export const config = {
