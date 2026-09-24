@@ -11,7 +11,7 @@ import { translateResolutionFamily } from "@/lib/resolution-family";
 import { TACTICAL_QUESTION_META } from "@/data/tactical-question-meta";
 import { getTacticalReferrals } from "@/data/tactical-referrals";
 
-// HRdiagnostic.com only. Resolves session.answers_log's TC-* entries into
+// hr-dx.com only. Resolves session.answers_log's TC-* entries into
 // display-ready results, grouped by section. Fetches question_text/
 // option_text live via invokeQuestionCopy() (one call per answered TC
 // question, run concurrently) -- matches this codebase's standing
