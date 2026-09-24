@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import { useBrand } from "@/components/BrandContext";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -48,9 +49,23 @@ function DiagnosticGate({
 }: {
   onChoose: (path: DiagnosticPath) => void;
 }) {
+  // hr_diagnostic: self-select (Path B) is blocked at the routing layer
+  // (/api/result, /api/interpret both 404 on that hostname -- see
+  // middleware.ts) since it exposes PRV3's full 58-state taxonomy, which
+  // this hostname must never reveal. Hiding the option here too, rather
+  // than leaving a button that would otherwise fail visibly if clicked.
+  const brand = useBrand();
+  const diagnosticOnly = brand === "hr_diagnostic";
+
   return (
     <div className="max-w-2xl mx-auto px-6 py-16">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div
+        className={
+          diagnosticOnly
+            ? "grid grid-cols-1 gap-4"
+            : "grid grid-cols-1 md:grid-cols-2 gap-4"
+        }
+      >
         <button
           onClick={() => onChoose("diagnostic")}
           className="text-left p-6 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-all duration-300 animate-fade-up"
@@ -63,17 +78,19 @@ function DiagnosticGate({
             carrying.
           </p>
         </button>
-        <button
-          onClick={() => onChoose("self-select")}
-          className="text-left p-6 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-all duration-300 animate-fade-up"
-        >
-          <h2 className="font-display text-lg font-semibold text-charcoal mb-2">
-            Start by recognizing.
-          </h2>
-          <p className="font-ui text-sm text-gray-600">
-            Select what looks familiar. See what it means together.
-          </p>
-        </button>
+        {!diagnosticOnly && (
+          <button
+            onClick={() => onChoose("self-select")}
+            className="text-left p-6 rounded-xl border border-gray-200 bg-white hover:border-charcoal transition-all duration-300 animate-fade-up"
+          >
+            <h2 className="font-display text-lg font-semibold text-charcoal mb-2">
+              Start by recognizing.
+            </h2>
+            <p className="font-ui text-sm text-gray-600">
+              Select what looks familiar. See what it means together.
+            </p>
+          </button>
+        )}
       </div>
     </div>
   );
