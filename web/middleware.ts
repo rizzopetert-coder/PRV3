@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { BRAND_HEADER, resolveBrand } from "@/lib/brand";
+import { BRAND_HEADER, resolveBrandForRequest } from "@/lib/brand";
 
 /**
  * hr_diagnostic is walled off to the diagnostic flow only -- no /book,
@@ -33,7 +33,7 @@ const HR_DIAGNOSTIC_ALLOWED_EXACT = new Set([
 ]);
 
 export function middleware(request: NextRequest) {
-  const brand = resolveBrand(request.headers.get("host"));
+  const brand = resolveBrandForRequest(request.headers);
   const { pathname } = request.nextUrl;
 
   if (brand === "hr_diagnostic") {
