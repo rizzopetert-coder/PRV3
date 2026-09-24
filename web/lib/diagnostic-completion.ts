@@ -1,12 +1,76 @@
 import { NextResponse } from "next/server";
 import { completeSession, type DiagnosticSession } from "@/lib/session-store";
-import { invokeComplete } from "@/lib/engine-client";
+import { invokeComplete, invokeQuestionCopy } from "@/lib/engine-client";
 import type {
   PrivateOutputPayload,
   StateRef,
   SynthesisFields,
+  TacticalSectionResult,
 } from "@/lib/types";
 import { translateResolutionFamily } from "@/lib/resolution-family";
+import { TACTICAL_QUESTION_META } from "@/data/tactical-question-meta";
+import { getTacticalReferrals } from "@/data/tactical-referrals";
+
+// HRdiagnostic.com only. Resolves session.answers_log's TC-* entries into
+// display-ready results, grouped by section. Fetches question_text/
+// option_text live via invokeQuestionCopy() (one call per answered TC
+// question, run concurrently) -- matches this codebase's standing
+// principle that question copy is never hand-duplicated in TypeScript
+// (get_question_copy()'s own docstring, engine/main.py). intent and
+// question_set_id have no engine-side existence, so those come from the
+// small TS-only lookup (web/data/tactical-question-meta.ts) instead.
+export async function resolveTacticalResults(
+  session: DiagnosticSession,
+): Promise<TacticalSectionResult[] | undefined> {
+  if (session.brand !== "hr_diagnostic") return undefined;
+
+  const tacticalEntries = session.answers_log.filter((e) =>
+    e.question_id.startsWith("TC-"),
+  );
+  if (tacticalEntries.length === 0) return undefined;
+
+  const resolved = await Promise.all(
+    tacticalEntries.map(async (entry) => {
+      const meta = TACTICAL_QUESTION_META[entry.question_id];
+      const copy = await invokeQuestionCopy(entry.question_id);
+      const selectedOptionId = entry.option_ids[0];
+      const selectedOptionText =
+        copy.options.find((o) => o.option_id === selectedOptionId)?.option_text ??
+        selectedOptionId;
+      return {
+        question_set_id: meta?.question_set_id ?? "unknown",
+        intent: meta?.intent ?? "",
+        result: {
+          question_id: entry.question_id,
+          question_text: copy.question_text,
+          selected_option_text: selectedOptionText,
+          intent: meta?.intent ?? "",
+        },
+      };
+    }),
+  );
+
+  const bySection = new Map<string, TacticalSectionResult>();
+  for (const { question_set_id, result } of resolved) {
+    if (!bySection.has(question_set_id)) {
+      bySection.set(question_set_id, {
+        question_set_id,
+        referral: getTacticalReferrals(question_set_id),
+        answers: [],
+      });
+    }
+    bySection.get(question_set_id)!.answers.push(result);
+  }
+
+  // Section order matches TACTICAL_QUESTION_META's own key insertion
+  // order (the JSON's question_sets array order), not re-sorted.
+  const sectionOrder = [
+    ...new Set(Object.values(TACTICAL_QUESTION_META).map((m) => m.question_set_id)),
+  ];
+  return sectionOrder
+    .map((id) => bySection.get(id))
+    .filter((s): s is TacticalSectionResult => s !== undefined);
+}
 
 // ---------------------------------------------------------------------------
 // Shared completion path -- extracted from session/answer/route.ts's own
@@ -125,5 +189,11 @@ export async function completeDiagnosticSession(
     stateRefs.map((s) => ({ id: s.id, name: s.name, weight: s.weight })),
   );
 
-  return NextResponse.json({ status: "complete", result: privatePayload });
+  const tacticalResults = await resolveTacticalResults(session);
+
+  return NextResponse.json({
+    status: "complete",
+    result: privatePayload,
+    ...(tacticalResults ? { tactical_results: tacticalResults } : {}),
+  });
 }
