@@ -85,7 +85,7 @@ function Rule() {
 
 interface PrivateOutputProps {
   payload: PrivateOutputPayload;
-  // HRdiagnostic.com only -- undefined for every principal_resolution
+  // hr-dx.com only -- undefined for every principal_resolution
   // session, and for hr_diagnostic sessions where no TC-* question was
   // ever reached (shouldn't happen in practice, but not assumed).
   tacticalResults?: TacticalSectionResult[];
@@ -613,7 +613,7 @@ export default function PrivateOutput({
 
       {/* Block 7 — friction_tax_estimate: null in Path B — render nothing */}
 
-      {/* Block 8 -- Tactical & Compliance results (HRdiagnostic.com only).
+      {/* Block 8 -- Tactical & Compliance results (hr-dx.com only).
           MVP: plain question/selected-answer list per section, each
           section headed by its OneDigital referral chips. Does not match
           the core diagnostic's narrative styling by design -- Pete's
