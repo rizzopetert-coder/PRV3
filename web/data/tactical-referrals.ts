@@ -1,5 +1,5 @@
 /**
- * HRdiagnostic.com-only: per-section OneDigital referral mapping for the
+ * hr-dx.com-only: per-section OneDigital referral mapping for the
  * Tactical & Compliance question module. Every section carries "HR
  * Consulting" in addition to its specific specialty/specialties, per
  * Pete's explicit mapping (2026-09-24). Keyed by question_set_id, matching
