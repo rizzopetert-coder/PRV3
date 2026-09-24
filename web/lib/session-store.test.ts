@@ -250,6 +250,7 @@ describe("checkpointIdMap / checkpointSlot / setCheckpointSlot", () => {
   function emptySession(): DiagnosticSession {
     return {
       session_id: "test",
+      brand: "principal_resolution",
       intake: {} as DiagnosticSession["intake"],
       next_question_id: "Q11",
       accumulated_vector: {
