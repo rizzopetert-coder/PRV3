@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { BRAND_HEADER, resolveBrand, type Brand } from "@/lib/brand";
+import { BRAND_HEADER, resolveBrandForRequest, type Brand } from "@/lib/brand";
 import { BrandProvider } from "@/components/BrandContext";
 
 /**
@@ -18,8 +18,9 @@ async function resolveRequestBrand(): Promise<Brand> {
   if (forwarded === "hr_diagnostic" || forwarded === "principal_resolution") {
     return forwarded;
   }
-  // Defensive fallback if middleware's header is ever absent.
-  return resolveBrand(headersList.get("host"));
+  // Defensive fallback if middleware's header is ever absent -- also
+  // covers the debug override consistently, not just the plain Host path.
+  return resolveBrandForRequest(headersList);
 }
 
 export async function generateMetadata(): Promise<Metadata> {
