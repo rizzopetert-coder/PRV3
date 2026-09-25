@@ -530,6 +530,21 @@ export async function invokeQuestionCopy(
   });
 
   if (!response.ok) {
+    // TEMPORARY diagnostic, this session -- remove once the cross-project
+    // bypass issue is resolved. Never logs the actual secret values, only
+    // presence/length and the raw upstream response body (which contains
+    // no secrets -- either Vercel's own "Protected deployment" JSON or
+    // api/engine.py's own error body).
+    const bodyText = await response.text().catch(() => "(failed to read body)");
+    console.error("[DIAG] question-copy failure", {
+      status: response.status,
+      bodyText,
+      bypassSecretPresent: !!VERCEL_PROTECTION_BYPASS,
+      bypassSecretLength: VERCEL_PROTECTION_BYPASS?.length ?? 0,
+      engineSecretPresent: !!ENGINE_SECRET,
+      engineSecretLength: ENGINE_SECRET.length,
+      resolvedUrl: resolveEnginePath("/api/question-copy"),
+    });
     throw new Error(`Question-copy invocation failed: ${response.status}`);
   }
 
