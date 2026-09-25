@@ -1,50 +1,42 @@
 {
-  "builds": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
     {
-      "src": "web/package.json",
-      "use": "@vercel/next"
+      "source": "/api/engine",
+      "destination": "/api/engine.py"
     },
     {
-      "src": "api/engine.py",
-      "use": "@vercel/python"
+      "source": "/api/accumulate",
+      "destination": "/api/engine.py"
+    },
+    {
+      "source": "/api/checkpoint",
+      "destination": "/api/engine.py"
+    },
+    {
+      "source": "/api/complete",
+      "destination": "/api/engine.py"
+    },
+    {
+      "source": "/api/question-copy",
+      "destination": "/api/engine.py"
+    },
+    {
+      "source": "/api/condensed-complete",
+      "destination": "/api/engine.py"
+    },
+    {
+      "source": "/api/narrative-prompt",
+      "destination": "/api/engine.py"
+    },
+    {
+      "source": "/api/narrative-process",
+      "destination": "/api/engine.py"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/engine",
-      "dest": "/api/engine.py"
-    },
-    {
-      "src": "/api/accumulate",
-      "dest": "/api/engine.py"
-    },
-    {
-      "src": "/api/checkpoint",
-      "dest": "/api/engine.py"
-    },
-    {
-      "src": "/api/complete",
-      "dest": "/api/engine.py"
-    },
-    {
-      "src": "/api/question-copy",
-      "dest": "/api/engine.py"
-    },
-    {
-      "src": "/api/condensed-complete",
-      "dest": "/api/engine.py"
-    },
-    {
-      "src": "/api/narrative-prompt",
-      "dest": "/api/engine.py"
-    },
-    {
-      "src": "/api/narrative-process",
-      "dest": "/api/engine.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/web/$1"
+  "functions": {
+    "api/engine.py": {
+      "maxDuration": 300
     }
-  ]
+  }
 }
