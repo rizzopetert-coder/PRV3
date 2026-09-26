@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { BRAND_HEADER, resolveBrandForRequest, type Brand } from "@/lib/brand";
 import { BrandProvider } from "@/components/BrandContext";
+import DiagnosticChrome from "@/components/DiagnosticChrome";
 
 /**
  * Brand-aware metadata and BrandProvider scoped to the /diagnostic route
@@ -45,5 +46,14 @@ export default async function DiagnosticLayout({
   children: React.ReactNode;
 }) {
   const brand = await resolveRequestBrand();
-  return <BrandProvider brand={brand}>{children}</BrandProvider>;
+  // PRV3 chrome for principal_resolution only. app/diagnostic/ sits
+  // outside the (site) route group, so this is the only place it can
+  // come from here -- and hr_diagnostic must never receive it, not even
+  // as a downloaded chunk. DiagnosticChrome (client) makes the brand
+  // decision and code-splits the chrome; see its header comment.
+  return (
+    <BrandProvider brand={brand}>
+      <DiagnosticChrome>{children}</DiagnosticChrome>
+    </BrandProvider>
+  );
 }

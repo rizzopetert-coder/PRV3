@@ -54,6 +54,9 @@ EXCLUDED_PREFIXES = (
     "/dev/",
     "/share/",
     "/first-call/admin",
+    # app/(site)/[...missing] -- 404 catch-all, calls notFound()
+    # unconditionally, never a real page.
+    "/[...missing]",
 )
 
 # Exact-match, not prefix-match: browser-convention/file-based routes Next
