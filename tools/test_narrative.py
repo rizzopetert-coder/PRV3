@@ -353,10 +353,10 @@ check("CONFIDENCE_FLOOR = 0.15 (CALIBRATION TARGET starting value)",
 # ── 9. NarrativeModulationEngine ──────────────────────────────────────────────
 print("\n9. NarrativeModulationEngine")
 
-engine = NarrativeModulationEngine(model="claude-sonnet-4-6")
+engine = NarrativeModulationEngine(model="claude-sonnet-5")
 check("Engine initial extraction_result is None", engine.extraction_result is None)
 check("Engine initial severity_signals is []", engine.severity_signals == [])
-check("Engine default model", engine.model == "claude-sonnet-4-6")
+check("Engine default model", engine.model == "claude-sonnet-5")
 
 # Simulate extraction result injection (bypasses API call)
 engine.extraction_result = good_extraction()

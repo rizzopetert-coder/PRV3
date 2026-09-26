@@ -510,7 +510,7 @@ check(
 
 # ── 24–25. OutputSynthesisEngine stateful interface ──────────────────────────
 
-engine = OutputSynthesisEngine(model="claude-sonnet-4-6")
+engine = OutputSynthesisEngine(model="claude-sonnet-5")
 
 check(
     "OutputSynthesisEngine: result is None before first call",

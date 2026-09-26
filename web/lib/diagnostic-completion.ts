@@ -136,6 +136,15 @@ export async function completeDiagnosticSession(
   }));
 
   const engSynthesis = engineResult.synthesis;
+  // Synthesis failures are swallowed engine-side (static backup copy) and
+  // the error detail never reached the client -- log it here so a silent
+  // fallback is diagnosable from runtime logs. Key-like strings redacted.
+  if (engSynthesis?.is_fallback) {
+    const detail = (engSynthesis.parse_error ?? "(no parse_error)")
+      .replace(/sk-ant-[A-Za-z0-9_-]+/g, "[redacted-key]")
+      .slice(0, 500);
+    console.warn("[DIAG] synthesis fallback", { brand: session.brand, detail });
+  }
   const synthesis: SynthesisFields = engSynthesis
     ? {
         liability_condition_text:     engSynthesis.liability_condition_text,

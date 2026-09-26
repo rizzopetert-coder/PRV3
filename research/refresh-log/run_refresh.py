@@ -172,7 +172,7 @@ def check_domain(client: Anthropic, domain: dict) -> dict:
 
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-6",
+            model="claude-sonnet-5",
             max_tokens=4000,
             tools=[{"type": "web_search_20260209", "name": "web_search"}],
             messages=[{"role": "user", "content": prompt}],

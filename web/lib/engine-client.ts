@@ -175,6 +175,9 @@ export interface EngineResult {
     headline:                     string;
     synthesis_confidence:         number;
     is_fallback:                  boolean;
+    // Present when is_fallback -- the swallowed error detail (API error,
+    // parse failure). Logged, never forwarded to the client payload.
+    parse_error?:                 string | null;
   } | null;
   engine_version: string;
   monitoring_metadata: Record<string, unknown>;

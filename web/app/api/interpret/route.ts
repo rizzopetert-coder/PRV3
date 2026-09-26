@@ -34,8 +34,11 @@ export async function POST(request: NextRequest) {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
   const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
+    model: "claude-sonnet-5",
     max_tokens: 200,
+    // Sonnet 5 runs adaptive thinking unless disabled; content[0] below
+    // must be the text block.
+    thinking: { type: "disabled" },
     messages: [{ role: "user", content: buildInterpretationPrompt(states) }],
   });
 

@@ -192,7 +192,7 @@ def _parse_extraction_response(response_text: str) -> NarrativeExtractionResult:
 
 def extract_signals(
     narrative_text: str,
-    model: str = "claude-sonnet-4-6",
+    model: str = "claude-sonnet-5",
     client=None,
 ) -> NarrativeExtractionResult:
     """
@@ -229,7 +229,9 @@ def extract_signals(
         message = client.messages.create(
             model=model,
             max_tokens=500,
-            temperature=0.2,
+            # Sonnet 5: no temperature (400), thinking off so content[0]
+            # is the text block.
+            thinking={"type": "disabled"},
             system=NARRATIVE_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": narrative_text}],
         )
@@ -431,7 +433,7 @@ class NarrativeModulationEngine:
     Orchestrates one narrative modulation pass for a scoring session.
 
     Usage:
-        engine = NarrativeModulationEngine(model="claude-sonnet-4-6")
+        engine = NarrativeModulationEngine(model="claude-sonnet-5")
 
         # After narrative prompt response received:
         result = engine.extract(narrative_text)
@@ -447,7 +449,7 @@ class NarrativeModulationEngine:
     Spec reference: Section IV (all subsections)
     """
 
-    def __init__(self, model: str = "claude-sonnet-4-6", client=None):
+    def __init__(self, model: str = "claude-sonnet-5", client=None):
         self.model = model
         self._client = client
         self.extraction_result: Optional[NarrativeExtractionResult] = None
@@ -622,7 +624,7 @@ def _build_prompt_generation_input(context: dict) -> str:
 
 def generate_narrative_prompt(
     context: dict,
-    model: str = "claude-sonnet-4-6",
+    model: str = "claude-sonnet-5",
     client=None,
     timeout: float = 15.0,
 ) -> NarrativePromptResult:
@@ -660,7 +662,9 @@ def generate_narrative_prompt(
         message = client.messages.create(
             model=model,
             max_tokens=150,
-            temperature=0.6,
+            # Sonnet 5: no temperature (400), thinking off so content[0]
+            # is the text block within 150 tokens.
+            thinking={"type": "disabled"},
             system=NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_content}],
             timeout=timeout,

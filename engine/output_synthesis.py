@@ -322,7 +322,7 @@ def synthesize(
     narrative_response: str = "",
     intake: dict | None = None,
     signal_map_context: str = "",
-    model: str = "claude-sonnet-4-6",
+    model: str = "claude-sonnet-5",
     client=None,
     timeout: float = 15.0,
 ) -> SynthesisResult:
@@ -389,7 +389,10 @@ def synthesize(
         message = client.messages.create(
             model=model,
             max_tokens=800,
-            temperature=0.3,
+            # Sonnet 5: sampling params (temperature) return a 400, and
+            # omitting `thinking` runs adaptive thinking -- content[0]
+            # below must be the text block, within 800 tokens / 15s.
+            thinking={"type": "disabled"},
             system=OUTPUT_SYNTHESIS_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": prompt}],
             timeout=timeout,
@@ -415,7 +418,7 @@ class OutputSynthesisEngine:
     Stores result for downstream access.
     """
 
-    def __init__(self, model: str = "claude-sonnet-4-6", client=None):
+    def __init__(self, model: str = "claude-sonnet-5", client=None):
         self.model = model
         self._client = client
         self.result: Optional[SynthesisResult] = None
