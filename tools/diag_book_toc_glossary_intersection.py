@@ -17,7 +17,7 @@ not assumed from memory):
      descriptive_prose, a genuinely different body of copy for the same
      58 states, not a duplicate of taxonomy.ts's description field.
   6. web/lib/book-taxonomy-labels.ts -- PUBLIC_DIMENSION_LABELS (4, title+description)
-  7. web/app/book/toc/page.tsx   -- SIGNATURE_DEFINITIONS (5)
+  7. web/app/(site)/book/toc/page.tsx   -- SIGNATURE_DEFINITIONS (5)
      -- CONFIRMED DISTINCT from source 2/3: a third, shorter body of
      signature-level copy, authored for the Gestalt Pass Terminology Guide.
   8. web/components/ConstellationField.tsx -- GESTALT_INFO (title + 3 points)
@@ -150,7 +150,7 @@ def extract_dimension_labels() -> list[Entry]:
 
 
 def extract_signature_definitions() -> list[Entry]:
-    path = REPO_ROOT / "web" / "app" / "book" / "toc" / "page.tsx"
+    path = REPO_ROOT / "web" / "app" / "(site)" / "book" / "toc" / "page.tsx"
     text = path.read_text(encoding="utf-8")
     block_start = text.index("SIGNATURE_DEFINITIONS")
     block_end = text.index("\n};", block_start)

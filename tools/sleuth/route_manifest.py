@@ -123,7 +123,11 @@ def _glob_dynamic_placeholders() -> frozenset[str]:
     patterns = set()
     for page in APP_DIR.rglob("page.tsx"):
         rel = page.relative_to(APP_DIR).parent
-        parts = [p for p in rel.parts if p != "."]
+        # "(group)" folders are Next route groups -- stripped from the
+        # URL, so dropped here too or "/(site)/share/[id]" would never
+        # match the manifest's "/share/[id]".
+        parts = [p for p in rel.parts
+                 if p != "." and not (p.startswith("(") and p.endswith(")"))]
         if parts and any(p.startswith("[") for p in parts):
             patterns.add("/" + "/".join(parts))
     return frozenset(patterns)

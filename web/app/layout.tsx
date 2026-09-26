@@ -8,9 +8,6 @@ import {
   Source_Serif_4,
 } from "next/font/google";
 import "./globals.css";
-import { NavBar } from "@/components/NavBar";
-import { MobileMenu } from "@/components/MobileMenu";
-import { ServiceSidebar } from "@/components/ServiceSidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -74,8 +71,9 @@ export default function RootLayout({
           Visual identity v2 theme persistence (OD-07, Stage 1) — blocking
           script, runs before first paint, sets data-theme on <html> from
           localStorage before React hydrates. ThemeSwitcher (OD-07) is
-          mounted in NavBar.tsx, sitewide global chrome as of this pass --
-          no longer dormant. suppressHydrationWarning above is required
+          mounted in NavBar.tsx, which now lives in app/(site)/layout.tsx
+          (not on /diagnostic) -- this script stays here so a stored
+          theme still applies on every route. suppressHydrationWarning above is required
           because this attribute is set outside React's render, after the
           server-rendered markup (which never has data-theme) is sent.
         */}
@@ -91,20 +89,13 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <NavBar />
-        {/* Homepage restructure (this session) -- mounted as a sibling to
-            NavBar, not inside it. NavBar.tsx is explicitly out of scope
-            (Pete's instruction, 2026-08-29); MobileMenu is fully
-            self-contained (own fixed trigger + overlay), so this is the
-            only wiring point needed. */}
-        <MobileMenu />
-        {/* Persistent service sidebar (this session) -- ServiceSidebar owns
-            the flex wiring itself (row w/ right column normally, column
-            w/ a thin top strip on /diagnostic) since the two modes need
-            genuinely different structure, not just a different sidebar
-            child. See ServiceSidebar.tsx's own header comment, including
-            why the /diagnostic trigger is in-flow rather than `fixed`. */}
-        <ServiceSidebar>{children}</ServiceSidebar>
+        {/* Minimal shell only. PRV3 site chrome (NavBar, MobileMenu,
+            ServiceSidebar) lives in app/(site)/layout.tsx so
+            app/diagnostic/ -- a sibling of (site), never a child --
+            never receives it. That is what keeps hr-dx.com free of
+            PRV3 branding without making this layout read headers()
+            (which would flip every route Static -> Dynamic). */}
+        {children}
       </body>
     </html>
   );
