@@ -83,6 +83,23 @@ check("urgency copy wins for any compound with Intervention",
       get_fallback_synthesis(hr_diagnostic_synthesis_family("Executive Counsel + Intervention"), "Entrenched")["resolution_framing_text"]
       == HR_DIAGNOSTIC_FALLBACK_COPY["Intervention"])
 
+# Exact approved wording (Pete, 2026-09-26) -- pinned so a wording
+# regression fails here, not just a table mismatch.
+APPROVED_HR_BACKUP_COPY = {
+    "Roadmap": "The conditions producing this live in how the organization is designed, not in the people working inside it. HR Consulting addresses that structure directly, targeted at what the diagnostic found rather than at the symptoms.",
+    "Development": "There is a capability gap. HR Consulting addresses it through Employee Training & Education and Learning & Development Consulting, built around the specific skills and practices the diagnostic identified.",
+    "Executive Counsel": "The decisions this situation requires sit at the leadership level. HR Consulting supports them through Employee Development, Coaching & Performance Management, with an outside perspective that is hard to get from inside the organization.",
+    "Intervention": "What the diagnostic found needs attention now, not later. HR Consulting can engage directly and help shape next steps before the situation develops further.",
+}
+for fam, want in APPROVED_HR_BACKUP_COPY.items():
+    check(f"backup copy for {fam} is the exact approved string", HR_DIAGNOSTIC_FALLBACK_COPY[fam] == want, HR_DIAGNOSTIC_FALLBACK_COPY[fam])
+check("Intervention compound backup renders the corrected First Call copy",
+      get_fallback_synthesis(hr_diagnostic_synthesis_family("Roadmap + Intervention"), "Endemic")["resolution_framing_text"]
+      == APPROVED_HR_BACKUP_COPY["Intervention"])
+check("old First Call closing clause is gone from every backup entry",
+      all("room to shape the outcome" not in c and "should not wait" not in c
+          for c in HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT.values()))
+
 print("get_fallback_synthesis -- hr keys resolve hr copy, all tiers, all fields")
 for fam in families:
     ctx = hr_diagnostic_synthesis_family(fam)

@@ -154,8 +154,8 @@ HR_DIAGNOSTIC_FALLBACK_COPY: dict[str, str] = {
         "perspective that is hard to get from inside the organization."
     ),
     "Intervention": (
-        "What the diagnostic found is active now and should not wait. HR Consulting engages directly "
-        "and promptly, while there is still room to shape the outcome."
+        "What the diagnostic found needs attention now, not later. HR Consulting can engage directly "
+        "and help shape next steps before the situation develops further."
     ),
 }
 
