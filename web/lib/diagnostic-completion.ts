@@ -7,7 +7,10 @@ import type {
   SynthesisFields,
   TacticalSectionResult,
 } from "@/lib/types";
-import { translateResolutionFamily } from "@/lib/resolution-family";
+import {
+  translateResolutionFamily,
+  HR_DIAGNOSTIC_RESOLUTION_FAMILY,
+} from "@/lib/resolution-family";
 import { TACTICAL_QUESTION_META } from "@/data/tactical-question-meta";
 import { getTacticalReferrals } from "@/data/tactical-referrals";
 
@@ -113,6 +116,7 @@ export async function completeDiagnosticSession(
     // Pure Stateful Modulation with Completion Re-ranking (this
     // session's fix) -- see session-store.ts's own field comment.
     pre_narrative_vector: session.pre_narrative_vector ?? undefined,
+    brand: session.brand,
   });
 
   const allEngineStates = engineResult.identified_states;
@@ -154,6 +158,9 @@ export async function completeDiagnosticSession(
         is_fallback:                  true,
       };
 
+  const isHrDiagnostic = session.brand === "hr_diagnostic";
+  const rawRouting = engineResult.private_output.resolution_routing;
+
   const privatePayload: PrivateOutputPayload = {
     synthesis,
 
@@ -163,8 +170,16 @@ export async function completeDiagnosticSession(
     severity: engineResult.severity.tier,
     severity_by_state: engineResult.severity.by_state,
 
-    resolution_family: translateResolutionFamily(engineResult.private_output.resolution_routing),
-    resolution_routing: engineResult.private_output.resolution_routing,
+    // hr_diagnostic: both fields are brand-safe display text -- PrivateOutput
+    // renders resolution_routing raw as a fallback (Blocks 2/4, Copy
+    // Results), so the raw engine name must not pass through either.
+    // Empty routing stays empty, same as principal_resolution.
+    resolution_family: isHrDiagnostic
+      ? (rawRouting ? HR_DIAGNOSTIC_RESOLUTION_FAMILY : "")
+      : translateResolutionFamily(rawRouting),
+    resolution_routing: isHrDiagnostic
+      ? (rawRouting ? HR_DIAGNOSTIC_RESOLUTION_FAMILY : "")
+      : rawRouting,
 
     friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
     friction_tax_ledger: engineResult.private_output.friction_tax_ledger,

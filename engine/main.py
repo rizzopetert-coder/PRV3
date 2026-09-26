@@ -36,7 +36,10 @@ from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.data.questions import QUESTION_LIBRARY
 from engine.data.salience import SALIENCE_PROFILES
 from engine.output_synthesis import OutputSynthesisEngine, SynthesisResult
-from engine.resolution_families import translate_resolution_family
+from engine.resolution_families import (
+    translate_resolution_family,
+    hr_diagnostic_synthesis_family,
+)
 from engine.data.fallback_synthesis import get_fallback_synthesis
 from engine.narrative import (
     extract_signals,
@@ -774,6 +777,10 @@ def run_accumulated_engine(
     narrative_overall_confidence: float = 0.0,
     narrative_signals_count: int = 0,
     pre_narrative_vector: Optional[dict] = None,
+    # "principal_resolution" | "hr_diagnostic". hr_diagnostic swaps the
+    # AI synthesis context (and so its backup copy) off PR tier names --
+    # see engine/resolution_families.py's hr_diagnostic block.
+    brand: str = "principal_resolution",
 ) -> dict:
     """
     Path 1 completion orchestrator ("Path A" -- real accumulation-based
@@ -913,9 +920,14 @@ def run_accumulated_engine(
             if lead_id in STATE_PROFILES
             else lead_id
         )
-        commercial_family = translate_resolution_family(
+        engine_family = (
             output_package.private.resolution_family
             if output_package.private else ""
+        )
+        commercial_family = (
+            hr_diagnostic_synthesis_family(engine_family)
+            if brand == "hr_diagnostic"
+            else translate_resolution_family(engine_family)
         )
         asset_obj = _compute_asset_score(accumulated_vector, lead_id)
         liability_obj = _compute_liability_score(accumulated_vector, lead_id)

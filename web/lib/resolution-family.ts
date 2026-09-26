@@ -21,6 +21,13 @@
 
 import type { ResolutionFamily } from "@/lib/types";
 
+// hr_diagnostic (hr-dx.com) display value for resolution_family and
+// resolution_routing -- every engine family and compound maps here, so
+// no PR tier name reaches that brand. Mirrors engine/resolution_
+// families.py's HR_DIAGNOSTIC_FAMILY_NAME; keep both in lockstep.
+// Server-side only (imported by route/lib code, never a client component).
+export const HR_DIAGNOSTIC_RESOLUTION_FAMILY: ResolutionFamily = "HR Consulting";
+
 // Commercial-name correction (this session): "People Tactics and Strategy"
 // -> "People Tactics & Strategy" (ampersand), "Intervention" -> "First Call".
 // Dict KEYS (raw engine routing names) are unchanged -- only the VALUES.

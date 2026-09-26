@@ -15,7 +15,11 @@ Source: documents/PRV3_Resolution_Families_Copy_v3.0.docx via RESOLUTION_FALLBAC
 
 from __future__ import annotations
 
-from engine.resolution_families import RESOLUTION_FALLBACK_COPY, _FALLBACK_GENERIC
+from engine.resolution_families import (
+    RESOLUTION_FALLBACK_COPY,
+    _FALLBACK_GENERIC,
+    HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT,
+)
 
 
 # Generic, state/severity-agnostic fallback headline. The fallback path
@@ -60,7 +64,15 @@ def get_fallback_synthesis(
     Single-service names: pass severity_tier ("Emerging", "Entrenched", "Endemic").
     Compound names (contain ' + '): severity_tier is ignored, None key is used.
     Returns generic fallback entry if key is not found.
+
+    hr_diagnostic context strings (engine.resolution_families.
+    hr_diagnostic_synthesis_family(), all prefixed "HR Consulting") are
+    checked first and resolve to the hr_diagnostic backup copy -- never
+    to a PR-named entry.
     """
+    hr_copy = HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT.get(commercial_name)
+    if hr_copy is not None:
+        return _make_entry(hr_copy)
     if " + " in commercial_name:
         return FALLBACK_SYNTHESIS.get((commercial_name, None), _FALLBACK_GENERIC_ENTRY)
     return FALLBACK_SYNTHESIS.get((commercial_name, severity_tier), _FALLBACK_GENERIC_ENTRY)

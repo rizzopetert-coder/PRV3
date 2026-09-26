@@ -177,11 +177,17 @@ async def complete(request: Request):
         # (engine/main.py) for why this is re-ranked fresh here rather
         # than any snapshot being used directly.
         pre_narrative_vector = payload.get("pre_narrative_vector") if isinstance(payload, dict) else None
+        # hr_diagnostic (hr-dx.com) keeps PR tier names out of the AI
+        # synthesis. Anything other than the two known brands, or absent
+        # (every pre-existing caller), is principal_resolution -- unchanged.
+        brand = payload.get("brand") if isinstance(payload, dict) else None
+        if brand not in ("principal_resolution", "hr_diagnostic"):
+            brand = "principal_resolution"
         result = run_accumulated_engine(
             accumulated_vector, intake, answered_question_count, checkpoint_results,
             severity_inputs, answers_log, narrative_response, narrative_severity_addition,
             narrative_trigger_point, narrative_overall_confidence, narrative_signals_count,
-            pre_narrative_vector,
+            pre_narrative_vector, brand=brand,
         )
         return JSONResponse(content=result)
     except KeyError as e:

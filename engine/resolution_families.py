@@ -78,6 +78,130 @@ def translate_resolution_family(engine_family_str: str) -> str:
     return " + ".join(translated)
 
 
+
+# ── hr_diagnostic (hr-dx.com) brand mapping ────────────────────────────────────
+# PR's commercial tier names must never reach an hr-dx.com session. Every
+# engine family maps to "HR Consulting" (the display value the web layer
+# uses for resolution_family / resolution_routing on that brand), with the
+# mapped OneDigital service references and an urgency cue carried into the
+# AI synthesis context string below. Mapping per Pete, 2026-09-26. Mirrored
+# on the web side by web/lib/resolution-family.ts's
+# HR_DIAGNOSTIC_RESOLUTION_FAMILY -- keep both in lockstep.
+
+HR_DIAGNOSTIC_FAMILY_NAME: str = "HR Consulting"
+
+HR_DIAGNOSTIC_FAMILY_REFERENCES: dict[str, str] = {
+    "Development":       "Employee Training & Education and Learning & Development Consulting",
+    "Executive Counsel": "Employee Development, Coaching & Performance Management",
+}
+
+_HR_DIAGNOSTIC_URGENT_FAMILY = "Intervention"
+_HR_DIAGNOSTIC_KNOWN_FAMILIES = ("Roadmap", "Development", "Intervention", "Executive Counsel")
+
+
+def _hr_parts(engine_family_str: str) -> list[str]:
+    # Unknown parts are dropped, never passed through -- a pass-through could
+    # carry a PR name onto hr-dx.com.
+    return [
+        p.strip() for p in engine_family_str.split(" + ")
+        if p.strip() in _HR_DIAGNOSTIC_KNOWN_FAMILIES
+    ]
+
+
+def hr_diagnostic_synthesis_family(engine_family_str: str) -> str:
+    """
+    hr_diagnostic replacement for translate_resolution_family() at the AI
+    synthesis call site. Returns the resolution_family context string the
+    synthesis prompt receives -- "HR Consulting", plus ", through <refs>"
+    for Development / Executive Counsel and ", engaged immediately" when
+    Intervention is present. Empty or wholly-unknown input returns "" (same
+    as the PR path's empty-routing case).
+    """
+    parts = _hr_parts(engine_family_str)
+    if not parts:
+        return ""
+    refs: list[str] = []
+    for p in parts:
+        ref = HR_DIAGNOSTIC_FAMILY_REFERENCES.get(p)
+        if ref and ref not in refs:
+            refs.append(ref)
+    text = HR_DIAGNOSTIC_FAMILY_NAME
+    if refs:
+        text += ", through " + " and ".join(refs)
+    if _HR_DIAGNOSTIC_URGENT_FAMILY in parts:
+        text += ", engaged immediately"
+    return text
+
+
+# Failure-case backup copy for hr_diagnostic -- NEW COPY (2026-09-26),
+# pending Pete's review. Tier-agnostic, one entry per engine family. Same
+# fill pattern as the PR table (fallback_synthesis._make_entry puts the
+# one string into liability/framing/resolution_framing text alike).
+HR_DIAGNOSTIC_FALLBACK_COPY: dict[str, str] = {
+    "Roadmap": (
+        "The conditions producing this live in how the organization is designed, not in the people "
+        "working inside it. HR Consulting addresses that structure directly, targeted at what the "
+        "diagnostic found rather than at the symptoms."
+    ),
+    "Development": (
+        "There is a capability gap. HR Consulting addresses it through Employee Training & Education "
+        "and Learning & Development Consulting, built around the specific skills and practices the "
+        "diagnostic identified."
+    ),
+    "Executive Counsel": (
+        "The decisions this situation requires sit at the leadership level. HR Consulting supports "
+        "them through Employee Development, Coaching & Performance Management, with an outside "
+        "perspective that is hard to get from inside the organization."
+    ),
+    "Intervention": (
+        "What the diagnostic found is active now and should not wait. HR Consulting engages directly "
+        "and promptly, while there is still room to shape the outcome."
+    ),
+}
+
+
+def hr_diagnostic_fallback_copy(engine_family_str: str) -> str:
+    """
+    Backup copy for an hr_diagnostic session. Compounds use the
+    highest-priority family: Intervention (urgency) first, then the first
+    of Development / Executive Counsel in order, then Roadmap.
+    """
+    parts = _hr_parts(engine_family_str)
+    if not parts:
+        return ""
+    if _HR_DIAGNOSTIC_URGENT_FAMILY in parts:
+        return HR_DIAGNOSTIC_FALLBACK_COPY[_HR_DIAGNOSTIC_URGENT_FAMILY]
+    for p in parts:
+        if p in HR_DIAGNOSTIC_FAMILY_REFERENCES:
+            return HR_DIAGNOSTIC_FALLBACK_COPY[p]
+    return HR_DIAGNOSTIC_FALLBACK_COPY[parts[0]]
+
+
+def _build_hr_fallback_by_context() -> dict[str, str]:
+    # Keyed by the exact context string synthesize() receives, so
+    # get_fallback_synthesis() can resolve it without a brand parameter.
+    # Every ordered combination of distinct known families (lengths 1-4),
+    # so any compound the taxonomy or a causation override produces is
+    # covered. Two engine strings can share a context string (e.g. Roadmap
+    # + Intervention / Intervention + Roadmap) -- asserted to map to the
+    # same copy, never silently overwritten.
+    from itertools import permutations
+    table: dict[str, str] = {}
+    for n in range(1, len(_HR_DIAGNOSTIC_KNOWN_FAMILIES) + 1):
+        for combo in permutations(_HR_DIAGNOSTIC_KNOWN_FAMILIES, n):
+            engine_str = " + ".join(combo)
+            ctx = hr_diagnostic_synthesis_family(engine_str)
+            copy = hr_diagnostic_fallback_copy(engine_str)
+            existing = table.get(ctx)
+            if existing is not None and existing != copy:
+                raise ValueError(f"hr_diagnostic fallback conflict for context {ctx!r}")
+            table[ctx] = copy
+    return table
+
+
+HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT: dict[str, str] = _build_hr_fallback_by_context()
+
+
 # ── causation_pattern routing override ─────────────────────────────────────────
 # Priority Queue item 2, Diagnostic Dimension Expansion follow-on. Per-state
 # authored overrides letting a session's causation_pattern (single_point vs.

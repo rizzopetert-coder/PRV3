@@ -2,6 +2,7 @@ import type {
   PrivateIntakeEcho, FrictionTaxEstimate, FrictionTaxLedgerEntry, LegalTailRiskExposure,
 } from "@/lib/types";
 import type { AccumulatedVector, AnswerLogEntry } from "@/lib/session-store";
+import type { Brand } from "@/lib/brand";
 
 const ENGINE_SECRET = process.env.ENGINE_SECRET ?? "";
 
@@ -361,6 +362,9 @@ export interface CompletePayload {
   // TRUE final accumulated_vector at completion time, rather than a
   // ranking snapshot frozen at whichever question narrative fired on.
   pre_narrative_vector?: AccumulatedVector;
+  // hr_diagnostic keeps PR tier names out of the AI synthesis (see
+  // api/engine.py). Absent -> principal_resolution on the engine side.
+  brand?: Brand;
 }
 
 export async function invokeComplete(
