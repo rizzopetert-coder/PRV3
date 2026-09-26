@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import dynamic from "next/dynamic";
 import type {
   PrivateOutputPayload,
   SeverityTier,
@@ -11,11 +11,17 @@ import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
 import CopyResultsButton from "@/components/CopyResultsButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
-import { stateIdToSlug } from "@/lib/state-slug";
-import ContextOrientation from "@/components/ContextOrientation";
-import { getResultsOrientation } from "@/data/orientation-copy";
 import { firstSentence, buildCoreCluster, joinNames } from "@/lib/output-text";
 import { useBrand } from "@/components/BrandContext";
+
+// Brand-specific pieces, code-split rather than conditionally rendered:
+// Next bundles by import graph, so PR-only strings (tier names, /book/toc,
+// the engage CTA) imported statically here would ship to hr-dx.com even
+// when never rendered. Each is its own chunk, fetched only when rendered.
+const ResultsOrientationPR = dynamic(() => import("@/components/ResultsOrientationPR"));
+const ResultsOrientationHR = dynamic(() => import("@/components/ResultsOrientationHR"));
+const StateBookLinkPR = dynamic(() => import("@/components/StateBookLinkPR"));
+const EngageCtaPR = dynamic(() => import("@/components/EngageCtaPR"));
 
 // Tier-based LOCKED copy — mirrors engine/severity.py SEVERITY_TIER_DESCRIPTIONS.
 const SEVERITY_ANCHOR: Record<SeverityTier, string> = {
@@ -185,11 +191,15 @@ export default function PrivateOutput({
           architecture. Sits above Block 1, singleton per render (one
           result, one orientation), not per-block. */}
       <div className="mb-3">
-        <ContextOrientation
-          variant="inline"
-          topic="output-private"
-          {...getResultsOrientation(payload.severity, payload.resolution_family)}
-        />
+        {brand === "hr_diagnostic" ? (
+          <ResultsOrientationHR topic="output-private" severity={payload.severity} />
+        ) : (
+          <ResultsOrientationPR
+            topic="output-private"
+            severity={payload.severity}
+            resolutionFamily={payload.resolution_family}
+          />
+        )}
       </div>
 
       {/* Block 1 — Condition header. Hero typographic treatment
@@ -344,12 +354,7 @@ export default function PrivateOutput({
                     {s.name}
                   </span>
                 ) : (
-                  <a
-                    href={`/book/toc#${stateIdToSlug(s.id)}`}
-                    className="font-display text-lg text-charcoal hover:underline"
-                  >
-                    {s.name}
-                  </a>
+                  <StateBookLinkPR id={s.id} name={s.name} />
                 )}
                 {s.descriptive_prose && (
                   <p className="text-[12px] text-charcoal leading-relaxed mt-0.5">
@@ -591,25 +596,10 @@ export default function PrivateOutput({
         </div>
       )}
 
-      {/* Block 6 — Engage CTA (Real Transaction Path, Phase 1). Links out
-          to the standalone /engage intake (name + email only, per Phase
-          1's e-signature-only scope) rather than carrying any diagnostic
-          result data forward — Dropbox Sign's hosted signing flow needs
-          nothing from this payload. enableEngage mirrors enableSharing's
+      {/* Block 6 — Engage CTA, principal_resolution only (see
+          EngageCtaPR.tsx). enableEngage mirrors enableSharing's
           suppression pattern exactly (see prop doc comment above). */}
-      {showEngageCta && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-[11px] uppercase tracking-wide text-slate mb-3">
-            Ready to move on this?
-          </p>
-          <Link
-            href="/engage"
-            className="inline-block bg-charcoal text-white font-ui text-sm font-medium px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            Start the engagement →
-          </Link>
-        </div>
-      )}
+      {showEngageCta && <EngageCtaPR />}
 
       {/* Block 7 — friction_tax_estimate: null in Path B — render nothing */}
 

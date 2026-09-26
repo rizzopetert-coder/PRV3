@@ -8,6 +8,9 @@ import type { ShareableOutputPayload } from "@/lib/types";
 import { severityAccentTokens } from "@/components/ConstellationField";
 import ContextOrientation from "@/components/ContextOrientation";
 import { getResultsOrientation } from "@/data/orientation-copy";
+// PR-only surface (share/[id] sits inside (site), 404 on hr-dx.com), so a
+// static import of the PR tier-keyed map is safe here.
+import { RESULTS_FAMILY_DETAIL } from "@/data/results-family-detail-pr";
 import { useBrand } from "@/components/BrandContext";
 
 function Rule() {
@@ -57,7 +60,7 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
         <ContextOrientation
           variant="inline"
           topic="output-shareable"
-          {...getResultsOrientation(payload.severity, payload.resolution_family)}
+          {...getResultsOrientation(payload.severity, RESULTS_FAMILY_DETAIL[payload.resolution_family])}
         />
       </div>
 

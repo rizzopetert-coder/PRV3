@@ -1,5 +1,5 @@
 import type { BookContentType, BookVoice } from "@/lib/book-manifest";
-import type { ResolutionFamily, SeverityTier } from "@/lib/types";
+import type { SeverityTier } from "@/lib/types";
 
 // Contextual orientation copy -- the content half of the ContextOrientation
 // component. Net-new file (confirmed no existing orientation-copy.ts or
@@ -106,34 +106,21 @@ const RESULTS_SEVERITY_SUMMARY: Record<SeverityTier, string> = {
   Endemic: "This is a private read of a condition that's become how the organization operates.",
 };
 
-// Commercial-name correction (this session): "People Tactics and Strategy"
-// -> "People Tactics & Strategy" (ampersand), "Intervention" -> "First Call".
-// Keyed by the live ResolutionFamily commercial name, not an engine key --
-// a stale key here silently falls through to RESULTS_FAMILY_DETAIL_FALLBACK
-// below rather than erroring, so this dict must be kept in lockstep with
-// engine/resolution_families.py's ENGINE_TO_COMMERCIAL_NAME.
-const RESULTS_FAMILY_DETAIL: Record<string, string> = {
-  "People Tactics & Strategy":
-    "The recommended next step below is practical and tactical -- specific actions, not a long engagement.",
-  "Training & Development":
-    "The recommended next step below is building a capability that isn't there yet, not fixing a single incident.",
-  "First Call":
-    "The recommended next step below is direct, hands-on involvement -- this isn't something to wait out.",
-  "Executive Advisory":
-    "The recommended next step below is advisory -- working through the decision at the leadership level, not a program rollout.",
-};
-
+// Family-conditional half lives in data/results-family-detail-pr.ts, NOT
+// here: it is keyed by PR commercial tier name, and this file is loaded on
+// hr-dx.com (DiagnosticFlow imports ORIENTATION_COPY). Callers pass the
+// looked-up detail string in; hr_diagnostic passes nothing and gets the
+// generic fallback.
 const RESULTS_FAMILY_DETAIL_FALLBACK =
   "The recommended next step is below, matched to what was found.";
 
 export function getResultsOrientation(
   severityTier: SeverityTier,
-  resolutionFamily: ResolutionFamily,
+  familyDetail?: string,
 ): OrientationCopy {
   return {
     title: "About this report",
     summary: RESULTS_SEVERITY_SUMMARY[severityTier],
-    details:
-      RESULTS_FAMILY_DETAIL[resolutionFamily] ?? RESULTS_FAMILY_DETAIL_FALLBACK,
+    details: familyDetail ?? RESULTS_FAMILY_DETAIL_FALLBACK,
   };
 }

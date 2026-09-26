@@ -2,11 +2,20 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import type { PrivateOutputPayload, TacticalSectionResult } from "@/lib/types";
 import { SIGNIFICANT_EVENT_OPTIONS } from "@/lib/types";
 import PrivateOutput from "@/components/PrivateOutput";
 import ContextOrientation from "@/components/ContextOrientation";
 import { ORIENTATION_COPY } from "@/data/orientation-copy";
+import { useBrand } from "@/components/BrandContext";
+
+// Brand-specific "Before you begin" copy, code-split rather than a
+// ternary over inline strings: Next bundles by import graph, so inline
+// PR copy here would ship to hr-dx.com even when not rendered. Each half
+// is its own chunk, fetched only for the brand that renders it.
+const BeforeYouBeginCopyPR = dynamic(() => import("@/components/BeforeYouBeginCopyPR"));
+const BeforeYouBeginCopyHR = dynamic(() => import("@/components/BeforeYouBeginCopyHR"));
 
 // ---------------------------------------------------------------------------
 // Path 1 (Session 71, Phase 1) — live sequential-question diagnostic.
@@ -244,6 +253,7 @@ function IntakeForm({
   onChange: (next: IntakeFormState) => void;
   onSubmit: () => void;
 }) {
+  const brand = useBrand();
   // Explicit field-by-field rather than the prior Object.values().every()
   // pattern -- that pattern silently broke once significant_events became
   // array-valued ([] !== "" is trivially true, so it would never have
@@ -364,10 +374,8 @@ function IntakeForm({
         This reflects what you see.
       </h2>
       <p className="font-ui text-sm text-gray-500 leading-relaxed mb-10">
-        What follows draws entirely on your own perceptions of your organization.
-        That's intentional — this is a starting point, not a full picture.
-        Principal Resolution's services bring more objective data and a solution
-        roadmap next, through a separate process built for exactly that.
+        What follows draws entirely on your own perceptions of your organization.{" "}
+        {brand === "hr_diagnostic" ? <BeforeYouBeginCopyHR /> : <BeforeYouBeginCopyPR />}
       </p>
 
       <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-2">
