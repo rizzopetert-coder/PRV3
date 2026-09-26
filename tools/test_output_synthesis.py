@@ -447,6 +447,17 @@ check(
     "Groundwork" in prompt_text,
     "resolution_family not found",
 )
+_compound_prompt = _build_synthesis_prompt(
+    state_name="Built to Fail", severity_tier="Emerging",
+    resolution_family="People Tactics & Strategy + First Call",
+    asset_score=0.1, liability_score=0.5, narrative_response="", intake={},
+)
+check(
+    "_build_synthesis_prompt: compound family rendered as prose, no literal '+'",
+    "resolution_family: People Tactics & Strategy and First Call" in _compound_prompt
+    and " + " not in _compound_prompt.split("resolution_family:")[1].splitlines()[0],
+    _compound_prompt.split("resolution_family:")[1].splitlines()[0],
+)
 check(
     "_build_synthesis_prompt: includes narrative_response",
     "Leadership keeps deferring the hard calls." in prompt_text,

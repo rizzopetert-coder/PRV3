@@ -261,6 +261,21 @@ def format_event_for_synthesis(event_id: str, elaboration: str) -> Optional[str]
     return adjuster.event_label if adjuster else None
 
 
+def _family_as_prose(resolution_family: str) -> str:
+    """
+    Render a "+"-joined commercial compound as prose for the synthesis
+    prompt ("A + B" -> "A and B", "A + B + C" -> "A, B and C"). The
+    model echoes resolution_family verbatim, and a literal "+" read as
+    prose ("People Tactics & Strategy + First Call is built to...").
+    Prompt-only: the "+" form is still what get_fallback_synthesis()
+    receives, so the compound backup-copy keys keep resolving.
+    """
+    parts = [p.strip() for p in resolution_family.split(" + ") if p.strip()]
+    if len(parts) <= 1:
+        return resolution_family
+    return ", ".join(parts[:-1]) + " and " + parts[-1]
+
+
 def _build_synthesis_prompt(
     state_name: str,
     severity_tier: str,
@@ -301,7 +316,7 @@ def _build_synthesis_prompt(
     parts = [
         f"state_name: {state_name}",
         f"severity_tier: {severity_tier}",
-        f"resolution_family: {resolution_family}",
+        f"resolution_family: {_family_as_prose(resolution_family)}",
         f"asset_score: {asset_score:.4f}",
         f"liability_score: {liability_score:.4f}",
         f"narrative_response: {narrative_response or '[not provided]'}",

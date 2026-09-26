@@ -56,12 +56,17 @@ expected = {
     "Roadmap": "HR Consulting",
     "Development": "HR Consulting, through Employee Training & Education and Learning & Development Consulting",
     "Executive Counsel": "HR Consulting, through Employee Development, Coaching & Performance Management",
-    "Intervention": "HR Consulting, engaged immediately",
+    "Intervention": "HR Consulting on an urgent basis",
 }
 for fam, want in expected.items():
     got = hr_diagnostic_synthesis_family(fam)
     check(f"{fam} -> {want!r}", got == want, f"got {got!r}")
 check("empty -> empty", hr_diagnostic_synthesis_family("") == "")
+check("urgency + reference combo reads as prose",
+      hr_diagnostic_synthesis_family("Executive Counsel + Intervention")
+      == "HR Consulting on an urgent basis, through Employee Development, Coaching & Performance Management")
+check("old 'engaged immediately' cue gone from every context string",
+      all("engaged immediately" not in c for c in HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT))
 check("unknown part dropped, never passed through",
       hr_diagnostic_synthesis_family("First Call") == "" and
       hr_diagnostic_synthesis_family("Roadmap + Groundwork") == "HR Consulting")
@@ -138,6 +143,8 @@ with mock.patch.dict("sys.modules", {"anthropic": None}):
         routed += 1
         hs, ps = hr["synthesis"], pr["synthesis"]
         check(f"[{routing}] hr synthesis is fallback", hs["is_fallback"] is True)
+        check(f"[{routing}] parse_error surfaced in /api/complete output",
+              bool(hs.get("parse_error")), repr(hs.get("parse_error")))
         check(f"[{routing}] hr synthesis text: no PR terms", not pr_hits(synth_blob(hs)), str(pr_hits(synth_blob(hs))))
         check(f"[{routing}] hr resolution_framing_text names HR Consulting", "HR Consulting" in hs["resolution_framing_text"])
         check(f"[{routing}] PR default still names a PR tier", any(t in ps["resolution_framing_text"] for t in PR_TERMS[:4]))

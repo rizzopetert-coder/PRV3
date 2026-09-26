@@ -820,6 +820,11 @@ def assemble_output(
             "headline":                     synthesis_result.headline,
             "synthesis_confidence":         synthesis_result.synthesis_confidence,
             "is_fallback":                  synthesis_result.is_fallback,
+            # Why a fallback happened (API error, parse failure); None on
+            # success. Additive -- consumers map named fields only. Read
+            # by web/lib/diagnostic-completion.ts's [DIAG] log, never
+            # forwarded to the client payload.
+            "parse_error":                  synthesis_result.parse_error,
         }
         if synthesis_result is not None
         else None

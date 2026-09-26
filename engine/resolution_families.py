@@ -112,10 +112,12 @@ def hr_diagnostic_synthesis_family(engine_family_str: str) -> str:
     """
     hr_diagnostic replacement for translate_resolution_family() at the AI
     synthesis call site. Returns the resolution_family context string the
-    synthesis prompt receives -- "HR Consulting", plus ", through <refs>"
-    for Development / Executive Counsel and ", engaged immediately" when
-    Intervention is present. Empty or wholly-unknown input returns "" (same
-    as the PR path's empty-routing case).
+    synthesis prompt receives -- "HR Consulting", plus " on an urgent
+    basis" directly after the name when Intervention is present, then
+    ", through <refs>" for Development / Executive Counsel. The model
+    tends to echo this string verbatim, so it is worded to read as
+    ordinary prose when it does. Empty or wholly-unknown input returns ""
+    (same as the PR path's empty-routing case).
     """
     parts = _hr_parts(engine_family_str)
     if not parts:
@@ -126,10 +128,10 @@ def hr_diagnostic_synthesis_family(engine_family_str: str) -> str:
         if ref and ref not in refs:
             refs.append(ref)
     text = HR_DIAGNOSTIC_FAMILY_NAME
+    if _HR_DIAGNOSTIC_URGENT_FAMILY in parts:
+        text += " on an urgent basis"
     if refs:
         text += ", through " + " and ".join(refs)
-    if _HR_DIAGNOSTIC_URGENT_FAMILY in parts:
-        text += ", engaged immediately"
     return text
 
 
