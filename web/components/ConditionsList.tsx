@@ -40,12 +40,19 @@ export default function ConditionsList({
   rows,
   leadDetail,
   renderExtra,
+  intro,
+  lockedRow,
 }: {
   rows: ConditionRow[];
   // Extra text shown only in the lead condition's detail (e.g. the severity
   // anchor paragraph that used to sit in the hero).
   leadDetail?: string;
   renderExtra?: (row: ConditionRow) => ReactNode;
+  // Lead line under the heading (the condensed report's headline).
+  intro?: string;
+  // A locked, non-expandable row after the list (the condensed report's
+  // "N more conditions" teaser).
+  lockedRow?: string;
 }) {
   if (rows.length === 0) return null;
   const anyBar = rows.some((r) => r.severity !== null);
@@ -54,6 +61,9 @@ export default function ConditionsList({
       <p className="text-[11px] uppercase tracking-wide text-slate mb-3">
         Conditions identified
       </p>
+      {intro && (
+        <p className="text-base font-medium leading-relaxed text-charcoal mb-3">{intro}</p>
+      )}
       <ul className="space-y-3">
         {rows.map((row, i) => {
           const accent = row.tier ? severityAccentTokens(row.tier) : null;
@@ -117,6 +127,11 @@ export default function ConditionsList({
           );
         })}
       </ul>
+      {lockedRow && (
+        <div className="mt-3 rounded-md border border-dashed border-gray-300 bg-gray-50 px-4 py-3">
+          <p className="text-sm text-gray-500 leading-relaxed">{lockedRow}</p>
+        </div>
+      )}
       {anyBar && (
         <p className="text-[11px] text-slate mt-3 leading-relaxed">
           A short bar at Emerging reflects a real finding, not a
