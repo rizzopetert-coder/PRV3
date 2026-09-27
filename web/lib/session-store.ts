@@ -240,6 +240,12 @@ export interface DiagnosticSession {
   // across the request boundary between /session/narrative and
   // whatever request later completes the session.
   narrative_fired: boolean;
+  // answers_log.length at the moment the narrative response was recorded
+  // -- the undo boundary. Answers after it can be undone, the narrative
+  // and anything before it cannot. Optional: sessions created before
+  // this field existed have no known boundary and keep the old
+  // reject-all-undo-after-narrative behavior.
+  narrative_answer_count?: number;
   narrative_response: string;
   narrative_severity_addition: number;
   narrative_trigger_point: "Q27" | "Q34" | null;

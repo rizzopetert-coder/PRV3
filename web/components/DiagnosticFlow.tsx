@@ -634,6 +634,10 @@ export default function DiagnosticFlow() {
   const [state, setState] = useState<FlowState>({ phase: "intake" });
   const [intake, setIntake] = useState<IntakeFormState>(EMPTY_INTAKE);
   const [history, setHistory] = useState<AnsweredEntry[]>([]);
+  // Undo boundary: history.length when the narrative response was
+  // accepted. Answers at or before it cannot be undone (the server
+  // rejects that too), so Back is hidden there rather than erroring.
+  const [undoFloor, setUndoFloor] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
 
   // Reset -- same kind of action as the pre-existing error-phase "Start
@@ -646,6 +650,7 @@ export default function DiagnosticFlow() {
     setState({ phase: "intake" });
     setIntake(EMPTY_INTAKE);
     setHistory([]);
+    setUndoFloor(0);
     setShowHistory(false);
   }
 
@@ -805,8 +810,12 @@ export default function DiagnosticFlow() {
   // undo twice in a row with no answer submission in between.
   async function handleUndo() {
     if (state.phase !== "question") return;
-    if (history.length === 0) return;
+    if (history.length <= undoFloor) return;
     const { sessionId } = state;
+    // A refused or failed undo restores the question the respondent was
+    // on -- never the error phase, which only offers a restart and would
+    // throw away every answer so far.
+    const current = state;
 
     setState({ phase: "loading" });
     try {
@@ -816,7 +825,7 @@ export default function DiagnosticFlow() {
         body: JSON.stringify({ session_id: sessionId }),
       });
       if (!res.ok) {
-        setState({ phase: "error", message: ERROR_COPY });
+        setState(current);
         return;
       }
       const data = await res.json();
@@ -833,7 +842,7 @@ export default function DiagnosticFlow() {
         prefillOptionIds: data.option_ids ?? null,
       });
     } catch {
-      setState({ phase: "error", message: ERROR_COPY });
+      setState(current);
     }
   }
 
@@ -864,6 +873,7 @@ export default function DiagnosticFlow() {
           tacticalResults: data.tactical_results as TacticalSectionResult[] | undefined,
         });
       } else {
+        setUndoFloor(history.length);
         setState({
           phase: "question",
           sessionId,
@@ -956,7 +966,7 @@ export default function DiagnosticFlow() {
       <>
         <div className="max-w-xl mx-auto px-6 pt-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {history.length > 0 && (
+            {history.length > undoFloor && (
               <button
                 onClick={handleUndo}
                 className="font-ui text-xs text-gray-400 hover:text-hover-ink transition-colors"
