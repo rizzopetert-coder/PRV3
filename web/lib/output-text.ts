@@ -8,7 +8,7 @@
 // reimplementation that could drift between what's shown on screen and
 // what gets copied.
 
-import type { PrivateOutputPayload, SeverityTier, StateRef } from "@/lib/types";
+import type { EvidenceReceipt, PrivateOutputPayload, SeverityTier, StateRef } from "@/lib/types";
 
 // First-sentence extraction for a secondary state's short-version summary
 // (Block 4b) -- splits on the first sentence-ending period, not a hard
@@ -101,6 +101,29 @@ function pct(ratio: number): string {
 // blocks use), which reads fine as plain text either pasted into a chat
 // or opened in a text file.
 // ---------------------------------------------------------------------------
+// Phase 3 export helpers.
+function money(low: number, high: number): string {
+  const f = (v: number) => `$${Math.round(v).toLocaleString()}`;
+  return low === high ? f(low) : `${f(low)} – ${f(high)}`;
+}
+
+function receiptLines(title: string, receipts: EvidenceReceipt[] | undefined): string[] {
+  if (!receipts || receipts.length === 0) return [];
+  const out = ["", title];
+  for (const r of receipts) {
+    out.push(`— ${r.category}: ${r.rationale}`);
+    if (r.triggering_answer) out.push(`  Based on your answers: ${r.triggering_answer}`);
+  }
+  return out;
+}
+
+const ASSET_AXIS_NAMES: Record<string, string> = {
+  aptitude: "Aptitude",
+  authority: "Authority",
+  alliance: "Alliance",
+  attitude: "Attitude",
+};
+
 export function buildResultsText(payload: PrivateOutputPayload): string {
   const lines: string[] = [];
 
@@ -110,6 +133,11 @@ export function buildResultsText(payload: PrivateOutputPayload): string {
     [payload.primary_state.id, payload.primary_state.name],
     ...payload.secondary_states.map((s): [string, string] => [s.id, s.name]),
   ]);
+
+  // Phase 3 -- executive summary, first when present.
+  if (payload.synthesis.executive_summary) {
+    lines.push("Executive summary:", payload.synthesis.executive_summary, "");
+  }
 
   // Block 1 -- condition header.
   lines.push(`${payload.primary_state.name} (${payload.severity})`);
@@ -158,6 +186,19 @@ export function buildResultsText(payload: PrivateOutputPayload): string {
     }
     if (payload.synthesis.asset_resolution_anchor_text) {
       lines.push(payload.synthesis.asset_resolution_anchor_text);
+    }
+  }
+
+  // Phase 3 -- where strength shows up (net asset scores).
+  const ev = payload.asset_evidence;
+  if (ev) {
+    const strongest = ev.strongest_axes.map((a) => ASSET_AXIS_NAMES[a] ?? a);
+    const scores = Object.keys(ASSET_AXIS_NAMES)
+      .map((a) => `${ASSET_AXIS_NAMES[a]} ${ev.net_scores[a as keyof typeof ev.net_scores] ?? 0}`)
+      .join(" | ");
+    lines.push("", `Where strength shows up: ${joinNames(strongest)} (net asset signal: ${scores})`);
+    for (const s of ev.contributing_signals) {
+      lines.push(`— ${s.observation_text}`);
     }
   }
 
@@ -232,6 +273,46 @@ export function buildResultsText(payload: PrivateOutputPayload): string {
       lines.push(`Real exposure current data can't price precisely for: ${joinNames(unpricedNames)}.`);
     }
     lines.push(legal.caveat);
+  }
+
+  // Phase 3 -- show-your-work receipts and the cost comparison.
+  if (legal) {
+    lines.push(...receiptLines("How the legal figure was calculated:", legal.driving_factors));
+  }
+  const friction = payload.friction_tax_estimate;
+  if (friction) {
+    lines.push("", `Friction tax, recurring every year: ${money(friction.low, friction.high)}`);
+    lines.push(...receiptLines("How the friction tax was calculated:", friction.driving_factors));
+  }
+  const scc = payload.service_cost_comparison;
+  if (scc && (friction || legalHasPrice)) {
+    lines.push("", "Cost comparison:");
+    if (friction) {
+      lines.push(`— Friction tax, recurring every year: ${money(friction.low, friction.high)}`);
+    }
+    if (legalHasPrice) {
+      lines.push(`— Legal exposure, one-time if a claim arises: ${money(legal!.low!, legal!.high!)}`);
+    }
+    const service = scc.target_service_name || payload.resolution_family;
+    const priced = scc.service_estimate_low !== null && scc.service_estimate_high !== null;
+    lines.push(
+      priced
+        ? `— ${service}: ${money(scc.service_estimate_low!, scc.service_estimate_high!)}${scc.pricing_model_note ? `. ${scc.pricing_model_note}` : ""}`
+        : `— ${service ? `${service}: ` : ""}Ask for pricing. Scoped to what this diagnostic found.`,
+    );
+  }
+
+  // Phase 3 -- tactical & compliance review (hr-dx only in practice).
+  const findings = payload.tactical_findings ?? [];
+  if (findings.length > 0) {
+    lines.push("", "Tactical & compliance review:");
+    for (const f of findings) {
+      const count = f.flagged_count === 0
+        ? `No gaps in these ${f.total_count} answers.`
+        : `${f.flagged_count} of ${f.total_count} answers show a gap.`;
+      lines.push(`— ${f.section_name}: ${count}`);
+      if (f.synthesis_text) lines.push(`  ${f.synthesis_text}`);
+    }
   }
 
   // ── Section 2 -- additional diagnostic detail (never shown on screen) ──

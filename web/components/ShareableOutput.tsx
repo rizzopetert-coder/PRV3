@@ -5,13 +5,13 @@
 // ShareableOutputPayload — excluded at /api/share/create before KV write.
 
 import type { ShareableOutputPayload } from "@/lib/types";
-import { severityAccentTokens } from "@/components/ConstellationField";
 import ContextOrientation from "@/components/ContextOrientation";
 import { getResultsOrientation } from "@/data/orientation-copy";
 // PR-only surface (share/[id] sits inside (site), 404 on hr-dx.com), so a
 // static import of the PR tier-keyed map is safe here.
 import { RESULTS_FAMILY_DETAIL } from "@/data/results-family-detail-pr";
 import { useBrand } from "@/components/BrandContext";
+import ConditionsList from "@/components/ConditionsList";
 
 function Rule() {
   return (
@@ -46,12 +46,6 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
 
   const observableIndicators = payload.synthesis.observable_indicators ?? [];
 
-  // Severity-conditional accent -- reuses the same tested function
-  // PrivateOutput.tsx/CondensedOutput.tsx already use, rather than a
-  // parallel implementation. --color-rust only at genuine Endemic;
-  // --color-slate at Emerging/Entrenched.
-  const accent = severityAccentTokens(payload.severity);
-
   return (
     <div className="max-w-2xl">
 
@@ -73,54 +67,47 @@ export default function ShareableOutput({ payload }: ShareableOutputProps) {
       </div>
       <Rule />
 
-      {/* Blocks 2/2b — Condition identified + headline, one continuous
-          block (cohesion pass, this session -- mirrors PrivateOutput.tsx's
-          same restructuring). No rule between the state name and the
-          headline; a single rule closes the whole block. */}
-      <div className="py-4 space-y-4">
-        <div className="flex items-center flex-wrap gap-2">
-          <span className="text-[13px] font-medium text-charcoal">
-            {payload.primary_state.name}
-          </span>
-          <span
-            className="text-[11px] rounded-md px-2 py-0.5 border"
-            style={{ borderColor: accent.stroke, color: accent.text }}
-          >
-            {payload.severity}
-          </span>
+      {/* Phase 2 (Pete, 2026-09-27): observable indicators lead (no
+          constellation data on the shared payload), then the conditions list
+          (primary + up to 2 secondaries), then headline and framing. The
+          former name + severity header is merged into the list. */}
+      {observableIndicators.length > 0 && (
+        <div className="py-4">
+          <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
+            Observable indicators
+          </p>
+          <ul className="space-y-1">
+            {observableIndicators.map((indicator, i) => (
+              <li key={i} className="flex gap-2 text-[13px] leading-[1.6] text-charcoal">
+                <span className="text-gray-300 shrink-0" aria-hidden>—</span>
+                <span>{indicator}</span>
+              </li>
+            ))}
+          </ul>
         </div>
+      )}
+      <Rule />
+
+      <ConditionsList
+        rows={[payload.primary_state, ...payload.secondary_states].map((s, i) => ({
+          id: s.id,
+          name: s.name,
+          prose: s.descriptive_prose ?? "",
+          tier: i === 0 ? payload.severity : null,
+          severity: null,
+        }))}
+      />
+      <Rule />
+
+      <div className="py-4 space-y-4">
         {payload.synthesis.headline && (
           <p className="text-base font-medium leading-relaxed text-charcoal">
             {payload.synthesis.headline}
           </p>
         )}
-      </div>
-      <Rule />
-
-      {/* Blocks 3/4 — Framing text + observable indicators, one
-          continuous narrative block. No rule between framingText and the
-          indicators list -- previously each had its own <Rule/>, giving
-          framingText the isolated, pull-quote-like weight it was never
-          meant to carry. */}
-      <div className="py-4 space-y-4">
         <p className="text-sm leading-[1.65] text-charcoal">
           {payload.synthesis.framing_text}
         </p>
-        {observableIndicators.length > 0 && (
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
-              Observable indicators
-            </p>
-            <ul className="space-y-1">
-              {observableIndicators.map((indicator, i) => (
-                <li key={i} className="flex gap-2 text-[13px] leading-[1.6] text-charcoal">
-                  <span className="text-gray-300 shrink-0" aria-hidden>—</span>
-                  <span>{indicator}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
       <Rule />
 

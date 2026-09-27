@@ -151,6 +151,7 @@ export async function POST(request: NextRequest) {
     resolution_family: translateResolutionFamily(engineResult.resolution_routing),
     headline: engineResult.synthesis?.headline ?? "",
     verdict_text: engineResult.synthesis?.liability_condition_text ?? "",
+    additional_condition_count: Math.max(0, engineResult.identified_states.length - 1),
     financial_range: engineResult.condensed_financial_range,
   };
 

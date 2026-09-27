@@ -480,6 +480,10 @@ export interface CondensedOutputPayload {
   // report's one-paragraph verdict. Static, already-approved copy, not a
   // live synthesis call (Decision Register, this session).
   verdict_text: string;
+  // Phase 2 Part B: identified_states.length - 1 from the condensed
+  // engine result. 0 in single-state routing (the engine sends only
+  // the lead). Optional so older payloads still type-check.
+  additional_condition_count?: number;
   financial_range: {
     low: number | null;
     high: number | null;
