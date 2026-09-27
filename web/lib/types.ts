@@ -148,6 +148,8 @@ export interface FrictionTaxEstimate {
   low: number;
   high: number;
   currency: string;
+  // Phase 1 show-your-work (engine: _friction_driving_factors()).
+  driving_factors?: EvidenceReceipt[];
 }
 
 /**
@@ -246,6 +248,8 @@ export interface LegalTailRiskExposure {
   // (jurisdictions is a single session-level input feeding one
   // deterministic priority resolution, verified this session).
   specific_caveat: string | null;
+  // Phase 1 show-your-work (engine: _legal_driving_factors()).
+  driving_factors?: EvidenceReceipt[];
 }
 
 /**
@@ -292,6 +296,8 @@ export interface SynthesisFields {
   headline:                     string;
   synthesis_confidence:         number;
   is_fallback:                  boolean;
+  // Phase 1 Call 3. "" or absent when skipped or failed.
+  executive_summary?:           string;
 }
 
 // Airgap enforced per Gemini Q1 revised (S42):
@@ -436,6 +442,12 @@ export interface PrivateOutputPayload {
   // populate it unconditionally from the same always-present EngineResult
   // field, so there is no path left where it could be missing.
   primary_asset_domain: string;
+
+  // Phase 1 report redesign -- optional, not rendered until Phase 3.
+  asset_evidence?: AssetEvidence;
+  service_cost_comparison?: ServiceCostComparison;
+  tactical_findings?: TacticalFinding[];
+  all_qualified_states?: QualifiedStateEntry[];
 }
 
 // ---------------------------------------------------------------------------
@@ -518,4 +530,61 @@ export interface ShareableOutputPayload {
   share_id: string;
   expires_at: string; // ISO 8601 timestamp, 30-day TTL
   created_at: string; // ISO 8601 timestamp, moment of share creation
+}
+
+// ---------------------------------------------------------------------------
+// Phase 1 report redesign (2026-09-27) -- engine data for Phase 3. Nothing
+// renders these yet. See tools/patch_phase1_*.py for the engine side.
+// ---------------------------------------------------------------------------
+
+// One step of "show your work". triggering_answer is present only when the
+// respondent's answer has authored observation_text -- never raw option text.
+export interface EvidenceReceipt {
+  category: string;
+  rationale: string;
+  triggering_answer?: string;
+}
+
+export interface TacticalFlaggedItem {
+  question_id: string;
+  option_id: string;
+  severity: "minor" | "severe";
+  question_text: string;
+}
+
+// One TC-* section. synthesis_text is "" for a section with no gaps.
+export interface TacticalFinding {
+  section_id: string;
+  section_name: string;
+  flagged_count: number;
+  total_count: number;
+  synthesis_text: string;
+  flagged_items: TacticalFlaggedItem[];
+}
+
+export type AssetAxis = "aptitude" | "authority" | "alliance" | "attitude";
+
+// Absent entirely (never {}) when every net asset score is zero.
+export interface AssetEvidence {
+  strongest_axes: AssetAxis[];
+  contributing_signals: Array<{ axis: AssetAxis; observation_text: string }>;
+  net_scores: Record<AssetAxis, number>;
+}
+
+// Service estimates stay null until pricing exists (parked decision).
+export interface ServiceCostComparison {
+  target_service_name: string;
+  inaction_cost_low: number | null;
+  inaction_cost_high: number | null;
+  service_estimate_low: number | null;
+  service_estimate_high: number | null;
+  pricing_model_note: string;
+}
+
+// Every above-floor state, score-descending, in single and multi mode.
+export interface QualifiedStateEntry {
+  state_id: string;
+  state_name: string;
+  score: number;
+  descriptive_prose: string;
 }
