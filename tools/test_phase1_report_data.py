@@ -208,5 +208,152 @@ check("single mode keeps every above-floor state in routing.qualified_states (th
       r.mode == "single" and len(r.qualified_states) == 3, f"{r.mode} {len(r.qualified_states)}")
 
 
+# ── 6. Tactical pre-aggregation (deterministic) ─────────────────────────────────
+from engine.tactical_synthesis import (
+    build_tactical_summary, tactical_totals, synthesize_tactical, TACTICAL_SECTIONS,
+    TACTICAL_SYNTHESIS_SYSTEM_PROMPT,
+)
+from engine.exec_summary import EXEC_SUMMARY_SYSTEM_PROMPT
+from engine.output_synthesis import OUTPUT_SYNTHESIS_SYSTEM_PROMPT
+tc_log = [
+    {"question_id": "Q05", "option_ids": ["C"]},                       # non-TC: ignored
+    {"question_id": "TC-HIRE-01", "option_ids": ["A"]},
+    {"question_id": "TC-HRPOL-01", "option_ids": ["A"]},
+    {"question_id": "TC-HRPOL-02", "option_ids": ["B"]},
+    {"question_id": "TC-HRPOL-03", "option_ids": ["C"]},
+    {"question_id": "TC-HRPOL-04", "option_ids": ["D"]},
+    {"question_id": "TC-NOPE-01", "option_ids": ["A"]},                # unknown section: ignored
+]
+summ = build_tactical_summary(tc_log)
+check("pre-aggregation: sections in report order, only answered ones",
+      list(summ) == ["TC-HR_POLICIES", "TC-HIRING_ONBOARDING"], str(list(summ)))
+hr = summ["TC-HR_POLICIES"]
+check("pre-aggregation: totals and flagged counts", hr["total"] == 4 and hr["flagged_count"] == 3
+      and summ["TC-HIRING_ONBOARDING"]["flagged_count"] == 0)
+check("pre-aggregation: A solid, B minor, C/D severe",
+      [i["severity"] for i in hr["flagged_items"]] == ["minor", "severe", "severe"])
+check("pre-aggregation: approved section names",
+      [n for _, _, n in TACTICAL_SECTIONS] == ["HR Practices & Policies", "Hiring & Onboarding", "Payroll & Wage-Hour",
+      "Compensation Compliance", "Benefits Compliance", "Leave Management", "Workplace Safety", "Records & Privacy",
+      "HR Systems & Data", "Performance Management"])
+check("tactical_totals", tactical_totals(summ) == {"flagged_count": 3, "total_count": 5, "severe_count": 2,
+      "sections_with_gaps": 1, "sections_total": 2}, str(tactical_totals(summ)))
+check("pre-aggregation: no TC answers -> {}", build_tactical_summary([{"question_id": "Q05", "option_ids": ["A"]}]) == {})
+
+# ── 7. Three-call flow, with a recording fake anthropic client ──────────────────
+import json as _json, time as _time, types as _types, os as _os
+CALLS = []
+FAIL = set()
+DELAY = {"call1": 0.0, "call2": 0.0, "call3": 0.0}
+def _which(system):
+    return {OUTPUT_SYNTHESIS_SYSTEM_PROMPT: "call1", TACTICAL_SYNTHESIS_SYSTEM_PROMPT: "call2",
+            EXEC_SUMMARY_SYSTEM_PROMPT: "call3"}.get(system, "other")
+class _Msg:
+    def __init__(self, text): self.content = [_types.SimpleNamespace(text=text)]
+class _Messages:
+    def create(self, **kw):
+        which = _which(kw.get("system"))
+        CALLS.append((which, kw, _time.monotonic()))
+        _time.sleep(DELAY.get(which, 0))
+        if which in FAIL:
+            raise RuntimeError(f"forced {which} failure")
+        if which == "call1":
+            return _Msg(_json.dumps({"liability_condition_text": "Decisions stall at the top.",
+                "asset_resolution_anchor_text": "Teams still deliver.", "framing_text": "A framing.",
+                "observable_indicators": ["a", "b", "c"], "resolution_framing_text": "A path.",
+                "headline": "Decisions are starting to stall across the leadership team", "synthesis_confidence": 0.8}))
+        if which == "call2":
+            ids = [l.split(": ", 1)[1] for l in kw["messages"][0]["content"].splitlines() if l.startswith("section_id: ")]
+            return _Msg(_json.dumps({i: f"Finding for {i}; with a semicolon." for i in ids}))
+        return _Msg("The organizational finding and the HR review point the same way.")
+class _FakeAnthropic:
+    def __init__(self, *a, **k): self.messages = _Messages()
+_fake_mod = _types.ModuleType("anthropic"); _fake_mod.Anthropic = _FakeAnthropic
+_real_mod = sys.modules.get("anthropic")
+INTAKE_WIRE = {"headcount": 175, "industry": "Professional Services", "org_type": "Privately held professional leadership",
+               "jurisdictions": ["OH"], "significant_events": ["none"], "principal_role": "Owner / Founder"}
+full_log = _log + tc_log
+def _complete(log, brand="hr_diagnostic"):
+    CALLS.clear()
+    sys.modules["anthropic"] = _fake_mod
+    try:
+        return _m.run_accumulated_engine(vec, INTAKE_WIRE, 40, {}, [], log, brand=brand)
+    finally:
+        if _real_mod is not None: sys.modules["anthropic"] = _real_mod
+        else: sys.modules.pop("anthropic", None)
+
+FAIL.clear()
+ok_out = _complete(full_log)
+kinds = [c[0] for c in CALLS]
+check("success: Call 1, Call 2, and Call 3 all run", sorted(kinds) == ["call1", "call2", "call3"], str(kinds))
+check("success: executive_summary populated", ok_out["synthesis"]["executive_summary"] != "")
+tf = ok_out["private_output"]["tactical_findings"]
+check("success: one finding per answered section, flagged sections have text",
+      [f["section_id"] for f in tf] == ["TC-HR_POLICIES", "TC-HIRING_ONBOARDING"]
+      and tf[0]["synthesis_text"] and tf[1]["synthesis_text"] == "")
+check("findings: house punctuation enforced on model text", ";" not in tf[0]["synthesis_text"])
+check("findings: flagged_items never carry answer (option) text",
+      all("answer_text" not in i for f in tf for i in f["flagged_items"]))
+call1_prompt = next(c[1] for c in CALLS if c[0] == "call1")["messages"][0]["content"]
+tc_texts = [L[e["question_id"]].question_text for e in tc_log if e["question_id"] in L]
+check("REGRESSION: Call 1 prompt contains no tactical content",
+      "TC-" not in call1_prompt and not any(t in call1_prompt for t in tc_texts)
+      and not any(n in call1_prompt for _, _, n in TACTICAL_SECTIONS))
+call3_prompt = next(c[1] for c in CALLS if c[0] == "call3")["messages"][0]["content"]
+check("Call 3 input = Call 1 liability text + raw tactical counts",
+      "Decisions stall at the top." in call3_prompt and "3 of 5 answers show a gap" in call3_prompt, call3_prompt)
+call2_prompt = next(c[1] for c in CALLS if c[0] == "call2")["messages"][0]["content"]
+check("Call 2 input = the pre-aggregation only (no core liability text)", "Decisions stall" not in call2_prompt)
+
+# Concurrency: with 0.5s per call, Step A overlaps and Step B follows
+DELAY.update(call1=0.5, call2=0.5, call3=0.5)
+_complete(full_log)
+t = {c[0]: c[2] for c in CALLS}
+check("Step A: Call 2 starts before Call 1 finishes (concurrent)", abs(t["call1"] - t["call2"]) < 0.4, str(t))
+check("Step B: Call 3 starts after both finish", t["call3"] - max(t["call1"], t["call2"]) >= 0.45, str(t))
+DELAY.update(call1=0.0, call2=0.0, call3=0.0)
+
+def _core(out):
+    s = dict(out["synthesis"]); s.pop("executive_summary", None)
+    return s
+FAIL.clear(); FAIL.add("call2")
+c2_out = _complete(full_log)
+check("Call 2 failure: tactical_findings [] and no crash", c2_out["private_output"]["tactical_findings"] == [])
+check("Call 2 failure: Call 3 skipped, executive_summary ''",
+      "call3" not in [c[0] for c in CALLS] and c2_out["synthesis"]["executive_summary"] == "")
+check("Call 2 failure: Call 1 result identical, no fallback", _core(c2_out) == _core(ok_out) and not c2_out["synthesis"]["is_fallback"])
+
+FAIL.clear(); FAIL.add("call3")
+c3_out = _complete(full_log)
+check("Call 3 failure: executive_summary '' only", c3_out["synthesis"]["executive_summary"] == ""
+      and c3_out["private_output"]["tactical_findings"] == tf and _core(c3_out) == _core(ok_out))
+
+FAIL.clear(); FAIL.add("call1")
+c1_out = _complete(full_log)
+check("Call 1 failure (fallback): Call 3 skipped, tactical findings still delivered",
+      c1_out["synthesis"]["is_fallback"] and "call3" not in [c[0] for c in CALLS]
+      and c1_out["synthesis"]["executive_summary"] == "" and c1_out["private_output"]["tactical_findings"] == tf)
+
+FAIL.clear()
+pr_out = _complete(_log, brand="principal_resolution")
+check("no TC answers: Call 2 and Call 3 never run, findings [], summary ''",
+      [c[0] for c in CALLS] == ["call1"] and pr_out["private_output"]["tactical_findings"] == []
+      and pr_out["synthesis"]["executive_summary"] == "")
+
+# Non-production debug hook, ignored in production
+_os.environ["PRV3_DEBUG_FAIL_CALL"] = "tactical"
+_os.environ["VERCEL_ENV"] = "preview"
+sys.modules["anthropic"] = _fake_mod
+try:
+    f_prev = synthesize_tactical(summ)
+    _os.environ["VERCEL_ENV"] = "production"
+    f_prod = synthesize_tactical(summ)
+finally:
+    _os.environ.pop("PRV3_DEBUG_FAIL_CALL", None); _os.environ.pop("VERCEL_ENV", None)
+    if _real_mod is not None: sys.modules["anthropic"] = _real_mod
+check("debug hook forces a Call 2 failure outside production", f_prev[0] == [] and f_prev[1] is False)
+check("debug hook is ignored in production", f_prod[1] is True)
+
+
 print(f"\nRESULT: {passed} passed, {failed} failed")
 sys.exit(1 if failed else 0)

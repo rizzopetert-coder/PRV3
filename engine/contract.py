@@ -805,7 +805,7 @@ def _build_asset_evidence(accumulated_vector: dict, answers_log: list, intake_da
 
 def assemble_output(
     session: SessionData, synthesis_result=None, trajectory_result=None, answers_log=None,
-    brand: str = "principal_resolution",
+    brand: str = "principal_resolution", tactical_findings=None,
 ) -> dict:
     """
     Assemble the complete VII.1 engine output object from session data.
@@ -1129,6 +1129,9 @@ def assemble_output(
         private_output["asset_evidence"] = asset_evidence
     if service_cost_comparison is not None:
         private_output["service_cost_comparison"] = service_cost_comparison
+    # Phase 1 Call 2 output: always a list, [] when the session has no
+    # TC-* answers or the tactical call failed.
+    private_output["tactical_findings"] = list(tactical_findings or [])
     # Every above-floor state, score-descending, in single AND multi mode
     # (identified_states keeps only the lead in single mode, and every
     # dollar figure is computed from identified_states, so this is a
@@ -1168,6 +1171,8 @@ def assemble_output(
             # by web/lib/diagnostic-completion.ts's [DIAG] log, never
             # forwarded to the client payload.
             "parse_error":                  synthesis_result.parse_error,
+            # Phase 1 Call 3, "" when skipped or failed.
+            "executive_summary":            getattr(synthesis_result, "executive_summary", ""),
         }
         if synthesis_result is not None
         else None
