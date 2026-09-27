@@ -240,6 +240,12 @@ export interface DiagnosticSession {
   // across the request boundary between /session/narrative and
   // whatever request later completes the session.
   narrative_fired: boolean;
+  // answers_log.length at the moment the narrative response was recorded
+  // -- the undo boundary. Answers after it can be undone, the narrative
+  // and anything before it cannot. Optional: sessions created before
+  // this field existed have no known boundary and keep the old
+  // reject-all-undo-after-narrative behavior.
+  narrative_answer_count?: number;
   narrative_response: string;
   narrative_severity_addition: number;
   narrative_trigger_point: "Q27" | "Q34" | null;
@@ -468,7 +474,13 @@ export function spliceLabel(
 // looked up from session.question_labels, populated at splice time.
 export type QuestionLabel =
   | { kind: "core"; position: number; total: number }
-  | { kind: "spliced"; label: string };
+  | { kind: "spliced"; label: string }
+  // hr_diagnostic TC-* module (appended in createSession()). Its own
+  // kind so it is never mislabeled as a follow-up, positioned within the
+  // 40-question module in TACTICAL_QUESTION_META's order.
+  | { kind: "tactical"; position: number; total: number };
+
+const TACTICAL_QUESTION_IDS: readonly string[] = Object.keys(TACTICAL_QUESTION_META);
 
 export function resolveQuestionLabel(
   questionId: string,
@@ -478,7 +490,13 @@ export function resolveQuestionLabel(
   if (corePosition !== null) {
     return { kind: "core", position: corePosition, total: TOTAL_CORE_QUESTIONS };
   }
-  return { kind: "spliced", label: spliceLabels[questionId] ?? questionId };
+  const tacticalIndex = TACTICAL_QUESTION_IDS.indexOf(questionId);
+  if (tacticalIndex !== -1) {
+    return { kind: "tactical", position: tacticalIndex + 1, total: TACTICAL_QUESTION_IDS.length };
+  }
+  // Never fall back to the raw question_id -- internal IDs are not
+  // user-facing. An unlabeled splice renders as plain "Follow-up".
+  return { kind: "spliced", label: spliceLabels[questionId] ?? "" };
 }
 
 // ---------------------------------------------------------------------------

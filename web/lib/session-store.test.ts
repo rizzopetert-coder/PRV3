@@ -387,9 +387,15 @@ describe("resolveQuestionLabel", () => {
     expect(label).toEqual({ kind: "spliced", label: "22A" });
   });
 
-  it("falls back to the raw question_id if a spliced question has no stored label", () => {
+  it("never falls back to the raw question_id when a spliced question has no stored label", () => {
     const label = resolveQuestionLabel("SEVER-99", {});
-    expect(label).toEqual({ kind: "spliced", label: "SEVER-99" });
+    expect(label).toEqual({ kind: "spliced", label: "" });
+  });
+
+  it("resolves TC-* questions to the tactical kind, not a follow-up", () => {
+    expect(resolveQuestionLabel("TC-HRPOL-01", {})).toEqual({ kind: "tactical", position: 1, total: 40 });
+    expect(resolveQuestionLabel("TC-HRPOL-03", {})).toEqual({ kind: "tactical", position: 3, total: 40 });
+    expect(resolveQuestionLabel("TC-PERF-04", {})).toEqual({ kind: "tactical", position: 40, total: 40 });
   });
 });
 

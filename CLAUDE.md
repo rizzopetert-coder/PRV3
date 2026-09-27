@@ -126,7 +126,7 @@ A full project assessment (workstream status, goal progress, process feedback) s
 **Required format, locked 2026-08-23 (tools/_mob.txt Section 14, MOB v4.225) — supersedes the single-question-resolution style used before this date.** A Quarterly Step-Back is a dual-sourced, source-verified process, not an open-ended single-question session: (1) Claude.ai produces an initial project evaluation — status, business viability, SWOT, recommendations — from whatever context it has; (2) Claude Code independently re-verifies it cold, from direct source only, without reading Claude.ai's version first, producing its own full five-part assessment; (3) discrepancies are resolved against live source, not by deferring to whichever assessment sounds more confident, and the root cause of any error is named; (4) the reconciled, verified picture — not either assessment alone — drives the next work plan. This exists because a conversation-history-based assessment gave Pete at least two materially wrong claims on 2026-08-23 (friction-tax engine status, resolution-family copy status) before an independent, source-verified CC pass caught and corrected both. Full process definition and this run's own trace: `prompts/prv3-quarterly-step-back-2026-08-23.md`. First assessment run to this format: `prompts/prv3-comprehensive-assessment-cc.md`.
 
 - Last step-back: September 16, 2026 (third run under the dual-sourced format. Full record: `prompts/prv3-quarterly-step-back-2026-09-16-cc-independent.md` (independent pass) and `prompts/prv3-quarterly-step-back-2026-09-16-reconciled.md` (reconciliation))
-- Next due: on or near September 19, 2026 (locked biweekly cadence, unchanged — corrects this session's own earlier flag: the prior closeout instruction's "~3-week" phrasing was imprecise wording, not a rule change, per Pete's direct confirmation; the 2026-08-28 biweekly lock stands as-is)
+- Next due: on or near October 3, 2026 (matches MOB Section 13b, corrected here 2026-09-27 per Pete, the earlier "September 19" was stale. The locked biweekly cadence is unchanged, the 2026-08-28 biweekly lock stands as-is)
 
 ### Outside Human Gap (documented, not yet actioned)
 The entire verification/decision loop currently runs inside Pete + the AI stack. This is strong for factual rigor, structurally weak for judgment about public reception. Before the first truly public, hard-to-reverse Tier 4 action, a second human read — a trusted colleague — is recommended over another internal review pass.
@@ -165,8 +165,8 @@ No session may assert as current fact something it cannot verify from its own en
 
 ### Engine Rules
 - All engine writes use Python patch scripts with dry-run verification
-- `engine/data/states.py` is the authoritative state registry — 57 states
-- `engine/data/questions.py` registry is intentionally empty — question population is a separate deliverable
+- `engine/data/states.py` is the authoritative state registry, 58 states
+- `engine/data/questions.py` holds the live question registry (`QUESTION_LIBRARY`, 141 entries as of 2026-09-27: the core Q-series and its follow-up chains, the SEVER-* severity follow-ons, and 40 hr-dx-only TC-* questions). It was empty only at the engine-scaffold stage (`c79179b`, MOB v1.4, 2026-05-03), when question content was still a separate deliverable, and has been populated since Session 9. Option `dimensional_contributions` are calibration values, so the data-first calibration rule below applies to them. The TC-* questions are zero-signal by design (no dimensional contributions, `state_targets=[]`), verified inert against the 175-profile calibration suite at `d384262`.
 - Do not adjust calibration target values speculatively — data-first calibration principle applies
 - No new state may be added to the taxonomy with a `dimensional_vector` or
   `salience_weights` identical to an existing state's — confirmed uniqueness
@@ -199,7 +199,7 @@ No session may assert as current fact something it cannot verify from its own en
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.326 |
+| MOB version | v4.327 |
 | Session continuity | Mem0 — see Section 12 |
 | Engine state count | 58 (locked) |
 | Test suite minimum (Phase 1) | 171 profiles across 57 states |

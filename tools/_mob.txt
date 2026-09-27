@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.326
+\\\#\\\# MOB v4.327
 
   
 
@@ -1506,7 +1506,9 @@ Open, not sequenced -- real items, no forced check-in, Pete's call when to pick 
 - `private_output.resolution_routing` stale values -- engine debt, deferred to Phase 3; `engine/data/states.py` still serializes pre-S32 service names, bypassed today by the TypeScript `STATE_RESOLUTION_FAMILY` map.
 - Service Expectations page -- draft complete, attorney-unreviewed, awaiting Pete's own read. No live route, no code placement.
 - SEVER-09/Q27A -- parked, reconfirmed unreachable 2026-09-23 via a fresh `diagnostic_question_audit.py` run.
-- `tools/diagnostic_fast_forward.py` -- rework-or-retire still undecided, but its failure modes are now concrete (2026-09-26): its `DEFAULT_INTAKE` is missing `org_type` and `significant_events` (session/start now 400s on it), and its answer loop does not handle the `status: "narrative"` response. Its `PreviewClient`/`choose_option_id` core still works -- a scratchpad wrapper reusing them unmodified (adding `x-debug-brand`, the narrative step, and result capture) drove every live Preview and Production session this session. The wrapper was never committed.
+- CLOSED 2026-09-26/27 -- `tools/diagnostic_fast_forward.py` reworked into the permanent session driver (`e836d79`): current intake (`org_type`, `significant_events`), the narrative step, `--brand`, `--narrative-text`, `--json-out`, a Production guard (`--allow-production`), and the `x-prv3-test-run` tag on every request. Its answer-steering gap is tracked as its own open item, next bullet.
+- `tools/diagnostic_fast_forward.py` answer-steering is too weak to reach most hr-dx pathways live (found 2026-09-27, own item, not closeout scope). Across 10 tagged Production sessions on hr-dx.com targeting `the_undefined_role`, `the_unformed_leader`, `leadership_deafness`, `the_overloaded_manager` and `the_uninitiated` at Entrenched and Endemic, every run landed on one of three states: `built_to_fail` (Roadmap + Intervention, hr_pathway urgent) or `the_unsolved_problem`/`the_dormant_talent` below the routing threshold (no pathway, generic drawer). Target severity missed on every run (all Emerging). So the structure, capability and leadership drawer pathways, and the plain "HR Consulting" Executive Advisory AI context, are verified by tests only, not live. The pathway logic itself is not in question (vitest pins routing to pathway, tools/test_hr_diagnostic_brand.py pins the context strings). Next step, if wanted: tune the driver's answer selection per target state so a live session can reach each family.
+- Separate Upstash database for Preview -- backlog, deferred by Pete 2026-09-26/27. Preview and Production share one database (confirmed 2026-09-26). Pete chose the `is_test` tag over a separate database for now, not pursued. Revisit is Pete's call.
 - OSHA actual-average-penalty backfill -- deferred per Addendum 9, 17 of 22 last-confirmed 2026-09-05; not re-derivable in code, since no live data structure exists yet to count against.
 - `StateDrawer`/`AssemblyPanel` mutual viewport overlap on `/diagnostic` -- unverified. Both mount simultaneously on that route; whether they visually collide with each other has not been checked (distinct from `ServiceSidebar`'s own, already-resolved collision risk with them, closed 2026-09-20).
 - 12-file salience-pilot cluster (`tools/_salience_pilot_*`) -- unchanged since 2026-08-27, own dedicated pass still pending.
@@ -1515,19 +1517,21 @@ Open, not sequenced -- real items, no forced check-in, Pete's call when to pick 
 - ATT-* moderate-tier prominence calibration failures (`ATT-UT-02`/`the_untouchable`, `ATT-IB-02`/`invisible_burnout`, `ATT-LD-02`/`leadership_deafness`, `ATT-IE-02`/`identity_erosion`) -- `tools/calibration_runner.py`'s 175-profile suite runs 171/175, all 4 failures "prominence criterion failed." Confirmed pre-existing at HEAD, 2026-09-24: `calibration_runner.py --verbose` output is byte-identical with and without that session's `engine/data/questions.py` TC-* additions (hr-dx.com Tactical & Compliance module, all zero-signal), ruling out that work as the cause. Logged as a known issue, not investigated further this session -- no fix attempted.
 - hr-dx follow-ups after the 2026-09-26 Production launch (full detail in Section 16's 2026-09-26 entry):
   - CLOSED 2026-09-26/27 -- `diagnostic-aggregate` cleared entirely by Pete (`DEL`, `LLEN` 0 confirmed), clean slate for Production. Answered the open question: Preview and Production DO share one Upstash database -- the list held this session's ~20 Preview test completions alongside the 2 Production ones, plus older likely-test entries (2026-09-24, August, 2026-09-13) that Pete chose to clear too. Records now carry `is_test` (Preview sessions always, Production only with `x-prv3-test-run: 1`) -- see `web/lib/test-run.ts`. Exclude `is_test: true` when analyzing the list. A separate Upstash database for Preview remains an option, not pursued.
-  - hr-dx "About this report" drawer copy -- currently the generic fallback ("The recommended next step is below, matched to what was found."), Pete's 2026-09-26 decision to revisit only after F/I/J landed. F/I/J is now live, so the revisit is due.
-  - Copy residual, PR brand: the AI renders compound families as a singular subject ("People Tactics & Strategy and First Call is built for..."). Next lever, if wanted: frame the prompt value as one offering rather than two names.
-  - Copy residual, both brands: AI-generated narrative questions occasionally use an em-dash (2 of roughly 10 observed, one in Production). Lever: `engine/narrative.py`'s question-generation system prompt.
+  - CLOSED 2026-09-26/27 -- hr-dx drawer copy shipped (`d60107c`): four family-specific texts (structure, capability, leadership, urgent) selected by a neutral `hr_pathway` payload field, plus the Executive Advisory AI-context string simplified to plain "HR Consulting". Live-confirmed in Production for urgent and for the no-routing generic drawer. Structure, capability, leadership, and the Executive Advisory context are verified by tests only, see the driver answer-steering item.
+  - CLOSED 2026-09-26/27 -- PR compound-family grammar (`ce9ad29`): the synthesis prompt renders compounds as "A with B", live Production output read "People Tactics & Strategy with First Call is built for...".
+  - CLOSED 2026-09-26/27 -- narrative-question em-dashes (`b675d9f`): a punctuation rule in the question-generation prompt plus a deterministic guard (`_enforce_house_punctuation`) that rewrites any em-dash, spaced en-dash, double hyphen, or semicolon to a comma. Every narrative question observed since was clean.
   - `web/lib/diagnostic-completion.ts` `[DIAG] synthesis fallback` log is PERMANENT by design (surfaces `parse_error`). Only the live run proves the log line itself -- no unit test covers it.
-- Section 16 logging gap, 2026-09-24/25: the pre-2026-09-26 hr-dx build work (Part A routing wall-off, TC-* wiring, hostname branding, the Preview-build/bypass debugging commits through `6058ca9`) has no Section 16 closeout entry. Flagged, not backfilled -- this session only has direct evidence for its own work.
+- CLOSED 2026-09-26/27 -- Section 16 logging gap for 2026-09-24/25: backfilled as a clearly marked reconstructed entry, placed chronologically before the 2026-09-26 closeout, built from git history, the `main` reflog, and Vercel deployment records. What it could not recover is listed in the entry.
 
 Infrastructure carry-forwards, tracked only in Section 16 closeouts until now:
 - `gh` CLI still not installed -- needs Pete interactively (a `winget` attempt hit a UAC prompt with nobody present to approve).
 - Local dev Upstash Redis credentials missing -- informational only, production already has them.
-- `prv-3` general-Preview `ENGINE_BASE_URL` still holds the stale deployment-pinned alias `https://hr-dx-peter-rizzos-projects.vercel.app` (affects Preview builds of branches other than `vercel-routing-migration` only). The correct target for a general Preview row is the relevant branch engine alias or the stable production alias -- Pete's call.
+- CLOSED 2026-09-26/27 -- `prv-3` `ENGINE_BASE_URL`, both scopes: Production = `https://prv3-engine-peter-rizzos-projects.vercel.app` (stable prod alias). General Preview = `https://prv3-engine-git-engine-preview-peter-rizzos-projects.vercel.app`, the git alias of the new long-lived `engine-preview` branch (Pete chose Preview-to-Preview over Previews hitting Production). The branch-scoped Preview row is gone with its branch.
 - `prv3-engine` Deployment Protection (SSO) is off project-wide, Production included -- Pete-approved 2026-09-26, `ENGINE_SECRET` is the engine's application-level auth. Its automation bypass secret was exposed in a CLI status read and rotated by Pete the same day.
-- `.claude/launch.json` carries an uncommitted local `prv3-web-start` entry (production-server launch config used for this session's local verification) -- deliberately kept out of every commit, keep or revert is Pete's call.
-- `vercel-routing-migration` branch still exists locally and on origin after the 2026-09-26 fast-forward merge (fully contained in `main` at `e368d8d`). Safe to delete -- Pete's call.
+- CLOSED 2026-09-26/27 -- `.claude/launch.json` now tracked (`7fbc77c`), Pete reversed the earlier keep-out call.
+- CLOSED 2026-09-26/27 -- `vercel-routing-migration` branch deleted locally and on origin (0 unmerged commits). Its leftover branch-scoped `ANTHROPIC_API_KEY` row on `prv3-engine` removed. Pete added a general Preview `ANTHROPIC_API_KEY` row (Sensitive, no branch restriction), verified by a tagged Preview session through `engine-preview` (`is_fallback: false`, Anthropic 200 on `/api/complete` in that deployment's logs).
+- `engine-preview` branch (new 2026-09-26/27, long-lived): exists so `prv3-engine` has a stable Preview alias for `prv-3`'s general Preview `ENGINE_BASE_URL`. It carries two empty build-trigger commits on top of `d60107c` (`fdf3d60`, `e8fa02e`), so refresh it by merging `main` into it and pushing, not by fast-forward. Do not delete it while the Preview row points at its alias.
+- CLOSED 2026-09-27 -- untracked `uv.lock` deleted (Pete-confirmed). Not load-bearing: never committed, so Vercel never saw it (its build log shows its own uv installing from `pyproject.toml`), uv is not installed locally, and nothing referenced it. Committing a lock file for pinned engine builds remains an option, not pursued.
 - Function Storage remediation not executed.
 - Dropbox Sign provisioning unconfirmed.
 - Next Quarterly Step-Back due **2026-10-03**.
@@ -1543,13 +1547,13 @@ Closed since the 2026-09-07 rewrite, dropped from the active list entirely -- fu
 
 Files to attach next session, categorized by likely next task:
 - Always: tools/_mob.txt (current version).
-- If revisiting hr-dx copy (drawer, compound-family grammar, narrative em-dashes): engine/output_synthesis.py (`_family_as_prose`, synthesis prompt), engine/narrative.py (question-generation prompt), engine/resolution_families.py (`hr_diagnostic_synthesis_family`, HR backup copy), web/data/orientation-copy.ts, web/components/ResultsOrientationHR.tsx, prompts/session-handoff-v4.326.md.
-- If reworking or retiring tools/diagnostic_fast_forward.py: that file, web/app/api/diagnostic/session/start/route.ts (`validateIntake`), web/app/api/diagnostic/session/narrative/route.ts.
-- If changing Vercel env/project config: prompts/session-handoff-v4.326.md (current row-by-row state of both projects).
+- If revisiting hr-dx copy: web/data/results-pathway-detail-hr.ts (drawer texts), engine/resolution_families.py (HR context strings and backup copy), engine/output_synthesis.py (`_family_as_prose`, synthesis prompt), engine/narrative.py (question-generation prompt and guard).
+- If tuning the fast_forward driver's answer-steering: tools/diagnostic_fast_forward.py (`choose_option_id`), engine/data/states.py (target-state signals), web/lib/resolution-family.ts (`hrPathwayForRouting`).
+- If changing Vercel env/project config: prompts/session-handoff-v4.327.md (current row-by-row state of both projects and the `engine-preview` branch).
 - If resuming the transaction path (parked indefinitely, not an active queue item -- see Explicitly parked above): prompts/real-transaction-path-phase1-gemini-request.md, web/app/engage/page.tsx, web/app/api/engage/initiate/route.ts.
 - If resuming book-manifest.ts's teaser em-dash pass (item 5): prompts/book-manifest-emdash-scan-2026-09-23.md, web/lib/book-manifest.ts.
 
-Last updated: This session (Claude Code), 2026-09-26 (closeout pass) -- no numbered priority item closed or resequenced; open-not-sequenced list gained the hr-dx post-launch follow-ups and the 2026-09-24/25 logging-gap flag, the fast_forward item was made concrete, infrastructure carry-forwards gained four config items, files-to-attach gained three entries. (Prior update: 2026-09-23 (closeout pass) -- item 2 amended with the sleuth-baseline-trust precondition, item 5's files-to-attach entry added, per the first live run of CLAUDE.md's Step 1a (Section 13b Currency Check). Supersedes the same-day wholesale rewrite earlier this session (full verification pass of the prior 2026-09-07 priority order against live repo state and the last three Section 16 closeouts -- all four numbered items confirmed genuinely closed; open items reconciled against Section 13 and recent closeouts; two framing errors retired). Full detail: Section 16's 2026-09-23 closeout entry. (Prior update: 2026-09-07 -- full resequencing per Pete's explicit 4-item priority order.)
+Last updated: This session (Claude Code), 2026-09-26/27 (final closeout of the hr-dx polish arc) -- no numbered priority item closed or resequenced. Closed in place: fast_forward rework, drawer copy, both copy residuals, the 2026-09-24/25 logging gap, both `ENGINE_BASE_URL` scopes, launch.json, the branch and its dead key row. Added: driver answer-steering (open), separate Preview database (backlog, deferred), `engine-preview` upkeep, untracked `uv.lock`.
 
 \\---
 
@@ -1914,7 +1918,7 @@ Last updated: This session (Claude Code), 2026-09-26 (closeout pass) -- no numbe
 
 | \\\*\\\*api/engine.py\\\*\\\* | FastAPI serverless endpoint, single app serving 4 routes. /api/engine (Path B, created S40): x-engine-secret shared-secret validation, KeyError→400 (unknown state ID), TypeError/ValueError→400 (bad intake), Exception→500. sys.path.insert adds repo root so engine package resolves. S71 (Stage 2/3) added /api/accumulate, /api/complete, /api/question-copy — the Path 1 (Path A) endpoints, all sharing the same secret check via a new _check_secret() extraction rather than duplicating the guard 4 times. |
 
-| \\\*\\\*requirements.txt\\\*\\\* | Python deps for Vercel serverless: fastapi, uvicorn, numpy, anthropic. anthropic added S44 — required by engine/output_synthesis.py; missing from S40 original caused synthesis to always fall back to static dict. Created S40. |
+| \\\*\\\*pyproject.toml\\\*\\\* | Python deps for the `prv3-engine` Vercel project (`[project].dependencies`): fastapi, uvicorn, numpy, anthropic, plus `[tool.vercel] entrypoint = "api.engine:app"`. Vercel's Python builder installs from it with its own uv. Created 2026-09-24 (`060327a`, full `[project]` table `8289ac7`). Replaced requirements.txt (created S40, anthropic added S44 because engine/output_synthesis.py needs it, its absence in S40 made synthesis always fall back to the static dict), which was deleted 2026-09-27. |
 
 | \\\*\\\*vercel.json\\\*\\\* | Dual-runtime routing. @vercel/next for web/package.json. @vercel/python for api/engine.py. Routes: /api/engine, /api/accumulate, /api/complete, /api/question-copy all → api/engine.py (S71, Stage 2/3 — no new Python serverless function, same build); /(.*) → /web/$1. Created S40. |
 
@@ -6809,6 +6813,39 @@ MOB v4.325.
 
 ---
 
+## BACKFILLED ENTRY (2026-09-24/25, reconstructed 2026-09-26/27 by terminal Claude Code)
+## -- pre-2026-09-26 hr-dx build: TC-* questions, brand resolution, routing wall-off,
+## domain rename, two-project split Phases 2-3
+
+**Provenance, read first:** this is not a contemporaneous record. No Section 16 entry, no diary entry (the Mem0 diary goes straight from the 2026-09-23 closeout to 2026-09-27), and no handoff file exist for these two days. Reconstructed after the fact, during the v4.327 closeout, from: `git log` and commit message bodies (58 commits, 2026-09-24 14:31 to 2026-09-25 00:17 -0400, every one carrying a `Co-Authored-By: Claude Sonnet 5` trailer), the local `main` reflog, and `vercel ls` Production deployment records filtered by commit SHA. Where a commit body states something, it is reported as the commit states it. The decisions, Pete confirmations, and any Gemini review behind this work are not recoverable from these sources and are not asserted here.
+
+### 1. 2026-09-24 afternoon, committed on `main` directly (45 commits, `d384262` to `6c99e55`)
+
+- **TC-* Tactical & Compliance questions.** 40 questions (10 sections x 4) added to `QUESTION_LIBRARY` (`d384262`, patch script `58b9911`), generated from `C:\Users\rizzo\Downloads\tactical-compliance-questions-schema-compliant.json` (generator `a73b145`, `web/data/tactical-question-meta.ts` at `9e3ebe1`). Per the commit body: hr_diagnostic only, zero-signal on every option, `state_targets=[]` for all 40, and verified inert against the 175-profile calibration suite (byte-identical output, 171/175 unchanged, the 4 ATT-* prominence failures pre-existing and logged to 13b at `dc850e5`).
+- **TC-* session wiring.** Brand-conditional TC-* sequence in `createSession()` (`2fd5172`), `tactical_results` resolved at completion (`a739a2a`, tests `5df5340`), threaded through `DiagnosticFlow` (`3c1d9c0`), rendered by section with the stale Engage CTA fixed on hr_diagnostic (`468c760`). `TACTICAL_REFERRALS` per-section referral mapping (`b3cc900`) is, per its own body, a corrective commit: the completion code depending on it had been committed first without it and did not compile. Its body also records "every section includes HR Consulting per Pete's explicit specialty list".
+- **Brand resolution and routing wall-off ("Part A").** Hostname-based `resolveBrand()` (`e290d8e`), `BrandContext` (`93eae1e`), brand from the Host header in session/start (`e69a6be`), middleware routing wall-off for hr_diagnostic (`b3a8b85`), brand metadata scoped to the `/diagnostic` layout (`2719b4b`), self-select entry point hidden on hr_diagnostic (`8aab0ed`), brand-conditional ShareableOutput header (`5dac6c5`). Then a debug-only hr_diagnostic override, `resolveBrandForRequest()` (`119cc5e`), adopted by middleware, the diagnostic layout, and session/start (`f062984`, `347a09d`, `5bdac39`).
+- **Domain rename** `hrdiagnostic.com` to `hr-dx.com` (`dfe4f25`, nine comment-only follow-ups, and the MOB ATT-* bullet at `1ceda19`).
+- **hr-dx.com root serving the wrong brand.** Homepage content extracted into a client `HomeClient`, and `/` forced dynamic to stop cross-domain cache sharing (`cd2bfc3`, `98a5712`).
+- **`3806506`, TEMPORARY middleware diagnostic** (echoes raw Host and brand as response headers). With its patch script `6c99e55` it was the last commit on `main` before the 2026-09-26 merge. Production exposure, checked for this backfill: both Production builds of `6c99e55` are in **Error**, and the last Ready Production build from this stretch is `4f104cd`, so the debug headers never served in Production. Removed in `e368d8d` before the merge.
+
+### 2. 2026-09-24 evening to 2026-09-25 00:17, on `vercel-routing-migration` (13 commits, `2b7b529` to `6058ca9`)
+
+Off-`main` confirmed by the reflog: `main` sits at `6c99e55` from 2026-09-24 17:48 until the 2026-09-26 fast-forward (`e368d8d`).
+
+- **Two-project split, Phase 2:** root `vercel.json` rewritten for Project B, the Python engine (`2b7b529`). **Phase 3:** the 8 engine routes proxied to Project B through `ENGINE_BASE_URL` (`585a80c`). `pyproject.toml` added for the FastAPI entrypoint, then given a full `[project]` table (`060327a`, `8289ac7`).
+- **Preview debugging:** three empty Preview build triggers for a rotated `ENGINE_SECRET` and a regenerated, then re-copied, bypass secret (`05ea3b7`, `5fcf67c`, `95a34e9`), and a TEMPORARY question-copy upstream-response diagnostic (`0f3fd67`, patch `6058ca9`), also removed in `e368d8d`. The 2026-09-26 closeout's section 4 records that live Preview sessions were still failing when that session began.
+
+### 3. Gaps this backfill cannot fill
+
+- **Phase 1 of the two-project split has no commit.** Creating `prv3-engine`, changing `prv-3`'s Root Directory to `web`, the Vercel env rows, and the domain setup were dashboard or CLI work with no git trace. When the Root Directory changed, and so exactly when the Production build freeze began, is not recoverable here.
+- **Not recorded in any source read:** why the domain became `hr-dx.com`, the authorship and approval of the 40 TC-* question texts (the source JSON is in Pete's Downloads folder, not the repo), and any Gemini review of the Part A design.
+- **Test status at the time** is known only where a commit body states it (the TC-* inertness check above). Whether Startup Protocol ran is unknown.
+- **Byproduct:** an untracked `uv.lock` at the repo root, timestamped 2026-09-24 23:39, alongside the `pyproject.toml` commits. Never committed, now noted in 13b.
+
+This backfill landed with the v4.327 closeout. The work it describes sits between v4.325 and v4.326.
+
+---
+
 ## SESSION CLOSEOUT (2026-09-26, terminal Claude Code) -- hr-dx.com
 ## airgapped and live in Production, two-project split live, Production
 ## freeze resolved -- MOB v4.325 -> v4.326
@@ -6852,3 +6889,47 @@ Preview: healthy AI path on both brands (9-12s per synthesis, rule checks pass, 
 MOB v4.326.
 
 **Addendum (2026-09-27, same session, post-closeout):** Production aggregate cleanup and test-run tagging. Pete cleared `diagnostic-aggregate` entirely (was 38 records: 20 of this session's Preview tests, 2 Production smoke tests, 16 older likely-test entries), `LLEN` 0 confirmed. This confirmed Preview writes to the Production Upstash database. Records now carry `is_test` (`web/lib/test-run.ts`, `completeSession()`), set for every non-Production session and for Production requests with `x-prv3-test-run: 1`, which `tools/diagnostic_fast_forward.py` now sends. 13b's "delete two test records" item closed in place. MOB version unchanged (v4.326).
+
+---
+
+## SESSION CLOSEOUT (2026-09-26/27, terminal Claude Code, same session continued) -- hr-dx
+## polish batch closed, Preview engine isolated, 2026-09-24/25 backfilled -- MOB v4.326 -> v4.327
+
+**One-line summary:** every hr-dx follow-up from the v4.326 closeout is closed: the six-item polish batch, the family-specific drawer copy with a plain "HR Consulting" Executive Advisory context, `prv-3` Previews moved off the Production engine onto a new `engine-preview` branch with its own Preview key, the dead key row removed, and the 2026-09-24/25 Section 16 gap backfilled.
+
+### 1. Shipped on `main` (Production READY on both projects after each push)
+
+- `5d81c1c` -- `is_test` on aggregate records (recorded in the v4.326 addendum).
+- `ce9ad29` -- compound families rendered as "A with B" in the synthesis prompt. Live: "People Tactics & Strategy with First Call is built for...".
+- `b675d9f` -- narrative questions: punctuation rule in the prompt plus a deterministic guard. No dashes in any narrative question observed since.
+- `e836d79` -- `tools/diagnostic_fast_forward.py` reworked into the permanent session driver, used for every live session since.
+- `7fbc77c` -- `.claude/launch.json` tracked.
+- `d60107c` -- hr-dx drawer copy (four texts, `web/data/results-pathway-detail-hr.ts`, selected by a neutral `hr_pathway` field that only hr_diagnostic payloads carry) and the Executive Advisory context simplified to "HR Consulting". Backup copy is now keyed by engine family, so two families sharing one context string keep distinct backups. Verified: 12/12 Python suites (hr brand 122/122), tsc clean, vitest 118/118, build clean with an unchanged route table, and the HR copy present only in dynamically loaded chunks for hr routes and dev pages. Live: 10 tagged hr-dx Production sessions, urgent confirmed 4 times, the no-routing generic drawer 6 times, no PR names in any payload. Structure, capability, leadership, and the Executive Advisory context are verified by tests only (driver item below).
+- `5e1eda9` -- 13b item for the driver's answer-steering gap.
+
+### 2. Vercel and branch config (non-git)
+
+- `vercel-routing-migration` deleted locally and on origin.
+- `engine-preview` created from `main` at `d60107c`, plus two empty build triggers (`fdf3d60`, `e8fa02e`). The first was needed because pushing a branch whose commit Production had already built started no Vercel build.
+- `prv-3` `ENGINE_BASE_URL`: Production = `https://prv3-engine-peter-rizzos-projects.vercel.app`. General Preview = `https://prv3-engine-git-engine-preview-peter-rizzos-projects.vercel.app`. Values are encrypted, so each was confirmed by a successful CLI write plus the alias existing, not by read-back.
+- `prv3-engine`: `ANTHROPIC_API_KEY` Production and general Preview (the Preview row added by Pete via CLI), `ENGINE_SECRET` Production and Preview. The branch-scoped key row for the deleted branch was removed.
+- End-to-end check: tagged Preview session `VptEM9KcD72IWi5LW8KMR` through `prv-3-git-engine-preview` reached engine deployment `prv3-engine-992dhvt68` (its logs show the full question sequence and an Anthropic 200 on `/api/complete`), `is_fallback: false`, no `parse_error`, real generated synthesis, 32s end to end. The logs do not break out the AI call's own duration.
+
+### 3. Records
+
+- Section 16 backfill for 2026-09-24/25, placed chronologically before the 2026-09-26 closeout. Reconstructed, marked as such, gaps listed.
+- CLAUDE.md: Quarterly Step-Back "Next due" corrected from September 19 to 2026-10-03, matching 13b, per Pete. MOB version cross-reference v4.327.
+
+### 4. Section 13b Currency Check (Step 1a)
+
+**13b checked, and amended** -- not "no change." No numbered priority item closed or resequenced. Closed in place: the fast_forward rework, the drawer copy, both copy residuals, the 2026-09-24/25 logging gap, both `ENGINE_BASE_URL` scopes, launch.json, and the branch with its dead key row. The driver answer-steering item stays open. Added: the separate Preview database as an explicit backlog item (deferred by Pete), `engine-preview` upkeep, and the untracked `uv.lock`. Files-to-attach refreshed.
+
+**Files changed, git-confirmed:** code and config commits listed in section 1. This closeout: `tools/_mob.txt`, `CLAUDE.md`, `prompts/session-handoff-v4.327.md` (new), `tools/patch_mob_session_closeout_20260927.py` (new).
+
+**Open items carried forward:** see Section 13b as amended above. Next Quarterly Step-Back due **2026-10-03**.
+
+**Anything Pete should know at next session start:** Startup Protocol did not run at the start of this continued session either, run it in full next time. `diagnostic-aggregate` holds this session's tagged test records (at least 16 Production, 1 Preview), so exclude `is_test: true` when reading it. The backfill does not recompute the 2026-09-26 entry's "~35h" freeze figure, since when the freeze began is one of its unrecoverable gaps.
+
+MOB v4.327.
+
+**Addendum (2026-09-27, same session, post-closeout):** three loose ends closed. `bd89664`: CLAUDE.md's Engine Rules line calling `engine/data/questions.py` "intentionally empty" replaced with current fact (141 entries). The line dated from the empty scaffold (`c79179b`, MOB v1.4) and had been stale since Session 9, not since the 2026-09-24 TC-* work. `0e1d9fb`: the Engine Rules state count corrected from 57 to 58 (registry counted directly), and the untracked `uv.lock` deleted with its 13b note closed in place. `210936a`: `requirements.txt` retired, since Vercel's `prv3-engine` build installs from `pyproject.toml`, with the Section 15 row and the numpy-removal task doc retargeted to `pyproject.toml`. Production build of `210936a` confirmed installing from `pyproject.toml`, and a tagged Production session returned `is_fallback: false`. MOB version unchanged (v4.327).

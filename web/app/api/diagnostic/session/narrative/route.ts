@@ -78,6 +78,7 @@ export async function POST(request: NextRequest) {
 
   session.accumulated_vector = result.accumulated_vector;
   session.narrative_fired = true;
+  session.narrative_answer_count = session.answers_log.length;
   session.narrative_response = narrative_text;
   session.narrative_severity_addition = result.narrative_severity_addition;
   // pending_completion (set by session/answer) distinguishes the standard

@@ -374,6 +374,19 @@ check("prompt: punctuation rule present, prompt itself has no em-dash",
       "never use em dashes" in NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT
       and "\u2014" not in NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT)
 
+# ── Organization-type grounding (2026-09-27): "principal" read as a school
+# principal and produced "your school" for a business intake ─────────────────
+from engine.narrative import _build_prompt_generation_input
+check("prompt: never calls the respondent a principal",
+      "principal" not in NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT.lower())
+check("prompt: tells the model it is not told the organization type",
+      "not told what kind of organization" in NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT
+      and '"your organization"' in NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT)
+check("prompt input: no 'principal' in either the empty or ranked user content",
+      "principal" not in _build_prompt_generation_input({}).lower()
+      and "principal" not in _build_prompt_generation_input(
+          {"top_states": [{"state_id": "built_to_fail", "rank": 1}], "entropy": 4, "max_entropy": 5.83}).lower())
+
 # Simulate extraction result injection (bypasses API call)
 engine.extraction_result = good_extraction()
 check("After extraction: severity_signals populated",

@@ -73,14 +73,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: "noop", question, label });
   }
 
-  // Narrative modulation has already begun -- undoing across that boundary
-  // is deliberately out of scope for this pass (see tools/_mob.txt). Not a
-  // live path today: narrative is a distinct FlowState phase on the client
-  // ("narrative", not "question"), so the back button is never visible when
-  // this would fire. Kept as an explicit reject rather than an assumption,
-  // same philosophy as session/answer's own index invariant check.
+  // Undoing ACROSS the narrative is out of scope: rejected while a
+  // narrative prompt or completion is pending, and after the narrative
+  // for any answer at or before its boundary (narrative_answer_count).
+  // Answers given after the narrative undo normally -- the early Q27
+  // trigger returns the client to the question phase, so Back stays
+  // visible for Q28 onward and the hr-dx TC-* module. A session with
+  // narrative_fired but no recorded boundary predates the field and
+  // keeps the old reject.
+  const undoWouldCrossNarrative =
+    session.narrative_fired &&
+    (session.narrative_answer_count === undefined ||
+      session.answers_log.length <= session.narrative_answer_count);
   if (
-    session.narrative_fired ||
+    undoWouldCrossNarrative ||
     session.pending_narrative_prompt !== null ||
     session.pending_completion
   ) {

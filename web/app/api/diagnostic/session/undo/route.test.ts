@@ -349,6 +349,57 @@ describe("session/undo -- guards", () => {
     expect(res.status).toBe(404);
   });
 
+  it("undoes an answer given after the narrative (early Q27 trigger, then TC-* answers)", async () => {
+    const session = await createSession(FAKE_INTAKE, "hr_diagnostic");
+    session.narrative_fired = true;
+    session.narrative_answer_count = 2;
+    session.answers_log = [
+      { question_id: "Q27A", option_ids: ["A"] },
+      { question_id: "Q27B", option_ids: ["A"] },
+      { question_id: "TC-HRPOL-01", option_ids: ["A"] },
+      { question_id: "TC-HRPOL-02", option_ids: ["B"] },
+    ];
+    session.next_question_id = "TC-HRPOL-03";
+    const { saveSession } = await import("@/lib/session-store");
+    await saveSession(session);
+    mockInvokeAccumulate.mockResolvedValue({
+      accumulated_vector: { ...ZERO },
+      severity_inputs: [], severity_follow_on_ids: [], severity_follow_on_origins: {},
+    });
+
+    const res1 = await POST(fakeRequest({ session_id: session.session_id }));
+    expect(res1.status).toBe(200);
+    const data1 = await res1.json();
+    expect(data1.question.question_id).toBe("TC-HRPOL-02");
+    expect(data1.label).toEqual({ kind: "tactical", position: 2, total: 40 });
+    const res2 = await POST(fakeRequest({ session_id: session.session_id }));
+    expect(res2.status).toBe(200);
+    expect((await res2.json()).question.question_id).toBe("TC-HRPOL-01");
+
+    // The next undo would reach the narrative-triggering answer: rejected,
+    // and nothing about the session changes.
+    const res3 = await POST(fakeRequest({ session_id: session.session_id }));
+    expect(res3.status).toBe(400);
+    const after = await getSession(session.session_id);
+    expect(after!.answers_log.map((e) => e.question_id)).toEqual(["Q27A", "Q27B"]);
+    expect(after!.next_question_id).toBe("TC-HRPOL-01");
+  });
+
+  it("keeps rejecting after the narrative for sessions with no recorded boundary (pre-fix sessions)", async () => {
+    const session = await createSession(FAKE_INTAKE);
+    session.narrative_fired = true;
+    session.answers_log = [
+      { question_id: "Q27B", option_ids: ["A"] },
+      { question_id: "Q28", option_ids: ["A"] },
+    ];
+    const { saveSession } = await import("@/lib/session-store");
+    await saveSession(session);
+
+    const res = await POST(fakeRequest({ session_id: session.session_id }));
+    expect(res.status).toBe(400);
+    expect(mockInvokeAccumulate).not.toHaveBeenCalled();
+  });
+
   it("rejects with 400 once narrative modulation has begun -- explicitly out of scope for this build", async () => {
     const session = await createSession(FAKE_INTAKE);
     session.answers_log = [{ question_id: "Q27B", option_ids: ["A"] }];
