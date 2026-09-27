@@ -157,5 +157,55 @@ check("assemble_output omits asset_evidence (no key) when all net scores are zer
       "asset_evidence" not in out["private_output"], str(out["private_output"].get("asset_evidence")))
 
 
+# ── 5. all_qualified_states + service_cost_comparison ───────────────────────────
+def _run(brand, vector):
+    _m.OutputSynthesisEngine = _NoSynth
+    try:
+        return _m.run_accumulated_engine(
+            vector,
+            {"headcount": 175, "industry": "Professional Services", "org_type": "Privately held professional leadership",
+             "jurisdictions": ["OH"], "significant_events": ["none"], "principal_role": "Owner / Founder"},
+            40, {}, [], [], brand=brand)
+    finally:
+        _m.OutputSynthesisEngine = _orig
+
+# A realistic path vector: weakest-asset (problem-heavy) answers across the core sequence
+vec, _log = _path(min)
+for brand in ("principal_resolution", "hr_diagnostic"):
+    out = _run(brand, vec)
+    aqs = out["all_qualified_states"]
+    ids_ = [s["state_id"] for s in out["identified_states"]]
+    check(f"[{brand}] all_qualified_states is score-descending", [s["score"] for s in aqs] == sorted((s["score"] for s in aqs), reverse=True))
+    check(f"[{brand}] identified_states is a prefix-consistent subset of all_qualified_states",
+          all(i in [s["state_id"] for s in aqs] for i in ids_))
+    if out["output_type"] == "single_state":
+        check(f"[{brand}] single mode: identified_states keeps only the lead", len(ids_) == 1)
+    scc = out["private_output"].get("service_cost_comparison")
+    check(f"[{brand}] service_cost_comparison present with null estimates and empty note",
+          scc is not None and scc["service_estimate_low"] is None and scc["service_estimate_high"] is None
+          and scc["pricing_model_note"] == "", str(scc))
+    fte = out["private_output"]["friction_tax_estimate"]; lte = out["private_output"]["legal_tail_risk_exposure"]
+    exp_low = (fte["low"] if fte else 0) + (lte["low"] if lte and lte["low"] is not None else 0)
+    check(f"[{brand}] inaction cost = priced friction + priced legal", scc and abs((scc["inaction_cost_low"] or 0) - exp_low) < 0.05,
+          f"{scc and scc['inaction_cost_low']} vs {exp_low}")
+    routing = out["private_output"]["resolution_routing"]
+    if brand == "hr_diagnostic":
+        check("[hr_diagnostic] target_service_name is HR Consulting (or empty with no routing)",
+              scc["target_service_name"] == ("HR Consulting" if routing else ""), scc["target_service_name"])
+    else:
+        from engine.resolution_families import translate_resolution_family
+        check("[principal_resolution] target_service_name is the commercial family name",
+              scc["target_service_name"] == translate_resolution_family(routing), scc["target_service_name"])
+
+# Single mode with several above-floor states: the field carries them all, dollars unchanged
+from engine.output import route_output, QualifiedState
+qs = [QualifiedState(rank=i + 1, state_id=s, state_name=s, score=sc, noise_baseline=0.0, signal_floor=0.0,
+                     cleared_floor=True, score_lift_pct=0.0, resolution_family="")
+      for i, (s, sc) in enumerate([("built_to_fail", 0.9), ("the_uninitiated", 0.4), ("the_founders_grip", 0.35)])]
+r = route_output(qs)
+check("single mode keeps every above-floor state in routing.qualified_states (the source of all_qualified_states)",
+      r.mode == "single" and len(r.qualified_states) == 3, f"{r.mode} {len(r.qualified_states)}")
+
+
 print(f"\nRESULT: {passed} passed, {failed} failed")
 sys.exit(1 if failed else 0)

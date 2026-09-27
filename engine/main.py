@@ -1005,7 +1005,7 @@ def run_accumulated_engine(
 
     return assemble_output(
         session_data, synthesis_result=synthesis_result, trajectory_result=trajectory_result,
-        answers_log=answers_log,
+        answers_log=answers_log, brand=brand,
     )
 
 

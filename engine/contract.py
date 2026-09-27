@@ -33,7 +33,9 @@ from engine.friction_tax import (
     compute_friction_tax, compute_legal_compliance_exposure,
     compute_legal_per_state_breakdown, STATE_MULTIPLIERS,
 )
-from engine.resolution_families import apply_causation_override
+from engine.resolution_families import (
+    apply_causation_override, translate_resolution_family, HR_DIAGNOSTIC_FAMILY_NAME,
+)
 
 # Addendum 11 -- caveat text for legal_tail_risk_exposure (private_output only).
 LEGAL_TAIL_RISK_CAVEAT_TEXT = (
@@ -803,6 +805,7 @@ def _build_asset_evidence(accumulated_vector: dict, answers_log: list, intake_da
 
 def assemble_output(
     session: SessionData, synthesis_result=None, trajectory_result=None, answers_log=None,
+    brand: str = "principal_resolution",
 ) -> dict:
     """
     Assemble the complete VII.1 engine output object from session data.
@@ -1085,6 +1088,30 @@ def assemble_output(
     asset_evidence = _build_asset_evidence(
         session.accumulated_vector, answers_log or [], session.intake,
     )
+    # service_cost_comparison (Phase 1, Pete: ship with nulls). Inaction
+    # cost counts friction tax and legal exposure only where each is priced.
+    _cost_parts = [
+        (friction_tax_estimate["low"], friction_tax_estimate["high"])
+        if friction_tax_estimate else None,
+        (legal_tail_risk_exposure["low"], legal_tail_risk_exposure["high"])
+        if legal_tail_risk_exposure and legal_tail_risk_exposure["low"] is not None else None,
+    ]
+    _cost_parts = [p for p in _cost_parts if p is not None]
+    if brand == "hr_diagnostic":
+        _target_service = HR_DIAGNOSTIC_FAMILY_NAME if effective_resolution_routing else ""
+    else:
+        _target_service = translate_resolution_family(effective_resolution_routing)
+    service_cost_comparison = (
+        {
+            "target_service_name":   _target_service,
+            "inaction_cost_low":     round(sum(p[0] for p in _cost_parts), 2) if _cost_parts else None,
+            "inaction_cost_high":    round(sum(p[1] for p in _cost_parts), 2) if _cost_parts else None,
+            "service_estimate_low":  None,
+            "service_estimate_high": None,
+            "pricing_model_note":    "",
+        }
+        if identified_states else None
+    )
     private_output = {
         "opening_text":            priv.state_name if priv else "",
         "resolution_routing":      effective_resolution_routing,
@@ -1100,6 +1127,8 @@ def assemble_output(
     # asset signal (Phase 1 spec).
     if asset_evidence is not None:
         private_output["asset_evidence"] = asset_evidence
+    if service_cost_comparison is not None:
+        private_output["service_cost_comparison"] = service_cost_comparison
 
     # ── shareable_output ──
     sha = session.output_package.shareable
@@ -1147,6 +1176,20 @@ def assemble_output(
         "state_distribution":   state_distribution,
         "output_type":          output_type,
         "identified_states":    identified_states,
+        # Every above-floor state, score-descending, in single AND multi
+        # mode (identified_states keeps only the lead in single mode, and
+        # every dollar figure is computed from identified_states, so this
+        # is a separate silent field -- Pete, Phase 1).
+        "all_qualified_states": [
+            {
+                "state_id":          qs.state_id,
+                "state_name":        qs.state_name,
+                "score":             round(qs.score, 6),
+                "descriptive_prose": STATE_PROFILES[qs.state_id].descriptive_prose
+                                     if qs.state_id in STATE_PROFILES else "",
+            }
+            for qs in routing.qualified_states
+        ],
         "severity":             severity_obj,
         "asset_score":          asset_obj,
         "dimension_summary":    dimension_obj,
