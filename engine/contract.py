@@ -20,7 +20,7 @@ from typing import Optional
 
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.data.jurisdiction import resolve_jurisdiction_flags
-from engine.data.questions import QUESTION_LIBRARY
+from engine.data.questions import QUESTION_LIBRARY, PROBLEM_CONTEXT_VALENCES
 from engine.data.salience import SALIENCE_PROFILES
 from engine.accumulation import (
     IntakeData, StateRanking, compute_cascade_risk,
@@ -512,7 +512,7 @@ def _build_friction_tax_ledger(
 
         top_contributing_answers: list = []
         for _, option in scored:
-            if option.observation_text:
+            if option.observation_text and option.observation_valence in PROBLEM_CONTEXT_VALENCES:
                 top_contributing_answers.append(option.observation_text)
             if len(top_contributing_answers) == _LEDGER_TOP_ANSWERS_MAX:
                 break
@@ -562,7 +562,7 @@ def _join_words(items: list) -> str:
 
 
 def _top_observation_texts(
-    state_id: str, answers_log: list, intake_data, limit: int = 1,
+    state_id: str, answers_log: list, intake_data, limit: Optional[int] = 1,
 ) -> list:
     """
     The respondent's own answers most relevant to state_id, as authored
@@ -570,7 +570,9 @@ def _top_observation_texts(
     _build_friction_tax_ledger() (a scratch AccumulationSession per
     selected option, salience-weighted against SALIENCE_PROFILES), kept
     separate rather than refactoring the ledger. Unauthored options are
-    skipped, never replaced with raw option_text.
+    skipped, never replaced with raw option_text. Only problem-context
+    valences (PROBLEM_CONTEXT_VALENCES) are cited. limit=None returns the
+    full ranking.
     """
     salience = SALIENCE_PROFILES.get(state_id)
     if not salience or not answers_log:
@@ -585,7 +587,10 @@ def _top_observation_texts(
             continue
         for option_id in option_ids:
             option = next((o for o in question.answer_options if o.option_id == option_id), None)
-            if option is None or not option.observation_text:
+            if (
+                option is None or not option.observation_text
+                or option.observation_valence not in PROBLEM_CONTEXT_VALENCES
+            ):
                 continue
             scratch = AccumulationSession()
             accumulate_answer(scratch, option, intake_data, entry.get("question_id"))
@@ -600,9 +605,20 @@ def _top_observation_texts(
     for _, text in scored:
         if text not in texts:
             texts.append(text)
-        if len(texts) == limit:
+        if limit is not None and len(texts) == limit:
             break
     return texts
+
+
+def _pick_distinct(ranked: list, used: set) -> Optional[str]:
+    """The highest-ranked text not already cited by an earlier condition in
+    the same receipt list. Falls back to the top one when every candidate
+    is already used (reused rather than dropped). Records the pick."""
+    if not ranked:
+        return None
+    pick = next((t for t in ranked if t not in used), ranked[0])
+    used.add(pick)
+    return pick
 
 
 def _receipt(category: str, rationale: str, triggering_answer: Optional[str] = None) -> dict:
@@ -636,6 +652,7 @@ def _friction_driving_factors(
         ),
         _receipt("Organization type", org_type_text),
     ]
+    used_answers: set = set()
     for s in identified_states:
         entry = STATE_MULTIPLIERS.get(s["state_id"])
         if entry is None:
@@ -646,11 +663,13 @@ def _friction_driving_factors(
         ]
         if not channels:
             continue
-        observed = _top_observation_texts(s["state_id"], answers_log, intake_data)
         receipts.append(_receipt(
             "Condition",
             f"{s['state_name']} adds cost through {_join_words(channels)}.",
-            observed[0] if observed else None,
+            _pick_distinct(
+                _top_observation_texts(s["state_id"], answers_log, intake_data, limit=None),
+                used_answers,
+            ),
         ))
     share = (
         f"Together these conditions put {c['combined_multiplier']:.1%} of that baseline at risk"
@@ -683,6 +702,7 @@ def _legal_driving_factors(
         return []
     names = {s["state_id"]: s["state_name"] for s in identified_states}
     receipts = []
+    used_answers: set = set()
     for b in breakdown:
         name = names.get(b["state_id"], b["state_id"])
         amount = (
@@ -695,11 +715,13 @@ def _legal_driving_factors(
                 f", counted at {b['weight']:.0%} because a larger exposure in the "
                 "same category is already included"
             )
-        observed = _top_observation_texts(b["state_id"], answers_log, intake_data)
         receipts.append(_receipt(
             _LEGAL_CLUSTER_LABELS.get(b["cluster"], "Legal exposure"),
             rationale + ".",
-            observed[0] if observed else None,
+            _pick_distinct(
+                _top_observation_texts(b["state_id"], answers_log, intake_data, limit=None),
+                used_answers,
+            ),
         ))
     if len(breakdown) > 1:
         receipts.append(_receipt(
@@ -778,7 +800,10 @@ def _build_asset_evidence(accumulated_vector: dict, answers_log: list, intake_da
             continue
         question, options = _selected_options(entry)
         for option in options:
-            if not option.observation_text:
+            # Strength evidence cites asset-valence text only: problem-phrased
+            # text on an answer that happens to add asset signal is never a
+            # strength. None is authored yet, so this is [] for now.
+            if not option.observation_text or option.observation_valence != "asset":
                 continue
             scratch = AccumulationSession()
             accumulate_answer(scratch, option, intake_data, question_id)

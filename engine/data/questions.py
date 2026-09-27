@@ -25,7 +25,7 @@ Spec reference: Section I.2
 """
 
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Literal, Optional
 
 
 # -- Answer option -------------------------------------------------------------
@@ -77,6 +77,19 @@ class AnswerOption:
     # separate, later phase -- this field defaults to None for all options
     # as of this build.
     observation_text: Optional[str] = None
+
+    # What observation_text is evidence of: "liability" (a problem),
+    # "asset" (a strength), or "neutral" (descriptive). Report readers
+    # filter on it: asset evidence cites "asset" only, problem-context
+    # readers cite PROBLEM_CONTEXT_VALENCES only. None when
+    # observation_text is None. See _observation_valence_tags.
+    observation_valence: Optional[Literal["asset", "liability", "neutral"]] = None
+
+
+# Valences fit to cite as evidence of a problem (driving_factors receipts,
+# the friction ledger, the synthesis signal map). Asset evidence uses
+# "asset" only.
+PROBLEM_CONTEXT_VALENCES = frozenset({"liability", "neutral"})
 
 
 # -- Question definition -------------------------------------------------------
@@ -3021,6 +3034,43 @@ def _build_library():
         "Q18": {"E": ["Safety & Wellbeing_DE"]},
     }
 
+    # observation_valence for every authored observation_text below, wired
+    # to AnswerOption.observation_valence at build time. Pete-approved
+    # 2026-09-27: 103 liability, 6 neutral (Q07-A, Q34-A..E), 0 asset --
+    # none of the authored text is phrased as a strength yet.
+    _observation_valence_tags: dict = {
+        "Q01": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q02": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q04": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q05": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q06": {"A": "liability", "B": "liability", "C": "liability", "D": "liability"},
+        "Q07": {"A": "neutral", "B": "liability", "C": "liability", "D": "liability"},
+        "Q08": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q09": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q10": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q11": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q12": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q13": {"A": "liability", "B": "liability", "C": "liability", "D": "liability"},
+        "Q14": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q15": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q16": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q17": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q18": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q19": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q20": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q21": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q22": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q23": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q24": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q25": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q26": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q27B": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q30": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q32": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q33": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q34": {"A": "neutral", "B": "neutral", "C": "neutral", "D": "neutral", "E": "neutral"},
+    }
+
     # Sparse per-option observation_text, wired to AnswerOption.observation_text
     # at build time -- same pattern as _axis_tags above. Any option not
     # listed here defaults to None via .get(qid, {}).get(o[0]). Q03B
@@ -3431,6 +3481,7 @@ def _build_library():
                     axis_targets=_axis_tags.get(qid, {}).get(o[0], []),
                     severity_input_mapping=_severity_input_tags.get(qid, {}).get(o[0]),
                     observation_text=_observation_text_tags.get(qid, {}).get(o[0]),
+                    observation_valence=_observation_valence_tags.get(qid, {}).get(o[0]),
                 )
                 for o in opts
             ],

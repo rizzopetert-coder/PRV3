@@ -355,5 +355,79 @@ check("debug hook forces a Call 2 failure outside production", f_prev[0] == [] a
 check("debug hook is ignored in production", f_prod[1] is True)
 
 
+# ── 8. observation_valence (Pass 1) ─────────────────────────────────────────────
+from collections import Counter as _Counter
+from engine.data.questions import PROBLEM_CONTEXT_VALENCES
+from engine.contract import _pick_distinct, _build_friction_tax_ledger
+_opts = [o for q in L.values() for o in q.answer_options]
+check("valence: all 109 authored texts tagged 103 liability / 6 neutral / 0 asset",
+      _Counter(o.observation_valence for o in _opts if o.observation_text) == {"liability": 103, "neutral": 6})
+check("valence: no text without a valence, no valence without text",
+      not any(bool(o.observation_text) != bool(o.observation_valence) for o in _opts))
+check("valence: neutral set is exactly Q07-A and Q34-A..E",
+      {(k, o.option_id) for k, q in L.items() for o in q.answer_options if o.observation_valence == "neutral"}
+      == {("Q07", "A"), ("Q34", "A"), ("Q34", "B"), ("Q34", "C"), ("Q34", "D"), ("Q34", "E")})
+check("PROBLEM_CONTEXT_VALENCES = liability + neutral", PROBLEM_CONTEXT_VALENCES == {"liability", "neutral"})
+
+# With no asset-valence text, strength evidence keeps axes and scores but cites nothing
+vec_s, log_s = _path(max)
+ev = _build_asset_evidence(vec_s, log_s, INTAKE)
+check("asset evidence: strongest_axes and net_scores still populate", ev is not None and ev["strongest_axes"] and ev["net_scores"])
+check("asset evidence: contributing_signals empty (no asset-valence text authored yet)", ev["contributing_signals"] == [])
+q18e = next(o for o in L["Q18"].answer_options if o.option_id == "E")
+ev_q18 = _build_asset_evidence(dict(ZERO, attitude_asset=1.0), [{"question_id": "Q18", "option_ids": ["E"]}], INTAKE)
+check("the 'safety concerns as strength' bug is gone (Q18-E never cited as a strength)",
+      ev_q18 is not None and all(s["observation_text"] != q18e.observation_text for s in ev_q18["contributing_signals"]))
+
+# asset-valence text IS cited as strength; problem readers never cite it
+_target = next(o for o in L["Q13"].answer_options if o.option_id == "A")     # carries asset signal
+_axis = next(f for f in ["aptitude_asset", "authority_asset", "alliance_asset", "attitude_asset"]
+             if _target.dimensional_contributions.get(f, 0) > 0)
+_saved = _target.observation_valence
+_target.observation_valence = "asset"
+try:
+    ev_a = _build_asset_evidence(dict(ZERO, **{_axis: 1.0}), [{"question_id": "Q13", "option_ids": ["A"]}], INTAKE)
+    check("asset-valence text is cited as a strength", ev_a is not None and
+          [s["observation_text"] for s in ev_a["contributing_signals"]] == [_target.observation_text], str(ev_a))
+    _log13 = [{"question_id": "Q13", "option_ids": ["A"]}]
+    check("receipts never cite asset-valence text",
+          all(_target.observation_text not in _top_observation_texts(sid, _log13, INTAKE, limit=None)
+              for sid in ["built_to_fail", "the_broken_compass", "leadership_deafness", "the_uninitiated"]))
+    _led = _build_friction_tax_ledger([{"state_id": "the_broken_compass", "state_name": "x"}],
+                                      [{"state_id": "the_broken_compass", "tier": "Emerging"}], _log13, INTAKE)
+    check("ledger top_contributing_answers never cite asset-valence text",
+          all(_target.observation_text not in r["top_contributing_answers"] for r in _led))
+    check("Call 1 signal map never cites asset-valence text",
+          _target.observation_text not in _m._build_signal_map_context(_log13, INTAKE, "the_broken_compass"))
+finally:
+    _target.observation_valence = _saved
+check("signal map still cites the same text when it is problem-context",
+      _target.observation_text in _m._build_signal_map_context([{"question_id": "Q13", "option_ids": ["A"]}], INTAKE, "the_broken_compass")
+      or _top_observation_texts("the_broken_compass", [{"question_id": "Q13", "option_ids": ["A"]}], INTAKE) == [])
+
+# Receipt variety: a repeat is allowed only when a condition has no unused alternative
+check("_pick_distinct prefers an unused answer", _pick_distinct(["a", "b"], {"a"}) == "b")
+check("_pick_distinct reuses the top answer when all are used", _pick_distinct(["a"], {"a"}) == "a")
+check("_pick_distinct: nothing ranked -> None", _pick_distinct([], set()) is None)
+vec_p, log_p = _path(min)
+many = ["built_to_fail", "the_overloaded_manager", "the_undefined_role", "the_unsolved_problem", "the_unformed_leader"]
+st5 = [{"state_id": s, "state_name": s} for s in many]
+fr5 = compute_friction_tax(many, "Emerging", 175, INTAKE.industry, INTAKE.org_type)
+rc = [r for r in _friction_driving_factors(fr5, st5, "Emerging", INTAKE, log_p) if r["category"] == "Condition"]
+picked = [r.get("triggering_answer") for r in rc]
+ok, used = True, set()
+for s, pick in zip(many, picked):
+    ranked = _top_observation_texts(s, log_p, INTAKE, limit=None)
+    if pick is None:
+        ok = ok and not ranked
+        continue
+    if any(t not in used for t in ranked) and pick in used:
+        ok = False
+    used.add(pick)
+check("friction receipts vary: a condition only repeats an answer when it has no unused alternative", ok, str(picked))
+check("friction receipts: more than one distinct triggering answer across 5 conditions",
+      len({p for p in picked if p}) > 1, str(picked))
+
+
 print(f"\nRESULT: {passed} passed, {failed} failed")
 sys.exit(1 if failed else 0)

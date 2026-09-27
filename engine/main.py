@@ -33,7 +33,7 @@ from engine.checkpoint import (
     build_narrative_prompt_context,
 )
 from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
-from engine.data.questions import QUESTION_LIBRARY
+from engine.data.questions import QUESTION_LIBRARY, PROBLEM_CONTEXT_VALENCES
 from engine.data.salience import SALIENCE_PROFILES
 from engine.output_synthesis import OutputSynthesisEngine, SynthesisResult
 from engine.tactical_synthesis import build_tactical_summary, synthesize_tactical, tactical_totals
@@ -231,8 +231,9 @@ def get_question_copy(question_id: str) -> dict:
     """
     Public-safe question copy for Path 1's frontend. Returns ONLY
     question_text and option_id/option_text pairs -- explicitly excludes
-    dimensional_contributions, axis_targets, severity_trigger, and
-    severity_follow_on_id. This is the runtime enforcement of the P-03
+    dimensional_contributions, axis_targets, severity_trigger,
+    severity_follow_on_id, observation_text, and observation_valence (an
+    allowlist, so any new internal field is excluded by construction). This is the runtime enforcement of the P-03
     boundary (scoring weight is invisible) for content actually rendered in
     the browser, not just an absence-by-construction of a duplicated
     dataset -- QUESTION_LIBRARY remains the single source of truth, nothing
@@ -691,7 +692,7 @@ def _build_signal_map_context(
 
     observations: list = []
     for _, option in scored:
-        if option.observation_text:
+        if option.observation_text and option.observation_valence in PROBLEM_CONTEXT_VALENCES:
             observations.append(option.observation_text)
         if len(observations) == 7:
             break
