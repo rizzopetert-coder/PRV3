@@ -13,6 +13,13 @@ import CopyResultsButton from "@/components/CopyResultsButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
 import { joinNames } from "@/lib/output-text";
 import ConditionsList, { type ConditionRow } from "@/components/ConditionsList";
+import {
+  AssetStrength,
+  CostComparison,
+  EvidenceReceipts,
+  ExecutiveSummary,
+  TacticalReview,
+} from "@/components/ReportDetails";
 import { useBrand } from "@/components/BrandContext";
 
 // Brand-specific pieces, code-split rather than conditionally rendered:
@@ -202,6 +209,9 @@ export default function PrivateOutput({
         )}
       </div>
 
+      {/* Phase 3: executive summary opens the report when present. */}
+      <ExecutiveSummary text={payload.synthesis.executive_summary} />
+
       {/* Phase 2 lead (Pete, 2026-09-27): the constellation, then the
           observable indicators, open the report. The former "Most prominent
           pattern" hero and "Severity across conditions" section are merged
@@ -262,7 +272,7 @@ export default function PrivateOutput({
           <p className="text-sm leading-[1.65] text-charcoal">{framingText}</p>
         )}
 
-        {(anchorText || primaryAssetDomain) && (
+        {(anchorText || primaryAssetDomain || payload.asset_evidence) && (
           <div>
             {primaryAssetDomain && (
               <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
@@ -272,6 +282,7 @@ export default function PrivateOutput({
             {anchorText && (
               <p className="text-[13px] text-charcoal">{anchorText}</p>
             )}
+            <AssetStrength evidence={payload.asset_evidence} />
           </div>
         )}
       </div>
@@ -375,6 +386,7 @@ export default function PrivateOutput({
           <p className="text-[11px] text-slate mt-1 leading-relaxed">
             {legal.caveat}
           </p>
+          <EvidenceReceipts receipts={legal.driving_factors} />
         </div>
       )}
 
@@ -445,8 +457,15 @@ export default function PrivateOutput({
           <p className="text-[11px] text-slate mt-3 leading-relaxed">
             {FRICTION_TAX_LEDGER_FOOTNOTE}
           </p>
+          <EvidenceReceipts receipts={payload.friction_tax_estimate?.driving_factors} />
         </details>
       )}
+
+      {/* Phase 3: inaction cost beside the resolution service. */}
+      <CostComparison
+        comparison={payload.service_cost_comparison}
+        fallbackServiceName={payload.resolution_family}
+      />
 
       {/* Block 4e — Copy results as text (this session). Comprehensive
           scope, visible to every respondent regardless of path -- NOT
@@ -471,42 +490,11 @@ export default function PrivateOutput({
 
       {/* Block 7 — friction_tax_estimate: null in Path B — render nothing */}
 
-      {/* Block 8 -- Tactical & Compliance results (hr-dx.com only).
-          MVP: plain question/selected-answer list per section, each
-          section headed by its OneDigital referral chips. Does not match
-          the core diagnostic's narrative styling by design -- Pete's
-          explicit instruction, a different report shape for a different
-          purpose. */}
+      {/* Block 8 -- Tactical & Compliance review (hr-dx.com only). Phase 3:
+          per-section synthesis from tactical_findings, raw answers kept
+          collapsed. Referral chips unchanged. */}
       {tacticalResults && tacticalResults.length > 0 && (
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <p className="text-[11px] uppercase tracking-wide text-slate mb-4">
-            Tactical &amp; compliance review
-          </p>
-          <div className="space-y-6">
-            {tacticalResults.map((section) => (
-              <div key={section.question_set_id}>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {section.referral.map((r) => (
-                    <span
-                      key={r}
-                      className="text-[10px] uppercase tracking-wide bg-gray-100 text-charcoal rounded-full px-2 py-0.5"
-                    >
-                      {r}
-                    </span>
-                  ))}
-                </div>
-                <ul className="space-y-3">
-                  {section.answers.map((a) => (
-                    <li key={a.question_id}>
-                      <p className="text-sm font-medium text-charcoal">{a.question_text}</p>
-                      <p className="text-sm text-slate">{a.selected_option_text}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
+        <TacticalReview sections={tacticalResults} findings={payload.tactical_findings} />
       )}
     </div>
   );
