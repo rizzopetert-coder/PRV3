@@ -368,11 +368,11 @@ RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
 
     # Training & Development — engine: Development
     ("Training & Development", "Emerging"): (
-        "There is a capability gap. Training & Development addresses it directly — not off-the-shelf training, "
+        "There is a capability gap. Training & Development addresses it directly: not off-the-shelf training, "
         "but targeted work on the specific skills and practices the diagnostic identified."
     ),
     ("Training & Development", "Entrenched"): (
-        "The gap has had time to become normal. Training & Development works against that — targeted, practical, "
+        "The gap has had time to become normal. Training & Development works against that: targeted, practical, "
         "and built around what your people actually need to be able to do, not a general program applied "
         "to a specific problem."
     ),
@@ -383,16 +383,16 @@ RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
 
     # First Call — engine: Intervention
     ("First Call", "Emerging"): (
-        "The situation requires someone in it, not advising from outside it. First Call is that presence "
-        "— engaged with what is happening while there is still room to shape it."
+        "The situation requires someone in it, not advising from outside it. First Call is that presence"
+        ": engaged with what is happening while there is still room to shape it."
     ),
     ("First Call", "Entrenched"): (
         "What is live right now requires more than a plan. First Call means someone in the room, "
         "with the expertise and authority to move the situation, until it resolves."
     ),
     ("First Call", "Endemic"): (
-        "This does not respond to a plan or a program. First Call is direct, immersive engagement "
-        "— inside the situation, not above it, for as long as it takes."
+        "This does not respond to a plan or a program. First Call is direct, immersive engagement"
+        ": inside the situation, not above it, for as long as it takes."
     ),
 
     # Executive Advisory — engine: Executive Counsel
