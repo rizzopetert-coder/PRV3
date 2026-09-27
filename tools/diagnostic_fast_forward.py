@@ -172,7 +172,10 @@ class PreviewClient:
     def post(self, path: str, body: dict) -> dict:
         url = f"{self.base_url}{path}"
         data = json.dumps(body).encode("utf-8")
-        headers = {"Content-Type": "application/json", "Origin": self.base_url}
+        # x-prv3-test-run: tags this session's aggregate record as a test
+        # run (web/lib/test-run.ts) -- required for any Production run;
+        # Preview sessions are tagged regardless.
+        headers = {"Content-Type": "application/json", "Origin": self.base_url, "x-prv3-test-run": "1"}
         if self.bypass_secret:
             headers["x-vercel-protection-bypass"] = self.bypass_secret
         req = urllib.request.Request(url, data=data, headers=headers, method="POST")

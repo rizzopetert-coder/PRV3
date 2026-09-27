@@ -177,6 +177,10 @@ export interface DiagnosticSession {
   // questions are appended to question_sequence below and whether
   // diagnostic-completion.ts resolves tactical_results.
   brand: Brand;
+  // Test run (web/lib/test-run.ts), decided once at createSession() and
+  // carried into the anonymized aggregate record. Optional: sessions
+  // already in Redis before this field existed complete as false.
+  is_test?: boolean;
   intake: PrivateIntakeEcho;
   next_question_id: string;
   accumulated_vector: AccumulatedVector;
@@ -264,6 +268,9 @@ export interface AnonymizedCompletion {
   organization_size: number;
   final_state_rankings: Array<{ id: string; name: string; weight: number }>;
   completed_at: string; // ISO 8601
+  // true for Preview sessions and flagged Production smoke tests --
+  // exclude these when analyzing diagnostic-aggregate. Always present.
+  is_test: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -489,6 +496,9 @@ export async function createSession(
   // resolved brand, so this default is never silently relied on in the
   // actual request path.
   brand: Brand = "principal_resolution",
+  // Same default-not-required convention as `brand`: the real caller
+  // (session/start/route.ts) passes isTestRun(request.headers).
+  isTest: boolean = false,
 ): Promise<DiagnosticSession> {
   // TC-* module appended only for hr_diagnostic -- the base
   // PHASE_1_QUESTION_SEQUENCE template is never mutated, matching its own
@@ -503,6 +513,7 @@ export async function createSession(
   const session: DiagnosticSession = {
     session_id: nanoid(),
     brand,
+    is_test: isTest,
     intake,
     next_question_id: questionSequence[0],
     accumulated_vector: { ...ZERO_VECTOR },
@@ -572,6 +583,7 @@ export async function completeSession(
     organization_size: session.intake.organization_size,
     final_state_rankings: finalRankings,
     completed_at: new Date().toISOString(),
+    is_test: session.is_test === true,
   };
 
   await redis.rpush(AGGREGATE_KEY, JSON.stringify(record));

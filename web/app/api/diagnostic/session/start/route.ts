@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSession, resolveQuestionLabel } from "@/lib/session-store";
 import { resolveBrandForRequest } from "@/lib/brand";
+import { isTestRun } from "@/lib/test-run";
 import { invokeQuestionCopy } from "@/lib/engine-client";
 import { SIGNIFICANT_EVENT_OPTIONS, type PrivateIntakeEcho } from "@/lib/types";
 
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
   }
 
   const brand = resolveBrandForRequest(request.headers);
-  const session = await createSession(body, brand);
+  const session = await createSession(body, brand, isTestRun(request.headers));
   const firstQuestion = await invokeQuestionCopy(session.next_question_id);
   const label = resolveQuestionLabel(session.next_question_id, session.question_labels);
 
