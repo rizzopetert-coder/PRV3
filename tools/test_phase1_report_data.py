@@ -473,13 +473,10 @@ check("exec summary prompt states the strict length",
 # ── 11. PR backup copy: every family authored, no em-dashes ─────────────────────
 from engine.resolution_families import RESOLUTION_FALLBACK_COPY, translate_resolution_family
 from engine.data.states import STATE_PROFILES as _SP2
-# Four single-service entries still carry " — " (not in the 2026-09-27 fix
-# list, flagged to Pete for copy). Any other em-dash is a regression.
-_DASH_KNOWN = {("Training & Development", "Emerging"), ("Training & Development", "Entrenched"),
-               ("First Call", "Emerging"), ("First Call", "Endemic")}
-check("no em-dash in RESOLUTION_FALLBACK_COPY beyond the 4 flagged entries",
-      {k for k, v in RESOLUTION_FALLBACK_COPY.items() if "\u2014" in v} <= _DASH_KNOWN,
-      str(sorted({k for k, v in RESOLUTION_FALLBACK_COPY.items() if "\u2014" in v} - _DASH_KNOWN)))
+# Zero exceptions since 2026-09-27 (Pete's final four fixes).
+check("no em-dash anywhere in RESOLUTION_FALLBACK_COPY",
+      not [k for k, v in RESOLUTION_FALLBACK_COPY.items() if "\u2014" in v],
+      str(sorted(k for k, v in RESOLUTION_FALLBACK_COPY.items() if "\u2014" in v)))
 _compounds = {translate_resolution_family(p.resolution_family) for p in _SP2.values() if " + " in p.resolution_family}
 check("every compound family in the taxonomy has authored PR backup copy",
       all((c, None) in RESOLUTION_FALLBACK_COPY for c in _compounds),
