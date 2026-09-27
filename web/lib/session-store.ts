@@ -468,7 +468,13 @@ export function spliceLabel(
 // looked up from session.question_labels, populated at splice time.
 export type QuestionLabel =
   | { kind: "core"; position: number; total: number }
-  | { kind: "spliced"; label: string };
+  | { kind: "spliced"; label: string }
+  // hr_diagnostic TC-* module (appended in createSession()). Its own
+  // kind so it is never mislabeled as a follow-up, positioned within the
+  // 40-question module in TACTICAL_QUESTION_META's order.
+  | { kind: "tactical"; position: number; total: number };
+
+const TACTICAL_QUESTION_IDS: readonly string[] = Object.keys(TACTICAL_QUESTION_META);
 
 export function resolveQuestionLabel(
   questionId: string,
@@ -478,7 +484,13 @@ export function resolveQuestionLabel(
   if (corePosition !== null) {
     return { kind: "core", position: corePosition, total: TOTAL_CORE_QUESTIONS };
   }
-  return { kind: "spliced", label: spliceLabels[questionId] ?? questionId };
+  const tacticalIndex = TACTICAL_QUESTION_IDS.indexOf(questionId);
+  if (tacticalIndex !== -1) {
+    return { kind: "tactical", position: tacticalIndex + 1, total: TACTICAL_QUESTION_IDS.length };
+  }
+  // Never fall back to the raw question_id -- internal IDs are not
+  // user-facing. An unlabeled splice renders as plain "Follow-up".
+  return { kind: "spliced", label: spliceLabels[questionId] ?? "" };
 }
 
 // ---------------------------------------------------------------------------

@@ -33,7 +33,8 @@ const BeforeYouBeginCopyHR = dynamic(() => import("@/components/BeforeYouBeginCo
 // added -- A.2, this session (Q06 weighted_multi_select).
 type QuestionLabel =
   | { kind: "core"; position: number; total: number }
-  | { kind: "spliced"; label: string };
+  | { kind: "spliced"; label: string }
+  | { kind: "tactical"; position: number; total: number };
 
 // Value vocabularies mirror engine/data/intake.py's INTAKE_FIELDS wherever
 // an engine equivalent exists (organization_size <- headcount, industry,
@@ -529,7 +530,11 @@ function QuestionView({
       <p className="font-ui text-xs tracking-widest uppercase text-gray-400 mb-6">
         {label.kind === "core"
           ? `Question ${label.position} of ${label.total}`
-          : `Follow-up ${label.label}`}
+          : label.kind === "tactical"
+            ? `Tactical & compliance review · Question ${label.position} of ${label.total}`
+            : label.label
+              ? `Follow-up ${label.label}`
+              : "Follow-up"}
       </p>
       <h2 className="font-display text-xl md:text-2xl text-charcoal mb-8 leading-snug">
         {question.question_text}
