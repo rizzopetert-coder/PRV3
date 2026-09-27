@@ -242,6 +242,72 @@ type FlowState =
 
 const ERROR_COPY = "Something went wrong. Please try again.";
 
+// Module scope, not nested inside IntakeForm: a component declared inside
+// another component's body gets a new identity on every render, so React
+// remounts it and the "Other" textarea lost focus after each keystroke.
+// None/other-events mutual exclusivity: checking "none" clears any other
+// selections, checking anything else clears "none" -- both being checked
+// simultaneously would be a logical contradiction the data model
+// shouldn't allow.
+function SignificantEventsField({
+  value,
+  elaboration,
+  onChange,
+  onElaborationChange,
+}: {
+  value: string[];
+  elaboration: string;
+  onChange: (next: string[]) => void;
+  onElaborationChange: (next: string) => void;
+}) {
+  function toggle(eventValue: string) {
+    if (eventValue === "none") {
+      onChange(value.includes("none") ? [] : ["none"]);
+      return;
+    }
+    const withoutNone = value.filter((v) => v !== "none");
+    onChange(
+      withoutNone.includes(eventValue)
+        ? withoutNone.filter((v) => v !== eventValue)
+        : [...withoutNone, eventValue]
+    );
+  }
+
+  return (
+    <div className="mb-5">
+      <label className="block font-ui text-sm font-medium text-charcoal mb-1.5">
+        Any significant events in the past 18 months?
+      </label>
+      <div className="space-y-2.5 border border-gray-200 rounded-lg px-3 py-3 bg-white">
+        {SIGNIFICANT_EVENT_OPTIONS.map((opt) => (
+          <label
+            key={opt.value}
+            className="flex items-start gap-2 font-ui text-sm text-charcoal cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              checked={value.includes(opt.value)}
+              onChange={() => toggle(opt.value)}
+              className="mt-0.5 shrink-0"
+            />
+            <span>{opt.label}</span>
+          </label>
+        ))}
+      </div>
+      {value.includes("other") && (
+        <textarea
+          value={elaboration}
+          onChange={(e) => onElaborationChange(e.target.value)}
+          maxLength={500}
+          placeholder="Briefly describe what happened…"
+          rows={3}
+          className="mt-2.5 w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-charcoal focus:outline-none focus:border-charcoal resize-none"
+        />
+      )}
+    </div>
+  );
+}
+
 // ── Intake form ────────────────────────────────────────────────────────────
 
 function IntakeForm({
@@ -298,69 +364,6 @@ function IntakeForm({
             </option>
           ))}
         </select>
-      </div>
-    );
-  }
-
-  // None/other-events mutual exclusivity: checking "none" clears any other
-  // selections, checking anything else clears "none" -- both being checked
-  // simultaneously would be a logical contradiction the data model
-  // shouldn't allow.
-  function SignificantEventsField({
-    value,
-    elaboration,
-    onChange,
-    onElaborationChange,
-  }: {
-    value: string[];
-    elaboration: string;
-    onChange: (next: string[]) => void;
-    onElaborationChange: (next: string) => void;
-  }) {
-    function toggle(eventValue: string) {
-      if (eventValue === "none") {
-        onChange(value.includes("none") ? [] : ["none"]);
-        return;
-      }
-      const withoutNone = value.filter((v) => v !== "none");
-      onChange(
-        withoutNone.includes(eventValue)
-          ? withoutNone.filter((v) => v !== eventValue)
-          : [...withoutNone, eventValue]
-      );
-    }
-
-    return (
-      <div className="mb-5">
-        <label className="block font-ui text-sm font-medium text-charcoal mb-1.5">
-          Any significant events in the past 18 months?
-        </label>
-        <div className="space-y-2.5 border border-gray-200 rounded-lg px-3 py-3 bg-white">
-          {SIGNIFICANT_EVENT_OPTIONS.map((opt) => (
-            <label
-              key={opt.value}
-              className="flex items-start gap-2 font-ui text-sm text-charcoal cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                checked={value.includes(opt.value)}
-                onChange={() => toggle(opt.value)}
-                className="mt-0.5 shrink-0"
-              />
-              <span>{opt.label}</span>
-            </label>
-          ))}
-        </div>
-        {value.includes("other") && (
-          <textarea
-            value={elaboration}
-            onChange={(e) => onElaborationChange(e.target.value)}
-            maxLength={500}
-            placeholder="Briefly describe what happened…"
-            rows={3}
-            className="mt-2.5 w-full font-ui text-sm border border-gray-200 rounded-lg px-3 py-2.5 bg-white text-charcoal focus:outline-none focus:border-charcoal resize-none"
-          />
-        )}
       </div>
     );
   }
