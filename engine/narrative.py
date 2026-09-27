@@ -572,7 +572,27 @@ or citing the signal directly.
 organization").
 - Output ONLY the question text. No markdown, no quotation marks, no \
 JSON, no surrounding punctuation beyond the question itself.
+- Punctuation: never use em dashes, en dashes used as dashes, double \
+hyphens, or semicolons. Use a comma, a period, or a separate sentence \
+instead.
 """
+
+def _enforce_house_punctuation(text: str) -> str:
+    """
+    House style for the generated narrative question: no em-dashes, no
+    dash-style en-dashes or double hyphens, no semicolons. The prompt asks
+    for this, and this guard guarantees it -- any that slip through become
+    a comma. Hyphenated words and unspaced en-dash ranges are left alone.
+    """
+    import re
+    text = re.sub(r"\s*\u2014\s*", ", ", text)        # em-dash, spaced or not
+    text = re.sub(r"\s+\u2013\s+", ", ", text)        # spaced en-dash used as a dash
+    text = re.sub(r"\s+--\s+", ", ", text)            # double-hyphen dash
+    text = re.sub(r"\s*;\s*", ", ", text)             # semicolon
+    text = re.sub(r",\s*,", ",", text)
+    text = re.sub(r",\s*([?.!])", r"\1", text)
+    return re.sub(r"[ \t]{2,}", " ", text).strip()
+
 
 _NARRATIVE_PROMPT_FALLBACK: str = (
     "Is there anything about what's happening in your organization right "
@@ -682,4 +702,4 @@ def generate_narrative_prompt(
             parse_error="empty response",
         )
 
-    return NarrativePromptResult(prompt=text, is_fallback=False)
+    return NarrativePromptResult(prompt=_enforce_house_punctuation(text), is_fallback=False)

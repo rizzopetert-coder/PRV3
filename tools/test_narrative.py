@@ -358,6 +358,22 @@ check("Engine initial extraction_result is None", engine.extraction_result is No
 check("Engine initial severity_signals is []", engine.severity_signals == [])
 check("Engine default model", engine.model == "claude-sonnet-5")
 
+# ── House punctuation on the generated narrative question (2026-09-27) ──────
+from engine.narrative import _enforce_house_punctuation, NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT
+_q1 = "People often know things that never make it into reviews \u2014 what's something like that on your mind?"
+check("guard: em-dash becomes a comma", _enforce_house_punctuation(_q1)
+      == "People often know things that never make it into reviews, what's something like that on your mind?")
+check("guard: semicolon becomes a comma", ";" not in _enforce_house_punctuation("It shifted; what changed?"))
+check("guard: spaced en-dash and double hyphen become commas",
+      "\u2013" not in _enforce_house_punctuation("a \u2013 b") and " -- " not in _enforce_house_punctuation("a -- b"))
+check("guard: hyphenated words and unspaced ranges untouched",
+      _enforce_house_punctuation("day-to-day follow-up, 2020\u20132024?") == "day-to-day follow-up, 2020\u20132024?")
+check("guard: clean text unchanged",
+      _enforce_house_punctuation("What stands out to you right now?") == "What stands out to you right now?")
+check("prompt: punctuation rule present, prompt itself has no em-dash",
+      "never use em dashes" in NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT
+      and "\u2014" not in NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT)
+
 # Simulate extraction result injection (bypasses API call)
 engine.extraction_result = good_extraction()
 check("After extraction: severity_signals populated",
