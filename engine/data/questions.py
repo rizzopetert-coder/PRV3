@@ -1709,7 +1709,7 @@ _QDATA = [
         "Which of your written policies aren't actually how the organization operates?",
         "forced_choice", None, "tactical",
         [
-            ("A", "None that I'm aware of -- policy and practice line up.", False, None),
+            ("A", "None that I'm aware of: policy and practice line up.", False, None),
             ("B", "A few minor ones, but nothing that carries real risk.", False, None),
             ("C", "Several, and some carry real exposure if surfaced.", False, None),
             ("D", "Honestly, I'd need to audit this to know.", False, None),
@@ -1719,10 +1719,10 @@ _QDATA = [
     ),
     (
         "TC-HRPOL-04",
-        "If a relevant state law changed tomorrow, how would you find out -- and how long would it take your policies to catch up?",
+        "If a relevant state law changed tomorrow, how would you find out, and how long would it take your policies to catch up?",
         "forced_choice", None, "tactical",
         [
-            ("A", "There's a defined process -- legal counsel or a compliance service flags it and policies update on a known timeline.", False, None),
+            ("A", "There's a defined process: legal counsel or a compliance service flags it and policies update on a known timeline.", False, None),
             ("B", "We'd probably hear about it eventually, but there's no defined process.", False, None),
             ("C", "It would depend on someone happening to notice.", False, None),
             ("D", "Not sure how we'd find out.", False, None),
@@ -1732,13 +1732,13 @@ _QDATA = [
     ),
     (
         "TC-HIRE-01",
-        "How much of your interview process is actually structured -- consistent questions, consistent scoring -- versus left to whoever's in the room that day?",
+        "How much of your interview process is actually structured, with consistent questions and consistent scoring, versus left to whoever's in the room that day?",
         "forced_choice", None, "tactical",
         [
-            ("A", "Fully structured -- consistent questions and scoring across every candidate.", False, None),
+            ("A", "Fully structured: consistent questions and scoring across every candidate.", False, None),
             ("B", "Structured for some roles, informal for others.", False, None),
             ("C", "Loosely guided, but mostly left to whoever's interviewing.", False, None),
-            ("D", "No structure -- entirely up to the interviewer.", False, None),
+            ("D", "No structure: entirely up to the interviewer.", False, None),
         ],
         [],
         False,
@@ -1784,23 +1784,23 @@ _QDATA = [
     ),
     (
         "TC-PAY-01",
-        "How confident are you that every employee's overtime eligibility was set correctly the day they were hired -- and hasn't drifted since their role changed?",
+        "How confident are you that every employee's overtime eligibility was set correctly the day they were hired, and hasn't drifted since their role changed?",
         "forced_choice", None, "tactical",
         [
-            ("A", "Very confident -- classifications are reviewed when roles change.", False, None),
+            ("A", "Very confident: classifications are reviewed when roles change.", False, None),
             ("B", "Fairly confident, but classifications aren't formally revisited.", False, None),
             ("C", "Some uncertainty, especially for roles that have evolved.", False, None),
-            ("D", "Not confident -- this hasn't been reviewed in a long time.", False, None),
+            ("D", "Not confident: this hasn't been reviewed in a long time.", False, None),
         ],
         [],
         False,
     ),
     (
         "TC-PAY-02",
-        "If an employee disputed their hours worked, could payroll produce a time record that would hold up -- or would it come down to someone's memory?",
+        "If an employee disputed their hours worked, could payroll produce a time record that would hold up, or would it come down to someone's memory?",
         "forced_choice", None, "tactical",
         [
-            ("A", "Yes -- a system-generated, timestamped record exists.", False, None),
+            ("A", "Yes, a system-generated, timestamped record exists.", False, None),
             ("B", "Some record exists, but it relies partly on manual entry.", False, None),
             ("C", "Records exist but aren't reliably accurate.", False, None),
             ("D", "It would largely come down to memory.", False, None),
@@ -1880,7 +1880,7 @@ _QDATA = [
         [
             ("A", "A written philosophy exists and is current.", False, None),
             ("B", "Something exists but is outdated.", False, None),
-            ("C", "Nothing written -- it would need to be reconstructed.", False, None),
+            ("C", "Nothing written: it would need to be reconstructed.", False, None),
             ("D", "No clear philosophy exists even informally.", False, None),
         ],
         [],
@@ -1888,7 +1888,7 @@ _QDATA = [
     ),
     (
         "TC-BEN-01",
-        "Are required notices -- COBRA, plan summaries, annual disclosures -- actually being sent and tracked, or is the assumption that the broker handles it?",
+        "Are required notices (such as COBRA, plan summaries, and annual disclosures) actually being sent and tracked, or is the assumption that the broker handles it?",
         "forced_choice", None, "tactical",
         [
             ("A", "Yes, sent and tracked directly, not just assumed.", False, None),
@@ -1901,7 +1901,7 @@ _QDATA = [
     ),
     (
         "TC-BEN-02",
-        "If a former employee never received their COBRA notice, would you know -- and could you prove when and how it was sent?",
+        "If a former employee never received their COBRA notice, would you know, and could you prove when and how it was sent?",
         "forced_choice", None, "tactical",
         [
             ("A", "We'd know, and could prove timely notice.", False, None),
@@ -1930,7 +1930,7 @@ _QDATA = [
         "Do employees actually understand what they're enrolled in, or does open enrollment happen and then nobody asks whether it landed?",
         "forced_choice", None, "tactical",
         [
-            ("A", "Yes -- there's follow-up after enrollment to confirm understanding.", False, None),
+            ("A", "Yes, there's follow-up after enrollment to confirm understanding.", False, None),
             ("B", "Some effort is made, but no real follow-up.", False, None),
             ("C", "Enrollment happens, no follow-up at all.", False, None),
             ("D", "Genuinely not sure how well it's understood.", False, None),
@@ -2049,7 +2049,7 @@ _QDATA = [
         [
             ("A", "Yes, a defined schedule that's followed.", False, None),
             ("B", "A schedule exists but isn't consistently followed.", False, None),
-            ("C", "No defined schedule -- retained indefinitely by default.", False, None),
+            ("C", "No defined schedule: retained indefinitely by default.", False, None),
             ("D", "Not sure what's actually being retained.", False, None),
         ],
         [],
@@ -2070,7 +2070,7 @@ _QDATA = [
     ),
     (
         "TC-REC-03",
-        "If an employee requested their own personnel file, could you produce it -- completely, and within a reasonable timeframe?",
+        "If an employee requested their own personnel file, could you produce it, completely and within a reasonable timeframe?",
         "forced_choice", None, "tactical",
         [
             ("A", "Yes, and within the required timeframe.", False, None),
@@ -2122,7 +2122,7 @@ _QDATA = [
     ),
     (
         "TC-TECH-03",
-        "Is sensitive employee data -- SSNs, banking info, medical information -- actually access-controlled within your systems, or does broad internal access exist by default?",
+        "Is sensitive employee data (such as SSNs, banking info, and medical information) actually access-controlled within your systems, or does broad internal access exist by default?",
         "forced_choice", None, "tactical",
         [
             ("A", "Access is deliberately restricted and reviewed.", False, None),
@@ -2174,13 +2174,13 @@ _QDATA = [
     ),
     (
         "TC-PERF-03",
-        "Are performance ratings actually consistent with the outcomes attached to them -- promotions, raises, terminations -- or do the numbers and the decisions sometimes not match?",
+        "Are performance ratings actually consistent with the outcomes attached to them (such as promotions, raises, and terminations), or do the numbers and the decisions sometimes not match?",
         "forced_choice", None, "tactical",
         [
             ("A", "Yes, consistently aligned.", False, None),
             ("B", "Mostly aligned, with occasional exceptions.", False, None),
             ("C", "Noticeable mismatches exist.", False, None),
-            ("D", "Not sure -- this hasn't been checked.", False, None),
+            ("D", "Not sure: this hasn't been checked.", False, None),
         ],
         [],
         False,
