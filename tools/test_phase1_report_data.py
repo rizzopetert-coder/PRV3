@@ -457,5 +457,18 @@ check("service_cost_comparison names the service on a multi-state PR result",
       _o["output_type"] != "multi_state" or _o["private_output"]["service_cost_comparison"]["target_service_name"] != "")
 
 
+# ── 10. Executive summary length ─────────────────────────────────────────────────
+from engine.exec_summary import _limit_sentences, EXEC_SUMMARY_SYSTEM_PROMPT
+five = "One thing. Two things here. Three is fine. Four is too many. Five is right out."
+check("exec summary guard keeps at most 3 sentences",
+      _limit_sentences(five) == "One thing. Two things here. Three is fine.", _limit_sentences(five))
+check("exec summary guard leaves 2-3 sentences untouched",
+      _limit_sentences("A short one. And a second.") == "A short one. And a second.")
+check("exec summary guard does not split on decimals or a lowercase continuation",
+      _limit_sentences("Costs rose 2.5 times. Then e.g. more. Three. Four.") == "Costs rose 2.5 times. Then e.g. more. Three.",
+      _limit_sentences("Costs rose 2.5 times. Then e.g. more. Three. Four."))
+check("exec summary prompt states the strict length",
+      "exactly 2 or 3 sentences" in EXEC_SUMMARY_SYSTEM_PROMPT and "70 words" in EXEC_SUMMARY_SYSTEM_PROMPT)
+
 print(f"\nRESULT: {passed} passed, {failed} failed")
 sys.exit(1 if failed else 0)

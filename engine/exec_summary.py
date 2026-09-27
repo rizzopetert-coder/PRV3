@@ -12,6 +12,7 @@ nothing else in the result changes.
 from __future__ import annotations
 
 import os
+import re
 
 from engine.narrative import _enforce_house_punctuation
 
@@ -30,7 +31,8 @@ report. The reader is the leader of the organization. The report has two \
 parts: what the diagnostic found about how the organization is operating, and \
 a review of its HR practices and compliance.
 
-Write 2 to 3 sentences that connect the two: what the organizational finding \
+Write exactly 2 or 3 sentences, and no more than 70 words in total, that \
+connect the two: what the organizational finding \
 means, and how the HR practices review adds to or sharpens that picture. \
 Speak to the reader directly, the way a trusted advisor would.
 
@@ -40,8 +42,23 @@ RULES
 than the gap counts you are given, and do not mention dollar figures.
 - Do not name any firm, service, product, or program.
 - Never use em dashes, en dashes used as dashes, double hyphens, or semicolons.
+- Length is strict: 2 or 3 sentences, 70 words at most. Stop after the third \
+sentence.
 - Output only the summary text. No heading, no quotation marks, no markdown.
 """
+
+
+_SENTENCE_END_RE = re.compile(r"(?<=[.!?])\s+(?=[A-Z])")
+MAX_SENTENCES = 3
+
+
+def _limit_sentences(text: str, limit: int = MAX_SENTENCES) -> str:
+    """Keep at most `limit` sentences. The prompt asks for 2-3, and this guard
+    guarantees the ceiling (a live run returned about 5). Splits only where a
+    sentence end is followed by a capitalized word, so decimals and "e.g."
+    mid-sentence are not treated as boundaries."""
+    sentences = [s.strip() for s in _SENTENCE_END_RE.split(text.strip()) if s.strip()]
+    return " ".join(sentences[:limit])
 
 
 def _build_exec_prompt(liability_condition_text: str, totals: dict) -> str:
@@ -71,13 +88,13 @@ def generate_executive_summary(
             client = _anthropic.Anthropic(max_retries=0)
         message = client.messages.create(
             model=model,
-            max_tokens=300,
+            max_tokens=200,
             thinking={"type": "disabled"},
             system=EXEC_SUMMARY_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": _build_exec_prompt(liability_condition_text, totals)}],
             timeout=timeout,
         )
-        text = _enforce_house_punctuation(message.content[0].text.strip())
+        text = _limit_sentences(_enforce_house_punctuation(message.content[0].text.strip()))
         if not text:
             return "", False, "empty response"
         return text, True, ""
