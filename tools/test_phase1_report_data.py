@@ -81,5 +81,81 @@ unauthored = [(k, o) for k, q in L.items() for o in q.answer_options if not o.ob
 check("unauthored answers never produce a triggering answer",
       _top_observation_texts("built_to_fail", [{"question_id": k, "option_ids": [o.option_id]} for k, o in unauthored], INTAKE, 5) == [])
 
+# ── 4. Asset evidence: baseline subtraction, zero floor, omission, signals ─────
+from engine.contract import _build_asset_evidence, _ASSET_BASELINE_QUESTION_IDS
+from engine.accumulation import AccumulationSession, accumulate_answer
+import re
+sever = {k for k in L if k.startswith("SEVER-")}
+check("baseline set = the fixed-value questions: 28 SEVER-* plus Q03B and Q03A-D-FOLLOW",
+      _ASSET_BASELINE_QUESTION_IDS - sever == {"Q03B", "Q03A-D-FOLLOW"}
+      and len(_ASSET_BASELINE_QUESTION_IDS & sever) == 28,
+      str(sorted(_ASSET_BASELINE_QUESTION_IDS - sever)))
+_vecs = lambda k: {tuple(o.dimensional_contributions.get(f, 0) for f in ["aptitude_asset", "authority_asset", "alliance_asset", "attitude_asset"])
+                   for o in L[k].answer_options}
+check("SEVER-* left out of the baseline either vary by answer (SEVER-05) or carry no asset signal (SEVER-30/31/32)",
+      all(len(_vecs(k)) > 1 or _vecs(k) == {(0, 0, 0, 0)} for k in sever - _ASSET_BASELINE_QUESTION_IDS))
+ZERO = {f: 0.0 for f in ["aptitude_liability", "aptitude_asset", "authority_liability", "authority_asset",
+                         "alliance_liability", "alliance_asset", "attitude_liability", "attitude_asset"]}
+base_log = [{"question_id": "Q03B", "option_ids": [L["Q03B"].answer_options[0].option_id]},
+            {"question_id": "SEVER-01", "option_ids": [L["SEVER-01"].answer_options[0].option_id]}]
+# Only baseline inflation present (0.25 x 2 per axis): everything nets to zero -> omitted
+v = dict(ZERO, aptitude_asset=0.5, authority_asset=0.5, alliance_asset=0.5, attitude_asset=0.5)
+check("all-zero net -> None (asset_evidence omitted)", _build_asset_evidence(v, base_log, INTAKE) is None)
+# Raw below the inflation floors at zero, never negative
+v = dict(ZERO, aptitude_asset=0.1, authority_asset=1.5, alliance_asset=0.5, attitude_asset=0.5)
+ev = _build_asset_evidence(v, base_log, INTAKE)
+check("net scores floor at 0.0 and subtract the replayed baseline exactly",
+      ev is not None and ev["net_scores"] == {"aptitude": 0.0, "authority": 1.0, "alliance": 0.0, "attitude": 0.0},
+      str(ev and ev["net_scores"]))
+check("strongest axis identified", ev is not None and ev["strongest_axes"] == ["authority"])
+v = dict(ZERO, authority_asset=1.0, attitude_asset=1.0)
+check("ties: every axis at the top net score is included",
+      _build_asset_evidence(v, [], INTAKE)["strongest_axes"] == ["authority", "attitude"])
+
+# Real answer paths over the live core sequence
+_src = open("web/lib/session-store.ts", encoding="utf-8").read().split("export const PHASE_1_QUESTION_SEQUENCE", 1)[1]
+seq = [q for q in re.findall(r'"([A-Z0-9-]+)"', _src[:_src.index("];")]) if q in L]
+AFS = ["aptitude_asset", "authority_asset", "alliance_asset", "attitude_asset"]
+def _path(pick):
+    log, sess = [], AccumulationSession()
+    for q in seq:
+        o = pick(L[q].answer_options, key=lambda o: sum(o.dimensional_contributions.get(f, 0) for f in AFS))
+        log.append({"question_id": q, "option_ids": [o.option_id]})
+        accumulate_answer(sess, o, INTAKE, q)
+    return sess.accumulated_vector, log
+vec, log = _path(max)
+ev = _build_asset_evidence(vec, log, INTAKE)
+obs = {o.observation_text for q in L.values() for o in q.answer_options if o.observation_text}
+check("strength path produces evidence", ev is not None and bool(ev["strongest_axes"]), str(ev))
+check("contributing signals are authored observation_text only",
+      all(sig["observation_text"] in obs for sig in ev["contributing_signals"]))
+check("contributing signals only support a strongest axis",
+      all(sig["axis"] in ev["strongest_axes"] for sig in ev["contributing_signals"]))
+check("contributing signals are deduplicated",
+      len({s["observation_text"] for s in ev["contributing_signals"]}) == len(ev["contributing_signals"]))
+vec, log = _path(min)
+ev_min = _build_asset_evidence(vec, log, INTAKE)
+check("weakest path: Q03B floor removed, little or no net evidence",
+      ev_min is None or max(ev_min["net_scores"].values()) <= 0.25, str(ev_min and ev_min["net_scores"]))
+
+# Through run_accumulated_engine/assemble_output: no key at all when net is zero
+import engine.main as _m
+class _NoSynth:
+    def __init__(self, *a, **k): pass
+    def synthesize(self, **k): return None
+_orig = _m.OutputSynthesisEngine
+_m.OutputSynthesisEngine = _NoSynth
+try:
+    out = _m.run_accumulated_engine(
+        dict(ZERO, authority_liability=3.0, attitude_liability=2.0),
+        {"headcount": 175, "industry": "Professional Services", "org_type": "Privately held professional leadership",
+         "jurisdictions": ["OH"], "significant_events": ["none"], "principal_role": "Owner / Founder"},
+        20, {}, [], base_log)
+finally:
+    _m.OutputSynthesisEngine = _orig
+check("assemble_output omits asset_evidence (no key) when all net scores are zero",
+      "asset_evidence" not in out["private_output"], str(out["private_output"].get("asset_evidence")))
+
+
 print(f"\nRESULT: {passed} passed, {failed} failed")
 sys.exit(1 if failed else 0)
