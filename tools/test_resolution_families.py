@@ -123,8 +123,8 @@ _COMPOUND_KEYS = [
 _all_expected_keys = _SINGLE_KEYS + _COMPOUND_KEYS
 
 check(
-    "RESOLUTION_FALLBACK_COPY has 19 entries (12 single + 7 compound)",
-    len(RESOLUTION_FALLBACK_COPY) == 19,
+    "RESOLUTION_FALLBACK_COPY has 21 entries (12 single + 9 compound)",
+    len(RESOLUTION_FALLBACK_COPY) == 21,
     f"got {len(RESOLUTION_FALLBACK_COPY)}",
 )
 for key in _all_expected_keys:

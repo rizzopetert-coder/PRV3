@@ -358,12 +358,12 @@ RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
     ),
     ("People Tactics & Strategy", "Entrenched"): (
         "The conditions producing this live in how your organization is designed, not in the people "
-        "navigating it. People Tactics & Strategy addresses that level directly — expert, targeted, and aimed "
+        "navigating it. People Tactics & Strategy addresses that level directly: expert, targeted, and aimed "
         "at the architecture rather than the symptoms."
     ),
     ("People Tactics & Strategy", "Endemic"): (
         "When a condition becomes the environment, adjusting what happens inside it is not enough. "
-        "People Tactics & Strategy is the structural redesign — expert work at the level where the problem actually lives."
+        "People Tactics & Strategy is the structural redesign: expert work at the level where the problem actually lives."
     ),
 
     # Training & Development — engine: Development
@@ -398,15 +398,15 @@ RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
     # Executive Advisory — engine: Executive Counsel
     ("Executive Advisory", "Emerging"): (
         "Yes, it is what it sounds like. A confidential relationship with someone who has no stake "
-        "in the outcome except getting it right — available before you need it urgently."
+        "in the outcome except getting it right, available before you need it urgently."
     ),
     ("Executive Advisory", "Entrenched"): (
-        "The honest read on your situation is not available inside the building. Executive Advisory is that read "
-        "— confidential, direct, and without the organizational politics attached to every word."
+        "The honest read on your situation is not available inside the building. Executive Advisory is that read"
+        ": confidential, direct, and without the organizational politics attached to every word."
     ),
     ("Executive Advisory", "Endemic"): (
         "When you are close enough to something long enough, you lose the ability to see it clearly. "
-        "Executive Advisory is the ongoing relationship that makes clarity possible — for the decisions that "
+        "Executive Advisory is the ongoing relationship that makes clarity possible: for the decisions that "
         "matter most and cannot be discussed with anyone inside the organization."
     ),
 
@@ -416,7 +416,7 @@ RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
         "People Tactics & Strategy addresses the architecture. First Call addresses the present."
     ),
     ("First Call + People Tactics & Strategy", None): (
-        "First Call handles what is active. People Tactics & Strategy follows — so what produced it does not reassemble."
+        "First Call handles what is active. People Tactics & Strategy follows, so what produced it does not reassemble."
     ),
     ("Executive Advisory + First Call", None): (
         "Executive Advisory provides the honest read on what the situation requires. First Call executes it."
@@ -430,12 +430,21 @@ RESOLUTION_FALLBACK_COPY: dict[tuple[str, str | None], str] = {
         "that keep recreating it."
     ),
     ("People Tactics & Strategy + Training & Development", None): (
-        "People Tactics & Strategy redesigns the environment. Training & Development follows — because capability built "
+        "People Tactics & Strategy redesigns the environment. Training & Development follows, because capability built "
         "inside a broken structure does not hold."
     ),
     ("Training & Development + First Call", None): (
         "First Call addresses what is live. Training & Development addresses what the organization needs to be "
         "able to do once it is through."
+    ),
+    # Pete-authored 2026-09-27: the two compounds that had no backup copy.
+    ("People Tactics & Strategy + Executive Advisory", None): (
+        "People Tactics & Strategy redesigns the structure behind this. Executive Advisory gives you a "
+        "confidential, outside read on leading through it."
+    ),
+    ("Executive Advisory + People Tactics & Strategy", None): (
+        "Executive Advisory gives you clarity on what leading through this actually requires. People Tactics & "
+        "Strategy addresses the structure underneath it."
     ),
 }
 

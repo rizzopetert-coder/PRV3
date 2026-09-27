@@ -470,5 +470,20 @@ check("exec summary guard does not split on decimals or a lowercase continuation
 check("exec summary prompt states the strict length",
       "exactly 2 or 3 sentences" in EXEC_SUMMARY_SYSTEM_PROMPT and "70 words" in EXEC_SUMMARY_SYSTEM_PROMPT)
 
+# ── 11. PR backup copy: every family authored, no em-dashes ─────────────────────
+from engine.resolution_families import RESOLUTION_FALLBACK_COPY, translate_resolution_family
+from engine.data.states import STATE_PROFILES as _SP2
+# Four single-service entries still carry " — " (not in the 2026-09-27 fix
+# list, flagged to Pete for copy). Any other em-dash is a regression.
+_DASH_KNOWN = {("Training & Development", "Emerging"), ("Training & Development", "Entrenched"),
+               ("First Call", "Emerging"), ("First Call", "Endemic")}
+check("no em-dash in RESOLUTION_FALLBACK_COPY beyond the 4 flagged entries",
+      {k for k, v in RESOLUTION_FALLBACK_COPY.items() if "\u2014" in v} <= _DASH_KNOWN,
+      str(sorted({k for k, v in RESOLUTION_FALLBACK_COPY.items() if "\u2014" in v} - _DASH_KNOWN)))
+_compounds = {translate_resolution_family(p.resolution_family) for p in _SP2.values() if " + " in p.resolution_family}
+check("every compound family in the taxonomy has authored PR backup copy",
+      all((c, None) in RESOLUTION_FALLBACK_COPY for c in _compounds),
+      str(sorted(c for c in _compounds if (c, None) not in RESOLUTION_FALLBACK_COPY)))
+
 print(f"\nRESULT: {passed} passed, {failed} failed")
 sys.exit(1 if failed else 0)
