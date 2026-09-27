@@ -39,12 +39,12 @@ function LockedConstellation() {
   return (
     <div className="max-w-70 mx-auto pb-4">
       <svg
-        className="w-full h-auto opacity-60"
+        className="w-full h-auto opacity-70"
         viewBox="0 0 600 600"
         role="img"
         aria-label="Locked diagnostic shape"
       >
-        <g stroke="#e5e7eb" strokeWidth="1" fill="none">
+        <g stroke="#9ca3af" strokeWidth="1" fill="none">
           <line
             x1={LIVE_CENTER.x}
             y1={LIVE_CENTER.y - LIVE_MAX_R}
