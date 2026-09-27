@@ -165,7 +165,7 @@ No session may assert as current fact something it cannot verify from its own en
 
 ### Engine Rules
 - All engine writes use Python patch scripts with dry-run verification
-- `engine/data/states.py` is the authoritative state registry — 57 states
+- `engine/data/states.py` is the authoritative state registry, 58 states
 - `engine/data/questions.py` holds the live question registry (`QUESTION_LIBRARY`, 141 entries as of 2026-09-27: the core Q-series and its follow-up chains, the SEVER-* severity follow-ons, and 40 hr-dx-only TC-* questions). It was empty only at the engine-scaffold stage (`c79179b`, MOB v1.4, 2026-05-03), when question content was still a separate deliverable, and has been populated since Session 9. Option `dimensional_contributions` are calibration values, so the data-first calibration rule below applies to them. The TC-* questions are zero-signal by design (no dimensional contributions, `state_targets=[]`), verified inert against the 175-profile calibration suite at `d384262`.
 - Do not adjust calibration target values speculatively — data-first calibration principle applies
 - No new state may be added to the taxonomy with a `dimensional_vector` or

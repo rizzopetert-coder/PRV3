@@ -1531,7 +1531,7 @@ Infrastructure carry-forwards, tracked only in Section 16 closeouts until now:
 - CLOSED 2026-09-26/27 -- `.claude/launch.json` now tracked (`7fbc77c`), Pete reversed the earlier keep-out call.
 - CLOSED 2026-09-26/27 -- `vercel-routing-migration` branch deleted locally and on origin (0 unmerged commits). Its leftover branch-scoped `ANTHROPIC_API_KEY` row on `prv3-engine` removed. Pete added a general Preview `ANTHROPIC_API_KEY` row (Sensitive, no branch restriction), verified by a tagged Preview session through `engine-preview` (`is_fallback: false`, Anthropic 200 on `/api/complete` in that deployment's logs).
 - `engine-preview` branch (new 2026-09-26/27, long-lived): exists so `prv3-engine` has a stable Preview alias for `prv-3`'s general Preview `ENGINE_BASE_URL`. It carries two empty build-trigger commits on top of `d60107c` (`fdf3d60`, `e8fa02e`), so refresh it by merging `main` into it and pushing, not by fast-forward. Do not delete it while the Preview row points at its alias.
-- Untracked `uv.lock` at the repo root (timestamped 2026-09-24 23:39), a byproduct of the `pyproject.toml` commits for `prv3-engine`. Never committed. Keep or remove is Pete's call.
+- CLOSED 2026-09-27 -- untracked `uv.lock` deleted (Pete-confirmed). Not load-bearing: never committed, so Vercel never saw it (its build log shows its own uv installing from `pyproject.toml`), uv is not installed locally, and nothing referenced it. Committing a lock file for pinned engine builds remains an option, not pursued.
 - Function Storage remediation not executed.
 - Dropbox Sign provisioning unconfirmed.
 - Next Quarterly Step-Back due **2026-10-03**.
