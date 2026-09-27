@@ -34,9 +34,15 @@ Two modes:
               resume URL instead of completing.
 
 Constraints:
-  - Preview only. --base-url must be an explicit Preview deployment URL;
-    the known stable Production alias (prv-3.vercel.app) is refused
-    outright, before any network call is made.
+  - Preview by default. Every known Production host (prv-3.vercel.app,
+    principalresolution.com, hr-dx.com, and their www. forms) is refused
+    before any network call unless --allow-production is passed. Every
+    request carries x-prv3-test-run: 1, so Production runs are recorded
+    with is_test=true in diagnostic-aggregate (web/lib/test-run.ts).
+  - Handles the narrative step (status "narrative") by posting
+    --narrative-text (default "": the route's deliberate skip).
+  - --brand hr_diagnostic sends x-debug-brand on Preview. In Production
+    brand comes from the host: use https://hr-dx.com.
   - Does not touch engine/question/weight content -- this only calls the
     existing live HTTP endpoints as a scripted user would.
   - No external Python dependencies -- uses urllib.request (stdlib) so
@@ -72,7 +78,14 @@ from engine.data.questions import QUESTION_LIBRARY
 from engine.data.states import STATE_PROFILES
 from tools.calibration_runner import best_option_for_state, _neutral_option
 
-PRODUCTION_HOST = "prv-3.vercel.app"
+# Every host that serves Production -- refused unless --allow-production.
+PRODUCTION_HOSTS = {
+    "prv-3.vercel.app",
+    "principalresolution.com",
+    "www.principalresolution.com",
+    "hr-dx.com",
+    "www.hr-dx.com",
+}
 
 TOTAL_CORE_QUESTIONS = 32  # web/lib/session-store.ts's PHASE_1_QUESTION_SEQUENCE.length
 
@@ -88,6 +101,11 @@ DEFAULT_INTAKE = {
     "tenure_in_role": "3-5 years",
     "direct_reports": "6-15",
     "jurisdiction": "CA",
+    # Both required by session/start's validateIntake() (the tool 400'd on
+    # every run without them). org_type must be one of engine/data/
+    # intake.py's INTAKE_FIELDS["org_type"] values.
+    "org_type": "Privately held professional leadership",
+    "significant_events": ["none"],
 }
 
 # Severity rank, low -> high. Matches the 3-tier SeverityTier vocabulary
@@ -165,9 +183,15 @@ def choose_option_id(question_id: str, target_state: str, target_severity: str) 
 
 
 class PreviewClient:
-    def __init__(self, base_url: str, bypass_secret: str | None):
+    def __init__(
+        self,
+        base_url: str,
+        bypass_secret: str | None,
+        extra_headers: dict | None = None,
+    ):
         self.base_url = base_url.rstrip("/")
         self.bypass_secret = bypass_secret
+        self.extra_headers = extra_headers or {}
 
     def post(self, path: str, body: dict) -> dict:
         url = f"{self.base_url}{path}"
@@ -176,11 +200,13 @@ class PreviewClient:
         # run (web/lib/test-run.ts) -- required for any Production run;
         # Preview sessions are tagged regardless.
         headers = {"Content-Type": "application/json", "Origin": self.base_url, "x-prv3-test-run": "1"}
+        headers.update(self.extra_headers)
         if self.bypass_secret:
             headers["x-vercel-protection-bypass"] = self.bypass_secret
         req = urllib.request.Request(url, data=data, headers=headers, method="POST")
         try:
-            with urllib.request.urlopen(req, timeout=30) as resp:
+            # 60s: the completing answer runs synthesis (~10s) plus engine work.
+            with urllib.request.urlopen(req, timeout=60) as resp:
                 raw = resp.read().decode("utf-8")
         except urllib.error.HTTPError as e:
             raw_err = e.read().decode("utf-8", errors="replace")
@@ -196,14 +222,19 @@ class PreviewClient:
             ) from e
 
 
-def _guard_not_production(base_url: str) -> None:
-    host = urlparse(base_url).netloc
-    if host == PRODUCTION_HOST:
-        raise SystemExit(
-            f"REFUSED: {base_url!r} is the known Production alias ({PRODUCTION_HOST}). "
-            "This tool is Preview-only -- pass an actual Preview deployment URL, "
-            "e.g. https://prv-3-xxxxx-peter-rizzos-projects.vercel.app"
-        )
+def _guard_not_production(base_url: str, allow_production: bool = False) -> bool:
+    """Returns True if base_url is a Production host (only when allowed)."""
+    host = urlparse(base_url).netloc.lower()
+    if host in PRODUCTION_HOSTS:
+        if not allow_production:
+            raise SystemExit(
+                f"REFUSED: {base_url!r} is a Production host. Pass --allow-production "
+                "for a deliberate Production smoke test (recorded as is_test=true), or "
+                "use a Preview deployment URL, e.g. "
+                "https://prv-3-xxxxx-peter-rizzos-projects.vercel.app"
+            )
+        return True
+    return False
 
 
 def drive_session(
@@ -212,6 +243,7 @@ def drive_session(
     target_severity: str,
     intake: dict,
     stop_before_question: int | None = None,
+    narrative_text: str = "",
 ) -> dict:
     """
     Drives session/start -> session/answer in a loop, following whatever
@@ -226,6 +258,7 @@ def drive_session(
     unaffected by how many spliced questions preceded it) and returns the
     session_id + next question info instead of completing.
     """
+    narrative_prompt = None
     start_resp = client.post("/api/diagnostic/session/start", intake)
     session_id = start_resp["session_id"]
     question = start_resp["question"]
@@ -253,8 +286,24 @@ def drive_session(
             {"session_id": session_id, "question_id": question_id, "option_ids": [option_id]},
         )
 
+        # Narrative step: the route returns {status: "narrative", prompt}
+        # instead of a question. Answer it via the narrative route, which
+        # returns either the next question or the completed result.
+        if answer_resp["status"] == "narrative":
+            narrative_prompt = answer_resp.get("prompt")
+            answer_resp = client.post(
+                "/api/diagnostic/session/narrative",
+                {"session_id": session_id, "narrative_text": narrative_text},
+            )
+
         if answer_resp["status"] == "complete":
-            return {"mode": "complete", "session_id": session_id, "result": answer_resp["result"]}
+            return {
+                "mode": "complete",
+                "session_id": session_id,
+                "result": answer_resp["result"],
+                "narrative_prompt": narrative_prompt,
+                "raw": answer_resp,
+            }
 
         question = answer_resp["question"]
         label = answer_resp["label"]
@@ -262,7 +311,7 @@ def drive_session(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="PRV3 diagnostic fast-forward tool -- Preview only, dev/test.",
+        description="PRV3 diagnostic fast-forward tool -- Preview by default, dev/test.",
     )
     parser.add_argument("mode", choices=["complete", "jump"])
     parser.add_argument(
@@ -279,9 +328,24 @@ def main():
         "--bypass-secret", default=os.environ.get("VERCEL_AUTOMATION_BYPASS_SECRET"),
         help="Deployment Protection bypass secret (defaults to VERCEL_AUTOMATION_BYPASS_SECRET env var)",
     )
+    parser.add_argument(
+        "--brand", choices=["principal_resolution", "hr_diagnostic"], default="principal_resolution",
+        help="Preview: sends x-debug-brand for hr_diagnostic. Production: brand comes from the host.",
+    )
+    parser.add_argument(
+        "--narrative-text", default="",
+        help="Answer to the narrative step, if it fires (default empty: deliberate skip)",
+    )
+    parser.add_argument(
+        "--allow-production", action="store_true",
+        help="Permit a Production host (smoke test; recorded with is_test=true)",
+    )
+    parser.add_argument("--json-out", default=None, help="Write the full completion response to this file")
     args = parser.parse_args()
 
-    _guard_not_production(args.base_url)
+    is_production = _guard_not_production(args.base_url, args.allow_production)
+    if is_production and args.brand == "hr_diagnostic" and "hr-dx.com" not in args.base_url:
+        raise SystemExit("In Production, hr_diagnostic comes from the host -- use https://hr-dx.com.")
 
     if args.state not in STATE_PROFILES:
         raise SystemExit(
@@ -294,7 +358,7 @@ def main():
         if not (1 <= args.question <= TOTAL_CORE_QUESTIONS):
             raise SystemExit(f"--question must be between 1 and {TOTAL_CORE_QUESTIONS}")
 
-    if not args.bypass_secret:
+    if not args.bypass_secret and not is_production:
         print(
             "WARNING: no bypass secret set -- this will fail if the target deployment "
             "has Deployment Protection enabled. Set VERCEL_AUTOMATION_BYPASS_SECRET or "
@@ -302,7 +366,10 @@ def main():
             file=sys.stderr,
         )
 
-    client = PreviewClient(args.base_url, args.bypass_secret)
+    extra_headers = {"x-debug-brand": "hr_diagnostic"} if args.brand == "hr_diagnostic" else {}
+    client = PreviewClient(
+        args.base_url, None if is_production else args.bypass_secret, extra_headers,
+    )
 
     print(
         f"Starting session against {args.base_url} -- "
@@ -316,6 +383,7 @@ def main():
         target_severity=args.severity,
         intake=DEFAULT_INTAKE,
         stop_before_question=args.question if args.mode == "jump" else None,
+        narrative_text=args.narrative_text,
     )
 
     if outcome["mode"] == "jump":
@@ -339,8 +407,27 @@ def main():
         f"weight={result['primary_state']['weight']:.3f}"
     )
 
-    preview_resp = client.post("/api/dev/diagnostic-preview", result)
-    print(f"\nView the completed report: {preview_resp['url']}")
+    synthesis = result.get("synthesis") or {}
+    print(f"session_id: {outcome['session_id']}  |  brand: {args.brand}  |  production: {is_production}")
+    print(f"Narrative question: {outcome.get('narrative_prompt') or '(narrative did not fire)'}")
+    print(f"resolution_family: {result.get('resolution_family')!r}")
+    print(f"resolution_routing: {result.get('resolution_routing')!r}")
+    print(f"synthesis.is_fallback: {synthesis.get('is_fallback')}")
+    print(f"headline: {synthesis.get('headline')}")
+    print(f"resolution_framing_text: {synthesis.get('resolution_framing_text')}")
+
+    if args.json_out:
+        Path(args.json_out).write_text(json.dumps(outcome["raw"], indent=2), encoding="utf-8")
+        print(f"Full response written to {args.json_out}")
+
+    # The dev-preview route exists only on Preview, and is walled off on
+    # hr_diagnostic -- request the viewable link only where it can work.
+    if not is_production and args.brand == "principal_resolution":
+        try:
+            preview_resp = client.post("/api/dev/diagnostic-preview", result)
+            print(f"\nView the completed report: {preview_resp['url']}")
+        except RuntimeError as e:
+            print(f"\n(dev preview link unavailable: {e})", file=sys.stderr)
 
 
 if __name__ == "__main__":
