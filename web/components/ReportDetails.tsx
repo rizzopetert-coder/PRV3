@@ -4,6 +4,8 @@ import type {
   AssetAxis,
   AssetEvidence,
   EvidenceReceipt,
+  FrictionTaxEstimate,
+  LegalTailRiskExposure,
   ServiceCostComparison,
   TacticalFinding,
   TacticalSectionResult,
@@ -54,16 +56,27 @@ export function EvidenceReceipts({ receipts }: { receipts?: EvidenceReceipt[] })
   );
 }
 
+function rangeText(low: number, high: number): string {
+  return low === high ? usd(low) : `${usd(low)} – ${usd(high)}`;
+}
+
+// The two inaction figures stay separate, each with its timeframe: the
+// friction tax is annual (payroll-based), legal exposure is one-time per
+// claim. Adding them would mix two kinds of number.
 export function CostComparison({
   comparison,
+  friction,
+  legal,
   fallbackServiceName,
 }: {
   comparison?: ServiceCostComparison;
+  friction: FrictionTaxEstimate | null;
+  legal: LegalTailRiskExposure | null;
   fallbackServiceName: string;
 }) {
-  if (!comparison || comparison.inaction_cost_low === null || comparison.inaction_cost_high === null) {
-    return null;
-  }
+  if (!comparison) return null;
+  const legalPriced = legal !== null && legal.low !== null && legal.high !== null;
+  if (!friction && !legalPriced) return null;
   const service = comparison.target_service_name || fallbackServiceName;
   const priced =
     comparison.service_estimate_low !== null && comparison.service_estimate_high !== null;
@@ -71,20 +84,26 @@ export function CostComparison({
     <div className="py-4">
       <p className="text-[11px] uppercase tracking-wide text-slate mb-3">Cost comparison</p>
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-md border border-gray-200 px-4 py-3">
-          <p className="text-[11px] text-slate mb-1">If these conditions go unaddressed</p>
-          <p className="text-sm font-medium text-charcoal">
-            {usd(comparison.inaction_cost_low)} – {usd(comparison.inaction_cost_high)}
-          </p>
-          <p className="text-[11px] text-slate mt-1">
-            Estimated friction tax and legal exposure combined.
-          </p>
+        <div className="rounded-md border border-gray-200 px-4 py-3 space-y-2">
+          <p className="text-[11px] text-slate">If these conditions go unaddressed</p>
+          {friction && (
+            <div>
+              <p className="text-sm font-medium text-charcoal">{rangeText(friction.low, friction.high)}</p>
+              <p className="text-[11px] text-slate">Friction tax, recurring every year</p>
+            </div>
+          )}
+          {legalPriced && (
+            <div>
+              <p className="text-sm font-medium text-charcoal">{rangeText(legal!.low!, legal!.high!)}</p>
+              <p className="text-[11px] text-slate">Legal exposure, one-time if a claim arises</p>
+            </div>
+          )}
         </div>
         <div className="rounded-md border border-gray-200 px-4 py-3">
           {service && <p className="text-[11px] text-slate mb-1">{service}</p>}
           {priced ? (
             <p className="text-sm font-medium text-charcoal">
-              {usd(comparison.service_estimate_low!)} – {usd(comparison.service_estimate_high!)}
+              {rangeText(comparison.service_estimate_low!, comparison.service_estimate_high!)}
             </p>
           ) : (
             <p className="text-sm font-medium text-charcoal">Ask for pricing</p>

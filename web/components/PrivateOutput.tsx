@@ -464,6 +464,8 @@ export default function PrivateOutput({
       {/* Phase 3: inaction cost beside the resolution service. */}
       <CostComparison
         comparison={payload.service_cost_comparison}
+        friction={payload.friction_tax_estimate}
+        legal={payload.legal_tail_risk_exposure}
         fallbackServiceName={payload.resolution_family}
       />
 
