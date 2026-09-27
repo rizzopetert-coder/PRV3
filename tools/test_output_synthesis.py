@@ -453,10 +453,21 @@ _compound_prompt = _build_synthesis_prompt(
     asset_score=0.1, liability_score=0.5, narrative_response="", intake={},
 )
 check(
-    "_build_synthesis_prompt: compound family rendered as prose, no literal '+'",
-    "resolution_family: People Tactics & Strategy and First Call" in _compound_prompt
+    "_build_synthesis_prompt: compound family rendered as singular-subject prose, no literal '+'",
+    "resolution_family: People Tactics & Strategy with First Call" in _compound_prompt
     and " + " not in _compound_prompt.split("resolution_family:")[1].splitlines()[0],
     _compound_prompt.split("resolution_family:")[1].splitlines()[0],
+)
+from engine.output_synthesis import _family_as_prose
+check(
+    "_family_as_prose: three-part compound keeps a singular head noun",
+    _family_as_prose("A + B + C") == "A with B and C",
+    _family_as_prose("A + B + C"),
+)
+check(
+    "_family_as_prose: single family unchanged",
+    _family_as_prose("First Call") == "First Call",
+    _family_as_prose("First Call"),
 )
 check(
     "_build_synthesis_prompt: includes narrative_response",

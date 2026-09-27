@@ -264,16 +264,20 @@ def format_event_for_synthesis(event_id: str, elaboration: str) -> Optional[str]
 def _family_as_prose(resolution_family: str) -> str:
     """
     Render a "+"-joined commercial compound as prose for the synthesis
-    prompt ("A + B" -> "A and B", "A + B + C" -> "A, B and C"). The
-    model echoes resolution_family verbatim, and a literal "+" read as
-    prose ("People Tactics & Strategy + First Call is built to...").
+    prompt ("A + B" -> "A with B", "A + B + C" -> "A with B and C").
+    The model echoes resolution_family verbatim as a sentence subject:
+    a literal "+" read as prose, and "A and B" is a plural subject the
+    model pairs with a singular verb ("...and First Call is built").
+    "with" keeps the head noun singular, so the echo stays grammatical.
     Prompt-only: the "+" form is still what get_fallback_synthesis()
     receives, so the compound backup-copy keys keep resolving.
     """
     parts = [p.strip() for p in resolution_family.split(" + ") if p.strip()]
     if len(parts) <= 1:
         return resolution_family
-    return ", ".join(parts[:-1]) + " and " + parts[-1]
+    if len(parts) == 2:
+        return f"{parts[0]} with {parts[1]}"
+    return f"{parts[0]} with " + ", ".join(parts[1:-1]) + " and " + parts[-1]
 
 
 def _build_synthesis_prompt(
