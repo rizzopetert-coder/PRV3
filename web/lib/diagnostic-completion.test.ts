@@ -101,7 +101,7 @@ describe("resolveTacticalResults", () => {
         return {
           question_id: "TC-HRPOL-01",
           question_text:
-            "When was your employee handbook last substantively revised -- not reformatted, actually reviewed against current law and current practice?",
+            "When was your employee handbook last substantively revised, meaning actually reviewed against current law and current practice, not just reformatted?",
           format: "forced_choice",
           options: [
             { option_id: "A", option_text: "Reviewed and revised within the past 12 months, against current law." },

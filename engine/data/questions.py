@@ -1680,7 +1680,7 @@ _QDATA = [
     # tactical-compliance-questions-schema-compliant.json.
     (
         "TC-HRPOL-01",
-        "When was your employee handbook last substantively revised -- not reformatted, actually reviewed against current law and current practice?",
+        "When was your employee handbook last substantively revised, meaning actually reviewed against current law and current practice, not just reformatted?",
         "forced_choice", None, "tactical",
         [
             ("A", "Reviewed and revised within the past 12 months, against current law.", False, None),
