@@ -482,5 +482,82 @@ check("every compound family in the taxonomy has authored PR backup copy",
       all((c, None) in RESOLUTION_FALLBACK_COPY for c in _compounds),
       str(sorted(c for c in _compounds if (c, None) not in RESOLUTION_FALLBACK_COPY)))
 
+# ── 12. Causation override: displayed pathway == synthesis family ───────────────
+import engine.contract as _ct
+from engine.contract import effective_resolution_family
+from engine.resolution_families import STATE_CAUSATION_OVERRIDES, translate_resolution_family as _tr
+_orig_ccp = _ct.compute_causation_pattern
+def _force_pattern(p):
+    _ct.compute_causation_pattern = lambda vec, routing: {"pattern": p, "dispersion": 0.0, "qualified_state_count": 1}
+_single_uninit = route_output([_qs("the_uninitiated", 0.9, 1)])
+try:
+    _force_pattern("diffuse")
+    check("helper: the_uninitiated + diffuse resolves to the override (Development)",
+          effective_resolution_family(_single_uninit, None, {}) == "Development")
+    _force_pattern("single_point")
+    check("helper: no override for a pattern the state doesn't list",
+          effective_resolution_family(_single_uninit, None, {}) == "Intervention")
+finally:
+    _ct.compute_causation_pattern = _orig_ccp
+
+# End to end: whatever the lead and pattern, Call 1's family == the displayed routing
+def _call1_family(out_calls):
+    p = next(c[1] for c in out_calls if c[0] == "call1")["messages"][0]["content"]
+    return p.split("resolution_family:")[1].splitlines()[0].strip()
+_checked = 0
+_fired = []  # (sid, pattern, vec) where the override changed the family
+for _pattern in ("diffuse", "single_point"):
+    for sid in STATE_CAUSATION_OVERRIDES:
+        vec_s = {f: float(getattr(_SP[sid].dimensional_vector, f)) * 3.0 for f in _SP[sid].dimensional_vector.__dataclass_fields__} \
+            if hasattr(_SP[sid].dimensional_vector, "__dataclass_fields__") else None
+        if vec_s is None:
+            continue
+        _force_pattern(_pattern)
+        try:
+            FAIL.clear(); CALLS.clear()
+            sys.modules["anthropic"] = _fake_mod
+            try:
+                _out = _m.run_accumulated_engine(vec_s, INTAKE_WIRE, 27, {}, [], [], brand="principal_resolution")
+            finally:
+                if _real_mod is not None: sys.modules["anthropic"] = _real_mod
+                else: sys.modules.pop("anthropic", None)
+        finally:
+            _ct.compute_causation_pattern = _orig_ccp
+        _routing = _out["private_output"]["resolution_routing"]
+        if not _routing or not any(c[0] == "call1" for c in CALLS):
+            continue
+        from engine.output_synthesis import _family_as_prose
+        if _call1_family(CALLS) != _family_as_prose(_tr(_routing)):
+            check(f"[{sid} / {_pattern}] Call 1 family matches the displayed pathway", False,
+                  f"call1={_call1_family(CALLS)!r} displayed={_tr(_routing)!r}")
+        _checked += 1
+        _lead = _SP[sid].resolution_family
+        if _routing != _lead and STATE_CAUSATION_OVERRIDES[sid].get(_pattern) == _routing:
+            _fired.append((sid, _pattern, vec_s))
+check(f"end to end: Call 1's family equals the displayed pathway for every override state and pattern ({_checked} runs)",
+      _checked > 0)
+check(f"end to end: the override actually re-routed some runs ({len(_fired)}), so the check has teeth",
+      len(_fired) > 0, str([(s, p) for s, p, _ in _fired]))
+# Fallback path uses the displayed family too, on a run where the override fired
+_fb_sid, _fb_pattern, _fb_vec = _fired[0]
+_force_pattern(_fb_pattern)
+try:
+    FAIL.clear(); FAIL.add("call1"); CALLS.clear()
+    sys.modules["anthropic"] = _fake_mod
+    try:
+        _fo = _m.run_accumulated_engine(_fb_vec, INTAKE_WIRE, 27, {}, [], [], brand="principal_resolution")
+    finally:
+        if _real_mod is not None: sys.modules["anthropic"] = _real_mod
+        else: sys.modules.pop("anthropic", None)
+finally:
+    _ct.compute_causation_pattern = _orig_ccp
+    FAIL.clear()
+from engine.data.fallback_synthesis import get_fallback_synthesis
+_disp = _tr(_fo["private_output"]["resolution_routing"])
+check(f"fallback path ({_fb_sid} / {_fb_pattern}): backup copy is the displayed (overridden) family's copy",
+      _fo["synthesis"]["is_fallback"] and
+      _fo["synthesis"]["resolution_framing_text"] == get_fallback_synthesis(_disp, _fo["severity"]["tier"])["resolution_framing_text"],
+      f"displayed={_disp!r}")
+
 print(f"\nRESULT: {passed} passed, {failed} failed")
 sys.exit(1 if failed else 0)

@@ -544,6 +544,29 @@ def lead_resolution_family(routing, private_block) -> str:
     return ""
 
 
+def effective_resolution_family(routing, private_block, accumulated_vector) -> str:
+    """
+    The result's resolution family exactly as the report displays it: the
+    lead state's family (lead_resolution_family) with the state's causation
+    override applied (apply_causation_override, keyed by the causation
+    pattern of accumulated_vector). The single source of truth for the
+    displayed pathway AND the synthesis family (Call 1, the backup copy, the
+    hr fallback key), so pathway and narrative always name the same service.
+    """
+    lead_id = (
+        routing.lead_state.state_id if routing is not None and routing.lead_state
+        else (routing.qualified_states[0].state_id
+              if routing is not None and routing.qualified_states else None)
+    )
+    pattern_obj = compute_causation_pattern(accumulated_vector or {}, routing)
+    pattern_type = pattern_obj.get("pattern") if isinstance(pattern_obj, dict) else None
+    return apply_causation_override(
+        state_id=lead_id,
+        default_family=lead_resolution_family(routing, private_block),
+        causation_pattern=pattern_type,
+    )
+
+
 # ── Phase 1 show-your-work: evidence receipts ──────────────────────────────
 #
 # EvidenceReceipt: {"category": str, "rationale": str, "triggering_answer"?: str}.
@@ -1057,13 +1080,10 @@ def assemble_output(
         if isinstance(causation_pattern_obj, dict)
         else None
     )
-    # Lead state's family in both routing modes (private.resolution_family
-    # is single-mode only), same source as run_condensed_engine().
-    default_routing_str = lead_resolution_family(routing, priv)
-    effective_resolution_routing = apply_causation_override(
-        state_id=lead_id,
-        default_family=default_routing_str,
-        causation_pattern=pattern_type,
+    # One definition shared with the synthesis call sites (engine/main.py),
+    # so the displayed pathway and the narrative name the same service.
+    effective_resolution_routing = effective_resolution_family(
+        routing, priv, session.accumulated_vector,
     )
 
     friction_tax_result = compute_friction_tax(

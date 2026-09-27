@@ -28,7 +28,7 @@ from engine.severity import SeverityEngine, SeverityInput
 from engine.output import OutputEngine
 from engine.contract import (
     SessionData, assemble_output, _compute_asset_score, _compute_liability_score,
-    lead_resolution_family,
+    effective_resolution_family,
 )
 from engine.checkpoint import (
     evaluate_checkpoint,
@@ -122,9 +122,10 @@ def run_engine(
             if lead_id in STATE_PROFILES
             else lead_id
         )
+        # Same family the displayed pathway uses (assemble_output() receives
+        # accumulated_vector={} on this path, passed identically here).
         commercial_family = translate_resolution_family(
-            output_package.private.resolution_family
-            if output_package.private else ""
+            effective_resolution_family(output_package.routing, output_package.private, {})
         )
         # Checkpoint 3: lead_id's own attributed tier, not the pooled
         # session-wide value. Path B never collects real severity inputs
@@ -943,9 +944,12 @@ def run_accumulated_engine(
             if lead_id in STATE_PROFILES
             else lead_id
         )
-        # Lead state's family in both routing modes (private.resolution_family
-        # is single-mode only), same source as run_condensed_engine().
-        engine_family = lead_resolution_family(output_package.routing, output_package.private)
+        # The family exactly as the report displays it (lead family plus the
+        # causation override), so Call 1, the backup copy, and the hr
+        # fallback key describe the same service the pathway names.
+        engine_family = effective_resolution_family(
+            output_package.routing, output_package.private, accumulated_vector,
+        )
         commercial_family = (
             hr_diagnostic_synthesis_family(engine_family)
             if brand == "hr_diagnostic"
