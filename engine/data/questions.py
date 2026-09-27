@@ -1389,10 +1389,10 @@ _QDATA = [
         " that matter at your organization?",
         "forced_choice", 51, "late",
         [
-            ("A", "It's based on role and relevance — the right people are in the room for the right reasons.", False, None),
+            ("A", "It's based on role and relevance: the right people are in the room for the right reasons.", False, None),
             ("B", "It leans toward a familiar group, but it's not rigid.", False, None),
-            ("C", "It's a consistent, recognizable group — and being outside it means being out of the real conversations.", False, None),
-            ("D", "It's the same small group every time, regardless of who's actually closest to the issue — and everyone else has stopped expecting to be included.", True, None),
+            ("C", "It's a consistent, recognizable group, and being outside it means being out of the real conversations.", False, None),
+            ("D", "It's the same small group every time, regardless of who's actually closest to the issue, and everyone else has stopped expecting to be included.", True, None),
         ],
         ["the_inner_circle"],
         True,
