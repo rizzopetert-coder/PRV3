@@ -69,6 +69,17 @@ function LockedConstellation() {
   );
 }
 
+// Above this, the count reads as noise for a 9-answer sample (real sessions
+// gave either 1-5 or 10-47 additional conditions), so the locked row says
+// "Several more" instead of a number. Pete-confirmed 2026-09-27.
+const LOCKED_COUNT_CAP = 3;
+
+function moreConditionsText(more: number): string | undefined {
+  if (more <= 0) return undefined;
+  if (more > LOCKED_COUNT_CAP) return "Several more conditions surfaced, unlock the full diagnostic";
+  return `${more} more condition${more === 1 ? "" : "s"} surfaced, unlock the full diagnostic`;
+}
+
 interface CondensedOutputProps {
   payload: CondensedOutputPayload;
 }
@@ -109,11 +120,7 @@ export default function CondensedOutput({ payload }: CondensedOutputProps) {
           },
         ]}
         intro={payload.headline || undefined}
-        lockedRow={
-          more > 0
-            ? `${more} more condition${more === 1 ? "" : "s"} surfaced, unlock the full diagnostic`
-            : undefined
-        }
+        lockedRow={moreConditionsText(more)}
       />
 
       <div style={{ height: 0, borderTop: "0.5px solid #e5e7eb" }} />
