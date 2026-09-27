@@ -1999,6 +1999,20 @@ def compute_friction_tax(
         "org_size_label": org_size,
         "severity_scalar": severity_scalar,
         "calibration_complete": True,
+        # Intermediate figures behind low/high (Phase 1 show-your-work),
+        # additive: nothing above changed, contract.py turns these into
+        # driving_factors receipts.
+        "components": {
+            "payroll_floor":                  payroll_floor,
+            "org_type_scalar":                org_type_scalar,
+            "adjusted_baseline":              adjusted_baseline,
+            "combined_criterion_scores":      dict(combined_criterion_scores),
+            "combined_multiplier":            combined_multiplier,
+            "breadth":                        breadth,
+            "multi_channel_severity_loading": multi_channel_severity_loading,
+            "severity_scalar":                severity_scalar,
+            "state_count":                    len(state_entries),
+        },
     }
 
 
@@ -4489,3 +4503,53 @@ def compute_legal_compliance_exposure(
         "has_uncollected_net_worth_caveat": has_uncollected_net_worth_caveat,
         "specific_caveat_jurisdiction": specific_caveat_jurisdiction,
     }
+
+
+def compute_legal_per_state_breakdown(
+    state_ids: list[str],
+    org_size: int,
+    industry: str,
+    org_type: str,
+    jurisdictions: Optional[list[str]] = None,
+) -> list[dict]:
+    """
+    The per-state figures behind compute_legal_compliance_exposure()'s
+    total (Phase 1 show-your-work). One entry per PRICED state:
+    {"state_id", "cluster", "low", "high", "weight"}. Priced by the same
+    _single_state_legal_pricing() call with the same inputs, and weighted
+    exactly as that function aggregates: N=1 -> 1.0, otherwise 0.5**i within
+    each cluster ranked by low (highest first, stable on ties like its own
+    sort), so sum(weight * low) == its returned low. Unpriced and
+    not-applicable states are excluded, same as the total.
+    """
+    headcount = org_size
+    jurisdictions = jurisdictions or []
+    org_size = resolve_headcount_bucket(org_size)
+    per_state_ranges: dict[str, tuple[float, float]] = {}
+    for sid in state_ids:
+        result = _single_state_legal_pricing(
+            sid, org_size, industry, org_type, headcount, jurisdictions
+        )
+        if result.status == LegalPricingStatus.PRICED:
+            per_state_ranges[sid] = result.dollar_range
+
+    if len(per_state_ranges) == 1:
+        (sid, (low, high)), = per_state_ranges.items()
+        return [{
+            "state_id": sid, "cluster": LEGAL_COMPLIANCE_CLUSTER[sid],
+            "low": round(low, 2), "high": round(high, 2), "weight": 1.0,
+        }]
+
+    breakdown: list[dict] = []
+    by_cluster_ids: dict[int, list[str]] = {}
+    for sid in per_state_ranges:
+        by_cluster_ids.setdefault(LEGAL_COMPLIANCE_CLUSTER[sid], []).append(sid)
+    for cluster, sids in by_cluster_ids.items():
+        ranked = sorted(sids, key=lambda s: per_state_ranges[s][0], reverse=True)
+        for i, sid in enumerate(ranked):
+            low, high = per_state_ranges[sid]
+            breakdown.append({
+                "state_id": sid, "cluster": cluster,
+                "low": round(low, 2), "high": round(high, 2), "weight": 0.5 ** i,
+            })
+    return breakdown
