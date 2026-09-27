@@ -1918,7 +1918,7 @@ Last updated: This session (Claude Code), 2026-09-26/27 (final closeout of the h
 
 | \\\*\\\*api/engine.py\\\*\\\* | FastAPI serverless endpoint, single app serving 4 routes. /api/engine (Path B, created S40): x-engine-secret shared-secret validation, KeyError→400 (unknown state ID), TypeError/ValueError→400 (bad intake), Exception→500. sys.path.insert adds repo root so engine package resolves. S71 (Stage 2/3) added /api/accumulate, /api/complete, /api/question-copy — the Path 1 (Path A) endpoints, all sharing the same secret check via a new _check_secret() extraction rather than duplicating the guard 4 times. |
 
-| \\\*\\\*requirements.txt\\\*\\\* | Python deps for Vercel serverless: fastapi, uvicorn, numpy, anthropic. anthropic added S44 — required by engine/output_synthesis.py; missing from S40 original caused synthesis to always fall back to static dict. Created S40. |
+| \\\*\\\*pyproject.toml\\\*\\\* | Python deps for the `prv3-engine` Vercel project (`[project].dependencies`): fastapi, uvicorn, numpy, anthropic, plus `[tool.vercel] entrypoint = "api.engine:app"`. Vercel's Python builder installs from it with its own uv. Created 2026-09-24 (`060327a`, full `[project]` table `8289ac7`). Replaced requirements.txt (created S40, anthropic added S44 because engine/output_synthesis.py needs it, its absence in S40 made synthesis always fall back to the static dict), which was deleted 2026-09-27. |
 
 | \\\*\\\*vercel.json\\\*\\\* | Dual-runtime routing. @vercel/next for web/package.json. @vercel/python for api/engine.py. Routes: /api/engine, /api/accumulate, /api/complete, /api/question-copy all → api/engine.py (S71, Stage 2/3 — no new Python serverless function, same build); /(.*) → /web/$1. Created S40. |
 

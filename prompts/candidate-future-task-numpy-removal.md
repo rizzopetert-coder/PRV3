@@ -7,6 +7,11 @@ satisfying both gates.
 ## What was found
 
 `requirements.txt` lists exactly four packages: `fastapi`, `uvicorn`, `numpy`, `anthropic`.
+
+> **Retargeted 2026-09-27:** the engine's dependencies now live in `pyproject.toml`'s
+> `[project].dependencies` (the same four packages), which is what Vercel's `prv3-engine` build
+> installs from. `requirements.txt` was deleted 2026-09-27. If this task is picked up, the file to
+> edit is `pyproject.toml`, not `requirements.txt`.
 `numpy` has exactly one import site in the entire codebase — `engine/accumulation.py:14`
 (`import numpy as np`) — confirmed via direct grep, not assumed.
 
@@ -36,7 +41,8 @@ equivalent. It does not mean "verified safe to ship" — see the gates below.
 
 ## Why this matters for Function Storage
 
-`numpy` is the single heaviest of the four `requirements.txt` packages by a wide margin
+`numpy` is the single heaviest of the four engine dependencies (then `requirements.txt`, now
+`pyproject.toml`) by a wide margin
 (compiled C extensions; a local-machine proxy measurement — not Vercel's own runtime,
 illustrative only — put a local install at 30.3 MB). It is bundled into `api/engine.py`'s
 deployed Python function on every single deployment, and per the 2026-09-19 investigation,
