@@ -429,5 +429,33 @@ check("friction receipts: more than one distinct triggering answer across 5 cond
       len({p for p in picked if p}) > 1, str(picked))
 
 
+# ── 9. Lead resolution family in both routing modes ─────────────────────────────
+from engine.contract import lead_resolution_family
+from engine.output import route_output, QualifiedState
+from engine.data.states import STATE_PROFILES as _SP
+def _qs(sid, score, rank):
+    return QualifiedState(rank=rank, state_id=sid, state_name=sid, score=score, noise_baseline=0.0, signal_floor=0.0,
+                          cleared_floor=True, score_lift_pct=0.0, resolution_family=_SP[sid].resolution_family)
+_multi = route_output([_qs("built_to_fail", 0.50, 1), _qs("the_uninitiated", 0.49, 2)])
+check("multi-state routing: family comes from the lead state, not empty",
+      _multi.mode == "multi" and lead_resolution_family(_multi, None) == _SP["built_to_fail"].resolution_family,
+      f"{_multi.mode} {lead_resolution_family(_multi, None)!r}")
+_single = route_output([_qs("built_to_fail", 0.9, 1)])
+check("single-state routing: unchanged (private block wins when set)",
+      lead_resolution_family(_single, type("P", (), {"resolution_family": "Roadmap"})()) == "Roadmap")
+check("nothing qualified: empty family", lead_resolution_family(route_output([]), None) == "")
+# End to end: the multi-state path vector now yields a non-empty routing
+_m.OutputSynthesisEngine = _NoSynth
+try:
+    _o = _m.run_accumulated_engine(vec_p, INTAKE_WIRE, 40, {}, [], log_p, brand="principal_resolution")
+finally:
+    _m.OutputSynthesisEngine = _orig
+check("run_accumulated_engine: multi-state result has a real resolution_routing",
+      _o["output_type"] != "multi_state" or _o["private_output"]["resolution_routing"] != "",
+      f"{_o['output_type']} {_o['private_output']['resolution_routing']!r}")
+check("service_cost_comparison names the service on a multi-state PR result",
+      _o["output_type"] != "multi_state" or _o["private_output"]["service_cost_comparison"]["target_service_name"] != "")
+
+
 print(f"\nRESULT: {passed} passed, {failed} failed")
 sys.exit(1 if failed else 0)

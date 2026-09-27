@@ -26,7 +26,10 @@ from engine.accumulation import (
 )
 from engine.severity import SeverityEngine, SeverityInput
 from engine.output import OutputEngine
-from engine.contract import SessionData, assemble_output, _compute_asset_score, _compute_liability_score
+from engine.contract import (
+    SessionData, assemble_output, _compute_asset_score, _compute_liability_score,
+    lead_resolution_family,
+)
 from engine.checkpoint import (
     evaluate_checkpoint,
     checkpoint_result_from_wire,
@@ -940,10 +943,9 @@ def run_accumulated_engine(
             if lead_id in STATE_PROFILES
             else lead_id
         )
-        engine_family = (
-            output_package.private.resolution_family
-            if output_package.private else ""
-        )
+        # Lead state's family in both routing modes (private.resolution_family
+        # is single-mode only), same source as run_condensed_engine().
+        engine_family = lead_resolution_family(output_package.routing, output_package.private)
         commercial_family = (
             hr_diagnostic_synthesis_family(engine_family)
             if brand == "hr_diagnostic"

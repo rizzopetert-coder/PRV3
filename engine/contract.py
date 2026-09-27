@@ -528,6 +528,22 @@ def _build_friction_tax_ledger(
     return ledger
 
 
+def lead_resolution_family(routing, private_block) -> str:
+    """
+    The result's resolution family in both routing modes. private.resolution_family
+    is only populated in single-state mode, so multi-state results (most real
+    results) fall back to the lead QualifiedState's family, the same source
+    run_condensed_engine() uses. "" only when nothing qualified.
+    """
+    if private_block is not None and private_block.resolution_family:
+        return private_block.resolution_family
+    if routing is not None and routing.lead_state is not None:
+        return routing.lead_state.resolution_family
+    if routing is not None and routing.qualified_states:
+        return routing.qualified_states[0].resolution_family
+    return ""
+
+
 # ── Phase 1 show-your-work: evidence receipts ──────────────────────────────
 #
 # EvidenceReceipt: {"category": str, "rationale": str, "triggering_answer"?: str}.
@@ -1041,7 +1057,9 @@ def assemble_output(
         if isinstance(causation_pattern_obj, dict)
         else None
     )
-    default_routing_str = priv.resolution_family if priv else ""
+    # Lead state's family in both routing modes (private.resolution_family
+    # is single-mode only), same source as run_condensed_engine().
+    default_routing_str = lead_resolution_family(routing, priv)
     effective_resolution_routing = apply_causation_override(
         state_id=lead_id,
         default_family=default_routing_str,
