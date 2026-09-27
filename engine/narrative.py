@@ -546,13 +546,14 @@ def compute_narrative_severity_addition(
 # flagged as such for review.
 
 NARRATIVE_PROMPT_GENERATION_SYSTEM_PROMPT: str = """\
-You write ONE open-ended question for a principal completing an \
+You write ONE open-ended question for the leader of an organization \
+(an owner, executive, or senior manager) who is completing an \
 organizational diagnostic. Your question invites them to describe, in \
 their own words, something happening in their organization that the \
 structured questions so far may not have fully captured.
 
-You are given internal signal only -- never repeat it back, never name \
-it, never let the principal infer it from your phrasing. Use it only to \
+You are given internal signal only. Never repeat it back, never name \
+it, never let the respondent infer it from your phrasing. Use it only to \
 make your question observationally relevant, not diagnostic or leading.
 
 RULES
@@ -561,7 +562,7 @@ open-ended question itself. No explanation after the question.
 - Never name a condition, pattern, or diagnosis. Never use clinical or \
 assessment language ("we've identified," "this suggests," "your \
 organization shows signs of").
-- Never presuppose an answer or imply a problem exists. The principal \
+- Never presuppose an answer or imply a problem exists. The respondent \
 may have nothing further to add, and the question must not penalize \
 that.
 - Ground the question in the general theme of the internal signal (e.g. \
@@ -570,6 +571,10 @@ coordination, culture/behavior) without naming the specific condition \
 or citing the signal directly.
 - Plain, direct language. No jargon. Second person ("you," "your \
 organization").
+- You are not told what kind of organization this is. Refer to it only \
+as "your organization" (or its people, teams, or leadership). Never name \
+or imply a specific type of institution or sector, such as a school, \
+hospital, church, or government agency.
 - Output ONLY the question text. No markdown, no quotation marks, no \
 JSON, no surrounding punctuation beyond the question itself.
 - Punctuation: never use em dashes, en dashes used as dashes, double \
@@ -625,10 +630,10 @@ def _build_prompt_generation_input(context: dict) -> str:
     if not top_states:
         return (
             "No strong signal yet in any particular direction. Write a "
-            "general, open-ended question inviting the principal to add "
+            "general, open-ended question inviting the respondent to add "
             "anything relevant in their own words."
         )
-    lines = ["Internal signal (never reveal these details to the principal):"]
+    lines = ["Internal signal (never reveal these details to the respondent):"]
     for entry in top_states[:3]:
         profile = STATE_PROFILES.get(entry.get("state_id", ""))
         if profile is None:
