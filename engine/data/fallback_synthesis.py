@@ -18,7 +18,8 @@ from __future__ import annotations
 from engine.resolution_families import (
     RESOLUTION_FALLBACK_COPY,
     _FALLBACK_GENERIC,
-    HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT,
+    HR_DIAGNOSTIC_FALLBACK_KEY_PREFIX,
+    hr_diagnostic_fallback_copy,
 )
 
 
@@ -70,9 +71,9 @@ def get_fallback_synthesis(
     checked first and resolve to the hr_diagnostic backup copy -- never
     to a PR-named entry.
     """
-    hr_copy = HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT.get(commercial_name)
-    if hr_copy is not None:
-        return _make_entry(hr_copy)
+    if commercial_name.startswith(HR_DIAGNOSTIC_FALLBACK_KEY_PREFIX):
+        hr_copy = hr_diagnostic_fallback_copy(commercial_name[len(HR_DIAGNOSTIC_FALLBACK_KEY_PREFIX):])
+        return _make_entry(hr_copy) if hr_copy else _FALLBACK_GENERIC_ENTRY
     if " + " in commercial_name:
         return FALLBACK_SYNTHESIS.get((commercial_name, None), _FALLBACK_GENERIC_ENTRY)
     return FALLBACK_SYNTHESIS.get((commercial_name, severity_tier), _FALLBACK_GENERIC_ENTRY)

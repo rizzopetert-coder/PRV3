@@ -10,6 +10,7 @@ import type {
 import {
   translateResolutionFamily,
   HR_DIAGNOSTIC_RESOLUTION_FAMILY,
+  hrPathwayForRouting,
 } from "@/lib/resolution-family";
 import { TACTICAL_QUESTION_META } from "@/data/tactical-question-meta";
 import { getTacticalReferrals } from "@/data/tactical-referrals";
@@ -189,6 +190,7 @@ export async function completeDiagnosticSession(
     resolution_routing: isHrDiagnostic
       ? (rawRouting ? HR_DIAGNOSTIC_RESOLUTION_FAMILY : "")
       : rawRouting,
+    ...(isHrDiagnostic ? { hr_pathway: hrPathwayForRouting(rawRouting) } : {}),
 
     friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
     friction_tax_ledger: engineResult.private_output.friction_tax_ledger,

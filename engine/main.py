@@ -39,6 +39,7 @@ from engine.output_synthesis import OutputSynthesisEngine, SynthesisResult
 from engine.resolution_families import (
     translate_resolution_family,
     hr_diagnostic_synthesis_family,
+    hr_diagnostic_fallback_key,
 )
 from engine.data.fallback_synthesis import get_fallback_synthesis
 from engine.narrative import (
@@ -952,6 +953,10 @@ def run_accumulated_engine(
             narrative_response=narrative_response,
             intake=intake,
             signal_map_context=signal_map_context,
+            fallback_key=(
+                hr_diagnostic_fallback_key(engine_family)
+                if brand == "hr_diagnostic" else None
+            ),
         )
 
     duration_band = next(

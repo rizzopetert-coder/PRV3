@@ -19,7 +19,7 @@
 // resolution_routing is never translated anywhere in the Python
 // pipeline) and is not touched by this file.
 
-import type { ResolutionFamily } from "@/lib/types";
+import type { HrPathway, ResolutionFamily } from "@/lib/types";
 
 // hr_diagnostic (hr-dx.com) display value for resolution_family and
 // resolution_routing -- every engine family and compound maps here, so
@@ -27,6 +27,29 @@ import type { ResolutionFamily } from "@/lib/types";
 // families.py's HR_DIAGNOSTIC_FAMILY_NAME; keep both in lockstep.
 // Server-side only (imported by route/lib code, never a client component).
 export const HR_DIAGNOSTIC_RESOLUTION_FAMILY: ResolutionFamily = "HR Consulting";
+
+// hr_diagnostic drawer pathway from the raw engine routing. Same compound
+// priority as the hr backup copy (engine/resolution_families.py
+// _HR_DIAGNOSTIC_SPECIALTY_PRIORITY): Intervention first, then the first
+// of Development / Executive Counsel in order, then the first part.
+// Unknown or empty routing -> undefined (drawer uses its generic text).
+const HR_PATHWAY_BY_ENGINE_FAMILY: Record<string, HrPathway> = {
+  Roadmap: "structure",
+  Development: "capability",
+  "Executive Counsel": "leadership",
+  Intervention: "urgent",
+};
+
+export function hrPathwayForRouting(engineFamilyStr: string): HrPathway | undefined {
+  const parts = engineFamilyStr
+    .split(" + ")
+    .map((p) => p.trim())
+    .filter((p) => p in HR_PATHWAY_BY_ENGINE_FAMILY);
+  if (parts.length === 0) return undefined;
+  if (parts.includes("Intervention")) return "urgent";
+  const specialty = parts.find((p) => p === "Development" || p === "Executive Counsel");
+  return HR_PATHWAY_BY_ENGINE_FAMILY[specialty ?? parts[0]];
+}
 
 // Commercial-name correction (this session): "People Tactics and Strategy"
 // -> "People Tactics & Strategy" (ampersand), "Intervention" -> "First Call".

@@ -344,6 +344,9 @@ def synthesize(
     model: str = "claude-sonnet-5",
     client=None,
     timeout: float = 15.0,
+    # Backup-copy lookup key when it must differ from the AI context string
+    # (hr_diagnostic: engine/resolution_families.hr_diagnostic_fallback_key).
+    fallback_key: str | None = None,
 ) -> SynthesisResult:
     """
     Call the LLM to generate six synthesis fields for a diagnostic result.
@@ -370,11 +373,12 @@ def synthesize(
     """
     if intake is None:
         intake = {}
+    fb_key = fallback_key or resolution_family
 
     try:
         import anthropic as _anthropic
     except ImportError:
-        fb = get_fallback_synthesis(resolution_family, severity_tier)
+        fb = get_fallback_synthesis(fb_key, severity_tier)
         return SynthesisResult(
             **fb,
             synthesis_confidence=0.0,
@@ -418,7 +422,7 @@ def synthesize(
         )
         response_text = message.content[0].text
     except Exception as e:
-        fb = get_fallback_synthesis(resolution_family, severity_tier)
+        fb = get_fallback_synthesis(fb_key, severity_tier)
         return SynthesisResult(
             **fb,
             synthesis_confidence=0.0,
@@ -426,7 +430,7 @@ def synthesize(
             is_fallback=True,
         )
 
-    return _parse_synthesis_response(response_text, resolution_family, severity_tier)
+    return _parse_synthesis_response(response_text, fb_key, severity_tier)
 
 
 # ── Engine class ───────────────────────────────────────────────────────────────
@@ -453,6 +457,7 @@ class OutputSynthesisEngine:
         intake: dict | None = None,
         signal_map_context: str = "",
         timeout: float = 15.0,
+        fallback_key: str | None = None,
     ) -> SynthesisResult:
         """Run synthesis and store result for downstream access."""
         self.result = synthesize(
@@ -467,5 +472,6 @@ class OutputSynthesisEngine:
             model=self.model,
             client=self._client,
             timeout=timeout,
+            fallback_key=fallback_key,
         )
         return self.result

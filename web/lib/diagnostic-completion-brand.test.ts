@@ -78,6 +78,18 @@ async function run(brand: DiagnosticSession["brand"], routing: string, withSynth
 describe("completeDiagnosticSession brand handling", () => {
   beforeEach(() => mockInvokeComplete.mockReset());
 
+  // Same compound priority as the hr backup copy: urgent first, then the
+  // first of capability/leadership, then structure.
+  const EXPECTED_PATHWAY: Record<string, string> = {
+    Roadmap: "structure",
+    Development: "capability",
+    Intervention: "urgent",
+    "Executive Counsel": "leadership",
+    "Intervention + Executive Counsel": "urgent",
+    "Roadmap + Intervention": "urgent",
+    "Development + Roadmap": "capability",
+  };
+
   const ROUTINGS = ["Roadmap", "Development", "Intervention", "Executive Counsel",
     "Intervention + Executive Counsel", "Roadmap + Intervention", "Development + Roadmap"];
 
@@ -88,8 +100,14 @@ describe("completeDiagnosticSession brand handling", () => {
       expect(result.resolution_routing).toBe("HR Consulting");
       const blob = `${result.resolution_family} ${result.resolution_routing}`;
       for (const t of PR_TERMS) expect(blob).not.toContain(t);
+      expect(result.hr_pathway).toBe(EXPECTED_PATHWAY[routing]);
     });
   }
+
+  it("principal_resolution payload carries no hr_pathway", async () => {
+    const result = await run("principal_resolution", "Intervention + Roadmap");
+    expect(result.hr_pathway).toBeUndefined();
+  });
 
   it("hr_diagnostic: empty routing stays empty (same as principal_resolution)", async () => {
     const result = await run("hr_diagnostic", "");

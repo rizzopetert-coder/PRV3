@@ -43,6 +43,9 @@ export type SingleResolutionFamily =
 
 export type ResolutionFamily = SingleResolutionFamily | (string & {});
 
+// hr_diagnostic drawer pathway -- neutral, never a PR tier name.
+export type HrPathway = "structure" | "capability" | "leadership" | "urgent";
+
 // ---------------------------------------------------------------------------
 // Shared interfaces
 // ---------------------------------------------------------------------------
@@ -360,6 +363,9 @@ export interface PrivateOutputPayload {
   // Layer 3 — resolution direction
   resolution_family: ResolutionFamily;
   resolution_routing: string; // human-readable routing description
+  // hr_diagnostic only: neutral pathway key for the "About this report"
+  // drawer (resolution_family is "HR Consulting" for every family there).
+  hr_pathway?: HrPathway;
 
   // Economic (nullable)
   friction_tax_estimate: FrictionTaxEstimate | null;

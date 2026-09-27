@@ -90,13 +90,20 @@ def translate_resolution_family(engine_family_str: str) -> str:
 
 HR_DIAGNOSTIC_FAMILY_NAME: str = "HR Consulting"
 
+# Service references carried into the AI synthesis context. Executive
+# Counsel's reference was dropped 2026-09-27 (Pete) -- it now reads plain
+# "HR Consulting", matching the drawer copy. Development keeps its own.
 HR_DIAGNOSTIC_FAMILY_REFERENCES: dict[str, str] = {
     "Development":       "Employee Training & Education and Learning & Development Consulting",
-    "Executive Counsel": "Employee Development, Coaching & Performance Management",
 }
 
 _HR_DIAGNOSTIC_URGENT_FAMILY = "Intervention"
 _HR_DIAGNOSTIC_KNOWN_FAMILIES = ("Roadmap", "Development", "Intervention", "Executive Counsel")
+# Compound priority for backup copy (and the web drawer's hr_pathway,
+# mirrored in web/lib/resolution-family.ts): Intervention first, then the
+# first of these in order, then the first part. Explicit -- not inferred
+# from which families carry a context reference.
+_HR_DIAGNOSTIC_SPECIALTY_PRIORITY = ("Development", "Executive Counsel")
 
 
 def _hr_parts(engine_family_str: str) -> list[str]:
@@ -174,34 +181,21 @@ def hr_diagnostic_fallback_copy(engine_family_str: str) -> str:
     if _HR_DIAGNOSTIC_URGENT_FAMILY in parts:
         return HR_DIAGNOSTIC_FALLBACK_COPY[_HR_DIAGNOSTIC_URGENT_FAMILY]
     for p in parts:
-        if p in HR_DIAGNOSTIC_FAMILY_REFERENCES:
+        if p in _HR_DIAGNOSTIC_SPECIALTY_PRIORITY:
             return HR_DIAGNOSTIC_FALLBACK_COPY[p]
     return HR_DIAGNOSTIC_FALLBACK_COPY[parts[0]]
 
 
-def _build_hr_fallback_by_context() -> dict[str, str]:
-    # Keyed by the exact context string synthesize() receives, so
-    # get_fallback_synthesis() can resolve it without a brand parameter.
-    # Every ordered combination of distinct known families (lengths 1-4),
-    # so any compound the taxonomy or a causation override produces is
-    # covered. Two engine strings can share a context string (e.g. Roadmap
-    # + Intervention / Intervention + Roadmap) -- asserted to map to the
-    # same copy, never silently overwritten.
-    from itertools import permutations
-    table: dict[str, str] = {}
-    for n in range(1, len(_HR_DIAGNOSTIC_KNOWN_FAMILIES) + 1):
-        for combo in permutations(_HR_DIAGNOSTIC_KNOWN_FAMILIES, n):
-            engine_str = " + ".join(combo)
-            ctx = hr_diagnostic_synthesis_family(engine_str)
-            copy = hr_diagnostic_fallback_copy(engine_str)
-            existing = table.get(ctx)
-            if existing is not None and existing != copy:
-                raise ValueError(f"hr_diagnostic fallback conflict for context {ctx!r}")
-            table[ctx] = copy
-    return table
+# Backup-copy lookup key for hr_diagnostic, passed to synthesize() as
+# fallback_key. Keyed by ENGINE family, not by the AI context string:
+# since 2026-09-27 different families share a context string (Roadmap and
+# Executive Counsel both read "HR Consulting") but keep distinct backup
+# copy. get_fallback_synthesis() resolves the prefix.
+HR_DIAGNOSTIC_FALLBACK_KEY_PREFIX = "hr_diagnostic::"
 
 
-HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT: dict[str, str] = _build_hr_fallback_by_context()
+def hr_diagnostic_fallback_key(engine_family_str: str) -> str:
+    return HR_DIAGNOSTIC_FALLBACK_KEY_PREFIX + engine_family_str
 
 
 # ── causation_pattern routing override ─────────────────────────────────────────

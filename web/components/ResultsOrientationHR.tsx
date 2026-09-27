@@ -2,25 +2,28 @@
 
 import ContextOrientation from "@/components/ContextOrientation";
 import { getResultsOrientation } from "@/data/orientation-copy";
-import type { SeverityTier } from "@/lib/types";
+import { RESULTS_PATHWAY_DETAIL_HR } from "@/data/results-pathway-detail-hr";
+import type { HrPathway, SeverityTier } from "@/lib/types";
 
-// hr_diagnostic "About this report" drawer -- no family-specific details
-// (those are keyed by PR tier name), so details falls back to
-// orientation-copy.ts's existing generic RESULTS_FAMILY_DETAIL_FALLBACK.
-// Loaded via next/dynamic from PrivateOutput.tsx only when brand is
-// hr_diagnostic.
+// hr_diagnostic "About this report" drawer. Details come from the neutral
+// hr_pathway (server-computed, no PR tier names); absent pathway (empty
+// routing) falls back to orientation-copy.ts's generic
+// RESULTS_FAMILY_DETAIL_FALLBACK. Loaded via next/dynamic from
+// PrivateOutput.tsx only when brand is hr_diagnostic.
 export default function ResultsOrientationHR({
   topic,
   severity,
+  pathway,
 }: {
   topic: string;
   severity: SeverityTier;
+  pathway?: HrPathway;
 }) {
   return (
     <ContextOrientation
       variant="inline"
       topic={topic}
-      {...getResultsOrientation(severity)}
+      {...getResultsOrientation(severity, pathway ? RESULTS_PATHWAY_DETAIL_HR[pathway] : undefined)}
     />
   );
 }

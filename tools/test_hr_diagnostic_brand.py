@@ -19,7 +19,7 @@ from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.data.fallback_synthesis import get_fallback_synthesis
 from engine.resolution_families import (
     hr_diagnostic_synthesis_family,
-    HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT,
+    hr_diagnostic_fallback_key,
     HR_DIAGNOSTIC_FALLBACK_COPY,
 )
 from engine.main import run_accumulated_engine
@@ -55,18 +55,28 @@ print("hr_diagnostic_synthesis_family -- four singles")
 expected = {
     "Roadmap": "HR Consulting",
     "Development": "HR Consulting, through Employee Training & Education and Learning & Development Consulting",
-    "Executive Counsel": "HR Consulting, through Employee Development, Coaching & Performance Management",
+    "Executive Counsel": "HR Consulting",
     "Intervention": "HR Consulting on an urgent basis",
 }
 for fam, want in expected.items():
     got = hr_diagnostic_synthesis_family(fam)
     check(f"{fam} -> {want!r}", got == want, f"got {got!r}")
 check("empty -> empty", hr_diagnostic_synthesis_family("") == "")
-check("urgency + reference combo reads as prose",
-      hr_diagnostic_synthesis_family("Executive Counsel + Intervention")
-      == "HR Consulting on an urgent basis, through Employee Development, Coaching & Performance Management")
+check("Executive Advisory + urgency reads as plain urgent HR Consulting",
+      hr_diagnostic_synthesis_family("Executive Counsel + Intervention") == "HR Consulting on an urgent basis")
+check("Training & Development + urgency keeps its reference",
+      hr_diagnostic_synthesis_family("Development + Intervention")
+      == "HR Consulting on an urgent basis, through Employee Training & Education and Learning & Development Consulting")
+check("Executive Advisory reference gone from every family context string",
+      all("Coaching & Performance Management" not in hr_diagnostic_synthesis_family(f)
+          for f in {p.resolution_family for p in STATE_PROFILES.values()}))
 check("old 'engaged immediately' cue gone from every context string",
-      all("engaged immediately" not in c for c in HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT))
+      all("engaged immediately" not in hr_diagnostic_synthesis_family(f)
+          for f in {p.resolution_family for p in STATE_PROFILES.values()}))
+check("shared context string, distinct backup copy (key is engine family)",
+      hr_diagnostic_synthesis_family("Roadmap") == hr_diagnostic_synthesis_family("Executive Counsel")
+      and get_fallback_synthesis(hr_diagnostic_fallback_key("Roadmap"), None)["resolution_framing_text"]
+      != get_fallback_synthesis(hr_diagnostic_fallback_key("Executive Counsel"), None)["resolution_framing_text"])
 check("unknown part dropped, never passed through",
       hr_diagnostic_synthesis_family("First Call") == "" and
       hr_diagnostic_synthesis_family("Roadmap + Groundwork") == "HR Consulting")
@@ -77,15 +87,17 @@ for fam in families:
     ctx = hr_diagnostic_synthesis_family(fam)
     check(f"context for {fam!r} starts 'HR Consulting', no PR terms",
           ctx.startswith("HR Consulting") and not pr_hits(ctx), ctx)
-    check(f"backup copy exists for {fam!r}", ctx in HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT)
+    check(f"backup copy exists for {fam!r}",
+          get_fallback_synthesis(hr_diagnostic_fallback_key(fam), None)["resolution_framing_text"]
+          in HR_DIAGNOSTIC_FALLBACK_COPY.values())
 
 print("hr_diagnostic backup copy -- content rules")
-for ctx, copy in HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT.items():
+for fam_key, copy in HR_DIAGNOSTIC_FALLBACK_COPY.items():
     ok = bool(copy) and not pr_hits(copy) and ";" not in copy and "\u2014" not in copy and "HR Consulting" in copy
-    check(f"backup copy for {ctx!r}: non-empty, no PR terms, no semicolon, no em-dash", ok, copy)
+    check(f"backup copy for {fam_key!r}: non-empty, no PR terms, no semicolon, no em-dash", ok, copy)
 check("four base entries", sorted(HR_DIAGNOSTIC_FALLBACK_COPY) == sorted(expected))
 check("urgency copy wins for any compound with Intervention",
-      get_fallback_synthesis(hr_diagnostic_synthesis_family("Executive Counsel + Intervention"), "Entrenched")["resolution_framing_text"]
+      get_fallback_synthesis(hr_diagnostic_fallback_key("Executive Counsel + Intervention"), "Entrenched")["resolution_framing_text"]
       == HR_DIAGNOSTIC_FALLBACK_COPY["Intervention"])
 
 # Exact approved wording (Pete, 2026-09-26) -- pinned so a wording
@@ -99,17 +111,17 @@ APPROVED_HR_BACKUP_COPY = {
 for fam, want in APPROVED_HR_BACKUP_COPY.items():
     check(f"backup copy for {fam} is the exact approved string", HR_DIAGNOSTIC_FALLBACK_COPY[fam] == want, HR_DIAGNOSTIC_FALLBACK_COPY[fam])
 check("Intervention compound backup renders the corrected First Call copy",
-      get_fallback_synthesis(hr_diagnostic_synthesis_family("Roadmap + Intervention"), "Endemic")["resolution_framing_text"]
+      get_fallback_synthesis(hr_diagnostic_fallback_key("Roadmap + Intervention"), "Endemic")["resolution_framing_text"]
       == APPROVED_HR_BACKUP_COPY["Intervention"])
 check("old First Call closing clause is gone from every backup entry",
       all("room to shape the outcome" not in c and "should not wait" not in c
-          for c in HR_DIAGNOSTIC_FALLBACK_BY_CONTEXT.values()))
+          for c in HR_DIAGNOSTIC_FALLBACK_COPY.values()))
 
 print("get_fallback_synthesis -- hr keys resolve hr copy, all tiers, all fields")
 for fam in families:
-    ctx = hr_diagnostic_synthesis_family(fam)
+    key = hr_diagnostic_fallback_key(fam)
     for tier in ("Emerging", "Entrenched", "Endemic", None):
-        fb = get_fallback_synthesis(ctx, tier)
+        fb = get_fallback_synthesis(key, tier)
         blob = " ".join(str(v) for v in fb.values())
         check(f"{fam} / {tier}: no PR terms", not pr_hits(blob), str(pr_hits(blob)))
 

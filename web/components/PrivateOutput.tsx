@@ -192,7 +192,11 @@ export default function PrivateOutput({
           result, one orientation), not per-block. */}
       <div className="mb-3">
         {brand === "hr_diagnostic" ? (
-          <ResultsOrientationHR topic="output-private" severity={payload.severity} />
+          <ResultsOrientationHR
+            topic="output-private"
+            severity={payload.severity}
+            pathway={payload.hr_pathway}
+          />
         ) : (
           <ResultsOrientationPR
             topic="output-private"
