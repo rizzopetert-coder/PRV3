@@ -128,3 +128,51 @@ describe("completeDiagnosticSession brand handling", () => {
     expect(result.resolution_routing).toBe("Intervention + Roadmap");
   });
 });
+
+// Phase 1 report redesign (2026-09-27): new engine fields pass through to the
+// client payload untouched, and asset_evidence stays absent (never {}) when
+// the engine omits it. Nothing renders these until Phase 3.
+describe("completeDiagnosticSession Phase 1 pass-through", () => {
+  beforeEach(() => mockInvokeComplete.mockReset());
+
+  it("engine without the new fields: absent or empty, never {}", async () => {
+    const result = await run("hr_diagnostic", "Intervention");
+    expect("asset_evidence" in result).toBe(false);
+    expect("service_cost_comparison" in result).toBe(false);
+    expect(result.tactical_findings).toEqual([]);
+    expect(result.all_qualified_states).toEqual([]);
+    expect(result.synthesis.executive_summary).toBe("");
+  });
+
+  it("engine with the new fields: passed through intact", async () => {
+    const base = engineResult("Intervention", true);
+    const extra = {
+      asset_evidence: {
+        strongest_axes: ["authority"],
+        contributing_signals: [{ axis: "authority", observation_text: "Decisions get made." }],
+        net_scores: { aptitude: 0, authority: 1, alliance: 0, attitude: 0 },
+      },
+      service_cost_comparison: {
+        target_service_name: "HR Consulting", inaction_cost_low: 10, inaction_cost_high: 14,
+        service_estimate_low: null, service_estimate_high: null, pricing_model_note: "",
+      },
+      tactical_findings: [{
+        section_id: "TC-HR_POLICIES", section_name: "HR Practices & Policies", flagged_count: 1,
+        total_count: 4, synthesis_text: "A gap.", flagged_items: [],
+      }],
+      all_qualified_states: [{ state_id: "built_to_fail", state_name: "Built to Fail", score: 0.9, descriptive_prose: "" }],
+    };
+    mockInvokeComplete.mockResolvedValueOnce({
+      ...base,
+      synthesis: { ...base.synthesis, executive_summary: "Summary." },
+      private_output: { ...base.private_output, ...extra },
+    });
+    const res = await completeDiagnosticSession(session("hr_diagnostic"));
+    const result = (await res.json()).result;
+    expect(result.asset_evidence).toEqual(extra.asset_evidence);
+    expect(result.service_cost_comparison).toEqual(extra.service_cost_comparison);
+    expect(result.tactical_findings).toEqual(extra.tactical_findings);
+    expect(result.all_qualified_states).toEqual(extra.all_qualified_states);
+    expect(result.synthesis.executive_summary).toBe("Summary.");
+  });
+});

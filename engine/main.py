@@ -36,6 +36,10 @@ from engine.data.states import STATE_PROFILES, DIMENSIONAL_FIELDS
 from engine.data.questions import QUESTION_LIBRARY
 from engine.data.salience import SALIENCE_PROFILES
 from engine.output_synthesis import OutputSynthesisEngine, SynthesisResult
+from engine.tactical_synthesis import build_tactical_summary, synthesize_tactical, tactical_totals
+from engine.exec_summary import generate_executive_summary
+from concurrent.futures import ThreadPoolExecutor
+import time
 from engine.resolution_families import (
     translate_resolution_family,
     hr_diagnostic_synthesis_family,
@@ -913,6 +917,20 @@ def run_accumulated_engine(
     output_engine.set_noise_baseline()
     output_package = output_engine.build(final_rankings, severity_result)
 
+    # Phase 1 Step A: Call 2 (tactical synthesis) runs in a worker thread
+    # concurrently with Call 1 below. It gets ONLY the deterministic
+    # TC-* pre-aggregation, and Call 1 gets no tactical data at all.
+    tactical_summary = build_tactical_summary(answers_log or [])
+    _phase1_t0 = time.monotonic()
+
+    def _timed_call_2():
+        _t = time.monotonic()
+        _findings, _ok, _err = synthesize_tactical(tactical_summary)
+        return _findings, _ok, _err, time.monotonic() - _t
+
+    _call_2_pool = ThreadPoolExecutor(max_workers=1)
+    _call_2_future = _call_2_pool.submit(_timed_call_2) if tactical_summary else None
+
     synthesis_result = None
     if final_rankings:
         lead_id = final_rankings[0].state_id
@@ -958,6 +976,31 @@ def run_accumulated_engine(
                 if brand == "hr_diagnostic" else None
             ),
         )
+    _call_1_s = time.monotonic() - _phase1_t0
+
+    tactical_findings, tactical_ok, tactical_err, _call_2_s = [], False, "not run", 0.0
+    if _call_2_future is not None:
+        tactical_findings, tactical_ok, tactical_err, _call_2_s = _call_2_future.result()
+    _call_2_pool.shutdown(wait=False)
+
+    # Phase 1 Step B: Call 3 (executive summary), sequential, only when
+    # Call 1 produced real synthesis and Call 2 succeeded.
+    executive_summary, exec_ok, exec_err, _call_3_s = "", False, "skipped", 0.0
+    if synthesis_result is not None and not synthesis_result.is_fallback and tactical_ok:
+        _t = time.monotonic()
+        executive_summary, exec_ok, exec_err = generate_executive_summary(
+            synthesis_result.liability_condition_text, tactical_totals(tactical_summary),
+        )
+        _call_3_s = time.monotonic() - _t
+    if synthesis_result is not None:
+        synthesis_result.executive_summary = executive_summary
+    print(
+        f"[PHASE1] brand={brand} call1={_call_1_s:.1f}s "
+        f"call1_fallback={synthesis_result.is_fallback if synthesis_result else None} "
+        f"call2={_call_2_s:.1f}s ok={tactical_ok} ({tactical_err or '-'}) "
+        f"call3={_call_3_s:.1f}s ok={exec_ok} ({exec_err or '-'})",
+        flush=True,
+    )
 
     duration_band = next(
         (si.get("duration_band") for si in (severity_inputs or []) if si.get("duration_band")),
@@ -1005,7 +1048,7 @@ def run_accumulated_engine(
 
     return assemble_output(
         session_data, synthesis_result=synthesis_result, trajectory_result=trajectory_result,
-        answers_log=answers_log,
+        answers_log=answers_log, brand=brand, tactical_findings=tactical_findings,
     )
 
 

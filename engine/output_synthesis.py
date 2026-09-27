@@ -154,6 +154,10 @@ class SynthesisResult:
     raw_response:                 str  = ""
     parse_error:                  str  = ""
     is_fallback:                  bool = False
+    # Phase 1 Call 3 (engine/exec_summary.py), set by
+    # run_accumulated_engine() after this call returns. Never produced
+    # by this module's own LLM call or its fallback.
+    executive_summary:            str  = ""
 
 
 # ── Parse ──────────────────────────────────────────────────────────────────────

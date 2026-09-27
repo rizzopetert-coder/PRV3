@@ -1,5 +1,6 @@
 import type {
   PrivateIntakeEcho, FrictionTaxEstimate, FrictionTaxLedgerEntry, LegalTailRiskExposure,
+  AssetEvidence, ServiceCostComparison, TacticalFinding, QualifiedStateEntry,
 } from "@/lib/types";
 import type { AccumulatedVector, AnswerLogEntry } from "@/lib/session-store";
 import type { Brand } from "@/lib/brand";
@@ -162,6 +163,11 @@ export interface EngineResult {
       time_to_consequence: "Acute" | "Medium-Term" | "Attritional" | null;
       response_window: "Extended" | "Near-Term" | "Immediate" | null;
     };
+    // Phase 1 report redesign (engine/contract.py).
+    asset_evidence?: AssetEvidence;
+    service_cost_comparison?: ServiceCostComparison;
+    tactical_findings?: TacticalFinding[];
+    all_qualified_states?: QualifiedStateEntry[];
   };
   shareable_output: {
     attribution_text: string;
@@ -178,6 +184,8 @@ export interface EngineResult {
     // Present when is_fallback -- the swallowed error detail (API error,
     // parse failure). Logged, never forwarded to the client payload.
     parse_error?:                 string | null;
+    // Phase 1 Call 3 (engine/exec_summary.py).
+    executive_summary?:           string;
   } | null;
   engine_version: string;
   monitoring_metadata: Record<string, unknown>;

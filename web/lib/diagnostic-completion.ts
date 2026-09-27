@@ -156,6 +156,7 @@ export async function completeDiagnosticSession(
         headline:                     engSynthesis.headline,
         synthesis_confidence:         engSynthesis.synthesis_confidence,
         is_fallback:                  engSynthesis.is_fallback,
+        executive_summary:            engSynthesis.executive_summary ?? "",
       }
     : {
         liability_condition_text:     "",
@@ -166,6 +167,7 @@ export async function completeDiagnosticSession(
         headline:                     "",
         synthesis_confidence:         0.0,
         is_fallback:                  true,
+        executive_summary:            "",
       };
 
   const isHrDiagnostic = session.brand === "hr_diagnostic";
@@ -205,6 +207,17 @@ export async function completeDiagnosticSession(
 
     dimension_summary: engineResult.dimension_summary,
     primary_asset_domain: engineResult.asset_score.primary_asset_domain,
+
+    // Phase 1 report redesign: passed through, not rendered until Phase 3.
+    // asset_evidence stays absent (not {}) when the engine omits it.
+    ...(engineResult.private_output.asset_evidence
+      ? { asset_evidence: engineResult.private_output.asset_evidence }
+      : {}),
+    ...(engineResult.private_output.service_cost_comparison
+      ? { service_cost_comparison: engineResult.private_output.service_cost_comparison }
+      : {}),
+    tactical_findings: engineResult.private_output.tactical_findings ?? [],
+    all_qualified_states: engineResult.private_output.all_qualified_states ?? [],
   };
 
   // Transition Rule — strips identifiable data the moment status becomes

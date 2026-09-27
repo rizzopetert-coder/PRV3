@@ -29,8 +29,13 @@ from engine.accumulation import (
 from engine.checkpoint import CheckpointResult
 from engine.narrative import NarrativeExtractionResult
 from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
-from engine.friction_tax import compute_friction_tax, compute_legal_compliance_exposure
-from engine.resolution_families import apply_causation_override
+from engine.friction_tax import (
+    compute_friction_tax, compute_legal_compliance_exposure,
+    compute_legal_per_state_breakdown, STATE_MULTIPLIERS,
+)
+from engine.resolution_families import (
+    apply_causation_override, translate_resolution_family, HR_DIAGNOSTIC_FAMILY_NAME,
+)
 
 # Addendum 11 -- caveat text for legal_tail_risk_exposure (private_output only).
 LEGAL_TAIL_RISK_CAVEAT_TEXT = (
@@ -523,8 +528,284 @@ def _build_friction_tax_ledger(
     return ledger
 
 
+# ── Phase 1 show-your-work: evidence receipts ──────────────────────────────
+#
+# EvidenceReceipt: {"category": str, "rationale": str, "triggering_answer"?: str}.
+# triggering_answer is included ONLY when an authored observation_text
+# exists for the condition. It is never padded with raw option_text.
+
+_LEGAL_CLUSTER_LABELS = {
+    1: "Individual employment claims",
+    2: "Class or systemic discrimination",
+    3: "Wage and hour",
+    4: "Whistleblower and retaliation",
+    5: "Workplace safety and regulatory",
+}
+
+_FRICTION_CHANNEL_LABELS = {
+    "turnover":         "turnover",
+    "productivity":     "lost productivity",
+    "decision_quality": "weaker decisions",
+}
+
+
+def _usd(value: float) -> str:
+    return f"${value:,.0f}"
+
+
+def _join_words(items: list) -> str:
+    if len(items) <= 1:
+        return "".join(items)
+    if len(items) == 2:
+        return f"{items[0]} and {items[1]}"
+    return ", ".join(items[:-1]) + f", and {items[-1]}"
+
+
+def _top_observation_texts(
+    state_id: str, answers_log: list, intake_data, limit: int = 1,
+) -> list:
+    """
+    The respondent's own answers most relevant to state_id, as authored
+    observation_text only. Same replay-and-rank technique as
+    _build_friction_tax_ledger() (a scratch AccumulationSession per
+    selected option, salience-weighted against SALIENCE_PROFILES), kept
+    separate rather than refactoring the ledger. Unauthored options are
+    skipped, never replaced with raw option_text.
+    """
+    salience = SALIENCE_PROFILES.get(state_id)
+    if not salience or not answers_log:
+        return []
+    scored: list = []
+    for entry in answers_log:
+        if not isinstance(entry, dict):
+            continue
+        question = QUESTION_LIBRARY.get(entry.get("question_id"))
+        option_ids = entry.get("option_ids")
+        if question is None or not isinstance(option_ids, list):
+            continue
+        for option_id in option_ids:
+            option = next((o for o in question.answer_options if o.option_id == option_id), None)
+            if option is None or not option.observation_text:
+                continue
+            scratch = AccumulationSession()
+            accumulate_answer(scratch, option, intake_data, entry.get("question_id"))
+            weight = sum(
+                scratch.accumulated_vector.get(f, 0.0) * salience.get(f, 0.0)
+                for f in DIMENSIONAL_FIELDS
+            )
+            if weight > 0:
+                scored.append((weight, option.observation_text))
+    scored.sort(key=lambda pair: pair[0], reverse=True)
+    texts: list = []
+    for _, text in scored:
+        if text not in texts:
+            texts.append(text)
+        if len(texts) == limit:
+            break
+    return texts
+
+
+def _receipt(category: str, rationale: str, triggering_answer: Optional[str] = None) -> dict:
+    receipt = {"category": category, "rationale": rationale}
+    if triggering_answer:
+        receipt["triggering_answer"] = triggering_answer
+    return receipt
+
+
+def _friction_driving_factors(
+    friction_result: dict, identified_states: list, severity_tier: str,
+    intake_data, answers_log: list,
+) -> list:
+    """The friction tax math, step by step, from compute_friction_tax()'s
+    own intermediate figures. [] when uncalibrated."""
+    c = friction_result.get("components")
+    if not friction_result.get("calibration_complete") or not c:
+        return []
+    if c["org_type_scalar"] == 1.0:
+        org_type_text = f"No adjustment for {intake_data.org_type} organizations."
+    else:
+        org_type_text = (
+            f"Adjusted by a factor of {c['org_type_scalar']:.2f} for {intake_data.org_type} "
+            f"organizations, giving a baseline of {_usd(c['adjusted_baseline'])}."
+        )
+    receipts = [
+        _receipt(
+            "Payroll baseline",
+            f"Estimated annual payroll for a {friction_result['org_size_label']} person "
+            f"{intake_data.industry} organization: {_usd(c['payroll_floor'])}.",
+        ),
+        _receipt("Organization type", org_type_text),
+    ]
+    for s in identified_states:
+        entry = STATE_MULTIPLIERS.get(s["state_id"])
+        if entry is None:
+            continue
+        channels = [
+            label for key, label in _FRICTION_CHANNEL_LABELS.items()
+            if entry.criteria[key].score > 0
+        ]
+        if not channels:
+            continue
+        observed = _top_observation_texts(s["state_id"], answers_log, intake_data)
+        receipts.append(_receipt(
+            "Condition",
+            f"{s['state_name']} adds cost through {_join_words(channels)}.",
+            observed[0] if observed else None,
+        ))
+    share = (
+        f"Together these conditions put {c['combined_multiplier']:.1%} of that baseline at risk"
+    )
+    if c["multi_channel_severity_loading"] > 1.0:
+        share += (
+            f", raised by a factor of {c['multi_channel_severity_loading']:.2f} because "
+            f"the cost spreads across {c['breadth']} channels"
+        )
+    receipts.append(_receipt("Share of payroll at risk", share + "."))
+    receipts.append(_receipt(
+        "Severity",
+        f"Multiplied by {c['severity_scalar']:.2f} for {severity_tier} severity.",
+    ))
+    receipts.append(_receipt(
+        "Estimate",
+        f"Low estimate {_usd(friction_result['low'])}. The high estimate is 1.4 times "
+        f"the low, {_usd(friction_result['high'])}.",
+    ))
+    return receipts
+
+
+def _legal_driving_factors(
+    breakdown: list, identified_states: list, intake_data, answers_log: list,
+) -> list:
+    """One receipt per priced condition from
+    compute_legal_per_state_breakdown(), plus how they combine. [] when
+    nothing was priced."""
+    if not breakdown:
+        return []
+    names = {s["state_id"]: s["state_name"] for s in identified_states}
+    receipts = []
+    for b in breakdown:
+        name = names.get(b["state_id"], b["state_id"])
+        amount = (
+            _usd(b["low"]) if b["low"] == b["high"]
+            else f"{_usd(b['low'])} to {_usd(b['high'])}"
+        )
+        rationale = f"{name}: {amount}"
+        if b["weight"] < 1.0:
+            rationale += (
+                f", counted at {b['weight']:.0%} because a larger exposure in the "
+                "same category is already included"
+            )
+        observed = _top_observation_texts(b["state_id"], answers_log, intake_data)
+        receipts.append(_receipt(
+            _LEGAL_CLUSTER_LABELS.get(b["cluster"], "Legal exposure"),
+            rationale + ".",
+            observed[0] if observed else None,
+        ))
+    if len(breakdown) > 1:
+        receipts.append(_receipt(
+            "Total",
+            "Within a category, overlapping exposures count at decreasing weight "
+            "(full, half, then a quarter). Categories are then added together.",
+        ))
+    return receipts
+
+
+# ── Phase 1 asset evidence ──────────────────────────────────────────────────
+
+_ASSET_FIELDS = ("aptitude_asset", "authority_asset", "alliance_asset", "attitude_asset")
+
+
+def _derive_asset_baseline_question_ids() -> frozenset:
+    """Questions whose options all carry the same nonzero asset values, so
+    answering them adds asset signal whatever the answer (the question
+    library's placeholder seeding). Derived, not hardcoded."""
+    ids = set()
+    for qid, q in QUESTION_LIBRARY.items():
+        vectors = {
+            tuple(round(o.dimensional_contributions.get(f, 0.0), 6) for f in _ASSET_FIELDS)
+            for o in q.answer_options
+        }
+        if len(vectors) == 1 and any(next(iter(vectors))):
+            ids.add(qid)
+    return frozenset(ids)
+
+
+_ASSET_BASELINE_QUESTION_IDS = _derive_asset_baseline_question_ids()
+
+
+def _answer_dependent(question, field: str) -> bool:
+    """True when the question's options actually differ on this field."""
+    return len({round(o.dimensional_contributions.get(field, 0.0), 6) for o in question.answer_options}) > 1
+
+
+def _selected_options(entry):
+    if not isinstance(entry, dict):
+        return None, []
+    question = QUESTION_LIBRARY.get(entry.get("question_id"))
+    option_ids = entry.get("option_ids")
+    if question is None or not isinstance(option_ids, list):
+        return None, []
+    return question, [o for o in question.answer_options if o.option_id in option_ids]
+
+
+def _build_asset_evidence(accumulated_vector: dict, answers_log: list, intake_data) -> Optional[dict]:
+    """
+    Where this respondent's own answers show strength. None (key omitted)
+    when every net asset score is 0.0. See tools/patch_phase1_asset_evidence.py
+    for the full rule set.
+    """
+    baseline = AccumulationSession()
+    for entry in answers_log or []:
+        if not isinstance(entry, dict) or entry.get("question_id") not in _ASSET_BASELINE_QUESTION_IDS:
+            continue
+        _, options = _selected_options(entry)
+        for option in options:
+            accumulate_answer(baseline, option, intake_data, entry.get("question_id"))
+
+    net = {
+        f: max(0.0, accumulated_vector.get(f, 0.0) - baseline.accumulated_vector.get(f, 0.0))
+        for f in _ASSET_FIELDS
+    }
+    top = max(net.values())
+    if top <= 1e-9:
+        return None
+    leading = [f for f in _ASSET_FIELDS if abs(net[f] - top) <= 1e-9]
+
+    scored: list = []
+    for entry in answers_log or []:
+        question_id = entry.get("question_id") if isinstance(entry, dict) else None
+        if not question_id or question_id.startswith("TC-") or question_id in _ASSET_BASELINE_QUESTION_IDS:
+            continue
+        question, options = _selected_options(entry)
+        for option in options:
+            if not option.observation_text:
+                continue
+            scratch = AccumulationSession()
+            accumulate_answer(scratch, option, intake_data, question_id)
+            for f in leading:
+                amount = scratch.accumulated_vector.get(f, 0.0)
+                if amount > 0 and _answer_dependent(question, f):
+                    scored.append((amount, f, option.observation_text))
+
+    scored.sort(key=lambda item: item[0], reverse=True)
+    signals: list = []
+    seen: set = set()
+    for _, f, text in scored:
+        if text in seen:
+            continue
+        seen.add(text)
+        signals.append({"axis": f.replace("_asset", ""), "observation_text": text})
+
+    return {
+        "strongest_axes": [f.replace("_asset", "") for f in leading],
+        "contributing_signals": signals,
+        "net_scores": {f.replace("_asset", ""): round(net[f], 4) for f in _ASSET_FIELDS},
+    }
+
+
 def assemble_output(
     session: SessionData, synthesis_result=None, trajectory_result=None, answers_log=None,
+    brand: str = "principal_resolution", tactical_findings=None,
 ) -> dict:
     """
     Assemble the complete VII.1 engine output object from session data.
@@ -759,6 +1040,10 @@ def assemble_output(
             "low":      friction_tax_result["low"],
             "high":     friction_tax_result["high"],
             "currency": friction_tax_result["currency"],
+            "driving_factors": _friction_driving_factors(
+                friction_tax_result, identified_states, lead_severity_tier,
+                session.intake, answers_log or [],
+            ),
         }
         if friction_tax_result["calibration_complete"]
         else None
@@ -783,12 +1068,49 @@ def assemble_output(
             "has_partial_jurisdictions": legal_result["has_partial_jurisdictions"],
             "has_uncollected_net_worth_caveat": legal_result["has_uncollected_net_worth_caveat"],
             "specific_caveat": _SPECIFIC_CAVEAT_TEXT.get(legal_result["specific_caveat_jurisdiction"]),
+            "driving_factors": _legal_driving_factors(
+                compute_legal_per_state_breakdown(
+                    state_ids=[s["state_id"] for s in identified_states],
+                    org_size=session.intake.headcount,
+                    industry=session.intake.industry,
+                    org_type=session.intake.org_type,
+                    jurisdictions=session.intake.jurisdictions,
+                ),
+                identified_states, session.intake, answers_log or [],
+            ),
         }
         if legal_result["low"] is not None or legal_result["has_unpriced_conditions"]
         else None
     )
     friction_tax_ledger = _build_friction_tax_ledger(
         identified_states, by_state, answers_log or [], session.intake,
+    )
+    asset_evidence = _build_asset_evidence(
+        session.accumulated_vector, answers_log or [], session.intake,
+    )
+    # service_cost_comparison (Phase 1, Pete: ship with nulls). Inaction
+    # cost counts friction tax and legal exposure only where each is priced.
+    _cost_parts = [
+        (friction_tax_estimate["low"], friction_tax_estimate["high"])
+        if friction_tax_estimate else None,
+        (legal_tail_risk_exposure["low"], legal_tail_risk_exposure["high"])
+        if legal_tail_risk_exposure and legal_tail_risk_exposure["low"] is not None else None,
+    ]
+    _cost_parts = [p for p in _cost_parts if p is not None]
+    if brand == "hr_diagnostic":
+        _target_service = HR_DIAGNOSTIC_FAMILY_NAME if effective_resolution_routing else ""
+    else:
+        _target_service = translate_resolution_family(effective_resolution_routing)
+    service_cost_comparison = (
+        {
+            "target_service_name":   _target_service,
+            "inaction_cost_low":     round(sum(p[0] for p in _cost_parts), 2) if _cost_parts else None,
+            "inaction_cost_high":    round(sum(p[1] for p in _cost_parts), 2) if _cost_parts else None,
+            "service_estimate_low":  None,
+            "service_estimate_high": None,
+            "pricing_model_note":    "",
+        }
+        if identified_states else None
     )
     private_output = {
         "opening_text":            priv.state_name if priv else "",
@@ -801,6 +1123,30 @@ def assemble_output(
         "trajectory":            trajectory_result,
         "urgency_window":        urgency_window_obj,
     }
+    # Omitted entirely, not an empty object, when there is no net
+    # asset signal (Phase 1 spec).
+    if asset_evidence is not None:
+        private_output["asset_evidence"] = asset_evidence
+    if service_cost_comparison is not None:
+        private_output["service_cost_comparison"] = service_cost_comparison
+    # Phase 1 Call 2 output: always a list, [] when the session has no
+    # TC-* answers or the tactical call failed.
+    private_output["tactical_findings"] = list(tactical_findings or [])
+    # Every above-floor state, score-descending, in single AND multi mode
+    # (identified_states keeps only the lead in single mode, and every
+    # dollar figure is computed from identified_states, so this is a
+    # separate silent field -- Pete, Phase 1). In private_output, not the
+    # top level, which is pinned at 16 fields.
+    private_output["all_qualified_states"] = [
+        {
+            "state_id":          qs.state_id,
+            "state_name":        qs.state_name,
+            "score":             round(qs.score, 6),
+            "descriptive_prose": STATE_PROFILES[qs.state_id].descriptive_prose
+                                 if qs.state_id in STATE_PROFILES else "",
+        }
+        for qs in routing.qualified_states
+    ]
 
     # ── shareable_output ──
     sha = session.output_package.shareable
@@ -825,6 +1171,8 @@ def assemble_output(
             # by web/lib/diagnostic-completion.ts's [DIAG] log, never
             # forwarded to the client payload.
             "parse_error":                  synthesis_result.parse_error,
+            # Phase 1 Call 3, "" when skipped or failed.
+            "executive_summary":            getattr(synthesis_result, "executive_summary", ""),
         }
         if synthesis_result is not None
         else None

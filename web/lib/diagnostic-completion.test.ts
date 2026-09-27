@@ -101,7 +101,7 @@ describe("resolveTacticalResults", () => {
         return {
           question_id: "TC-HRPOL-01",
           question_text:
-            "When was your employee handbook last substantively revised -- not reformatted, actually reviewed against current law and current practice?",
+            "When was your employee handbook last substantively revised, meaning actually reviewed against current law and current practice, not just reformatted?",
           format: "forced_choice",
           options: [
             { option_id: "A", option_text: "Reviewed and revised within the past 12 months, against current law." },
@@ -115,13 +115,13 @@ describe("resolveTacticalResults", () => {
         return {
           question_id: "TC-HIRE-01",
           question_text:
-            "How much of your interview process is actually structured -- consistent questions, consistent scoring -- versus left to whoever's in the room that day?",
+            "How much of your interview process is actually structured, with consistent questions and consistent scoring, versus left to whoever's in the room that day?",
           format: "forced_choice",
           options: [
-            { option_id: "A", option_text: "Fully structured -- consistent questions and scoring across every candidate." },
+            { option_id: "A", option_text: "Fully structured: consistent questions and scoring across every candidate." },
             { option_id: "B", option_text: "Structured for some roles, informal for others." },
             { option_id: "C", option_text: "Loosely guided, but mostly left to whoever's interviewing." },
-            { option_id: "D", option_text: "No structure -- entirely up to the interviewer." },
+            { option_id: "D", option_text: "No structure: entirely up to the interviewer." },
           ],
         };
       }
