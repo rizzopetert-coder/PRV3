@@ -302,3 +302,63 @@ describe("output-text -- shared pure helpers (moved from PrivateOutput.tsx, unch
     expect(overflowCount).toBe(2);
   });
 });
+
+
+describe("buildResultsText -- Phase 3 sections", () => {
+  const phase3: PrivateOutputPayload = {
+    ...FULL_PAYLOAD,
+    synthesis: { ...FULL_PAYLOAD.synthesis, executive_summary: "The summary sentence." },
+    friction_tax_estimate: {
+      low: 50000, high: 70000, currency: "USD",
+      driving_factors: [{ category: "Payroll baseline", rationale: "Estimated annual payroll: $1,000,000." }],
+    },
+    legal_tail_risk_exposure: {
+      ...FULL_PAYLOAD.legal_tail_risk_exposure!,
+      driving_factors: [{ category: "Wage and hour", rationale: "State X: $100,000.", triggering_answer: "Time records are informal." }],
+    },
+    service_cost_comparison: {
+      target_service_name: "", inaction_cost_low: 150000, inaction_cost_high: 520000,
+      service_estimate_low: null, service_estimate_high: null, pricing_model_note: "",
+    },
+    asset_evidence: {
+      strongest_axes: ["attitude"], contributing_signals: [],
+      net_scores: { aptitude: 0, authority: 1.4, alliance: 0, attitude: 1.9 },
+    },
+    tactical_findings: [{
+      section_id: "TC-PAYROLL", section_name: "Payroll & Wage-Hour", flagged_count: 2, total_count: 4,
+      synthesis_text: "Overtime classifications may have drifted.", flagged_items: [],
+    }],
+  };
+  const text = buildResultsText(phase3);
+
+  it("opens with the executive summary", () => {
+    expect(text.startsWith("Executive summary:\nThe summary sentence.")).toBe(true);
+  });
+  it("includes where strength shows up, with net scores", () => {
+    expect(text).toContain("Where strength shows up: Attitude (net asset signal: Aptitude 0 | Authority 1.4 | Alliance 0 | Attitude 1.9)");
+  });
+  it("includes both receipt lists, with the triggering answer when present", () => {
+    expect(text).toContain("How the legal figure was calculated:");
+    expect(text).toContain("— Wage and hour: State X: $100,000.");
+    expect(text).toContain("  Based on your answers: Time records are informal.");
+    expect(text).toContain("How the friction tax was calculated:");
+    expect(text).toContain("— Payroll baseline: Estimated annual payroll: $1,000,000.");
+  });
+  it("includes the cost comparison with separate timeframes, never a combined total", () => {
+    expect(text).toContain("Cost comparison:");
+    expect(text).toContain("— Friction tax, recurring every year: $50,000 – $70,000");
+    expect(text).toContain("— Legal exposure, one-time if a claim arises: $100,000 – $450,000");
+    expect(text).toContain("— People Tactics & Strategy: Ask for pricing.");
+    expect(text).not.toContain("520,000");
+  });
+  it("includes the tactical review", () => {
+    expect(text).toContain("— Payroll & Wage-Hour: 2 of 4 answers show a gap.");
+    expect(text).toContain("  Overtime classifications may have drifted.");
+  });
+  it("omits every Phase 3 section when the payload has none", () => {
+    const plain = buildResultsText(MINIMAL_PAYLOAD);
+    for (const s of ["Executive summary:", "Where strength shows up", "How the legal figure", "Cost comparison:", "Tactical & compliance review:"]) {
+      expect(plain).not.toContain(s);
+    }
+  });
+});
