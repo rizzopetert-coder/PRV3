@@ -9,15 +9,17 @@ import { stateIdToSlug } from "@/lib/state-slug";
 export default function StateBookLinkPR({
   id,
   name,
-  label,
+  small,
 }: {
   id: string;
   name: string;
-  // Phase 2: a small secondary link (e.g. inside an expanded condition
-  // card) instead of the large name link.
-  label?: string;
+  // Phase 2: a small secondary link inside an expanded condition card
+  // instead of the large name link. The label text lives here, in this
+  // PR-only code-split component, so it never reaches an hr-dx bundle.
+  small?: boolean;
 }) {
-  if (label) {
+  if (small) {
+    const label = "Read more in The Book";
     return (
       <a
         href={`/book/toc#${stateIdToSlug(id)}`}

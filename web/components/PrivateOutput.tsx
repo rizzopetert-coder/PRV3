@@ -242,7 +242,7 @@ export default function PrivateOutput({
         renderExtra={
           brand === "hr_diagnostic"
             ? undefined
-            : (row) => <StateBookLinkPR id={row.id} name={row.name} label="Read more in The Book" />
+            : (row) => <StateBookLinkPR id={row.id} name={row.name} small />
         }
       />
       <Rule />
