@@ -173,7 +173,8 @@ def _run(brand, vector):
 vec, _log = _path(min)
 for brand in ("principal_resolution", "hr_diagnostic"):
     out = _run(brand, vec)
-    aqs = out["all_qualified_states"]
+    aqs = out["private_output"]["all_qualified_states"]
+    check(f"[{brand}] top level stays at the pinned 16 fields", len(out) == 16, str(len(out)))
     ids_ = [s["state_id"] for s in out["identified_states"]]
     check(f"[{brand}] all_qualified_states is score-descending", [s["score"] for s in aqs] == sorted((s["score"] for s in aqs), reverse=True))
     check(f"[{brand}] identified_states is a prefix-consistent subset of all_qualified_states",

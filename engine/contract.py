@@ -1129,6 +1129,21 @@ def assemble_output(
         private_output["asset_evidence"] = asset_evidence
     if service_cost_comparison is not None:
         private_output["service_cost_comparison"] = service_cost_comparison
+    # Every above-floor state, score-descending, in single AND multi mode
+    # (identified_states keeps only the lead in single mode, and every
+    # dollar figure is computed from identified_states, so this is a
+    # separate silent field -- Pete, Phase 1). In private_output, not the
+    # top level, which is pinned at 16 fields.
+    private_output["all_qualified_states"] = [
+        {
+            "state_id":          qs.state_id,
+            "state_name":        qs.state_name,
+            "score":             round(qs.score, 6),
+            "descriptive_prose": STATE_PROFILES[qs.state_id].descriptive_prose
+                                 if qs.state_id in STATE_PROFILES else "",
+        }
+        for qs in routing.qualified_states
+    ]
 
     # ── shareable_output ──
     sha = session.output_package.shareable
@@ -1176,20 +1191,6 @@ def assemble_output(
         "state_distribution":   state_distribution,
         "output_type":          output_type,
         "identified_states":    identified_states,
-        # Every above-floor state, score-descending, in single AND multi
-        # mode (identified_states keeps only the lead in single mode, and
-        # every dollar figure is computed from identified_states, so this
-        # is a separate silent field -- Pete, Phase 1).
-        "all_qualified_states": [
-            {
-                "state_id":          qs.state_id,
-                "state_name":        qs.state_name,
-                "score":             round(qs.score, 6),
-                "descriptive_prose": STATE_PROFILES[qs.state_id].descriptive_prose
-                                     if qs.state_id in STATE_PROFILES else "",
-            }
-            for qs in routing.qualified_states
-        ],
         "severity":             severity_obj,
         "asset_score":          asset_obj,
         "dimension_summary":    dimension_obj,
