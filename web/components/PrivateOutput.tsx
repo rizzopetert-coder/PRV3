@@ -11,7 +11,8 @@ import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
 import CopyResultsButton from "@/components/CopyResultsButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
-import { firstSentence, buildCoreCluster, joinNames } from "@/lib/output-text";
+import { joinNames } from "@/lib/output-text";
+import ConditionsList, { type ConditionRow } from "@/components/ConditionsList";
 import { useBrand } from "@/components/BrandContext";
 
 // Brand-specific pieces, code-split rather than conditionally rendered:
@@ -33,22 +34,6 @@ const SEVERITY_ANCHOR: Record<SeverityTier, string> = {
     "This is how the organization works now. The condition isn't something that happens inside the organization anymore. It is part of the operating environment itself. People make decisions inside it without questioning it. Resolution means changing the environment, not just addressing the condition.",
 };
 
-// Visualize Your Data (Layer 3). Mirrors engine/severity.py's
-// classify_severity() CALIBRATION TARGET default boundaries (0-100
-// scale; EMERGING_MAX/ENTRENCHED_MAX confirmed None/live-on-default
-// at HEAD) -- same accepted mirror-drift risk SEVERITY_ANCHOR above
-// already carries for SEVERITY_TIER_DESCRIPTIONS, not a new pattern.
-const SEVERITY_TIER_BAND: Record<SeverityTier, { min: number; max: number }> = {
-  Emerging:   { min: 0,  max: 33 },
-  Entrenched: { min: 33, max: 66 },
-  Endemic:    { min: 66, max: 100 },
-};
-
-function tierFillPercent(tier: SeverityTier, score: number): number {
-  const { min, max } = SEVERITY_TIER_BAND[tier];
-  const fraction = (score - min) / (max - min);
-  return Math.max(0, Math.min(1, fraction)) * 100;
-}
 
 // Friction tax ledger -- Block 4f. One shared footnote for the whole
 // ledger, not per-row (per spec) -- hardcoded here rather than sent over
@@ -139,25 +124,36 @@ export default function PrivateOutput({
   // Block 4 must not repeat it if it was already used in block 2.
   const usedRoutingInBlock2 = !liabilityText && Boolean(payload.resolution_routing);
 
-  // Severity-conditional accent — reuses the same tested function live-mode
-  // ConstellationField uses for its own rings, rather than a parallel
-  // implementation. --urgency/--urgency-text only at genuine Endemic;
-  // --oxide/--oxide-text at Emerging/Entrenched.
-  const accent = severityAccentTokens(payload.severity);
-
-  // Direction 3, this session -- see buildCoreCluster() above.
-  const { core: coreCluster, overflowCount } = buildCoreCluster(
-    payload.secondary_states,
-    payload.primary_state.weight,
+  // Phase 2 conditions list: every qualifying state, descending score.
+  // all_qualified_states (Pass 1) is already score-sorted by the engine and
+  // includes every above-floor state even in single mode; older payloads,
+  // self-select, and dev fixtures fall back to primary + secondary. Severity
+  // badge/bar only where severity_by_state has the state.
+  const severityById = new Map(
+    (payload.severity_by_state ?? []).map((e) => [e.state_id, e] as const),
   );
+  const qualifiedSource =
+    payload.all_qualified_states && payload.all_qualified_states.length > 0
+      ? payload.all_qualified_states.map((s) => ({
+          id: s.state_id, name: s.state_name, prose: s.descriptive_prose,
+        }))
+      : [payload.primary_state, ...payload.secondary_states].map((s) => ({
+          id: s.id, name: s.name, prose: s.descriptive_prose ?? "",
+        }));
+  const conditionRows: ConditionRow[] = qualifiedSource.map((s, i) => {
+    const entry = severityById.get(s.id);
+    return {
+      ...s,
+      tier: entry?.tier ?? (i === 0 ? payload.severity : null),
+      severity: entry ? { tier: entry.tier, score_0_100: entry.score_0_100 } : null,
+    };
+  });
 
-  // Visualize Your Data (Layer 3). severity_by_state entries carry
-  // state_id only -- both real builders derive primary_state/
-  // secondary_states from the exact same identified_states array
-  // severity_by_state comes from, so this lookup always resolves.
+  // Names for the legal/ledger blocks below, which carry state_id only.
   const stateNameById = new Map<string, string>([
     [payload.primary_state.id, payload.primary_state.name],
     ...payload.secondary_states.map((s): [string, string] => [s.id, s.name]),
+    ...conditionRows.map((r): [string, string] => [r.id, r.name]),
   ]);
 
   // Block 4d -- Legal/Compliance tail-risk exposure derived values.
@@ -206,51 +202,10 @@ export default function PrivateOutput({
         )}
       </div>
 
-      {/* Block 1 — Condition header. Hero typographic treatment
-          (Direction 3, this session): the primary condition name gets
-          the largest type in the report (font-display/Lora), replacing
-          the prior text-[13px] treatment -- still one verdict named
-          with confidence, per Output Precision. Eyebrow softened from
-          "Condition identified" (implies singularity) to "Most
-          prominent pattern" (signals rank without claiming exclusivity)
-          -- per prompts/category-e-direction3-cluster-display.md. */}
-      <div className="pb-4">
-        <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
-          Most prominent pattern
-        </p>
-        <div className="flex items-center gap-3 flex-wrap mb-2">
-          <span className="font-display text-3xl font-semibold text-charcoal">
-            {payload.primary_state.name}
-          </span>
-          <span
-            className="text-[11px] rounded-md px-2 py-0.5 border"
-            style={{ borderColor: accent.stroke, color: accent.text }}
-          >
-            {payload.severity}
-          </span>
-        </div>
-        {payload.primary_state.descriptive_prose && (
-          <p className="text-[12px] text-charcoal leading-relaxed mb-2">
-            {payload.primary_state.descriptive_prose}
-          </p>
-        )}
-        <p className="text-[12px] text-charcoal leading-relaxed">
-          {SEVERITY_ANCHOR[payload.severity]}
-        </p>
-      </div>
-
-      {/* Block 1a — Headline (omit entirely if empty) */}
-      {headline && (
-        <div className="pb-4">
-          <p className="text-base font-medium leading-relaxed text-charcoal">{headline}</p>
-        </div>
-      )}
-
-      {/* Block 1b — Weighted dimensional shape (live mode). Placeholder
-          mock weights from Stage 3's scaffolding replaced with the real
-          dimension_summary field (shipped commit 9c52e7d) — confirmed
-          present in this payload at runtime for both Path A and Path B,
-          not just in the type. */}
+      {/* Phase 2 lead (Pete, 2026-09-27): the constellation, then the
+          observable indicators, open the report. The former "Most prominent
+          pattern" hero and "Severity across conditions" section are merged
+          into ConditionsList below. */}
       <div className="max-w-70 mx-auto pb-4">
         <ConstellationField
           mode="live"
@@ -263,30 +218,40 @@ export default function PrivateOutput({
           severityTier={payload.severity}
         />
       </div>
+
+      {observableIndicators.length > 0 && (
+        <div className="pb-4">
+          <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
+            Observable indicators
+          </p>
+          <ul className="space-y-1">
+            {observableIndicators.map((indicator, i) => (
+              <li key={i} className="flex gap-2 text-[13px] leading-[1.6] text-charcoal">
+                <span className="text-gray-300 shrink-0" aria-hidden>—</span>
+                <span>{indicator}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <Rule />
 
-      {/* Blocks 2/2b/2c/3 — Observable indicators, liability condition,
-          framing text, and the asset resolution anchor now render as one
-          continuous narrative block (cohesion pass, this session) --
-          previously each sub-block had its own <Rule/>, which gave a
-          short, isolated line like framingText the visual weight of a
-          pull-quote it was never meant to carry. No rule between any of
-          these four sub-blocks; a single rule closes the whole section. */}
-      <div className="pb-4 space-y-4">
-        {observableIndicators.length > 0 && (
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
-              Observable indicators
-            </p>
-            <ul className="space-y-1">
-              {observableIndicators.map((indicator, i) => (
-                <li key={i} className="flex gap-2 text-[13px] leading-[1.6] text-charcoal">
-                  <span className="text-gray-300 shrink-0" aria-hidden>—</span>
-                  <span>{indicator}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+      <ConditionsList
+        rows={conditionRows}
+        leadDetail={SEVERITY_ANCHOR[payload.severity]}
+        renderExtra={
+          brand === "hr_diagnostic"
+            ? undefined
+            : (row) => <StateBookLinkPR id={row.id} name={row.name} label="Read more in The Book" />
+        }
+      />
+      <Rule />
+
+      {/* Narrative: headline, liability condition, framing text, and the
+          asset resolution anchor, one continuous block. */}
+      <div className="py-4 space-y-4">
+        {headline && (
+          <p className="text-base font-medium leading-relaxed text-charcoal">{headline}</p>
         )}
 
         <p className="text-sm leading-[1.65] text-charcoal">
@@ -329,107 +294,6 @@ export default function PrivateOutput({
         )}
       </div>
       <Rule />
-
-      {/* Block 4b — Core cluster of co-occurring conditions (Direction
-          3, this session). Replaces the flat "Also present" bulleted
-          list (with its per-state percentage that a fixed 2/3-state
-          tier and near-uniform real weights made frequently
-          uninformative -- confirmed via real distribution data, see
-          prompts/category-e-direction3-cluster-display.md) with a
-          variable-length cluster: real typographic presence
-          (font-display/Lora, uniform "secondary" weight -- a clear step
-          down from the Block 1 hero, not graduated per member) for
-          every state in the core cluster, plus a "+N co-occurring
-          conditions" overflow affordance for the rest. Section label
-          softened from "Also present" to "Co-occurring conditions" --
-          signals real co-existence, not an afterthought footnote.
-          Percentage intentionally dropped from display -- see this
-          patch script's own docstring for the full rationale. */}
-      {payload.secondary_states.length > 0 && (
-        <div className="py-4">
-          <p className="text-[11px] uppercase tracking-wide text-slate mb-3">
-            Co-occurring conditions
-          </p>
-          <ul className="space-y-4">
-            {coreCluster.map((s) => (
-              <li key={s.id}>
-                {brand === "hr_diagnostic" ? (
-                  <span className="font-display text-lg text-charcoal">
-                    {s.name}
-                  </span>
-                ) : (
-                  <StateBookLinkPR id={s.id} name={s.name} />
-                )}
-                {s.descriptive_prose && (
-                  <p className="text-[12px] text-charcoal leading-relaxed mt-0.5">
-                    {firstSentence(s.descriptive_prose)}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-          {overflowCount > 0 && (
-            <p className="font-ui text-[12px] text-slate mt-3">
-              +{overflowCount} co-occurring condition{overflowCount === 1 ? "" : "s"}
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Block 4c — Visualize Your Data (Layer 3): per-state severity
-          comparison, one row per state in severity_by_state.
-          Deliberately NOT lead-state-anchored -- a departure from
-          Block 1's hero treatment, by design
-          (prompts/visualize-your-data-build-scope.md). Omitted
-          entirely when severity_by_state is absent or empty, same
-          idiom as every other optional block in this component --
-          never a partial/broken render. Row order is
-          severity_by_state's own array order (primary state first,
-          secondary_states rank-sorted); no re-sort here, matching
-          "no sorting/ranking implied by row position." Renders for
-          single-state results too (one row) -- the literal settled
-          design, not gated to multi-state only. */}
-      {payload.severity_by_state && payload.severity_by_state.length > 0 && (
-        <div className="py-4">
-          <p className="text-[11px] uppercase tracking-wide text-slate mb-3">
-            Severity across conditions
-          </p>
-          <ul className="space-y-3">
-            {payload.severity_by_state.map((entry) => {
-              const rowAccent = severityAccentTokens(entry.tier);
-              return (
-                <li key={entry.state_id}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[13px] text-charcoal">
-                      {stateNameById.get(entry.state_id) ?? entry.state_id}
-                    </span>
-                    <span
-                      className="text-[10px] rounded-md px-1.5 py-0.5 border"
-                      style={{ borderColor: rowAccent.stroke, color: rowAccent.text }}
-                    >
-                      {entry.tier}
-                    </span>
-                  </div>
-                  <div className="h-1 rounded-full bg-gray-100">
-                    <div
-                      className="h-1 rounded-full"
-                      style={{
-                        width: `${tierFillPercent(entry.tier, entry.score_0_100)}%`,
-                        backgroundColor: rowAccent.stroke,
-                      }}
-                    />
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="text-[11px] text-slate mt-3 leading-relaxed">
-            A short bar at Emerging reflects a real finding, not a
-            partial or uncertain one — Emerging is the floor of the
-            severity scale.
-          </p>
-        </div>
-      )}
 
       {/* Block 4d — Legal/Compliance tail-risk exposure (Addendum 11).
           Omitted entirely when legal_tail_risk_exposure is null, same
