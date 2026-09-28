@@ -149,10 +149,11 @@ def synthesize_tactical(
     summary: dict,
     model: str = "claude-sonnet-5",
     client=None,
-    timeout: float = 15.0,
+    timeout: float = 30.0,
 ) -> tuple:
     """
-    Call 2. Returns (findings, ok, error). findings is a TacticalFinding list
+    Call 2. timeout 30s (2026-09-28): about 2x the worst measured latency
+    (14.4s with all 40 TC answers flagged), which crowded the old 15s. Returns (findings, ok, error). findings is a TacticalFinding list
     for every answered section (clean sections get synthesis_text ""),
     flagged_items without answer_text. On any failure: ([], False, error).
     A session whose answers show no gaps at all makes no LLM call.
