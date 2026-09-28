@@ -67,6 +67,10 @@ function validateRequest(body: unknown): body is AnswerRequest {
   );
 }
 
+// Completion runs Call 1 || Call 2 (30s) then Call 3 (15s), worst case 45s
+// engine-side, plus the TC question-copy fetches. Pinned, not left to the default.
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   let body: unknown;
   try {
