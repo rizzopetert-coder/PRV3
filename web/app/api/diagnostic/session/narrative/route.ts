@@ -36,6 +36,9 @@ function validateRequest(body: unknown): body is NarrativeRequest {
   return typeof b.session_id === "string" && typeof b.narrative_text === "string";
 }
 
+// Can run the full completion path when the narrative fires at Q34.
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   let body: unknown;
   try {
