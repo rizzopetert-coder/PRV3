@@ -122,6 +122,23 @@ describe("completeDiagnosticSession brand handling", () => {
     expect(mockInvokeComplete.mock.calls[1][0].brand).toBe("principal_resolution");
   });
 
+  it("hr_diagnostic: hr_pathway follows the causation-overridden routing, not the state's default family", async () => {
+    // the_uninitiated defaults to Intervention (First Call, "urgent"). With a
+    // diffuse pattern the engine overrides it to Development before writing
+    // private_output.resolution_routing, and the narrative is written for
+    // Development too. The drawer must match: "capability", not "urgent".
+    const base = engineResult("Development", false);
+    mockInvokeComplete.mockResolvedValueOnce({
+      ...base,
+      identified_states: [{ state_id: "the_uninitiated", state_name: "The Uninitiated", score: 1, descriptive_prose: "" }],
+      private_output: { ...base.private_output, causation_pattern: { pattern: "diffuse", dispersion: 0.5, qualified_state_count: 1 } },
+    });
+    const result = (await (await completeDiagnosticSession(session("hr_diagnostic"))).json()).result;
+    expect(result.hr_pathway).toBe("capability");
+    expect(result.hr_pathway).not.toBe("urgent");
+    expect(result.resolution_family).toBe("HR Consulting");
+  });
+
   it("principal_resolution unchanged: translated family, raw routing", async () => {
     const result = await run("principal_resolution", "Intervention + Roadmap");
     expect(result.resolution_family).toBe("First Call + People Tactics & Strategy");
