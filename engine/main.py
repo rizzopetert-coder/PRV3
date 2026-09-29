@@ -991,12 +991,17 @@ def run_accumulated_engine(
     _call_2_pool.shutdown(wait=False)
 
     # Phase 1 Step B: Call 3 (executive summary), sequential, only when
-    # Call 1 produced real synthesis and Call 2 succeeded.
+    # Call 1 produced real synthesis and Call 2 either succeeded or was
+    # never attempted (no TC answers, e.g. every principal_resolution
+    # session). Call 2 attempted and failed still skips Call 3.
+    call_2_attempted = _call_2_future is not None
     executive_summary, exec_ok, exec_err, _call_3_s = "", False, "skipped", 0.0
-    if synthesis_result is not None and not synthesis_result.is_fallback and tactical_ok:
+    if (synthesis_result is not None and not synthesis_result.is_fallback
+            and (tactical_ok or not call_2_attempted)):
         _t = time.monotonic()
         executive_summary, exec_ok, exec_err = generate_executive_summary(
-            synthesis_result.liability_condition_text, tactical_totals(tactical_summary),
+            synthesis_result.liability_condition_text,
+            tactical_totals(tactical_summary) if call_2_attempted else None,
         )
         _call_3_s = time.monotonic() - _t
     if synthesis_result is not None:
