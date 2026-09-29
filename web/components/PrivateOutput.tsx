@@ -12,7 +12,8 @@ import ShareButton from "@/components/ShareButton";
 import CopyResultsButton from "@/components/CopyResultsButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
 import {
-  buildConditionRows, FRICTION_TAX_LEDGER_FOOTNOTE, FRICTION_TAX_LEDGER_STANDALONE_NOTE,
+  buildConditionRows, FRICTION_DOLLARS_VISIBLE, FRICTION_LEDGER_HEADING_NO_DOLLARS,
+  FRICTION_LEDGER_NOTE_NO_DOLLARS, FRICTION_TAX_LEDGER_FOOTNOTE, FRICTION_TAX_LEDGER_STANDALONE_NOTE,
   formatUsdRange, groupLedgerRows, joinNames, OHIO_NET_WORTH_CAVEAT,
 } from "@/lib/output-text";
 import ConditionsList, { type ConditionRow } from "@/components/ConditionsList";
@@ -374,7 +375,7 @@ export default function PrivateOutput({
       {frictionTaxLedger.length > 0 && (
         <details open className="py-4">
           <summary className="text-[11px] uppercase tracking-wide text-slate mb-3 cursor-pointer">
-            Friction tax ledger
+            {FRICTION_DOLLARS_VISIBLE ? "Friction tax ledger" : FRICTION_LEDGER_HEADING_NO_DOLLARS}
           </summary>
           <ul className="space-y-4 mt-3">
             {/* P2: rows citing the same evidence set share one row. */}
@@ -403,6 +404,8 @@ export default function PrivateOutput({
                       </details>
                     )}
                   </div>
+                  {/* Option C: no figure line while friction dollars are hidden. */}
+                  {FRICTION_DOLLARS_VISIBLE && (
                   <p className="text-[13px] text-charcoal mb-1">
                     {figure ? (
                       <>
@@ -419,6 +422,7 @@ export default function PrivateOutput({
                       </span>
                     )}
                   </p>
+                  )}
                   {group.top_contributing_answers.length > 0 && (
                     <ul className="text-[12px] text-slate leading-relaxed list-disc pl-4 space-y-0.5">
                       {group.top_contributing_answers.map((text, i) => (
@@ -430,20 +434,28 @@ export default function PrivateOutput({
               );
             })}
           </ul>
-          <p className="text-[11px] text-slate mt-3 leading-relaxed">
-            {FRICTION_TAX_LEDGER_STANDALONE_NOTE}
-          </p>
-          <p className="text-[11px] text-slate mt-2 leading-relaxed">
-            {FRICTION_TAX_LEDGER_FOOTNOTE}
-          </p>
-          <EvidenceReceipts receipts={payload.friction_tax_estimate?.driving_factors} />
+          {FRICTION_DOLLARS_VISIBLE ? (
+            <>
+              <p className="text-[11px] text-slate mt-3 leading-relaxed">
+                {FRICTION_TAX_LEDGER_STANDALONE_NOTE}
+              </p>
+              <p className="text-[11px] text-slate mt-2 leading-relaxed">
+                {FRICTION_TAX_LEDGER_FOOTNOTE}
+              </p>
+              <EvidenceReceipts receipts={payload.friction_tax_estimate?.driving_factors} />
+            </>
+          ) : (
+            <p className="text-[11px] text-slate mt-3 leading-relaxed">
+              {FRICTION_LEDGER_NOTE_NO_DOLLARS}
+            </p>
+          )}
         </details>
       )}
 
       {/* Phase 3: inaction cost beside the resolution service. */}
       <CostComparison
         comparison={payload.service_cost_comparison}
-        friction={payload.friction_tax_estimate}
+        friction={FRICTION_DOLLARS_VISIBLE ? payload.friction_tax_estimate : null}
         legal={payload.legal_tail_risk_exposure}
         fallbackServiceName={payload.resolution_family}
       />
