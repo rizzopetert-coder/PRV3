@@ -774,6 +774,8 @@ def _legal_driving_factors(
 # ── Phase 1 asset evidence ──────────────────────────────────────────────────
 
 _ASSET_FIELDS = ("aptitude_asset", "authority_asset", "alliance_asset", "attitude_asset")
+# Most quoted strength lines asset_evidence carries (Pete, 2026-09-28).
+_ASSET_EVIDENCE_MAX = 5
 
 
 def _derive_asset_baseline_question_ids() -> frozenset:
@@ -841,7 +843,7 @@ def _build_asset_evidence(accumulated_vector: dict, answers_log: list, intake_da
         for option in options:
             # Strength evidence cites asset-valence text only: problem-phrased
             # text on an answer that happens to add asset signal is never a
-            # strength. None is authored yet, so this is [] for now.
+            # strength.
             if not option.observation_text or option.observation_valence != "asset":
                 continue
             scratch = AccumulationSession()
@@ -851,6 +853,8 @@ def _build_asset_evidence(accumulated_vector: dict, answers_log: list, intake_da
                 if amount > 0 and _answer_dependent(question, f):
                     scored.append((amount, f, option.observation_text))
 
+    # Highest contribution to a leading axis first. The sort is stable and
+    # answers_log is in question order, so ties keep question order.
     scored.sort(key=lambda item: item[0], reverse=True)
     signals: list = []
     seen: set = set()
@@ -859,6 +863,8 @@ def _build_asset_evidence(accumulated_vector: dict, answers_log: list, intake_da
             continue
         seen.add(text)
         signals.append({"axis": f.replace("_asset", ""), "observation_text": text})
+        if len(signals) == _ASSET_EVIDENCE_MAX:
+            break
 
     return {
         "strongest_axes": [f.replace("_asset", "") for f in leading],
