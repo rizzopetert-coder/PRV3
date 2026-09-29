@@ -47,6 +47,7 @@ Format rules:
 No em dashes. No bullet points unless the field specification requires a list.
 No semicolons. Limit all text fields to 2-3 concise sentences. Output strict JSON.
 Short sentences preferred over long ones. Plain words preferred over elevated ones.
+Do not state dollar figures or percentages of payroll.
 
 The diagnostic has already named the condition and the severity. Do not restate
 them unless the field specification requires it. Do not soften the verdict.
