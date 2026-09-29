@@ -184,6 +184,15 @@ class _FakeClient:
         self.messages = _FakeMessages()
 
 
+from engine.output_synthesis import OUTPUT_SYNTHESIS_SYSTEM_PROMPT
+
+
+def _call1(calls):
+    # Call 3 also runs when there are no TC answers (both brands), so the
+    # last captured call is not necessarily Call 1.
+    return next(c for c in calls if c.get("system") == OUTPUT_SYNTHESIS_SYSTEM_PROMPT)
+
+
 fake_anthropic = types.ModuleType("anthropic")
 fake_anthropic.Anthropic = _FakeClient
 with mock.patch.dict("sys.modules", {"anthropic": fake_anthropic}):
@@ -193,14 +202,14 @@ with mock.patch.dict("sys.modules", {"anthropic": fake_anthropic}):
         routing = r["private_output"]["resolution_routing"]
         if not routing or not captured:
             continue
-        prompt = captured[-1]["messages"][0]["content"]
+        prompt = _call1(captured)["messages"][0]["content"]
         line = next((l for l in prompt.splitlines() if l.startswith("resolution_family:")), "")
         check(f"[{routing}] prompt resolution_family line is hr context, no PR terms",
               line.startswith("resolution_family: HR Consulting") and not pr_hits(line), line)
         check(f"[{routing}] LLM result used (not fallback)", r["synthesis"]["is_fallback"] is False)
         captured.clear()
         run_accumulated_engine(state_vector(sid), INTAKE, 27)
-        pr_line = next((l for l in captured[-1]["messages"][0]["content"].splitlines() if l.startswith("resolution_family:")), "")
+        pr_line = next((l for l in _call1(captured)["messages"][0]["content"].splitlines() if l.startswith("resolution_family:")), "")
         check(f"[{routing}] PR default prompt still carries the PR commercial name",
               any(t in pr_line for t in PR_TERMS[:4]), pr_line)
 
