@@ -11,7 +11,10 @@ import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
 import CopyResultsButton from "@/components/CopyResultsButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
-import { buildConditionRows, FRICTION_TAX_LEDGER_FOOTNOTE, joinNames, OHIO_NET_WORTH_CAVEAT } from "@/lib/output-text";
+import {
+  buildConditionRows, FRICTION_TAX_LEDGER_FOOTNOTE, FRICTION_TAX_LEDGER_STANDALONE_NOTE,
+  formatUsdRange, groupLedgerRows, joinNames, OHIO_NET_WORTH_CAVEAT,
+} from "@/lib/output-text";
 import ConditionsList, { type ConditionRow } from "@/components/ConditionsList";
 import {
   AssetStrength,
@@ -63,6 +66,25 @@ function Rule() {
   );
 }
 
+// One ledger condition name with its tier badge (A2).
+function LedgerConditionBadge({ name, tier }: { name: string; tier: SeverityTier }) {
+  const accent = severityAccentTokens(tier);
+  return (
+    <span className="flex items-center gap-2">
+      <span className="text-[13px] text-charcoal">{name}</span>
+      <span
+        className="text-[10px] rounded-md px-1.5 py-0.5 border"
+        style={{ borderColor: accent.stroke, color: accent.text }}
+      >
+        {tier}
+      </span>
+    </span>
+  );
+}
+
+// A grouped ledger row shows at most this many names before "and N more".
+const LEDGER_NAMES_SHOWN = 3;
+
 interface PrivateOutputProps {
   payload: PrivateOutputPayload;
   // hr-dx.com only -- undefined for every principal_resolution
@@ -106,7 +128,6 @@ export default function PrivateOutput({
   const resolutionFramingText = payload.synthesis.resolution_framing_text;
   const framingText = payload.synthesis.framing_text;
   const observableIndicators = payload.synthesis.observable_indicators ?? [];
-  const primaryAssetDomain = payload.primary_asset_domain;
   const headline = payload.synthesis.headline;
 
   // Block 2 uses resolution_routing as fallback when liability_condition_text is empty.
@@ -233,13 +254,10 @@ export default function PrivateOutput({
           <p className="text-sm leading-[1.65] text-charcoal">{framingText}</p>
         )}
 
-        {(anchorText || primaryAssetDomain || payload.asset_evidence) && (
+        {/* P1: the primary asset domain describes the lead condition, not
+            this respondent, so it is not shown. */}
+        {(anchorText || payload.asset_evidence) && (
           <div>
-            {primaryAssetDomain && (
-              <p className="text-[11px] uppercase tracking-wide text-slate mb-2">
-                Primary asset domain: {primaryAssetDomain}
-              </p>
-            )}
             {anchorText && (
               <p className="text-[13px] text-charcoal">{anchorText}</p>
             )}
@@ -293,18 +311,10 @@ export default function PrivateOutput({
                 LEGAL_BAND_WEIGHT[legal.band ?? "Minor"]
               }`}
             >
-              {legal.low === legal.high ? (
-                <>
-                  Estimated exposure: {legal.currency === "USD" ? "$" : ""}
-                  {legal.low!.toLocaleString()}
-                </>
-              ) : (
-                <>
-                  {legal.currency === "USD" ? "$" : ""}
-                  {legal.low!.toLocaleString()} – {legal.currency === "USD" ? "$" : ""}
-                  {legal.high!.toLocaleString()}
-                </>
-              )}
+              {(() => {
+                const figure = formatUsdRange(legal.low!, legal.high!);
+                return figure.includes("–") ? figure : `Estimated exposure: ${figure}`;
+              })()}
             </p>
           )}
 
@@ -367,43 +377,51 @@ export default function PrivateOutput({
             Friction tax ledger
           </summary>
           <ul className="space-y-4 mt-3">
-            {frictionTaxLedger.map((row) => {
-              const rowAccent = severityAccentTokens(row.risk_label);
+            {/* P2: rows citing the same evidence set share one row. */}
+            {groupLedgerRows(frictionTaxLedger, stateNameById).map((group) => {
+              const grouped = group.conditions.length > 1;
+              const d = group.dollar_exposure;
+              const figure = d ? formatUsdRange(d.low, d.high) : null;
+              const hidden = group.conditions.slice(LEDGER_NAMES_SHOWN);
               return (
-                <li key={row.state_id}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[13px] text-charcoal">
-                      {stateNameById.get(row.state_id) ?? row.state_name}
-                    </span>
-                    <span
-                      className="text-[10px] rounded-md px-1.5 py-0.5 border"
-                      style={{ borderColor: rowAccent.stroke, color: rowAccent.text }}
-                    >
-                      {row.risk_label}
-                    </span>
+                <li key={group.conditions[0].state_id}>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-1">
+                    {group.conditions.slice(0, LEDGER_NAMES_SHOWN).map((c) => (
+                      <LedgerConditionBadge key={c.state_id} name={c.name} tier={c.risk_label} />
+                    ))}
+                    {/* A2: the rest of a large group behind a toggle. */}
+                    {hidden.length > 0 && (
+                      <details>
+                        <summary className="text-[12px] text-slate cursor-pointer hover:underline">
+                          and {hidden.length} more
+                        </summary>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                          {hidden.map((c) => (
+                            <LedgerConditionBadge key={c.state_id} name={c.name} tier={c.risk_label} />
+                          ))}
+                        </div>
+                      </details>
+                    )}
                   </div>
                   <p className="text-[13px] text-charcoal mb-1">
-                    {row.dollar_exposure ? (
-                      row.dollar_exposure.low === row.dollar_exposure.high ? (
-                        <>
-                          Estimated exposure: {row.dollar_exposure.currency === "USD" ? "$" : ""}
-                          {row.dollar_exposure.low.toLocaleString()}
-                        </>
-                      ) : (
-                        <>
-                          {row.dollar_exposure.currency === "USD" ? "$" : ""}
-                          {row.dollar_exposure.low.toLocaleString()} –{" "}
-                          {row.dollar_exposure.currency === "USD" ? "$" : ""}
-                          {row.dollar_exposure.high.toLocaleString()}
-                        </>
-                      )
+                    {figure ? (
+                      <>
+                        {grouped ? (
+                          <span className="text-slate">Highest standalone estimate in this group: </span>
+                        ) : figure.includes("–") ? null : (
+                          "Estimated exposure: "
+                        )}
+                        {figure}
+                      </>
                     ) : (
-                      <span className="text-slate">Estimate not available for this condition.</span>
+                      <span className="text-slate">
+                        Estimate not available for {grouped ? "these conditions" : "this condition"}.
+                      </span>
                     )}
                   </p>
-                  {row.top_contributing_answers.length > 0 && (
+                  {group.top_contributing_answers.length > 0 && (
                     <ul className="text-[12px] text-slate leading-relaxed list-disc pl-4 space-y-0.5">
-                      {row.top_contributing_answers.map((text, i) => (
+                      {group.top_contributing_answers.map((text, i) => (
                         <li key={i}>{text}</li>
                       ))}
                     </ul>
@@ -413,6 +431,9 @@ export default function PrivateOutput({
             })}
           </ul>
           <p className="text-[11px] text-slate mt-3 leading-relaxed">
+            {FRICTION_TAX_LEDGER_STANDALONE_NOTE}
+          </p>
+          <p className="text-[11px] text-slate mt-2 leading-relaxed">
             {FRICTION_TAX_LEDGER_FOOTNOTE}
           </p>
           <EvidenceReceipts receipts={payload.friction_tax_estimate?.driving_factors} />
