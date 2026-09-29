@@ -524,6 +524,14 @@ _lg = [r for r in _legal_driving_factors(bd, [{"state_id": b["state_id"], "state
 check("P4: legal Total wording", bool(_lg) and _lg[0]["rationale"] == 'Within a category, the largest exposure counts in full and each additional one counts at half the weight of the one before it. Categories are then added together.', str(_lg))
 
 
+# Option C: Call 1 and Call 2 may not state dollar figures or payroll shares
+_RULE = 'Do not state dollar figures or percentages of payroll.'
+check("Option C: Call 1 system prompt carries the no-dollar-figures rule",
+      _RULE in OUTPUT_SYNTHESIS_SYSTEM_PROMPT)
+check("Option C: Call 2 system prompt carries the no-dollar-figures rule",
+      "- " + _RULE in TACTICAL_SYNTHESIS_SYSTEM_PROMPT)
+
+
 # ── 9. Lead resolution family in both routing modes ─────────────────────────────
 from engine.contract import lead_resolution_family
 from engine.output import route_output, QualifiedState
