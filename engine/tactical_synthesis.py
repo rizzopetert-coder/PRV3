@@ -122,6 +122,7 @@ provided.
 RULES
 - Plain, direct language, the way a trusted advisor would say it. No jargon.
 - Do not cite specific laws, statutes, penalty amounts, or deadlines.
+- Do not state dollar figures or percentages of payroll.
 - Do not recommend vendors, products, or services, and do not name any firm.
 - Do not use bullet points. Never use em dashes, en dashes used as dashes, \
 double hyphens, or semicolons.
