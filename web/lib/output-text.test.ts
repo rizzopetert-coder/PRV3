@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { buildResultsText, firstSentence, joinNames, buildCoreCluster } from "./output-text";
-import type { PrivateOutputPayload, StateRef } from "./types";
+import { buildResultsText, firstSentence, joinNames, buildCoreCluster, OHIO_NET_WORTH_CAVEAT } from "./output-text";
+import type { PrivateOutputPayload, StateRef, TacticalSectionResult } from "./types";
 
 // A full payload with every optional field populated -- confirms every
 // listed field (visible Blocks 1-4d, plus the fields PrivateOutput.tsx
@@ -104,17 +104,17 @@ const MINIMAL_PAYLOAD: PrivateOutputPayload = {
 describe("buildResultsText -- full payload, every field present", () => {
   const text = buildResultsText(FULL_PAYLOAD);
 
-  it("includes the primary state, severity, and descriptive_prose", () => {
-    expect(text).toContain("The Paper Tiger (Entrenched)");
-    expect(text).toContain("Primary state descriptive prose.");
+  it("lists every condition with its tier and prose, severity paragraph on the lead only", () => {
+    expect(text).toContain("Conditions identified:");
+    expect(text).toContain("— The Paper Tiger (Entrenched)\n  Primary state descriptive prose.");
+    expect(text).toContain("— State B (Emerging)\n  State B's own prose. Second sentence.");
+    // State D has no severity entry and is not the lead, so no tier badge.
+    expect(text).toContain("— State D\n  State D's own prose, far below the delta.");
+    expect(text.split("The condition has been here long enough").length - 1).toBe(1);
   });
 
   it("includes the headline", () => {
     expect(text).toContain("The headline.");
-  });
-
-  it("includes the dimensional shape as a plain text line with real values", () => {
-    expect(text).toContain("Dimensional shape: Aptitude: 60% | Authority: 25% | Alliance: 10% | Attitude: 5%");
   });
 
   it("includes observable indicators", () => {
@@ -134,18 +134,6 @@ describe("buildResultsText -- full payload, every field present", () => {
     expect(text).toContain("The resolution framing text.");
   });
 
-  it("includes co-occurring states with their first-sentence summaries, and folds the rest into an overflow count", () => {
-    expect(text).toContain("State B: State B's own prose.");
-    expect(text).toContain("State C: State C's own prose.");
-    expect(text).not.toContain("State D");
-    expect(text).toContain("+1 co-occurring condition");
-  });
-
-  it("includes severity-by-state with the numeric score, unlike the on-screen bar", () => {
-    expect(text).toContain("The Paper Tiger: Entrenched (62/100)");
-    expect(text).toContain("State B: Emerging (20/100)");
-  });
-
   it("includes legal/compliance exposure, the coverage caveat, the partial-jurisdiction caveat, the unpriced-state caveat, and the base caveat", () => {
     expect(text).toContain("$100,000 – $450,000");
     expect(text).toContain("federal coverage threshold");
@@ -154,47 +142,28 @@ describe("buildResultsText -- full payload, every field present", () => {
     expect(text).toContain("This is a directional estimate, not a legal opinion.");
   });
 
-  it("includes every field PrivateOutput.tsx never renders, in the additional-detail section", () => {
-    expect(text).toContain("Cascade risk: 0.42");
-    expect(text).toContain("Causation pattern: single_point (dispersion: 0.23, qualified states: 3)");
-    expect(text).toContain("Trajectory: escalating (delta: 0.15, dispersion delta: 0.05, duration: 6_18mo)");
-    expect(text).toContain("Urgency window: time to consequence: Acute, response window: Immediate");
-    expect(text).toContain("Synthesis confidence: 0.87");
-    expect(text).toContain("Synthesis is fallback: false");
-    expect(text).toContain("Friction tax estimate: $50,000 – $120,000");
-    expect(text).toContain("Organization size: 152");
-    expect(text).toContain("Industry: Professional Services");
-    expect(text).toContain("Role level: C-suite");
-    expect(text).toContain("Tenure in role: 1-3 years");
-    expect(text).toContain("Direct reports: 6-15");
-    expect(text).toContain("Jurisdiction: CA");
-    expect(text).toContain("Significant events: leadership_change, other");
-    expect(text).toContain("Significant event elaboration: A merger completed six months ago.");
+  it("copies nothing the screen does not show", () => {
+    for (const s of [
+      "Dimensional shape", "60%", "Co-occurring conditions", "co-occurring condition",
+      "Severity across conditions", "62/100", "/100",
+      "Additional diagnostic detail", "Cascade risk", "Causation pattern", "dispersion",
+      "Trajectory", "delta:", "Urgency window", "Synthesis confidence", "Synthesis is fallback",
+      "Friction tax estimate:", "Intake:", "Organization size", "Role level",
+      "Significant event elaboration",
+    ]) {
+      expect(text).not.toContain(s);
+    }
   });
 
-  it("places the additional-detail section after all visible content, correctly ordered", () => {
-    const markerIndex = text.indexOf("--- Additional diagnostic detail ---");
-    expect(markerIndex).toBeGreaterThan(-1);
-
-    // Everything visible (Blocks 1-4d) appears before the marker.
-    const visibleMarkers = [
-      "The Paper Tiger (Entrenched)",
-      "Dimensional shape:",
-      "Resolution pathway:",
-      "Co-occurring conditions:",
-      "Severity across conditions:",
+  it("follows the on-screen order", () => {
+    const order = [
+      "Observable indicators:", "Conditions identified:", "The headline.",
+      "The liability condition text.", "Primary asset domain:", "Resolution pathway:",
       "Legal/Compliance exposure:",
     ];
-    for (const marker of visibleMarkers) {
-      expect(text.indexOf(marker)).toBeLessThan(markerIndex);
-      expect(text.indexOf(marker)).toBeGreaterThan(-1);
-    }
-
-    // Everything additional-detail-only appears after the marker.
-    const detailMarkers = ["Cascade risk:", "Causation pattern:", "Trajectory:", "Urgency window:", "Synthesis confidence:", "Intake:"];
-    for (const marker of detailMarkers) {
-      expect(text.indexOf(marker)).toBeGreaterThan(markerIndex);
-    }
+    const idx = order.map((m) => text.indexOf(m));
+    idx.forEach((v) => expect(v).toBeGreaterThan(-1));
+    expect([...idx].sort((a, b) => a - b)).toEqual(idx);
   });
 
   it("contains no literal markdown syntax that would look wrong pasted as plain text", () => {
@@ -205,10 +174,9 @@ describe("buildResultsText -- full payload, every field present", () => {
 describe("buildResultsText -- minimal payload, optional fields absent/null", () => {
   const text = buildResultsText(MINIMAL_PAYLOAD);
 
-  it("omits the headline section entirely rather than emitting an empty line for it", () => {
-    // The headline block would otherwise insert a blank-then-empty pair;
-    // confirm no stray double-blank artifact from an empty headline.
+  it("never emits an empty paragraph", () => {
     expect(text).not.toMatch(/\n\n\n/);
+    expect(text.startsWith("\n")).toBe(false);
   });
 
   it("omits observable indicators entirely when empty", () => {
@@ -220,45 +188,19 @@ describe("buildResultsText -- minimal payload, optional fields absent/null", () 
     expect(text).not.toContain("Primary asset domain:");
   });
 
-  it("omits co-occurring conditions when secondary_states is empty", () => {
-    expect(text).not.toContain("Co-occurring conditions:");
-  });
-
-  it("omits severity-by-state when absent", () => {
-    expect(text).not.toContain("Severity across conditions:");
+  it("falls back to the primary state for the conditions list, with the payload tier", () => {
+    expect(text).toContain("Conditions identified:\n— The Paper Tiger (Emerging)");
   });
 
   it("omits the entire legal/compliance block when legal_tail_risk_exposure is null", () => {
     expect(text).not.toContain("Legal/Compliance exposure:");
   });
 
-  it("omits cascade_risk, causation_pattern, trajectory, and urgency_window when absent", () => {
-    expect(text).not.toContain("Cascade risk:");
-    expect(text).not.toContain("Causation pattern:");
-    expect(text).not.toContain("Trajectory:");
-    expect(text).not.toContain("Urgency window:");
+  it("omits the friction tax ledger when there is none", () => {
+    expect(text).not.toContain("Friction tax ledger:");
   });
 
-  it("omits friction_tax_estimate when null (Path B)", () => {
-    expect(text).not.toContain("Friction tax estimate:");
-  });
-
-  it("omits significant_event_elaboration when not provided", () => {
-    expect(text).not.toContain("Significant event elaboration:");
-  });
-
-  it("still includes the always-present fields -- synthesis confidence/fallback and full intake", () => {
-    expect(text).toContain("Synthesis confidence: 0.5");
-    expect(text).toContain("Synthesis is fallback: true");
-    expect(text).toContain("Organization size: 50");
-    expect(text).toContain("Significant events: none");
-  });
-
-  it("still uses resolution_routing as the Block 2b fallback when liability text is present but framing text is empty", () => {
-    // liability_condition_text IS present in MINIMAL_PAYLOAD -- confirm it
-    // renders directly rather than falling back, and resolution_routing
-    // still appears once, in Block 4 (not duplicated per the same
-    // usedRoutingInBlock2 logic PrivateOutput.tsx itself uses).
+  it("still uses resolution_routing once, in the pathway, when liability text is present", () => {
     expect(text).toContain("The liability condition text.");
     const routingCount = text.split("Routing description text.").length - 1;
     expect(routingCount).toBe(1);
@@ -274,6 +216,21 @@ describe("buildResultsText -- Block 2b fallback to resolution_routing", () => {
     const text = buildResultsText(payload);
     const routingCount = text.split("Routing description text.").length - 1;
     expect(routingCount).toBe(1);
+  });
+});
+
+describe("buildResultsText -- conditions list source", () => {
+  it("uses all_qualified_states when present, in its order", () => {
+    const text = buildResultsText({
+      ...MINIMAL_PAYLOAD,
+      all_qualified_states: [
+        { state_id: "q1", state_name: "Q One", score: 0.9, descriptive_prose: "Q one prose." },
+        { state_id: "q2", state_name: "Q Two", score: 0.7, descriptive_prose: "Q two prose." },
+      ],
+    });
+    expect(text.indexOf("— Q One (Emerging)")).toBeGreaterThan(-1);
+    expect(text.indexOf("— Q Two")).toBeGreaterThan(text.indexOf("— Q One"));
+    expect(text).not.toContain("The Paper Tiger");
   });
 });
 
@@ -312,6 +269,17 @@ describe("buildResultsText -- Phase 3 sections", () => {
       low: 50000, high: 70000, currency: "USD",
       driving_factors: [{ category: "Payroll baseline", rationale: "Estimated annual payroll: $1,000,000." }],
     },
+    friction_tax_ledger: [
+      {
+        state_id: "the_paper_tiger", state_name: "The Paper Tiger", risk_label: "Entrenched",
+        dollar_exposure: { low: 20000, high: 28000, currency: "USD" },
+        top_contributing_answers: ["Decisions get made, then get reopened."],
+      },
+      {
+        state_id: "state_b", state_name: "State B", risk_label: "Emerging",
+        dollar_exposure: null, top_contributing_answers: [],
+      },
+    ],
     legal_tail_risk_exposure: {
       ...FULL_PAYLOAD.legal_tail_risk_exposure!,
       driving_factors: [{ category: "Wage and hour", rationale: "State X: $100,000.", triggering_answer: "Time records are informal." }],
@@ -321,7 +289,8 @@ describe("buildResultsText -- Phase 3 sections", () => {
       service_estimate_low: null, service_estimate_high: null, pricing_model_note: "",
     },
     asset_evidence: {
-      strongest_axes: ["attitude"], contributing_signals: [],
+      strongest_axes: ["attitude"],
+      contributing_signals: [{ axis: "attitude", observation_text: "Most managers here develop their people and produce results." }],
       net_scores: { aptitude: 0, authority: 1.4, alliance: 0, attitude: 1.9 },
     },
     tactical_findings: [{
@@ -334,15 +303,23 @@ describe("buildResultsText -- Phase 3 sections", () => {
   it("opens with the executive summary", () => {
     expect(text.startsWith("Executive summary:\nThe summary sentence.")).toBe(true);
   });
-  it("includes where strength shows up, with net scores", () => {
-    expect(text).toContain("Where strength shows up: Attitude (net asset signal: Aptitude 0 | Authority 1.4 | Alliance 0 | Attitude 1.9)");
+  it("includes where strength shows up as the on-screen sentence and evidence, without scores", () => {
+    expect(text).toContain(
+      "Where strength shows up:\nYour answers show the most strength in Attitude.\n— Most managers here develop their people and produce results.",
+    );
+    expect(text).not.toContain("1.9");
+    expect(text).not.toContain("net asset signal");
   });
-  it("includes both receipt lists, with the triggering answer when present", () => {
+  it("includes the friction tax ledger rows, the footnote, and the friction receipts", () => {
+    expect(text).toContain("— The Paper Tiger (Entrenched): $20,000 – $28,000\n  Decisions get made, then get reopened.");
+    expect(text).toContain("— State B (Emerging): Estimate not available for this condition.");
+    expect(text).toContain("Estimates are calculated from your organization's size");
+    expect(text).toContain("How the friction tax was calculated:\n— Payroll baseline: Estimated annual payroll: $1,000,000.");
+  });
+  it("includes the legal receipts, with the triggering answer when present", () => {
     expect(text).toContain("How the legal figure was calculated:");
     expect(text).toContain("— Wage and hour: State X: $100,000.");
     expect(text).toContain("  Based on your answers: Time records are informal.");
-    expect(text).toContain("How the friction tax was calculated:");
-    expect(text).toContain("— Payroll baseline: Estimated annual payroll: $1,000,000.");
   });
   it("includes the cost comparison with separate timeframes, never a combined total", () => {
     expect(text).toContain("Cost comparison:");
@@ -355,9 +332,43 @@ describe("buildResultsText -- Phase 3 sections", () => {
     expect(text).toContain("— Payroll & Wage-Hour: 2 of 4 answers show a gap.");
     expect(text).toContain("  Overtime classifications may have drifted.");
   });
+  it("hides the strength panel when every net score is 0, like the screen", () => {
+    const zero = buildResultsText({
+      ...phase3,
+      asset_evidence: { strongest_axes: [], contributing_signals: [], net_scores: { aptitude: 0, authority: 0, alliance: 0, attitude: 0 } },
+    });
+    expect(zero).not.toContain("Where strength shows up");
+  });
+  it("on Call 2 failure, copies what the screen shows: referral chips over each section's answers", () => {
+    const tactical: TacticalSectionResult[] = [{
+      question_set_id: "TC-PAYROLL",
+      referral: ["HR Consulting", "Managed Payroll"],
+      answers: [{
+        question_id: "TC-PAY-01", question_text: "How are overtime hours tracked?",
+        selected_option_text: "Informally, by each manager.", intent: "",
+      }],
+    }];
+    const failed = buildResultsText({ ...phase3, tactical_findings: [] }, tactical);
+    expect(failed).toContain(
+      "Tactical & compliance review:\n— HR Consulting, Managed Payroll\n  How are overtime hours tracked?\n    Informally, by each manager.",
+    );
+    expect(failed).not.toContain("answers show a gap");
+    // With findings present the tactical results are not read (unchanged behavior).
+    const ok = buildResultsText(phase3, tactical);
+    expect(ok).not.toContain("Managed Payroll");
+    expect(ok).toContain("— Payroll & Wage-Hour: 2 of 4 answers show a gap.");
+  });
+  it("copies the Ohio net-worth caveat from the shared constant, with no spaced double hyphen", () => {
+    const ohio = buildResultsText({
+      ...phase3,
+      legal_tail_risk_exposure: { ...phase3.legal_tail_risk_exposure!, has_uncollected_net_worth_caveat: true },
+    });
+    expect(ohio).toContain(OHIO_NET_WORTH_CAVEAT);
+    expect(OHIO_NET_WORTH_CAVEAT).not.toContain("--");
+  });
   it("omits every Phase 3 section when the payload has none", () => {
     const plain = buildResultsText(MINIMAL_PAYLOAD);
-    for (const s of ["Executive summary:", "Where strength shows up", "How the legal figure", "Cost comparison:", "Tactical & compliance review:"]) {
+    for (const s of ["Executive summary:", "Where strength shows up", "How the legal figure", "Cost comparison:", "Tactical & compliance review:", "Friction tax ledger:", "Ohio"]) {
       expect(plain).not.toContain(s);
     }
   });
