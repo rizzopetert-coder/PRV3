@@ -3036,39 +3036,48 @@ def _build_library():
 
     # observation_valence for every authored observation_text below, wired
     # to AnswerOption.observation_valence at build time. Pete-approved
-    # 2026-09-27: 103 liability, 6 neutral (Q07-A, Q34-A..E), 0 asset --
-    # none of the authored text is phrased as a strength yet.
+    # 2026-09-27 (103 liability, 6 neutral: Q07-A, Q34-A..E), extended by
+    # Pass 2 on 2026-09-28: 33 asset (the strength answers that can surface
+    # as asset evidence) and 3 liability (DIST-CM-01-A, DIST-CM-02-A/C).
+    # Totals: 106 liability, 6 neutral, 33 asset.
     _observation_valence_tags: dict = {
-        "Q01": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q02": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q04": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q05": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q06": {"A": "liability", "B": "liability", "C": "liability", "D": "liability"},
+        "Q01": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q02": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q04": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q05": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q06": {"A": "liability", "B": "liability", "C": "liability", "D": "liability", "E": "asset"},
         "Q07": {"A": "neutral", "B": "liability", "C": "liability", "D": "liability"},
-        "Q08": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q09": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q10": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q11": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q12": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q13": {"A": "liability", "B": "liability", "C": "liability", "D": "liability"},
-        "Q14": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q15": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q16": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q17": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q18": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q19": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q20": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q21": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q22": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q23": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q24": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q25": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q26": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q27B": {"B": "liability", "C": "liability", "D": "liability", "E": "liability"},
-        "Q30": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q32": {"B": "liability", "C": "liability", "D": "liability"},
-        "Q33": {"B": "liability", "C": "liability", "D": "liability"},
+        "Q08": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q09": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q10": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q11": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q12": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q13": {"A": "liability", "B": "liability", "C": "liability", "D": "liability", "E": "asset"},
+        "Q14": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q15": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q16": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q17": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q18": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q19": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q20": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q21": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q22": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q23": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q24": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q25": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q26": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q27B": {"A": "asset", "B": "liability", "C": "liability", "D": "liability", "E": "liability"},
+        "Q28": {"A": "asset"},
+        "Q30": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q32": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
+        "Q33": {"A": "asset", "B": "liability", "C": "liability", "D": "liability"},
         "Q34": {"A": "neutral", "B": "neutral", "C": "neutral", "D": "neutral", "E": "neutral"},
+        "Q36": {"A": "asset"},
+        "Q37": {"A": "asset"},
+        "Q38": {"A": "asset"},
+        "Q39": {"A": "asset"},
+        "DIST-CM-01": {"A": "liability"},
+        "DIST-CM-02": {"A": "liability", "C": "liability"},
     }
 
     # Sparse per-option observation_text, wired to AnswerOption.observation_text
@@ -3076,28 +3085,34 @@ def _build_library():
     # listed here defaults to None via .get(qid, {}).get(o[0]). Q03B
     # intentionally excluded -- all four options share an identical flat
     # 0.25 baseline across every field, no salience-differentiating signal
-    # to author against. The single strength/baseline option per other
-    # question (the asset/healthy case) is deliberately left unauthored
-    # throughout, except where a question has no such option (Q07, Q34).
+    # to author against. Strength answers carry asset-valence text (Pass 2,
+    # 2026-09-28) wherever _build_asset_evidence can quote them: live-
+    # reachable, not placeholder-seeded, positive asset signal on a field
+    # the question's options differ on. Strength answers on unreachable
+    # questions (Q03A, Q27A, VERIFY-*) stay unauthored.
     _observation_text_tags: dict = {
         "Q01": {
+            "A": "Decisions here get made by the right people, and they stay made.",
             "B": "Bigger decisions get complicated here even when smaller ones don't.",
             "C": "Decisions get made, then get reopened. People aren't always sure what's actually final.",
             "D": "Getting to a decision here takes more effort than it should.",
             "E": "Decisions happen, but nobody's quite sure who was accountable for making them.",
         },
         "Q02": {
+            "A": "This organization has dedicated HR leadership that operates with real authority.",
             "B": "HR handles what it needs to, but it isn't operating as a strategic function here.",
-            "C": "HR is thin -- a part-time role or something people share on top of other work.",
+            "C": "HR is thin here. It's a part-time role or something people share on top of other work.",
             "D": "There's no dedicated HR function in this organization right now.",
             "E": "There's an HR function, but its independence is genuinely in question.",
         },
         "Q04": {
+            "A": "People here raise concerns, and there's a process they actually use.",
             "B": "Whether a concern gets addressed here depends more on the person than the process.",
             "C": "There's real uncertainty about what actually happens once a concern gets raised.",
             "D": "People have learned that raising a concern here doesn't produce results.",
         },
         "Q05": {
+            "A": "Underperformance here gets addressed through a process managers actually use.",
             "B": "Underperformance gets addressed eventually, but it takes longer than it should.",
             "C": "Whether someone's held accountable here seems to depend on who they are.",
             "D": "Underperformance tends to get tolerated rather than addressed.",
@@ -3107,36 +3122,42 @@ def _build_library():
             "B": "There's been a monetary settlement tied to an employment matter.",
             "C": "Legal counsel has already flagged something here as a liability.",
             "D": "There's a known practice here that isn't fully compliant, and it hasn't been addressed.",
+            "E": "None of the legal or HR situations asked about have come up here in three years.",
         },
         "Q07": {
-            "A": "Turnover here doesn't concentrate anywhere obvious -- it's spread across the organization.",
+            "A": "Turnover here doesn't concentrate anywhere obvious. It's spread across the organization.",
             "B": "Turnover concentrates under specific managers or in specific teams.",
             "C": "The same roles keep turning over here.",
             "D": "People tend to leave at a specific point in their career with this organization.",
         },
         "Q08": {
+            "A": "Important information reaches leadership here reliably, so the picture at the top is accurate.",
             "B": "Leadership sometimes wonders whether they're getting the full picture.",
             "C": "Problems tend to reach leadership only once they're already crises.",
             "D": "What people hear informally here doesn't match what comes through formal channels.",
         },
         "Q09": {
+            "A": "The senior team here disagrees productively and still moves forward together.",
             "B": "People here do their jobs, but they don't really operate as a team.",
             "C": "There's tension at the senior level that's mostly stayed contained there.",
-            "D": "There's a senior-level dynamic that's broken the surface -- the rest of the organization has noticed.",
+            "D": "There's a senior-level dynamic that's broken the surface, and the rest of the organization has noticed.",
             "E": "There's a real unresolved conflict at the senior level.",
         },
         "Q10": {
+            "A": "This organization's formal processes are current, and people actually use them.",
             "B": "Some processes here are out of date or inconsistently followed.",
             "C": "There's a real gap between what's written down and how this organization actually operates.",
             "D": "This organization runs more on managers' judgment than on documented process.",
         },
         "Q11": {
+            "A": "What this organization says it values shows up in how it actually operates.",
             "B": "There are visible exceptions here to what this organization says it values.",
             "C": "Relationships and visibility tend to drive outcomes here more than the stated values do.",
             "D": "What gets rewarded here and what this organization says it values are two different things, and people know it.",
             "E": "This organization's values are written down, but they don't really govern anything.",
         },
         "Q12": {
+            "A": "Most managers here develop their people and produce results.",
             "B": "Manager quality is uneven here, some strong, some struggling.",
             "C": "The managers here are capable individually, but they're stretched beyond what they can handle.",
             "D": "There are specific managers here who are a real problem, not the whole layer.",
@@ -3147,97 +3168,118 @@ def _build_library():
             "B": "This organization has been here before. People are waiting to see if this time is actually different.",
             "C": "The direction here isn't as clear as it should be, and people are operating on different assumptions.",
             "D": "The direction is clear, but there's real skepticism about whether it'll be followed through on.",
+            "E": "People here know the direction and trust leadership to execute on it.",
         },
         "Q14": {
+            "A": "Leadership here is confident pay is competitive and internally consistent.",
             "B": "This organization may be externally competitive, but internal consistency is a real question.",
             "C": "This organization may be internally consistent, but external competitiveness is a real question.",
             "D": "There are real concerns here about both compensation consistency and competitiveness.",
             "E": "This organization hasn't looked closely enough at compensation to know where it stands.",
         },
         "Q15": {
+            "A": "People here know what it takes to advance, and advancement is merit-based.",
             "B": "Advancement happens here, but the criteria aren't always transparent.",
             "C": "Advancement here tends to favor certain people or certain teams.",
             "D": "This organization doesn't have much room for advancement to offer.",
             "E": "People looking to grow tend to leave before this organization can develop them.",
         },
         "Q16": {
+            "A": "Diverse talent here advances at the same rate as everyone else.",
             "B": "This organization is diverse at entry levels, but that changes as people move up.",
             "C": "This organization has invested in diversity, but it's not clear that's translating into advancement.",
             "D": "This organization is losing diverse talent before it reaches senior levels, and the reason isn't clear.",
             "E": "This isn't something this organization has looked at closely enough to answer with confidence.",
         },
         "Q17": {
+            "A": "When this organization changes something, the change sticks and people invest in it.",
             "B": "Initiatives here tend to start strong and fade before they take hold.",
             "C": "People here participate in change, but they don't really invest in it.",
             "D": "This organization keeps addressing the same problems with different approaches and getting the same result.",
             "E": "This organization knows what needs to change and talks about it, but doesn't actually move.",
         },
         "Q18": {
+            "A": "Safety and security are taken seriously here. People report concerns and the organization responds.",
             "B": "The policies exist here, but there's real doubt about whether people follow them or report when something's wrong.",
             "C": "This organization has had incidents that, in hindsight, could have been prevented if people had spoken up earlier.",
             "D": "Security here is a known gap, people work around protocols rather than follow them.",
             "E": "Safety and security concerns here have gone unaddressed longer than they should have.",
         },
         "Q19": {
+            "A": "What this organization says publicly matches what it lives internally.",
             "B": "There are gaps between what this organization says internally and externally, and people are aware of them.",
             "C": "There's a real gap here, the external narrative is ahead of the internal reality.",
             "D": "This organization hasn't really looked at whether its internal and external stories align.",
         },
         "Q20": {
+            "A": "People here know their mandates, and decisions get made at the right level.",
             "B": "There are some areas of overlap or ambiguity in who owns what here.",
             "C": "There are meaningful gaps here, certain functions or roles don't have clear mandates.",
             "D": "Authority and responsibility questions are a recurring source of friction here.",
         },
         "Q21": {
+            "A": "Decisions here get from idea to final call without stalling.",
             "B": "Decisions here require more back-and-forth than they should.",
             "C": "Decisions that shouldn't need senior involvement tend to escalate there anyway.",
             "D": "Decisions get made here and then get reopened without much new information.",
             "E": "Decisions happen here, but it's unclear who actually has the authority to make them.",
         },
         "Q22": {
+            "A": "This organization's people policies are current and reviewed regularly.",
             "B": "Some policies here haven't been looked at in a while.",
             "C": "This organization hasn't reviewed its policies recently, and there's real doubt they reflect current law or practice.",
             "D": "This organization has run into a situation its policies didn't cover, or didn't cover correctly.",
             "E": "This organization uses AI tools in people decisions without a clear sense of the implications.",
         },
         "Q23": {
+            "A": "This organization has built real depth. No single departure would be unmanageable.",
             "B": "This organization is more dependent on certain people than it should be, even if it hasn't been tested yet.",
             "C": "A past departure exposed how thin this organization was in a role, and recovery was harder than expected.",
             "D": "There are people here right now whose departure would be genuinely destabilizing.",
         },
         "Q24": {
+            "A": "The highest performers here are engaged, and their pace is sustainable.",
             "B": "Some high performers here are carrying more than is healthy long term.",
             "C": "This organization has lost high performers recently in ways that came as a real surprise.",
             "D": "There are people here running on empty, and it's not clear how to address it.",
         },
         "Q25": {
+            "A": "This organization develops people on purpose, and it shows in who gets promoted.",
             "B": "Internal development here is inconsistent, promotion from within happens when it can.",
             "C": "This organization tends to hire externally for senior roles rather than build the pipeline.",
             "D": "This organization has invested in developing people, but it hasn't produced what was expected.",
             "E": "Developing people hasn't really been a priority here.",
         },
         "Q26": {
+            "A": "Cross-functional work happens naturally here and produces results.",
             "B": "Cross-functional work here happens, but there's more friction at the seams than there should be.",
             "C": "Cross-functional initiatives here stall predictably at the same points.",
             "D": "Functions here operate independently, collaboration is the exception rather than the rule.",
         },
         "Q27B": {
+            "A": "The culture this organization describes is the culture people actually live.",
             "B": "This organization's culture is drifting, things feel different from what it's been.",
             "C": "Different parts of this organization seem to have genuinely different cultures.",
             "D": "There's real uncertainty here about what the culture actually is right now.",
             "E": "The culture people experience here doesn't match what gets described in recruiting.",
         },
+        "Q28": {
+            "A": "After an earlier legal or HR matter, this organization made real structural changes.",
+        },
         "Q30": {
+            "A": "Leadership here communicates deliberately, and people are generally informed.",
             "B": "There are gaps in what reaches people here, some things land and some don't.",
             "C": "Communication here is inconsistent, it varies a lot by team or manager.",
             "D": "There's a real information gap here, people often hear about things informally before it's official.",
         },
         "Q32": {
+            "A": "This organization examines what happened, draws conclusions, and actually changes as a result.",
             "B": "This organization reflects on what happens, but doesn't always follow through on the learning.",
             "C": "This organization has received consistent feedback, through surveys, consultants, or data, that it's struggled to act on.",
             "D": "This organization tends to move on from difficult experiences without really examining them.",
         },
         "Q33": {
+            "A": "Operational plans here are current, tested, and match how the organization actually runs.",
             "B": "Continuity plans exist here, but there's real doubt they're current or would hold up under pressure.",
             "C": "This organization has some continuity documentation, but it isn't something actively maintained.",
             "D": "This organization doesn't have continuity infrastructure in place.",
@@ -3248,6 +3290,25 @@ def _build_library():
             "C": "This reads as a cultural issue, about how people behave and what this organization accepts.",
             "D": "This reads as a leadership issue, the will or capability to act on what's known isn't there.",
             "E": "The problem here is real, but it doesn't cleanly categorize into one clear cause.",
+        },
+        "Q36": {
+            "A": "Underperformance here usually gets an early, direct conversation, and that resolves most of it.",
+        },
+        "Q37": {
+            "A": "When something stops working here, whoever owns it flags it and brings a recommendation.",
+        },
+        "Q38": {
+            "A": "If a senior leader left suddenly, someone here is ready to cover the work.",
+        },
+        "Q39": {
+            "A": "When someone isn't right for a role, this organization addresses it directly and decides.",
+        },
+        "DIST-CM-01": {
+            "A": "This manager's role grew significantly, and nothing was taken off their plate.",
+        },
+        "DIST-CM-02": {
+            "A": "This manager knows what each person needs to grow but hasn't acted on it.",
+            "C": "This manager points to workload or time as the reason development hasn't happened.",
         },
     }
 
