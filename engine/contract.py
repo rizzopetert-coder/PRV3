@@ -14,6 +14,7 @@ Spec reference: documents/PRV3_Scoring_Architecture_Spec_v1.docx, Section VII
 
 from __future__ import annotations
 
+import math
 import uuid
 from dataclasses import dataclass, field
 from typing import Optional
@@ -502,11 +503,14 @@ def _build_friction_tax_ledger(
                     accumulate_answer(scratch, option, intake_data, question_id)
                     contribution = scratch.accumulated_vector
 
+                    # A3: liability fields only, and zero-weight answers
+                    # left out, same ranking rule as receipt evidence.
                     weight = sum(
                         contribution.get(f, 0.0) * salience.get(f, 0.0)
-                        for f in DIMENSIONAL_FIELDS
+                        for f in _LIABILITY_FIELDS
                     )
-                    scored.append((weight, option))
+                    if weight > 0:
+                        scored.append((weight, option))
 
         scored.sort(key=lambda pair: pair[0], reverse=True)
 
@@ -589,7 +593,14 @@ _FRICTION_CHANNEL_LABELS = {
 
 
 def _usd(value: float) -> str:
-    return f"${value:,.0f}"
+    """Display dollars to 3 significant figures, half up (A1). Same rule as
+    formatUsd in web/lib/output-text.ts. Payload values stay unrounded.
+    A nonzero value never renders as $0."""
+    if value == 0:
+        return "$0"
+    unit = 10 ** max(0, math.floor(math.log10(abs(value))) + 1 - 3)
+    rounded = int(math.floor(value / unit + 0.5)) * unit
+    return f"${rounded:,}" if rounded else "under $1"
 
 
 def _join_words(items: list) -> str:
@@ -600,8 +611,19 @@ def _join_words(items: list) -> str:
     return ", ".join(items[:-1]) + f", and {items[-1]}"
 
 
+# Receipt evidence (P3, Pete 2026-09-28): problem answers are ranked on
+# *_liability contributions only, so an answer's asset signal can never
+# make it look like evidence of a problem. A receipt quotes an answer only
+# when its salience-weighted weight reaches _RECEIPT_EVIDENCE_MIN_WEIGHT.
+# Calibration picks (175 profiles) cluster near 0.12 and near 0.6, with
+# 4% between 0.20 and 0.30, so 0.20 separates weak matches from real ones.
+_LIABILITY_FIELDS = tuple(f for f in DIMENSIONAL_FIELDS if f.endswith("_liability"))
+_RECEIPT_EVIDENCE_MIN_WEIGHT = 0.20
+
+
 def _top_observation_texts(
     state_id: str, answers_log: list, intake_data, limit: Optional[int] = 1,
+    min_weight: float = 0.0,
 ) -> list:
     """
     The respondent's own answers most relevant to state_id, as authored
@@ -610,8 +632,9 @@ def _top_observation_texts(
     selected option, salience-weighted against SALIENCE_PROFILES), kept
     separate rather than refactoring the ledger. Unauthored options are
     skipped, never replaced with raw option_text. Only problem-context
-    valences (PROBLEM_CONTEXT_VALENCES) are cited. limit=None returns the
-    full ranking.
+    valences (PROBLEM_CONTEXT_VALENCES) are cited, ranked on *_liability
+    contributions only. Answers below min_weight are left out. limit=None
+    returns the full ranking.
     """
     salience = SALIENCE_PROFILES.get(state_id)
     if not salience or not answers_log:
@@ -635,9 +658,9 @@ def _top_observation_texts(
             accumulate_answer(scratch, option, intake_data, entry.get("question_id"))
             weight = sum(
                 scratch.accumulated_vector.get(f, 0.0) * salience.get(f, 0.0)
-                for f in DIMENSIONAL_FIELDS
+                for f in _LIABILITY_FIELDS
             )
-            if weight > 0:
+            if weight > 0 and weight >= min_weight:
                 scored.append((weight, option.observation_text))
     scored.sort(key=lambda pair: pair[0], reverse=True)
     texts: list = []
@@ -651,12 +674,12 @@ def _top_observation_texts(
 
 def _pick_distinct(ranked: list, used: set) -> Optional[str]:
     """The highest-ranked text not already cited by an earlier condition in
-    the same receipt list. Falls back to the top one when every candidate
-    is already used (reused rather than dropped). Records the pick."""
-    if not ranked:
-        return None
-    pick = next((t for t in ranked if t not in used), ranked[0])
-    used.add(pick)
+    the same receipt list. None when every candidate is already used: the
+    receipt then carries no evidence line rather than a repeat (P3).
+    Records the pick."""
+    pick = next((t for t in ranked if t not in used), None)
+    if pick is not None:
+        used.add(pick)
     return pick
 
 
@@ -706,7 +729,10 @@ def _friction_driving_factors(
             "Condition",
             f"{s['state_name']} adds cost through {_join_words(channels)}.",
             _pick_distinct(
-                _top_observation_texts(s["state_id"], answers_log, intake_data, limit=None),
+                _top_observation_texts(
+                    s["state_id"], answers_log, intake_data, limit=None,
+                    min_weight=_RECEIPT_EVIDENCE_MIN_WEIGHT,
+                ),
                 used_answers,
             ),
         ))
@@ -745,7 +771,7 @@ def _legal_driving_factors(
     for b in breakdown:
         name = names.get(b["state_id"], b["state_id"])
         amount = (
-            _usd(b["low"]) if b["low"] == b["high"]
+            _usd(b["low"]) if _usd(b["low"]) == _usd(b["high"])
             else f"{_usd(b['low'])} to {_usd(b['high'])}"
         )
         rationale = f"{name}: {amount}"
@@ -758,15 +784,19 @@ def _legal_driving_factors(
             _LEGAL_CLUSTER_LABELS.get(b["cluster"], "Legal exposure"),
             rationale + ".",
             _pick_distinct(
-                _top_observation_texts(b["state_id"], answers_log, intake_data, limit=None),
+                _top_observation_texts(
+                    b["state_id"], answers_log, intake_data, limit=None,
+                    min_weight=_RECEIPT_EVIDENCE_MIN_WEIGHT,
+                ),
                 used_answers,
             ),
         ))
     if len(breakdown) > 1:
         receipts.append(_receipt(
             "Total",
-            "Within a category, overlapping exposures count at decreasing weight "
-            "(full, half, then a quarter). Categories are then added together.",
+            "Within a category, the largest exposure counts in full and each additional "
+            "one counts at half the weight of the one before it. Categories are then "
+            "added together.",
         ))
     return receipts
 
