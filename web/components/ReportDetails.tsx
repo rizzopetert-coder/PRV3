@@ -10,13 +10,11 @@ import type {
   TacticalFinding,
   TacticalSectionResult,
 } from "@/lib/types";
+import { formatUsdRange } from "@/lib/output-text";
 
 // Phase 3 report blocks (Pete, 2026-09-27). Brand-neutral: every brand-
 // specific value (service names, referral chips) arrives as data.
 
-function usd(value: number): string {
-  return `$${Math.round(value).toLocaleString()}`;
-}
 
 function joinWords(items: string[]): string {
   if (items.length <= 1) return items.join("");
@@ -56,8 +54,9 @@ export function EvidenceReceipts({ receipts }: { receipts?: EvidenceReceipt[] })
   );
 }
 
+// Dollars to the nearest $1,000 (A1), the shared report formatter.
 function rangeText(low: number, high: number): string {
-  return low === high ? usd(low) : `${usd(low)} – ${usd(high)}`;
+  return formatUsdRange(low, high);
 }
 
 // The two inaction figures stay separate, each with its timeframe: the
