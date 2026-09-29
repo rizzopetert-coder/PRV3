@@ -11,7 +11,7 @@ import type { EnginePayload } from "@/lib/engine-client";
 import ShareButton from "@/components/ShareButton";
 import CopyResultsButton from "@/components/CopyResultsButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
-import { joinNames } from "@/lib/output-text";
+import { buildConditionRows, FRICTION_TAX_LEDGER_FOOTNOTE, joinNames, OHIO_NET_WORTH_CAVEAT } from "@/lib/output-text";
 import ConditionsList, { type ConditionRow } from "@/components/ConditionsList";
 import {
   AssetStrength,
@@ -41,24 +41,6 @@ const SEVERITY_ANCHOR: Record<SeverityTier, string> = {
     "This is how the organization works now. The condition isn't something that happens inside the organization anymore. It is part of the operating environment itself. People make decisions inside it without questioning it. Resolution means changing the environment, not just addressing the condition.",
 };
 
-
-// Friction tax ledger -- Block 4f. One shared footnote for the whole
-// ledger, not per-row (per spec) -- hardcoded here rather than sent over
-// the wire since it's invariant across every session, same convention as
-// this component's other static section labels. Pete-approved final copy
-// (supersedes the earlier draft, which was cross-checked against
-// prompts/friction-tax-client-copy.md and found to diverge in several
-// ways -- named sources, a missing severity-scaling step, a different
-// "why a range" justification -- all resolved in this final text).
-const FRICTION_TAX_LEDGER_FOOTNOTE =
-  "Estimates are calculated from your organization's size, industry, and " +
-  "structure, then scaled to how deeply organizational risk conditions " +
-  "have taken root. The financial risk range draws on published research " +
-  "including public wage and compensation data and studies on turnover, " +
-  "disengagement, and lost productivity. Sources include McKinsey, SHRM, " +
-  "Gallup, and other widely-recognized credible sources. Figures shown as " +
-  "a range reflect the actual uncertainty identified in your diagnostic " +
-  "result, and are not indicative of imprecision in the diagnosis.";
 
 // Legal/Compliance tail-risk exposure -- Block 4d. Typographic
 // differentiation only (font-weight/size) by band, no color ramp --
@@ -132,29 +114,8 @@ export default function PrivateOutput({
   const usedRoutingInBlock2 = !liabilityText && Boolean(payload.resolution_routing);
 
   // Phase 2 conditions list: every qualifying state, descending score.
-  // all_qualified_states (Pass 1) is already score-sorted by the engine and
-  // includes every above-floor state even in single mode; older payloads,
-  // self-select, and dev fixtures fall back to primary + secondary. Severity
-  // badge/bar only where severity_by_state has the state.
-  const severityById = new Map(
-    (payload.severity_by_state ?? []).map((e) => [e.state_id, e] as const),
-  );
-  const qualifiedSource =
-    payload.all_qualified_states && payload.all_qualified_states.length > 0
-      ? payload.all_qualified_states.map((s) => ({
-          id: s.state_id, name: s.state_name, prose: s.descriptive_prose,
-        }))
-      : [payload.primary_state, ...payload.secondary_states].map((s) => ({
-          id: s.id, name: s.name, prose: s.descriptive_prose ?? "",
-        }));
-  const conditionRows: ConditionRow[] = qualifiedSource.map((s, i) => {
-    const entry = severityById.get(s.id);
-    return {
-      ...s,
-      tier: entry?.tier ?? (i === 0 ? payload.severity : null),
-      severity: entry ? { tier: entry.tier, score_0_100: entry.score_0_100 } : null,
-    };
-  });
+  // Shared derivation with the Copy results text (output-text.ts).
+  const conditionRows: ConditionRow[] = buildConditionRows(payload);
 
   // Names for the legal/ledger blocks below, which carry state_id only.
   const stateNameById = new Map<string, string>([
@@ -293,9 +254,11 @@ export default function PrivateOutput({
         <p className="text-[11px] uppercase tracking-wide text-slate">
           Resolution pathway
         </p>
-        <p className="text-[13px] font-medium text-charcoal">
-          {payload.resolution_family}
-        </p>
+        {payload.resolution_family && (
+          <p className="text-[13px] font-medium text-charcoal">
+            {payload.resolution_family}
+          </p>
+        )}
         {resolutionFramingText ? (
           <p className="text-[13px] text-charcoal">{resolutionFramingText}</p>
         ) : (
@@ -361,12 +324,7 @@ export default function PrivateOutput({
 
           {legalHasPrice && legal.has_uncollected_net_worth_caveat && (
             <p className="text-[11px] text-slate mt-1 mb-2 leading-relaxed">
-              This figure reflects twice the compensatory-damages
-              estimate above, capped at Ohio&apos;s $350,000 ceiling --
-              not the net-worth alternative Ohio law also applies
-              (R.C. 2315.21(D)(2)(b)). Since net worth isn&apos;t
-              collected here, the true cap could be materially lower
-              than what&apos;s reflected here.
+              {OHIO_NET_WORTH_CAVEAT}
             </p>
           )}
 
@@ -475,7 +433,7 @@ export default function PrivateOutput({
           No backend round-trip: payload is already fully present
           client-side by the time this renders. */}
       <div className="mt-2 w-full">
-        <CopyResultsButton payload={payload} />
+        <CopyResultsButton payload={payload} tacticalResults={tacticalResults} />
       </div>
 
       {/* Block 5 — ShareButton */}
