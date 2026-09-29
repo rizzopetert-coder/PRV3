@@ -148,6 +148,18 @@ export const FRICTION_TAX_LEDGER_STANDALONE_NOTE =
   "because the total counts overlapping conditions at decreasing weight rather " +
   "than adding them in full.";
 
+// Friction dollar switch (Pete, 2026-09-28, option C): friction-tax dollar
+// figures are hidden on both brands until the friction methodology is
+// rebuilt. The engine still computes them and the payload still carries
+// them. Set to true to restore the dollar ledger, its calculation steps,
+// its footnotes and the friction line in the cost comparison. Legal
+// exposure is not affected by this switch.
+export const FRICTION_DOLLARS_VISIBLE = false;
+
+// Ledger copy while friction dollars are hidden.
+export const FRICTION_LEDGER_HEADING_NO_DOLLARS = "The answers behind these conditions";
+export const FRICTION_LEDGER_NOTE_NO_DOLLARS = "Conditions that rest on the same answers share a row.";
+
 // One ledger row per distinct evidence set (P2). Rows whose
 // top_contributing_answers are the same set (order ignored) merge into
 // one group that names every condition and carries the highest standalone
@@ -249,10 +261,14 @@ export function buildConditionRows(payload: PrivateOutputPayload): ConditionRowD
 // tacticalResults: the hr-dx TC answers, the same data PrivateOutput passes
 // to TacticalReview. Only read when Call 2 failed (no tactical_findings),
 // where the screen shows referral chips over the answer list.
+// options.frictionDollarsVisible defaults to FRICTION_DOLLARS_VISIBLE, the
+// same switch the screen reads. Tests pass it to cover both states.
 export function buildResultsText(
   payload: PrivateOutputPayload,
   tacticalResults?: TacticalSectionResult[],
+  options: { frictionDollarsVisible?: boolean } = {},
 ): string {
+  const frictionVisible = options.frictionDollarsVisible ?? FRICTION_DOLLARS_VISIBLE;
   // Each block is one paragraph or list; blocks are separated by a blank line.
   const blocks: string[][] = [];
   const add = (block: string[]) => {
@@ -368,7 +384,17 @@ export function buildResultsText(
   // Friction tax ledger, with its footnote and calculation steps. The screen
   // shows the friction receipts inside the ledger, so they share its gate.
   const ledger = payload.friction_tax_ledger ?? [];
-  if (ledger.length > 0) {
+  if (ledger.length > 0 && !frictionVisible) {
+    // Friction dollars hidden: the conditions and the answers behind
+    // them. No figures, no footnotes, no calculation steps.
+    const block = [`${FRICTION_LEDGER_HEADING_NO_DOLLARS}:`];
+    for (const group of groupLedgerRows(ledger, stateNameById)) {
+      block.push(`— ${group.conditions.map((c) => `${c.name} (${c.risk_label})`).join(", ")}`);
+      for (const t of group.top_contributing_answers) block.push(`  ${t}`);
+    }
+    add(block);
+    add([FRICTION_LEDGER_NOTE_NO_DOLLARS]);
+  } else if (ledger.length > 0) {
     const block = ["Friction tax ledger:"];
     for (const group of groupLedgerRows(ledger, stateNameById)) {
       const d = group.dollar_exposure;
@@ -390,7 +416,7 @@ export function buildResultsText(
   }
 
   // Cost comparison (same gate as the on-screen CostComparison).
-  const friction = payload.friction_tax_estimate;
+  const friction = frictionVisible ? payload.friction_tax_estimate : null;
   const scc = payload.service_cost_comparison;
   if (scc && (friction || legalHasPrice)) {
     const block = ["Cost comparison:"];
