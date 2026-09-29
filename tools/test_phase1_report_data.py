@@ -467,7 +467,7 @@ check("signal map still cites the same text when it is problem-context",
 
 # Receipt variety: a repeat is allowed only when a condition has no unused alternative
 check("_pick_distinct prefers an unused answer", _pick_distinct(["a", "b"], {"a"}) == "b")
-check("_pick_distinct reuses the top answer when all are used", _pick_distinct(["a"], {"a"}) == "a")
+check("_pick_distinct: every candidate used -> None, no repeat (P3)", _pick_distinct(["a"], {"a"}) is None)
 check("_pick_distinct: nothing ranked -> None", _pick_distinct([], set()) is None)
 vec_p, log_p = _path(min)
 many = ["built_to_fail", "the_overloaded_manager", "the_undefined_role", "the_unsolved_problem", "the_unformed_leader"]
@@ -476,17 +476,52 @@ fr5 = compute_friction_tax(many, "Emerging", 175, INTAKE.industry, INTAKE.org_ty
 rc = [r for r in _friction_driving_factors(fr5, st5, "Emerging", INTAKE, log_p) if r["category"] == "Condition"]
 picked = [r.get("triggering_answer") for r in rc]
 ok, used = True, set()
+from engine.contract import _RECEIPT_EVIDENCE_MIN_WEIGHT
 for s, pick in zip(many, picked):
-    ranked = _top_observation_texts(s, log_p, INTAKE, limit=None)
+    ranked = _top_observation_texts(s, log_p, INTAKE, limit=None, min_weight=_RECEIPT_EVIDENCE_MIN_WEIGHT)
     if pick is None:
-        ok = ok and not ranked
+        ok = ok and all(t in used for t in ranked)
         continue
-    if any(t not in used for t in ranked) and pick in used:
+    if pick in used or pick != next((t for t in ranked if t not in used), None):
         ok = False
     used.add(pick)
-check("friction receipts vary: a condition only repeats an answer when it has no unused alternative", ok, str(picked))
+check("friction receipts: never repeat an answer, and omit the line only when no unused answer clears the floor (P3)",
+      ok, str(picked))
 check("friction receipts: more than one distinct triggering answer across 5 conditions",
       len({p for p in picked if p}) > 1, str(picked))
+
+
+# P3: receipt evidence ranks on *_liability only and respects the weight floor
+_q18e = next(o for o in L["Q18"].answer_options if o.option_id == "E")
+check("P3: Q18-E in a non-hazard industry (asset-only signal) never ranks as problem evidence",
+      _q18e.observation_text not in _top_observation_texts(
+          "invisible_performance_management", [{"question_id": "Q18", "option_ids": ["E"]}], INTAKE, limit=None))
+_all_ranked = _top_observation_texts("built_to_fail", log, INTAKE, limit=None)
+_floor_ranked = _top_observation_texts("built_to_fail", log, INTAKE, limit=None, min_weight=_RECEIPT_EVIDENCE_MIN_WEIGHT)
+check("P3: the weight floor only removes answers, never reorders them",
+      _floor_ranked == [t for t in _all_ranked if t in _floor_ranked] and len(_floor_ranked) <= len(_all_ranked))
+check("P3: floor is 0.20", _RECEIPT_EVIDENCE_MIN_WEIGHT == 0.20)
+
+# A3: ledger evidence ranks on *_liability only, zero-weight answers left out
+_led_q18 = _build_friction_tax_ledger(
+    [{"state_id": "invisible_performance_management", "state_name": "x"}],
+    [{"state_id": "invisible_performance_management", "tier": "Emerging"}],
+    [{"question_id": "Q18", "option_ids": ["E"]}], INTAKE)
+check("A3: Q18-E in a non-hazard industry never appears as ledger evidence",
+      INTAKE.industry not in __import__("engine.data.intake", fromlist=["x"]).HIGH_HAZARD_INDUSTRIES
+      and all(_q18e.observation_text not in r["top_contributing_answers"] for r in _led_q18), str(_led_q18))
+
+# A1: calculation-step dollars to 3 significant figures, half up, never $0
+from engine.contract import _usd
+_a1 = tuple(_usd(v) for v in (4839283, 604214.4, 1800, 16550, 450, 16381908.3, 2499.99))
+check("A1: _usd rounds to 3 significant figures, half up",
+      _a1 == ("$4,840,000", "$604,000", "$1,800", "$16,600", "$450", "$16,400,000", "$2,500"), str(_a1))
+check("A1: _usd never renders $0 for a nonzero value", _usd(0.3) != "$0" and _usd(0) == "$0")
+
+# P4: the legal Total receipt describes the halving for any number of conditions
+_lg = [r for r in _legal_driving_factors(bd, [{"state_id": b["state_id"], "state_name": b["state_id"]} for b in bd],
+                                         INTAKE, []) if r["category"] == "Total"]
+check("P4: legal Total wording", bool(_lg) and _lg[0]["rationale"] == 'Within a category, the largest exposure counts in full and each additional one counts at half the weight of the one before it. Categories are then added together.', str(_lg))
 
 
 # ── 9. Lead resolution family in both routing modes ─────────────────────────────
