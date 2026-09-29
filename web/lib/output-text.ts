@@ -8,7 +8,9 @@
 // reimplementation that could drift between what's shown on screen and
 // what gets copied.
 
-import type { EvidenceReceipt, PrivateOutputPayload, SeverityTier, StateRef, TacticalSectionResult } from "@/lib/types";
+import type {
+  EvidenceReceipt, FrictionTaxLedgerEntry, PrivateOutputPayload, SeverityTier, StateRef, TacticalSectionResult,
+} from "@/lib/types";
 
 // First-sentence extraction for a secondary state's short-version summary
 // (Block 4b) -- splits on the first sentence-ending period, not a hard
@@ -84,9 +86,28 @@ const SEVERITY_ANCHOR: Record<SeverityTier, string> = {
 // No markdown syntax -- plain labels and blank-line separation only. List
 // items use an em dash prefix, the same idiom the on-screen lists use.
 // ---------------------------------------------------------------------------
+// Display-only dollar rounding (A1, Pete 2026-09-28): every dollar figure
+// in the report, on screen and in Copy results, is shown to 3 significant
+// figures, half up (4,839,283 -> $4,840,000, 16,550 -> $16,600, 450 ->
+// $450). A nonzero value never renders as $0. Payload values stay
+// unrounded. The engine's calculation-step text uses the same rule
+// (engine/contract.py _usd).
+export function formatUsd(value: number): string {
+  if (value === 0) return "$0";
+  const unit = 10 ** Math.max(0, Math.floor(Math.log10(Math.abs(value))) + 1 - 3);
+  const rounded = Math.floor(value / unit + 0.5) * unit;
+  return rounded === 0 ? "under $1" : `$${rounded.toLocaleString("en-US")}`;
+}
+
+// A range, collapsed to one figure when both ends round to the same value.
+export function formatUsdRange(low: number, high: number): string {
+  const a = formatUsd(low);
+  const b = formatUsd(high);
+  return a === b ? a : `${a} – ${b}`;
+}
+
 function money(low: number, high: number): string {
-  const f = (v: number) => `$${Math.round(v).toLocaleString()}`;
-  return low === high ? f(low) : `${f(low)} – ${f(high)}`;
+  return formatUsdRange(low, high);
 }
 
 function receiptLines(title: string, receipts: EvidenceReceipt[] | undefined): string[] {
@@ -117,6 +138,69 @@ export const FRICTION_TAX_LEDGER_FOOTNOTE =
   "Gallup, and other widely-recognized credible sources. Figures shown as " +
   "a range reflect the actual uncertainty identified in your diagnostic " +
   "result, and are not indicative of imprecision in the diagnosis.";
+
+// Ledger note (P2, Pete 2026-09-28): rows are standalone estimates and do
+// not add up to the friction tax total. Shared with PrivateOutput.tsx.
+export const FRICTION_TAX_LEDGER_STANDALONE_NOTE =
+  "Each row estimates what that condition would cost on its own. Conditions " +
+  "that rest on the same answers share a row, which shows the highest of their " +
+  "individual estimates. The rows do not add up to the friction tax total, " +
+  "because the total counts overlapping conditions at decreasing weight rather " +
+  "than adding them in full.";
+
+// One ledger row per distinct evidence set (P2). Rows whose
+// top_contributing_answers are the same set (order ignored) merge into
+// one group that names every condition and carries the highest standalone
+// estimate among them. Rows with no evidence are never grouped: an empty
+// list is not shared evidence. Group order follows first appearance.
+export interface LedgerGroup {
+  conditions: Array<{ state_id: string; name: string; risk_label: SeverityTier }>;
+  dollar_exposure: FrictionTaxLedgerEntry["dollar_exposure"];
+  top_contributing_answers: string[];
+}
+
+function higherEstimate(
+  a: FrictionTaxLedgerEntry["dollar_exposure"],
+  b: FrictionTaxLedgerEntry["dollar_exposure"],
+): boolean {
+  if (!a) return false;
+  if (!b) return true;
+  return a.high > b.high || (a.high === b.high && a.low > b.low);
+}
+
+export function groupLedgerRows(
+  ledger: FrictionTaxLedgerEntry[],
+  nameById?: Map<string, string>,
+): LedgerGroup[] {
+  const groups: LedgerGroup[] = [];
+  const byEvidence = new Map<string, LedgerGroup>();
+  for (const row of ledger) {
+    const condition = {
+      state_id: row.state_id,
+      name: nameById?.get(row.state_id) ?? row.state_name,
+      risk_label: row.risk_label,
+    };
+    const key = row.top_contributing_answers.length > 0
+      ? JSON.stringify([...row.top_contributing_answers].sort())
+      : null;
+    const existing = key ? byEvidence.get(key) : undefined;
+    if (existing) {
+      existing.conditions.push(condition);
+      if (higherEstimate(row.dollar_exposure, existing.dollar_exposure)) {
+        existing.dollar_exposure = row.dollar_exposure;
+      }
+      continue;
+    }
+    const group: LedgerGroup = {
+      conditions: [condition],
+      dollar_exposure: row.dollar_exposure,
+      top_contributing_answers: row.top_contributing_answers,
+    };
+    groups.push(group);
+    if (key) byEvidence.set(key, group);
+  }
+  return groups;
+}
 
 // Block 4d Ohio punitive-cap caveat. Shared with PrivateOutput.tsx so the
 // screen and the copied text cannot drift.
@@ -216,15 +300,12 @@ export function buildResultsText(
   if (block2) add([block2]);
   if (payload.synthesis.framing_text) add([payload.synthesis.framing_text]);
 
-  // Asset block: primary asset domain, anchor text, where strength shows up
-  // (the sentence and the quoted evidence, never the bar values).
+  // Asset block: anchor text, then where strength shows up (the sentence
+  // and the quoted evidence, never the bar values). The primary asset
+  // domain is a property of the lead condition, not of this respondent,
+  // so it is not shown (P1).
   const ev = payload.asset_evidence;
-  if (payload.synthesis.asset_resolution_anchor_text || payload.primary_asset_domain || ev) {
-    const block: string[] = [];
-    if (payload.primary_asset_domain) block.push(`Primary asset domain: ${payload.primary_asset_domain}`);
-    if (payload.synthesis.asset_resolution_anchor_text) block.push(payload.synthesis.asset_resolution_anchor_text);
-    add(block);
-  }
+  if (payload.synthesis.asset_resolution_anchor_text) add([payload.synthesis.asset_resolution_anchor_text]);
   if (ev) {
     const max = Math.max(...Object.keys(ASSET_AXIS_NAMES).map(
       (a) => ev.net_scores[a as keyof typeof ev.net_scores] ?? 0,
@@ -254,12 +335,8 @@ export function buildResultsText(
   if (legal) {
     const block = ["Legal/Compliance exposure:"];
     if (legalHasPrice) {
-      const sym = legal.currency === "USD" ? "$" : "";
-      block.push(
-        legal.low === legal.high
-          ? `Estimated exposure: ${sym}${legal.low!.toLocaleString()}`
-          : `${sym}${legal.low!.toLocaleString()} – ${sym}${legal.high!.toLocaleString()}`,
-      );
+      const figure = formatUsdRange(legal.low!, legal.high!);
+      block.push(figure.includes("–") ? figure : `Estimated exposure: ${figure}`);
     }
     if (legalHasPrice && legal.coverage_basis === "federal_baseline") {
       block.push(
@@ -293,18 +370,21 @@ export function buildResultsText(
   const ledger = payload.friction_tax_ledger ?? [];
   if (ledger.length > 0) {
     const block = ["Friction tax ledger:"];
-    for (const row of ledger) {
-      const d = row.dollar_exposure;
-      const sym = d?.currency === "USD" ? "$" : "";
-      const amount = d
-        ? d.low === d.high
-          ? `Estimated exposure: ${sym}${d.low.toLocaleString()}`
-          : `${sym}${d.low.toLocaleString()} – ${sym}${d.high.toLocaleString()}`
-        : "Estimate not available for this condition.";
-      block.push(`— ${stateNameById.get(row.state_id) ?? row.state_name} (${row.risk_label}): ${amount}`);
-      for (const t of row.top_contributing_answers) block.push(`  ${t}`);
+    for (const group of groupLedgerRows(ledger, stateNameById)) {
+      const d = group.dollar_exposure;
+      const grouped = group.conditions.length > 1;
+      const figure = d ? formatUsdRange(d.low, d.high) : null;
+      const amount = figure === null
+        ? `Estimate not available for ${grouped ? "these conditions" : "this condition"}.`
+        : grouped
+          ? `highest standalone estimate in this group, ${figure}`
+          : figure.includes("–") ? figure : `Estimated exposure: ${figure}`;
+      const names = group.conditions.map((c) => `${c.name} (${c.risk_label})`).join(", ");
+      block.push(`— ${names}: ${amount}`);
+      for (const t of group.top_contributing_answers) block.push(`  ${t}`);
     }
     add(block);
+    add([FRICTION_TAX_LEDGER_STANDALONE_NOTE]);
     add([FRICTION_TAX_LEDGER_FOOTNOTE]);
     add(receiptLines("How the friction tax was calculated:", payload.friction_tax_estimate?.driving_factors));
   }
