@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { buildResultsText, firstSentence, joinNames, buildCoreCluster, OHIO_NET_WORTH_CAVEAT } from "./output-text";
+import {
+  buildResultsText, firstSentence, joinNames, buildCoreCluster, OHIO_NET_WORTH_CAVEAT,
+  FRICTION_TAX_LEDGER_STANDALONE_NOTE, groupLedgerRows, formatUsd, formatUsdRange,
+} from "./output-text";
 import type { PrivateOutputPayload, StateRef, TacticalSectionResult } from "./types";
 
 // A full payload with every optional field populated -- confirms every
@@ -126,7 +129,10 @@ describe("buildResultsText -- full payload, every field present", () => {
     expect(text).toContain("The liability condition text.");
     expect(text).toContain("The framing text.");
     expect(text).toContain("The asset resolution anchor text.");
-    expect(text).toContain("Primary asset domain: Governance Discipline");
+    // P1: the primary asset domain describes the lead condition, not the
+    // respondent, and is not shown.
+    expect(text).not.toContain("Primary asset domain");
+    expect(text).not.toContain("Governance Discipline");
   });
 
   it("includes the resolution pathway", () => {
@@ -158,7 +164,7 @@ describe("buildResultsText -- full payload, every field present", () => {
   it("follows the on-screen order", () => {
     const order = [
       "Observable indicators:", "Conditions identified:", "The headline.",
-      "The liability condition text.", "Primary asset domain:", "Resolution pathway:",
+      "The liability condition text.", "The asset resolution anchor text.", "Resolution pathway:",
       "Legal/Compliance exposure:",
     ];
     const idx = order.map((m) => text.indexOf(m));
@@ -338,6 +344,54 @@ describe("buildResultsText -- Phase 3 sections", () => {
       asset_evidence: { strongest_axes: [], contributing_signals: [], net_scores: { aptitude: 0, authority: 0, alliance: 0, attitude: 0 } },
     });
     expect(zero).not.toContain("Where strength shows up");
+  });
+  it("groups ledger rows with the same evidence set into one row, highest standalone estimate, evidence once", () => {
+    const shared = ["Answer one.", "Answer two."];
+    const grouped = buildResultsText({
+      ...phase3,
+      friction_tax_ledger: [
+        { state_id: "a", state_name: "Cond A", risk_label: "Emerging",
+          dollar_exposure: { low: 100400, high: 140560, currency: "USD" }, top_contributing_answers: shared },
+        { state_id: "b", state_name: "Cond B", risk_label: "Entrenched",
+          dollar_exposure: { low: 300499, high: 420699, currency: "USD" }, top_contributing_answers: [...shared].reverse() },
+        { state_id: "c", state_name: "Cond C", risk_label: "Emerging",
+          dollar_exposure: { low: 200500, high: 280700, currency: "USD" }, top_contributing_answers: ["Answer three."] },
+      ],
+    });
+    expect(grouped).toContain(
+      "— Cond A (Emerging), Cond B (Entrenched): highest standalone estimate in this group, $300,000 – $421,000\n  Answer one.\n  Answer two.",
+    );
+    expect(grouped.split("Answer one.").length - 1).toBe(1);
+    expect(grouped).toContain("— Cond C (Emerging): $201,000 – $281,000\n  Answer three.");
+    expect(grouped).toContain(FRICTION_TAX_LEDGER_STANDALONE_NOTE);
+  });
+  it("formats every dollar figure to 3 significant figures, half up, never $0 (A1)", () => {
+    expect(formatUsd(4839283)).toBe("$4,840,000");
+    expect(formatUsd(604214.4)).toBe("$604,000");
+    expect(formatUsd(1800)).toBe("$1,800");
+    expect(formatUsd(16550)).toBe("$16,600");
+    expect(formatUsd(450)).toBe("$450");
+    expect(formatUsd(16381908.3)).toBe("$16,400,000");
+    expect(formatUsd(0.3)).not.toBe("$0");
+    expect(formatUsd(0)).toBe("$0");
+    expect(formatUsdRange(604214.4, 626278.8)).toBe("$604,000 – $626,000");
+    expect(formatUsdRange(604214.4, 604400)).toBe("$604,000");
+    const legal = buildResultsText({
+      ...phase3,
+      legal_tail_risk_exposure: { ...phase3.legal_tail_risk_exposure!, low: 604214.4, high: 626278.8 },
+    });
+    expect(legal).toContain("Legal/Compliance exposure:\n$604,000 – $626,000");
+    expect(legal).not.toMatch(/\$[0-9,]+\.[0-9]/);
+  });
+  it("groupLedgerRows never groups rows that have no evidence", () => {
+    const groups = groupLedgerRows([
+      { state_id: "a", state_name: "A", risk_label: "Emerging", dollar_exposure: null, top_contributing_answers: [] },
+      { state_id: "b", state_name: "B", risk_label: "Emerging", dollar_exposure: null, top_contributing_answers: [] },
+    ]);
+    expect(groups).toHaveLength(2);
+  });
+  it("ledger note: plain language, no dashes or semicolons", () => {
+    expect(FRICTION_TAX_LEDGER_STANDALONE_NOTE).not.toMatch(/[—–;]|--/);
   });
   it("on Call 2 failure, copies what the screen shows: referral chips over each section's answers", () => {
     const tactical: TacticalSectionResult[] = [{
