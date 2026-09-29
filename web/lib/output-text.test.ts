@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   buildResultsText, firstSentence, joinNames, buildCoreCluster, OHIO_NET_WORTH_CAVEAT,
   FRICTION_TAX_LEDGER_STANDALONE_NOTE, groupLedgerRows, formatUsd, formatUsdRange,
+  FRICTION_DOLLARS_VISIBLE, FRICTION_LEDGER_HEADING_NO_DOLLARS, FRICTION_LEDGER_NOTE_NO_DOLLARS,
 } from "./output-text";
 import type { PrivateOutputPayload, StateRef, TacticalSectionResult } from "./types";
 
@@ -304,7 +305,8 @@ describe("buildResultsText -- Phase 3 sections", () => {
       synthesis_text: "Overtime classifications may have drifted.", flagged_items: [],
     }],
   };
-  const text = buildResultsText(phase3);
+  // The dollar ledger path, with the switch on (the restorable state).
+  const text = buildResultsText(phase3, undefined, { frictionDollarsVisible: true });
 
   it("opens with the executive summary", () => {
     expect(text.startsWith("Executive summary:\nThe summary sentence.")).toBe(true);
@@ -357,13 +359,54 @@ describe("buildResultsText -- Phase 3 sections", () => {
         { state_id: "c", state_name: "Cond C", risk_label: "Emerging",
           dollar_exposure: { low: 200500, high: 280700, currency: "USD" }, top_contributing_answers: ["Answer three."] },
       ],
-    });
+    }, undefined, { frictionDollarsVisible: true });
     expect(grouped).toContain(
       "— Cond A (Emerging), Cond B (Entrenched): highest standalone estimate in this group, $300,000 – $421,000\n  Answer one.\n  Answer two.",
     );
     expect(grouped.split("Answer one.").length - 1).toBe(1);
     expect(grouped).toContain("— Cond C (Emerging): $201,000 – $281,000\n  Answer three.");
     expect(grouped).toContain(FRICTION_TAX_LEDGER_STANDALONE_NOTE);
+  });
+  it("friction dollars hidden (default): conditions and their answers, no friction figure or footnote", () => {
+    const hidden = buildResultsText(phase3);
+    expect(FRICTION_DOLLARS_VISIBLE).toBe(false);
+    expect(hidden).toContain(`${FRICTION_LEDGER_HEADING_NO_DOLLARS}:\n— The Paper Tiger (Entrenched)\n  Decisions get made, then get reopened.\n— State B (Emerging)`);
+    expect(hidden).toContain(FRICTION_LEDGER_NOTE_NO_DOLLARS);
+    for (const s of ["$20,000", "$28,000", "$50,000", "$70,000", "$1,000,000", "Friction tax", "friction tax",
+                     "How the friction tax", "highest standalone", "Highest standalone", "Sources include",
+                     "Estimates are calculated", "Drives cost through", FRICTION_TAX_LEDGER_STANDALONE_NOTE]) {
+      expect(hidden).not.toContain(s);
+    }
+    // Legal exposure and the rest of the cost comparison are unchanged.
+    expect(hidden).toContain("Legal/Compliance exposure:\n$100,000 – $450,000");
+    expect(hidden).toContain("Cost comparison:\n— Legal exposure, one-time if a claim arises: $100,000 – $450,000\n— People Tactics & Strategy: Ask for pricing.");
+  });
+  it("friction dollars hidden: a grouped row names every condition, evidence once", () => {
+    const shared = ["Answer one.", "Answer two."];
+    const g = buildResultsText({
+      ...phase3,
+      friction_tax_ledger: [
+        { state_id: "a", state_name: "Cond A", risk_label: "Emerging",
+          dollar_exposure: { low: 100400, high: 140560, currency: "USD" }, top_contributing_answers: shared },
+        { state_id: "b", state_name: "Cond B", risk_label: "Entrenched",
+          dollar_exposure: { low: 300499, high: 420699, currency: "USD" }, top_contributing_answers: [...shared].reverse() },
+      ],
+    });
+    expect(g).toContain("— Cond A (Emerging), Cond B (Entrenched)\n  Answer one.\n  Answer two.");
+    expect(g.split("Answer one.").length - 1).toBe(1);
+    // The ledger's own figures ($100,400 -> $100,000 collides with the legal
+    // fixture, so the other three are checked) never appear.
+    for (const s of ["$141,000", "$300,000", "$421,000"]) expect(g).not.toContain(s);
+  });
+  it("friction dollars hidden, no priced legal exposure: the cost comparison is omitted entirely", () => {
+    const t = buildResultsText({ ...phase3, legal_tail_risk_exposure: null });
+    expect(t).not.toContain("Cost comparison:");
+    expect(t).not.toContain("Ask for pricing");
+  });
+  it("hidden-state copy: plain language, no dashes or semicolons", () => {
+    for (const s of [FRICTION_LEDGER_HEADING_NO_DOLLARS, FRICTION_LEDGER_NOTE_NO_DOLLARS]) {
+      expect(s).not.toMatch(/[—–;]|--/);
+    }
   });
   it("formats every dollar figure to 3 significant figures, half up, never $0 (A1)", () => {
     expect(formatUsd(4839283)).toBe("$4,840,000");
