@@ -1121,13 +1121,16 @@ check(
     f"got {ledger_row.get('dollar_exposure')}, expected from direct call: {_expected_friction}",
 )
 
+# Q01-B carries negative authority_liability (-0.15), so its liability-only
+# weight is below zero and the ledger's weight filter (A3, weight > 0)
+# excludes it. Its scoring is logged for calibration. Q06 still supplies
+# real evidence, so the row is non-empty.
 check(
     "friction_tax_ledger row: top_contributing_answers is non-empty and ranked "
-    "-- Q01/B's real authored observation_text must appear (both Q01 and Q06 "
-    "were logged, capped at _LEDGER_TOP_ANSWERS_MAX=3)",
+    "-- Q01/B (negative weight) is ABSENT, capped at _LEDGER_TOP_ANSWERS_MAX=3",
     isinstance(ledger_row.get("top_contributing_answers"), list)
     and 0 < len(ledger_row["top_contributing_answers"]) <= 3
-    and "Bigger decisions get complicated here even when smaller ones don't." in ledger_row["top_contributing_answers"],
+    and "Bigger decisions get complicated here even when smaller ones don't." not in ledger_row["top_contributing_answers"],
     f"got {ledger_row.get('top_contributing_answers')}",
 )
 
