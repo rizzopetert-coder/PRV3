@@ -213,7 +213,7 @@ from engine.tactical_synthesis import (
     build_tactical_summary, tactical_totals, synthesize_tactical, TACTICAL_SECTIONS,
     TACTICAL_SYNTHESIS_SYSTEM_PROMPT,
 )
-from engine.exec_summary import EXEC_SUMMARY_SYSTEM_PROMPT
+from engine.exec_summary import EXEC_SUMMARY_SYSTEM_PROMPT, EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC
 from engine.output_synthesis import OUTPUT_SYNTHESIS_SYSTEM_PROMPT
 tc_log = [
     {"question_id": "Q05", "option_ids": ["C"]},                       # non-TC: ignored
@@ -247,7 +247,7 @@ FAIL = set()
 DELAY = {"call1": 0.0, "call2": 0.0, "call3": 0.0}
 def _which(system):
     return {OUTPUT_SYNTHESIS_SYSTEM_PROMPT: "call1", TACTICAL_SYNTHESIS_SYSTEM_PROMPT: "call2",
-            EXEC_SUMMARY_SYSTEM_PROMPT: "call3"}.get(system, "other")
+            EXEC_SUMMARY_SYSTEM_PROMPT: "call3", EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC: "call3"}.get(system, "other")
 class _Msg:
     def __init__(self, text): self.content = [_types.SimpleNamespace(text=text)]
 class _Messages:
@@ -300,6 +300,7 @@ check("REGRESSION: Call 1 prompt contains no tactical content",
       "TC-" not in call1_prompt and not any(t in call1_prompt for t in tc_texts)
       and not any(n in call1_prompt for _, _, n in TACTICAL_SECTIONS))
 call3_prompt = next(c[1] for c in CALLS if c[0] == "call3")["messages"][0]["content"]
+call3_prompt_system = next(c[1] for c in CALLS if c[0] == "call3")["system"]
 check("Call 3 input = Call 1 liability text + raw tactical counts",
       "Decisions stall at the top." in call3_prompt and "3 of 5 answers show a gap" in call3_prompt, call3_prompt)
 call2_prompt = next(c[1] for c in CALLS if c[0] == "call2")["messages"][0]["content"]
@@ -336,9 +337,42 @@ check("Call 1 failure (fallback): Call 3 skipped, tactical findings still delive
 
 FAIL.clear()
 pr_out = _complete(_log, brand="principal_resolution")
-check("no TC answers: Call 2 and Call 3 never run, findings [], summary ''",
-      [c[0] for c in CALLS] == ["call1"] and pr_out["private_output"]["tactical_findings"] == []
-      and pr_out["synthesis"]["executive_summary"] == "")
+check("no TC answers: Call 2 never runs, Call 3 does (Section 14 lock, both brands)",
+      [c[0] for c in CALLS] == ["call1", "call3"] and pr_out["private_output"]["tactical_findings"] == [],
+      str([c[0] for c in CALLS]))
+check("no TC answers: PR-shaped payload gets an executive summary",
+      pr_out["synthesis"]["executive_summary"] != "")
+_nt = next(c[1] for c in CALLS if c[0] == "call3")
+_nt_all = _nt["system"] + "\n" + _nt["messages"][0]["content"]
+check("no-TC Call 3 uses the no-TC system prompt", _nt["system"] == EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC)
+check("no-TC Call 3 prompt mentions no HR review, compliance, or empty counts",
+      not any(s in _nt_all for s in ("HR practices", "compliance", "0 of 0", "show a gap")), _nt_all)
+check("no-TC Call 3 input is the finding alone",
+      _nt["messages"][0]["content"] == "Organizational finding:\nDecisions stall at the top.")
+_NO_TC_PARAGRAPH = 'Tell this leader, in plain language, what the diagnostic found and what it means for them. Start with what is happening, then what it is costing the organization in working terms, then what would have to change. Use only what is in the input, and describe only what the diagnostic assessed.'
+check("no-TC system prompt carries Pete's paragraph verbatim and keeps the length rule",
+      _NO_TC_PARAGRAPH in EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC
+      and "Write exactly 2 or 3 sentences, and no more than 70 words in total." in EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC
+      and "RULES" in EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC)
+check("no-TC numbers rule: 'Do not quote numbers.' with no mention of gap counts",
+      "Do not quote numbers, and do not mention dollar figures." in EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC
+      and "gap counts" not in EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC
+      and "gap counts you are given" in EXEC_SUMMARY_SYSTEM_PROMPT)
+check("no-TC paragraph: no em-dash, en-dash, double hyphen, or semicolon",
+      not any(ch in _NO_TC_PARAGRAPH for ch in ("\u2014", "\u2013", "--", ";")))
+FAIL.clear(); FAIL.add("call1")
+pr_fb = _complete(_log, brand="principal_resolution")
+check("no TC answers + Call 1 fallback: Call 3 still skipped",
+      "call3" not in [c[0] for c in CALLS] and pr_fb["synthesis"]["executive_summary"] == "")
+FAIL.clear()
+
+# hr-dx (TC present): Call 3's system prompt and input are byte-identical to
+# before the no-TC change (frozen copies of the pre-change strings).
+_FROZEN_TC_SYSTEM = 'You write the executive summary that opens an organizational diagnostic report. The reader is the leader of the organization. The report has two parts: what the diagnostic found about how the organization is operating, and a review of its HR practices and compliance.\n\nWrite exactly 2 or 3 sentences, and no more than 70 words in total, that connect the two: what the organizational finding means, and how the HR practices review adds to or sharpens that picture. Speak to the reader directly, the way a trusted advisor would.\n\nRULES\n- Plain, direct language. No jargon, no clinical or assessment language.\n- Do not name a condition, pattern, or diagnosis. Do not quote numbers other than the gap counts you are given, and do not mention dollar figures.\n- Do not name any firm, service, product, or program.\n- Never use em dashes, en dashes used as dashes, double hyphens, or semicolons.\n- Length is strict: 2 or 3 sentences, 70 words at most. Stop after the third sentence.\n- Output only the summary text. No heading, no quotation marks, no markdown.\n'
+_FROZEN_TC_INPUT = 'Organizational finding:\nDecisions stall at the top.\n\nHR practices review: 3 of 5 answers show a gap, 2 of them significant or unknown, across 1 of 2 areas reviewed.'
+check("hr-dx: Call 3 system prompt byte-identical to pre-change",
+      EXEC_SUMMARY_SYSTEM_PROMPT == _FROZEN_TC_SYSTEM and call3_prompt_system == _FROZEN_TC_SYSTEM)
+check("hr-dx: Call 3 input byte-identical to pre-change", call3_prompt == _FROZEN_TC_INPUT, call3_prompt)
 
 # Non-production debug hook, ignored in production
 _os.environ["PRV3_DEBUG_FAIL_CALL"] = "tactical"
@@ -360,8 +394,14 @@ from collections import Counter as _Counter
 from engine.data.questions import PROBLEM_CONTEXT_VALENCES
 from engine.contract import _pick_distinct, _build_friction_tax_ledger
 _opts = [o for q in L.values() for o in q.answer_options]
-check("valence: all 109 authored texts tagged 103 liability / 6 neutral / 0 asset",
-      _Counter(o.observation_valence for o in _opts if o.observation_text) == {"liability": 103, "neutral": 6})
+check("valence: all 145 authored texts tagged 106 liability / 6 neutral / 33 asset (Pass 2)",
+      _Counter(o.observation_valence for o in _opts if o.observation_text) == {"liability": 106, "neutral": 6, "asset": 33})
+check("valence: asset text only on options that carry positive asset signal",
+      all(any(isinstance(v, (int, float)) and v > 0 for f, v in o.dimensional_contributions.items() if f.endswith("_asset"))
+          for o in _opts if o.observation_valence == "asset"))
+check("house punctuation: no authored observation_text has an em-dash, en-dash, double hyphen, or semicolon",
+      not [o.observation_text for o in _opts if o.observation_text
+           and any(ch in o.observation_text for ch in ("\u2014", "\u2013", "--", ";"))])
 check("valence: no text without a valence, no valence without text",
       not any(bool(o.observation_text) != bool(o.observation_valence) for o in _opts))
 check("valence: neutral set is exactly Q07-A and Q34-A..E",
@@ -369,11 +409,31 @@ check("valence: neutral set is exactly Q07-A and Q34-A..E",
       == {("Q07", "A"), ("Q34", "A"), ("Q34", "B"), ("Q34", "C"), ("Q34", "D"), ("Q34", "E")})
 check("PROBLEM_CONTEXT_VALENCES = liability + neutral", PROBLEM_CONTEXT_VALENCES == {"liability", "neutral"})
 
-# With no asset-valence text, strength evidence keeps axes and scores but cites nothing
+# Strength path: evidence quotes asset-valence text, and only that (Pass 2)
 vec_s, log_s = _path(max)
 ev = _build_asset_evidence(vec_s, log_s, INTAKE)
 check("asset evidence: strongest_axes and net_scores still populate", ev is not None and ev["strongest_axes"] and ev["net_scores"])
-check("asset evidence: contributing_signals empty (no asset-valence text authored yet)", ev["contributing_signals"] == [])
+_asset_texts = {o.observation_text for o in _opts if o.observation_valence == "asset"}
+check("asset evidence: strength path quotes asset-valence text only",
+      bool(ev["contributing_signals"]) and all(s["observation_text"] in _asset_texts for s in ev["contributing_signals"]),
+      str(ev["contributing_signals"][:3]))
+_txt = lambda q, o: next(x for x in L[q].answer_options if x.option_id == o).observation_text
+_got = [s["observation_text"] for s in ev["contributing_signals"]]
+check("asset evidence: capped at 5 quoted lines, highest contribution first, ties in question order",
+      _got == [_txt("Q01", "A"), _txt("Q02", "A"), _txt("Q04", "A"), _txt("Q06", "E"), _txt("Q13", "E")], str(_got))
+# The mixed respondent from the Pass 2 review: strong on six answers, weakest everywhere else.
+_picks = {"Q01": "A", "Q05": "A", "Q20": "A", "Q21": "A", "Q36": "A", "Q37": "A"}
+_mlog, _msess = [], AccumulationSession()
+for _q in seq:
+    _o = (next(x for x in L[_q].answer_options if x.option_id == _picks[_q]) if _q in _picks
+          else min(L[_q].answer_options, key=lambda o: sum(o.dimensional_contributions.get(f, 0) for f in AFS)))
+    _mlog.append({"question_id": _q, "option_ids": [_o.option_id]})
+    accumulate_answer(_msess, _o, INTAKE, _q)
+_mev = _build_asset_evidence(_msess.accumulated_vector, _mlog, INTAKE)
+_mgot = [s["observation_text"] for s in _mev["contributing_signals"]]
+check("asset evidence: mixed respondent quotes its 4 authority answers, under the cap",
+      _mev["strongest_axes"] == ["authority"]
+      and _mgot == [_txt("Q01", "A"), _txt("Q21", "A"), _txt("Q36", "A"), _txt("Q37", "A")], str(_mgot))
 q18e = next(o for o in L["Q18"].answer_options if o.option_id == "E")
 ev_q18 = _build_asset_evidence(dict(ZERO, attitude_asset=1.0), [{"question_id": "Q18", "option_ids": ["E"]}], INTAKE)
 check("the 'safety concerns as strength' bug is gone (Q18-E never cited as a strength)",
