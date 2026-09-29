@@ -1,4 +1,5 @@
 import type { CondensedOutputPayload } from "@/lib/types";
+import { formatUsdRange } from "@/lib/output-text";
 import {
   AXES,
   LIVE_CENTER,
@@ -85,7 +86,7 @@ interface CondensedOutputProps {
 }
 
 export default function CondensedOutput({ payload }: CondensedOutputProps) {
-  const { low, high, currency } = payload.financial_range;
+  const { low, high } = payload.financial_range;
   const hasFinancialRange = low !== null && high !== null;
   const more = payload.additional_condition_count ?? 0;
 
@@ -134,9 +135,7 @@ export default function CondensedOutput({ payload }: CondensedOutputProps) {
         </p>
         {hasFinancialRange ? (
           <p className="text-sm text-charcoal">
-            {currency === "USD" ? "$" : ""}
-            {low!.toLocaleString()} – {currency === "USD" ? "$" : ""}
-            {high!.toLocaleString()}{" "}
+            {formatUsdRange(low!, high!)}{" "}
             <span className="text-gray-400">
               (roughly 50–75% of one departing employee&apos;s estimated salary)
             </span>
