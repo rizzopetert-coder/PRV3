@@ -3,11 +3,14 @@ PRV3 Engine -- Executive summary (Phase 1 report redesign, Call 3).
 Gemini-reviewed spec (2026-09-27).
 
 One LLM call, run AFTER Call 1 (core synthesis) and Call 2 (tactical
-synthesis) and only when both succeeded. Input is deliberately narrow: Call
-1's liability_condition_text plus the raw tactical counts. Output is a 2-3
+synthesis), when Call 1 succeeded and Call 2 either succeeded or was never
+attempted. Input is deliberately narrow: Call 1's liability_condition_text
+plus the raw tactical counts. With TC answers (hr-dx) the output is a 2-3
 sentence summary bridging the organizational finding and the HR practices
-review. Any failure returns ("", False, error): the UI omits the section, and
-nothing else in the result changes.
+review. Without TC answers (totals=None) the counts line is left out and
+EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC asks for the finding alone. Any failure
+returns ("", False, error): the UI omits the section, and nothing else in
+the result changes.
 """
 from __future__ import annotations
 
@@ -48,6 +51,32 @@ sentence.
 """
 
 
+# No-TC variant (Pete, 2026-09-28): the same prompt with the two-part task
+# replaced, so the length rule and RULES block stay shared. Derived by
+# replacement rather than a second literal, so the TC prompt above is
+# untouched and the two cannot drift apart outside the task text.
+_TWO_PART_TASK: str = (
+    " The report has two parts: what the diagnostic found about how the "
+    "organization is operating, and a review of its HR practices and compliance."
+    "\n\nWrite exactly 2 or 3 sentences, and no more than 70 words in total, that "
+    "connect the two: what the organizational finding means, and how the HR "
+    "practices review adds to or sharpens that picture."
+)
+_NO_TC_TASK: str = (
+    "\n\n"
+    "Tell this leader, in plain language, what the diagnostic found and what it means "
+    "for them. Start with what is happening, then what it is costing the organization "
+    "in working terms, then what would have to change. Use only what is in the input, "
+    "and describe only what the diagnostic assessed."
+    "\n\nWrite exactly 2 or 3 sentences, and no more than 70 words in total."
+)
+# No gap counts exist without TC answers, so the numbers rule drops them.
+_GAP_COUNT_RULE: str = "Do not quote numbers other than the gap counts you are given"
+EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC: str = EXEC_SUMMARY_SYSTEM_PROMPT.replace(
+    _TWO_PART_TASK, _NO_TC_TASK, 1,
+).replace(_GAP_COUNT_RULE, "Do not quote numbers", 1)
+
+
 _SENTENCE_END_RE = re.compile(r"(?<=[.!?])\s+(?=[A-Z])")
 MAX_SENTENCES = 3
 
@@ -61,7 +90,9 @@ def _limit_sentences(text: str, limit: int = MAX_SENTENCES) -> str:
     return " ".join(sentences[:limit])
 
 
-def _build_exec_prompt(liability_condition_text: str, totals: dict) -> str:
+def _build_exec_prompt(liability_condition_text: str, totals: dict | None) -> str:
+    if totals is None:
+        return f"Organizational finding:\n{liability_condition_text}"
     return (
         f"Organizational finding:\n{liability_condition_text}\n\n"
         f"HR practices review: {totals['flagged_count']} of {totals['total_count']} answers show a gap, "
@@ -72,12 +103,13 @@ def _build_exec_prompt(liability_condition_text: str, totals: dict) -> str:
 
 def generate_executive_summary(
     liability_condition_text: str,
-    totals: dict,
+    totals: dict | None,
     model: str = "claude-sonnet-5",
     client=None,
     timeout: float = 15.0,
 ) -> tuple:
-    """Call 3. Returns (text, ok, error). ("", False, error) on any failure."""
+    """Call 3. Returns (text, ok, error). ("", False, error) on any failure.
+    totals=None means no TC answers: no-TC prompt, no counts line."""
     if not liability_condition_text.strip():
         return "", False, "no liability_condition_text"
     try:
@@ -90,7 +122,7 @@ def generate_executive_summary(
             model=model,
             max_tokens=200,
             thinking={"type": "disabled"},
-            system=EXEC_SUMMARY_SYSTEM_PROMPT,
+            system=EXEC_SUMMARY_SYSTEM_PROMPT if totals is not None else EXEC_SUMMARY_SYSTEM_PROMPT_NO_TC,
             messages=[{"role": "user", "content": _build_exec_prompt(liability_condition_text, totals)}],
             timeout=timeout,
         )
