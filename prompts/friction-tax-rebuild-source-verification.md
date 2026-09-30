@@ -155,9 +155,15 @@ Stated limits, not adjusted:
 5. Decision time is dropped from the dollar total. It stays as a written receipt citing McKinsey 2019 (37%, 58%), with no dollar figure.
 6. Point estimate, not a range.
 7. P2 partial-year factor f = 0.5, labelled an assumption (exits spread evenly across the year).
+
+    CORRECTION 2026-09-30: withdrawn. The engagement channel prices position-years of payroll (P = N x W). A leaver's remaining year is filled by the replacement, who draws that payroll and is engaged or not like anyone else, so no partial-year discount applies. The only overlap is the vacancy gap between leaver and replacement, partly covered by Work Institute's ~22% indirect cost. Disclosed as a limit, not adjusted (Pete, 2026-09-30). This also withdraws the P2 amendment from the 2026-09-29 Gemini outcome.
 8. Payroll wages refreshed to OEWS May 2025.
 9. JOLTS mapping: "Other" = total private. Nonprofit & Education = private educational services plus other services, weighted by employment. Use BLS-published annual quits rates by industry if they exist, otherwise the monthly rate x 12 per the Table 22 footnote.
 10. Use actual headcount when intake gives an integer. Bucket mean only for legacy string labels.
 
     CORRECTION 2026-09-30: "Bucket mean only for legacy string labels" assumed legacy strings still arrive. String tolerance in resolve_headcount_bucket was deliberately removed 2026-08-29. Corrected rule: use the actual integer headcount. Bucket-mean fallback only if a live path supplies no integer. Do not reintroduce string tolerance.
 11. ORG_TYPE_SCALARS retired.
+12. Wage W uses privately owned OEWS rows where the engine industry is private (Nonprofit & Education, Healthcare & Life Sciences, and any other mapped industry with a published privately owned row). Government stays all-ownership.
+13. Engine headcount guard: N must be int or float, not bool, finite, and at least 2. N = 1 returns null (a solo principal has no workforce the sources measure).
+14. inaction_cost_*: two lines (typical-loss point estimate, legal tail-risk range), not a sum.
+15. Headcount ceiling: keep the 1,000 intake cap and state it on the output.
