@@ -122,3 +122,32 @@ Searched `web/content`, `web/lib`, `engine`, and `prompts` for 43 or 81 followed
 1. **18% population.** Gallup's 18% applies to the broad not-engaged population, not only actively disengaged. Decide whether the rebuild prices the broad population (as the source does) or restricts to a narrower one.
 2. **P4 bound.** The Gallup Q12 quartile differences (1b) do not meet P4 as amended (top vs bottom quartile, unit-level, cross-industry, not bottom vs typical). Decide whether any of them may serve as a within-industry bound, or whether no above-typical adjustment is made for these channels.
 3. **Supervisor inclusion.** 11-0000 excludes first-line supervisors. Decide whether the manager population is 11-0000 alone (national 7.16%) or 11-0000 plus first-line supervisors (national 12.10%, see 2a). Also open and dependent on this: confirm or revise the proposed NAICS mapping in 2b, and whether 3-digit aggregation (used here) is acceptable for sector wages.
+
+## 4. McKinsey decision-time source (Claude.ai, primary-source checked 2026-09-30)
+
+Source: McKinsey, "Decision making in the age of urgency," April 2019 (survey fielded Feb 13-23, 2018), n=1,259 from McKinsey's Online Executive Panel, 91 countries. One-third C-level, 35% senior managers, the rest middle managers in the exhibits. No first-line supervisors identified. 62% at companies under $1B revenue. Self-reported.
+
+Inputs for the rebuild:
+- 37% of working time on decisions (mean).
+- 58% of that time used ineffectively (mean).
+- Do NOT use the 61% figure. It is the share of respondents saying most of their time is ineffective, a different measure.
+
+The 20% manager share originates in McKinsey's own "thought experiment" sidebar footnote: an average Fortune 500 company of 56,400 employees, 20% managers, 220 eight-hour days, priced at the 2017 BLS median for management occupations ($102,590). It is an illustrative assumption, not data. McKinsey itself used BLS 11-0000 for pay, so replacing the 20% with the BLS 11-0000 share by industry is internally consistent.
+
+Stated limits, not adjusted:
+- The sample is senior-skewed and larger than PRV3's clients.
+- Decision time rises with seniority, while inefficiency is higher for middle managers (68%) than C-level (57%). The net effect for an SMB manager mix is unknown.
+
+## Decisions (Pete, 2026-09-30)
+
+1. The Gallup 18% applies to the broad not-engaged population, as Gallup does.
+2. P4: no above-typical adjustment. The Q12 quartile differences don't qualify (top vs bottom units, not bottom vs typical).
+3. Manager population = SOC 11-0000 only. Confirmed by the McKinsey sample check (Section 4).
+4. Option A: identified states select which channels appear (per-state criteria > 0). Severity does not move the dollar figure.
+5. Decision time is dropped from the dollar total. It stays as a written receipt citing McKinsey 2019 (37%, 58%), with no dollar figure.
+6. Point estimate, not a range.
+7. P2 partial-year factor f = 0.5, labelled an assumption (exits spread evenly across the year).
+8. Payroll wages refreshed to OEWS May 2025.
+9. JOLTS mapping: "Other" = total private. Nonprofit & Education = private educational services plus other services, weighted by employment. Use BLS-published annual quits rates by industry if they exist, otherwise the monthly rate x 12 per the Table 22 footnote.
+10. Use actual headcount when intake gives an integer. Bucket mean only for legacy string labels.
+11. ORG_TYPE_SCALARS retired.
