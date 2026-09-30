@@ -39,8 +39,25 @@ function shareKey(id: string): string {
 // and branching on typeof handles both the normal (already-parsed)
 // case and the degenerate case where the SDK's own parseResponse()
 // falls back to returning the raw string unchanged.
+//
+// Read-time projection (2026-09-30): shares written before that date still
+// carry friction_tax_estimate (with dollars) and legal_tail_risk_band in
+// Redis until their 30-day TTL ends. Both fields were removed from
+// ShareableOutputPayload, and every reader (GET /api/share/[id] and the
+// /share/[id] page) goes through this function, so they are stripped here.
+type LegacyShareRecord = ShareableOutputPayload & {
+  friction_tax_estimate?: unknown;
+  legal_tail_risk_band?: unknown;
+};
+
+function stripRetiredFields(record: LegacyShareRecord): ShareableOutputPayload {
+  const { friction_tax_estimate: _friction, legal_tail_risk_band: _legal, ...rest } = record;
+  return rest;
+}
+
 export async function getShareRecord(id: string): Promise<ShareableOutputPayload | null> {
-  const raw = await redis.get<string | ShareableOutputPayload>(shareKey(id));
+  const raw = await redis.get<string | LegacyShareRecord>(shareKey(id));
   if (raw === null || raw === undefined) return null;
-  return typeof raw === "string" ? (JSON.parse(raw) as ShareableOutputPayload) : raw;
+  const record = typeof raw === "string" ? (JSON.parse(raw) as LegacyShareRecord) : raw;
+  return stripRetiredFields(record);
 }
