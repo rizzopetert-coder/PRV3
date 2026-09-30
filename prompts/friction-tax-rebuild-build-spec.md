@@ -4,9 +4,9 @@ Status: DRAFT, not Gemini-cleared. No engine code written. Research and decision
 
 ## Open questions (Pete), up front
 
-Resolved 2026-09-30 and folded into the design: a state set with no dollar channel returns a null estimate, receipts move to `private_output.friction_receipts` (Section 6), headcount below 1 returns null (Section 2), the state criteria move to `engine/data/state_criteria.py` (Section 4), the decision-time receipt stays inside the `FRICTION_DOLLARS_VISIBLE` branch, the bucket-mean fallback is removed, and the Nonprofit & Education rate is recomputed (Section 3). The share-path headcount bug is being fixed separately ahead of the rebuild.
+Resolved 2026-09-30 and folded into the design: a state set with no dollar channel returns a null estimate, receipts move to `private_output.friction_receipts` (Section 6), headcount below 1 returns null (Section 2), the state criteria move to `engine/data/state_criteria.py` (Section 4), the decision-time receipt stays inside the `FRICTION_DOLLARS_VISIBLE` branch, the bucket-mean fallback is removed, and the Nonprofit & Education rate is recomputed (Section 3). The share-path headcount bug is latent: Path 1 sharing is disabled (`web/components/DiagnosticFlow.tsx:930`), fix when sharing is enabled.
 
-1. **Headcount ceiling.** The intake clamps headcount to 1 through 1,000 (`web/components/DiagnosticFlow.tsx:53`, clamp at `:95` and `:62-63`) and displays 1,000 as "1000+". An organization of 1,200 or 5,000 therefore reaches the engine as 1,000 and is priced at 1,000 employees. The 1,200-employee example in Section 6b is outside what intake can send. Decide whether to lift the cap, or to state the limit on the output.
+1. **Headcount ceiling (known limit).** The intake clamps headcount to 1 through 1,000 (`web/components/DiagnosticFlow.tsx:53`, clamp at `:95` and `:62-63`) and displays 1,000 as "1000+". An organization of 1,200 or 5,000 therefore reaches the engine as 1,000 and is priced at 1,000 employees. The 1,200-employee example in Section 6b is outside what intake can send. Decide whether to lift the cap, or to state the limit on the output.
 2. **Legal snapshot method.** The byte-identical test (Section 8) needs a committed baseline taken before the refactor. Confirm that the baseline is taken at the parent of the first refactor commit, stored under `tools/fixtures/`, and never regenerated.
 3. **JOLTS annualization.** Table 22 (verified 2026-09-30) is an average monthly rate by its footnote. I found no annualized quits table (t18 to t21 returned no readable caption). The spec uses monthly x 12. Nonprofit & Education weights private educational services (3,344,880) and NAICS 813 (1,429,400), using the JOLTS "Other services" row (2.2) as the stand-in for 813, which JOLTS does not publish separately. Result 1.64.
 4. **`inaction_cost_*`.** Recommend two lines, not a sum (Section 6).
@@ -27,7 +27,7 @@ Resolved 2026-09-30 and folded into the design: a state set with no dollar chann
 | `_INDUSTRY_WAGE_DATA` | `:230` (May 2023) | mean wage per engine industry, 11 keys | REPLACE with OEWS May 2025 (Section 3), new citation ids |
 | `get_industry_wage` | `:345`, used only at `api/engine.py:284` | wage accessor | KEEP, returns May 2025 |
 | `ORG_TYPE_SCALARS` | `:436` | 1.00 x5, Government 1.05 | REMOVE (Decision 11, build step 4) |
-| Web share path | `web/components/DiagnosticFlow.tsx:916`, `web/app/api/share/create/route.ts:93` | sends a numeric string | Fixed separately ahead of the rebuild. See the share-path headcount fix |
+| Web share path | `web/components/DiagnosticFlow.tsx:916`, `web/app/api/share/create/route.ts:93` | sends a numeric string | latent: Path 1 sharing is disabled (DiagnosticFlow.tsx:930). Fix when sharing is enabled. |
 | Ledger | `engine/contract.py:405-532`, `dollar_exposure` `:473-481` | single-state dollars | CHANGE: `dollar_exposure` dropped, add `channels` (the channels that state switches on) |
 | Receipts | `engine/contract.py:693-757`, uses `STATE_MULTIPLIERS` at `:719`, channel labels `:588` | narrates grid, org scalar, loading, severity, 1.4x | REWRITE as per-channel inputs with vintages |
 | Payload assembly | `engine/contract.py:1125-1150`, `:1184`, `:1191-1207`, `:1217-1218` | `friction_tax_estimate {low, high, currency, driving_factors}` | CHANGE (Section 6) |
@@ -45,6 +45,8 @@ Notation: N = employees, W = all-occupation mean annual wage for the engine indu
 | Turnover | P x q x 0.42 x 0.333 | 0.42 = Gallup preventable share (July 2024, verification doc Section 5). 0.333 = Work Institute (2017 Retention Report, low-wage derivation, Section 5). q = JOLTS 2025 |
 | Decision time (receipt only) | no dollar value | McKinsey 2019: 37% of time on decisions, 58% of it ineffective. Text only. `W_m` and the 11-0000 share are removed from the engine design and stay in the verification doc as research |
 
+Known limit: intake clamps headcount to 1 through 1,000 (`web/components/DiagnosticFlow.tsx:53`, `:62-63`, `:95`), so any larger organization is priced as 1,000 employees. Percent of payroll is unaffected, dollars for larger organizations are understated.
+
 Headcount rule (Decision 10, corrected 2026-09-30): N = the intake number when `isinstance(headcount, (int, float))` and N is at least 1 (Pete, 2026-09-30: below 1 returns null). The engine rule is the backstop, because `web/app/api/diagnostic/session/start/route.ts:22-23` checks only `typeof number` and `Number.isFinite` and accepts 0 and negatives, and `engine/main.py:220` defaults a missing value to 0. Anything else ("", a numeric string, None, 0, negative) is uncalibrated, so `friction_tax_estimate` is null. There is no bucket-mean fallback. A live-path review on 2026-09-30 found no path that supplies a bucket label:
 
 | Path | Headcount supplied | Reference | Result |
@@ -53,7 +55,9 @@ Headcount rule (Decision 10, corrected 2026-09-30): N = the intake number when `
 | Self-select `/api/result` | number from the modal, or "" sentinel | `web/components/SelfSelectIntakeModal.tsx:82`, `web/lib/engine-client.ts:84` | integer, or uncalibrated on "" (by design) |
 | Condensed | none, friction is never computed | `engine/main.py:1075-1078` | not applicable |
 | Dev preview and fixture picker | "" in the intake echo only, payload is stored | `web/app/(site)/dev/diagnostic-preview/[id]/page.tsx:62`, `web/components/DiagnosticFixturePicker.tsx:189` | not applicable |
-| Share `/api/share/create` | numeric string | `web/components/DiagnosticFlow.tsx:916`, `web/app/api/share/create/route.ts:93` | uncalibrated today. Fixed separately ahead of the rebuild. See the share-path headcount fix |
+| Share `/api/share/create` | numeric string | `web/components/DiagnosticFlow.tsx:916`, `web/app/api/share/create/route.ts:93` | never reached today, latent: Path 1 sharing is disabled (DiagnosticFlow.tsx:930). Fix when sharing is enabled. |
+
+CORRECTION 2026-09-30: an earlier draft described this as live. Path 1 sharing is off, so the string headcount is never sent.
 
 Vintages (every figure):
 
@@ -142,9 +146,9 @@ f = 0.5, NE = 0.69, q = JOLTS monthly x 12.
 | 400 / Manufacturing | $69,131 | 1.40, 16.8% | $27,652,400 | $3,145,936 | $649,734 | $3,795,670 | 11.4% | 2.3% | 13.7% |
 | 800 / Healthcare & Life Sciences | $71,770 | 2.00, 24.0% | $57,416,000 | $6,275,339 | $1,927,248 | $8,202,588 | 10.9% | 3.4% | 14.3% |
 | 800 / Transportation & Warehousing | $64,331 | 2.20, 26.4% | $51,464,800 | $5,548,194 | $1,900,237 | $7,448,431 | 10.8% | 3.7% | 14.5% |
-| 1,200 / Financial Services | $100,842 | 1.30, 15.6% | $121,010,400 | $13,857,191 | $2,640,224 | $16,497,416 | 11.5% | 2.2% | 13.6% |
+| 1,000 / Financial Services | $100,842 | 1.30, 15.6% | $100,842,000 | $11,547,659 | $2,200,187 | $13,747,846 | 11.5% | 2.2% | 13.6% |
 
-The 1,200-employee row is outside what intake can send today (open question 1). Totals run 13.2% to 15.6% of payroll. One profile exceeds the 15% flag line (Retail & Hospitality, driven by a 40.4% annual quit rate). Percent of payroll does not depend on headcount, only dollars do.
+The largest row is 1,000 employees, the intake ceiling (known limit, Section 2). Totals run 13.2% to 15.6% of payroll. One profile exceeds the 15% flag line (Retail & Hospitality, driven by a 40.4% annual quit rate). Percent of payroll does not depend on headcount, only dollars do.
 
 What the benchmarks do and do not show:
 - **The engagement channel's only benchmark is Gallup's own worked example** (verification doc Section 1a: 10,000 x 67% x $50,000 x 18% = $60.3M on $500M payroll, 12.06%). That is circular. The channel applies Gallup's formula, so landing at 9.9% to 11.8% against Gallup's 12.06% confirms arithmetic, not magnitude. No independent check of the engagement magnitude was found.
@@ -153,14 +157,14 @@ What the benchmarks do and do not show:
 
 ## 7. Demographic Applicability Filter (`prompts/demographic-applicability-filter-protocol.md`)
 
-Intake fields: headcount (integer, minimum 1, `engine/data/intake.py:54-62`), industry (11 values, `:283`), org type (6 values, `:296`), jurisdictions. Extremes tested: 1 to 12 employees, 1,200+ employees, Government, Nonprofit & Education, Retail & Hospitality, Technology.
+Intake fields: headcount (integer, minimum 1, `engine/data/intake.py:54-62`), industry (11 values, `:283`), org type (6 values, `:296`), jurisdictions. Extremes tested: 1 to 12 employees, 1,000 employees (the intake ceiling), Government, Nonprofit & Education, Retail & Hospitality, Technology.
 
 | Source | Assumption | Eligibility boundary (what I could establish) | Extremes | Status |
 |---|---|---|---|---|
 | Gallup 18% and engaged 31% | An average not-engaged US employee costs 18% of salary at any employer | US workforce, not segmented by employer size or industry in the verification doc material | 12 employees: Gallup's share is not testable for a single small team. Government and nonprofit: US sample includes them, not confirmed from source | Partly unverified |
 | Gallup 42% preventable (July 2024) | Share of voluntary exits that were preventable | Self-reported by leavers (their own view of preventability), not an employer record | Unknown by size and industry | Self-report limit |
 | Work Institute 33.3% | Cost per voluntary exit is a flat 33.3% of salary | Low-wage derivation (2017 Retention Report, $8/hour basis). Gallup's same July 2024 article gives role tiers: about 200% of salary for leaders and managers, 80% technical, 40% frontline | High-wage end: Technology ($115,030), Professional Services ($108,640), Financial Services ($100,842) are where a flat 33.3% is most likely to understate. Low-wage end (Retail & Hospitality $42,024) is the derivation's home range | Limit at the high-wage end |
-| JOLTS Table 22 | The industry quits rate applies to a client in that industry | Verified: nonfarm establishment survey, sector and supersector rows, no size-class cut in Table 22 | 12 and 1,200 employees get the same blended industry rate. Nonprofit & Education and Other are built or blended rows | Applies to industry, untested by size |
+| JOLTS Table 22 | The industry quits rate applies to a client in that industry | Verified: nonfarm establishment survey, sector and supersector rows, no size-class cut in Table 22 | 12 and 1,000 employees get the same blended industry rate. Nonprofit & Education and Other are built or blended rows | Applies to industry, untested by size |
 | OEWS May 2025 wage W | Industry all-occupation mean wage represents a client's average wage | Verified: wage and salary workers at establishments of all sizes, excludes owners and self-employed | 12 employees: occupation mix and owner-operators differ from the industry blend. Sectors 61, 62, 99 blend public ownership | Small end untested |
 | McKinsey 2019 (receipt only) | Managers spend 37% of time on decisions, 58% ineffective | Executives and managers, senior-skewed, 62% at companies under $1B, no first-line supervisors | Weakest under about 100 employees. No dollar is computed, so the receipt must state the limit | Receipt with stated limit |
 
@@ -190,7 +194,7 @@ The Gallup 18% with the 69% population and the JOLTS rate assume US employers. P
 
 ## 10. Build steps (proposed order, no code until the spec clears Gemini and Pete)
 
-Precondition: the share-path headcount bug (`web/components/DiagnosticFlow.tsx:916`) is fixed separately ahead of the rebuild. See the share-path headcount fix.
+Note: the share-path headcount bug (`web/components/DiagnosticFlow.tsx:916`) is latent: Path 1 sharing is disabled (DiagnosticFlow.tsx:930). Fix when sharing is enabled.
 
 1. **Legal baseline.** Record the byte-identical baseline (Section 8) from unchanged code and commit it.
 2. **State criteria refactor.** Create `engine/data/state_criteria.py`, point Legal (`engine/friction_tax.py:2172-2176`, `:4166-4170`) and `engine/contract.py:35`, `:719` at it, then run the byte-identical test.
