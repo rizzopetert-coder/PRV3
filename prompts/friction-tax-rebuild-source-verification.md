@@ -73,7 +73,7 @@ Method:
 
 ### 2b. Engine industry keys beside a proposed NAICS mapping
 
-PROPOSED, NOT DECIDED. The engine industries are the 11 values in `INTAKE_FIELDS["industry"]` (`engine/data/intake.py`), which equal `INDUSTRIES` in `engine/friction_tax.py` exactly, in the same order. `PAYROLL_BASELINE_GRID` is keyed `(headcount, industry)` over those 11 industries and 6 headcount buckets, 66 cells.
+LOCKED by Pete 2026-09-30, with the decision 12 privately owned rows (611 and 622) for Nonprofit & Education and Healthcare & Life Sciences. The engine industries are the 11 values in `INTAKE_FIELDS["industry"]` (`engine/data/intake.py`), which equal `INDUSTRIES` in `engine/friction_tax.py` exactly, in the same order. `PAYROLL_BASELINE_GRID` is keyed `(headcount, industry)` over those 11 industries and 6 headcount buckets, 66 cells.
 
 The proposed mapping below follows the component logic already in each `_INDUSTRY_WAGE_DATA` entry (May 2023) so the two vintages stay comparable. It is a starting point for Pete, not a recommendation to adopt.
 
@@ -167,3 +167,7 @@ Stated limits, not adjusted:
 13. Engine headcount guard: N must be int or float, not bool, finite, and at least 2. N = 1 returns null (a solo principal has no workforce the sources measure).
 14. inaction_cost_*: two lines (typical-loss point estimate, legal tail-risk range), not a sum.
 15. Headcount ceiling: keep the 1,000 intake cap and state it on the output.
+
+    Narrowed by decision 17: at the cap, dollars are withheld and only percent of payroll is shown.
+16. OEWS industry mapping (Section 2b) locked as committed, with decision 12 rows.
+17. At the 1,000 intake ceiling, the output shows percent of payroll only, with no dollar figure (Gemini round 2 failure mode 2: dollars would understate for larger organizations).
