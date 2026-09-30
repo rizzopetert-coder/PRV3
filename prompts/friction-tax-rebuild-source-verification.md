@@ -119,6 +119,8 @@ Searched `web/content`, `web/lib`, `engine`, and `prompts` for 43 or 81 followed
 
 ## Open decisions (Pete)
 
+Resolved 2026-09-30, see Decisions (Pete, 2026-09-30) below.
+
 1. **18% population.** Gallup's 18% applies to the broad not-engaged population, not only actively disengaged. Decide whether the rebuild prices the broad population (as the source does) or restricts to a narrower one.
 2. **P4 bound.** The Gallup Q12 quartile differences (1b) do not meet P4 as amended (top vs bottom quartile, unit-level, cross-industry, not bottom vs typical). Decide whether any of them may serve as a within-industry bound, or whether no above-typical adjustment is made for these channels.
 3. **Supervisor inclusion.** 11-0000 excludes first-line supervisors. Decide whether the manager population is 11-0000 alone (national 7.16%) or 11-0000 plus first-line supervisors (national 12.10%, see 2a). Also open and dependent on this: confirm or revise the proposed NAICS mapping in 2b, and whether 3-digit aggregation (used here) is acceptable for sector wages.
@@ -138,6 +140,12 @@ Stated limits, not adjusted:
 - The sample is senior-skewed and larger than PRV3's clients.
 - Decision time rises with seniority, while inefficiency is higher for middle managers (68%) than C-level (57%). The net effect for an SMB manager mix is unknown.
 
+## 5. Relayed inputs verified (Claude.ai, primary-source checked 2026-09-30)
+
+- US engagement: Gallup Global Indicator: Employee Engagement (gallup.com/394373), "As of May 2026, 31% of U.S. employees are engaged and 17% are actively disengaged." Not-engaged share for the engagement channel = 69%, consistent with the SOGW cost method covering both not engaged and actively disengaged. The spec draft's statement that the 2020 article's 67% "equals 100 minus the engaged share" does not reconcile for any year and is not the basis for 69%.
+- 42% preventable: Gallup, "42% of Employee Turnover Is Preventable but Often Ignored," Tatel and Wigert, July 2024 (gallup.com/workplace/646538). Self-reported by voluntary leavers ("at least from the employee perspective"). Gallup's 2019 figure was 52%. Same article gives role-tiered replacement costs: about 200% of salary for leaders and managers, 80% technical, 40% frontline.
+- Work Institute 33.3%: 2017 Retention Report, derived from a conservative $5,506 turnover cost on an $8/hour ($16,640) employee. The current Work Institute method is 33.3% of base salary, about 11% direct and 22% indirect. Limit: derived from a low-wage basis and applied to all salaries.
+
 ## Decisions (Pete, 2026-09-30)
 
 1. The Gallup 18% applies to the broad not-engaged population, as Gallup does.
@@ -150,4 +158,6 @@ Stated limits, not adjusted:
 8. Payroll wages refreshed to OEWS May 2025.
 9. JOLTS mapping: "Other" = total private. Nonprofit & Education = private educational services plus other services, weighted by employment. Use BLS-published annual quits rates by industry if they exist, otherwise the monthly rate x 12 per the Table 22 footnote.
 10. Use actual headcount when intake gives an integer. Bucket mean only for legacy string labels.
+
+    CORRECTION 2026-09-30: "Bucket mean only for legacy string labels" assumed legacy strings still arrive. String tolerance in resolve_headcount_bucket was deliberately removed 2026-08-29. Corrected rule: use the actual integer headcount. Bucket-mean fallback only if a live path supplies no integer. Do not reintroduce string tolerance.
 11. ORG_TYPE_SCALARS retired.
