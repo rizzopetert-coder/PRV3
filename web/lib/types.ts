@@ -67,9 +67,9 @@ export interface StateRef {
 
 /**
  * Intake fields echoed into both outputs.
- * Required in ShareableOutputPayload to ground friction_tax_estimate math —
- * the shareable document must state the organizational parameters under which
- * the estimate was calculated.
+ * Required in ShareableOutputPayload for the client identifier line (industry,
+ * size, date). It previously also grounded friction_tax_estimate math, which
+ * no longer ships in the shareable payload.
  */
 export interface SignificantEventOption {
   value: string;
@@ -190,10 +190,8 @@ export interface FrictionTaxLedgerEntry {
  * identified state carries real-but-unpriced exposure
  * (has_unpriced_conditions) -- see compute_legal_compliance_exposure()
  * in engine/friction_tax.py for the exact trigger logic. band is the
- * same qualitative value ShareableOutputPayload.legal_tail_risk_band
- * carries publicly -- present here too so the shareable-path builder
- * (web/app/api/share/create/route.ts) can read it straight off
- * engineResult.private_output without a separate computation.
+ * qualitative legal band. It is no longer carried into
+ * ShareableOutputPayload (removed 2026-09-30).
  */
 export interface LegalTailRiskExposure {
   // null when every identified Legal-scoring state is QUALITATIVE_ONLY
@@ -255,11 +253,11 @@ export interface LegalTailRiskExposure {
 /**
  * Qualitative severity band for legal tail-risk exposure. Computed
  * server-side in engine/friction_tax.py's _legal_exposure_band() and
- * carried through LegalTailRiskExposure.band (private output) into
- * ShareableOutputPayload.legal_tail_risk_band (shareable output) --
- * the shareable path never gets a dollar figure, only this band
- * (Addendum 11: a specific number in a shareable artifact could
- * function as documented notice of a contingent liability).
+ * carried through LegalTailRiskExposure.band (private output). It was
+ * also carried into the shareable payload until 2026-09-30, when that
+ * field was removed (Addendum 11: a specific number in a shareable
+ * artifact could function as documented notice of a contingent
+ * liability, and the band is no longer shared either).
  */
 export type LegalTailRiskBand = "Minor" | "Moderate" | "Elevated" | "Significant";
 
@@ -516,15 +514,14 @@ export interface ShareableOutputPayload {
   // Resolution — family only, no service name (clinical boundary, S34)
   resolution_family: ResolutionFamily;
 
-  // Economic (nullable — Option B rendering when null)
-  friction_tax_estimate: FrictionTaxEstimate | null;
+  // friction_tax_estimate and legal_tail_risk_band were removed from this
+  // payload 2026-09-30. The share page serializes the whole stored payload
+  // to the browser, so friction dollars stayed retrievable even while their
+  // display was hidden. Shares written before that date still hold both
+  // fields in Redis until their 30-day TTL ends. getShareRecord()
+  // (web/lib/share-store.ts) strips them on read.
 
-  // Legal/Compliance qualitative band (nullable) -- Addendum 11.
-  // web/app/api/share/create/route.ts populates this from
-  // engineResult.private_output.legal_tail_risk_exposure?.band.
-  legal_tail_risk_band: LegalTailRiskBand | null;
-
-  // Intake echo — grounds friction_tax_estimate math for external audience.
+  // Intake echo — the client identifier line (industry, size, date).
   // ShareableIntakeEcho specifically -- significant_event_elaboration (if
   // any) never reaches this payload, enforced at the type level (see
   // PrivateIntakeEcho above).
