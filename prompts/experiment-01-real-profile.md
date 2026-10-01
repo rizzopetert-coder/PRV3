@@ -112,3 +112,11 @@ DIST-CC-02 C | the closest framing to "supervisors don't match what leadership s
 
 Narrative: written by Claude.ai after the live prompt appears. Not pre-written.
 --- END ---
+
+## NARRATIVE (written by Claude.ai to the live prompt, before submission)
+
+--- NARRATIVE ---
+Prompt served: "People often know more about what's really going on than what gets said out loud in meetings or surveys. What's something true about your organization right now that most people would privately agree with, but almost no one would say in a room with you in it?"
+Answer:
+"Nobody reports near-misses anymore, and everybody knows why. Last year an operator reported one and his supervisor tore into him in front of the whole line. The lesson landed. Our numbers say safety is fine, and the people on second shift know it isn't. The other thing people would say privately is that a few supervisors are the reason new hires quit, and that those supervisors are safe because their lines hit the throughput numbers the new owners care about. Most of our supervisors were great machinists who got promoted and were never taught how to lead people. On top of that, second shift has been on mandatory overtime for most of the year and people are worn down."
+--- END ---
