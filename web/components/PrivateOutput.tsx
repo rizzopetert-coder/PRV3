@@ -13,7 +13,7 @@ import CopyResultsButton from "@/components/CopyResultsButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
 import {
   buildConditionRows, FRICTION_DOLLARS_VISIBLE, FRICTION_LEDGER_HEADING_NO_DOLLARS,
-  FRICTION_LEDGER_NOTE_NO_DOLLARS, FRICTION_TAX_LEDGER_FOOTNOTE, FRICTION_TAX_LEDGER_STANDALONE_NOTE,
+  FRICTION_LEDGER_NOTE_NO_DOLLARS, frictionReceiptsOf,
   formatUsdRange, groupLedgerRows, joinNames, OHIO_NET_WORTH_CAVEAT,
 } from "@/lib/output-text";
 import ConditionsList, { type ConditionRow } from "@/components/ConditionsList";
@@ -380,9 +380,6 @@ export default function PrivateOutput({
           <ul className="space-y-4 mt-3">
             {/* P2: rows citing the same evidence set share one row. */}
             {groupLedgerRows(frictionTaxLedger, stateNameById).map((group) => {
-              const grouped = group.conditions.length > 1;
-              const d = group.dollar_exposure;
-              const figure = d ? formatUsdRange(d.low, d.high) : null;
               const hidden = group.conditions.slice(LEDGER_NAMES_SHOWN);
               return (
                 <li key={group.conditions[0].state_id}>
@@ -404,25 +401,6 @@ export default function PrivateOutput({
                       </details>
                     )}
                   </div>
-                  {/* Option C: no figure line while friction dollars are hidden. */}
-                  {FRICTION_DOLLARS_VISIBLE && (
-                  <p className="text-[13px] text-charcoal mb-1">
-                    {figure ? (
-                      <>
-                        {grouped ? (
-                          <span className="text-slate">Highest standalone estimate in this group: </span>
-                        ) : figure.includes("–") ? null : (
-                          "Estimated exposure: "
-                        )}
-                        {figure}
-                      </>
-                    ) : (
-                      <span className="text-slate">
-                        Estimate not available for {grouped ? "these conditions" : "this condition"}.
-                      </span>
-                    )}
-                  </p>
-                  )}
                   {group.top_contributing_answers.length > 0 && (
                     <ul className="text-[12px] text-slate leading-relaxed list-disc pl-4 space-y-0.5">
                       {group.top_contributing_answers.map((text, i) => (
@@ -435,15 +413,7 @@ export default function PrivateOutput({
             })}
           </ul>
           {FRICTION_DOLLARS_VISIBLE ? (
-            <>
-              <p className="text-[11px] text-slate mt-3 leading-relaxed">
-                {FRICTION_TAX_LEDGER_STANDALONE_NOTE}
-              </p>
-              <p className="text-[11px] text-slate mt-2 leading-relaxed">
-                {FRICTION_TAX_LEDGER_FOOTNOTE}
-              </p>
-              <EvidenceReceipts receipts={payload.friction_tax_estimate?.driving_factors} />
-            </>
+            <EvidenceReceipts receipts={frictionReceiptsOf(payload)} />
           ) : (
             <p className="text-[11px] text-slate mt-3 leading-relaxed">
               {FRICTION_LEDGER_NOTE_NO_DOLLARS}
