@@ -76,3 +76,28 @@ Disclosure: Claude.ai has seen the 12 paths' target states and the signature siz
 - **Hypothesis arithmetic.** S1 holds when the best scorer's path top-1 is at least 8 AND is strictly greater than CR0max's path top-1 (so S1 fails if the best scorer is CR0max itself). S2 holds when the best scorer's path top-2 is at least 10. S3 holds when the best scorer's profile top-1 is at least 120 of 175. S4 holds when no condition leads more than 87 of the 175 profiles (50 percent is 87.5) under the best scorer. Each is HOLDS or FAILS.
 - **Extra output, no hypothesis.** For each of the 12 paths and each scorer: the top 2 conditions with their scores. For the best scorer: the member states of the rank-1 condition with wired evidence on that path (n[s] at least 1 wired question answered, as defined in `prompts/ranker-test-01-preregistration.md`), with n[s] and the state's R2 score. These are the candidate symptoms a report would name.
 - **Output.** The script is committed as `tools/condition_test_01.py` and appends a RESULTS section to this file. The text above that section is not edited. A "Membership check" section is appended first, in its own commit, before any scoring.
+
+## Membership check (run after the pre-registration commit, before any scoring)
+
+Produced by `tools/condition_test_01.py --membership`. `taxonomy.ts` is evaluated with Node, the engine registry is `engine.data.states.STATE_PROFILES`. Nothing was fixed.
+
+- `taxonomy.ts` `states[]` entries: 58 (58 distinct ids). Engine registry states: 58.
+- In the registry but absent from `taxonomy.ts` states: none.
+- In `taxonomy.ts` states but absent from the registry: none.
+- Duplicate ids in `states[]`: none.
+- States whose `signatureId` is not a signature id: none. Secondary ids that are not a signature id: none.
+- State ids listed in `Signature.stateIds` that are absent from `states[]`: none. `states[]` ids that appear in no `Signature.stateIds`: none.
+
+Two-representation comparison, per signature (State side = `signatureId` plus `secondarySignatureIds`, Signature side = `stateIds`):
+
+| Signature | Spec-claimed size | State-side size | Signature-side size | In State side only | In Signature side only |
+|---|---:|---:|---:|---|---|
+| leadership_bottleneck | 9 | 9 | 9 | - | - |
+| culture_erosion | 13 | 14 | 14 | - | - |
+| stunted_growth | 8 | 8 | 8 | - | - |
+| compounding_risks | 20 | 20 | 20 | - | - |
+| information_blindness | 9 | 9 | 9 | - | - |
+
+- States with secondary signatures: 2: leadership_continuity_risk in leadership_bottleneck, stunted_growth; narrative_lock in culture_erosion, information_blindness.
+- Total memberships: State side 60, Signature side 60. Signature-size sum claimed in the specification: 59.
+- Result: the two representations MATCH and cover all registry states.
