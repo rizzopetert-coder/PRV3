@@ -1,6 +1,6 @@
 # Friction Tax Rebuild: Build Spec
 
-Status: DRAFT, Gemini round 2 partial (2026-09-30), follow-up pending. No engine code written. Research and decisions: `prompts/friction-tax-rebuild-source-verification.md` (Sections 1 to 5 and "Decisions (Pete, 2026-09-30)" items 1 to 11). MOB reference: 13b FRICTION TAX REBUILD entry (`tools/_mob.txt:1505`). Every code reference below was read live on 2026-09-30.
+Status: Gemini-cleared 2026-09-30. Awaiting Pete's go to build. No engine code written. Research and decisions: `prompts/friction-tax-rebuild-source-verification.md` (Sections 1 to 5 and "Decisions (Pete, 2026-09-30)" items 1 to 11). MOB reference: 13b FRICTION TAX REBUILD entry (`tools/_mob.txt:1505`). Every code reference below was read live on 2026-09-30.
 
 ## Open questions (Pete), up front
 
@@ -38,13 +38,15 @@ Notation: N = employees, W = all-occupation mean annual wage for the engine indu
 
 | Channel | Formula | Inputs |
 |---|---|---|
-| Engagement | P x 0.69 x 0.18 | 0.18: Gallup 2020 article. 0.69 = 1 minus Gallup engaged 31% (May 2026 indicator). The channel prices position-years of payroll, so there is no partial-year discount: a leaver's remaining year is filled by the replacement (verification doc decision 7 correction) |
+| Engagement | P x max(0, E_bp - E_us) x 0.18 = P x 0.39 x 0.18 = 7.02% of payroll | 0.18: Gallup 2020 article (decision 1 governs which population the 18% describes). E_bp = 0.70, the average engagement in Gallup's best-practice organizations, and E_us = 0.31, the U.S. engaged share, both from the Gallup Global Indicator: Employee Engagement (gallup.com/394373, verification doc Section 5). The floor at 0 applies if E_us is ever at or above E_bp. Decision 18 (option B) prices the gap to best practice, not full engagement. The channel prices position-years of payroll, so there is no partial-year discount (verification doc decision 7 correction) |
 | Turnover | P x q x 0.42 x 0.333 | 0.42 = Gallup preventable share (July 2024, verification doc Section 5). 0.333 = Work Institute (2017 Retention Report, low-wage derivation, Section 5). q = JOLTS 2025 |
 | Decision time (receipt only) | no dollar value | McKinsey 2019: 37% of time on decisions, 58% of it ineffective. Text only. `W_m` and the 11-0000 share are removed from the engine design and stay in the verification doc as research |
 
 Known limits:
 - Vacancy gap between leaver and replacement is counted in both the engagement channel and Work Institute's indirect ~22%. Small and disclosed, not adjusted.
 - Intake clamps headcount to 1 through 1,000 (`web/components/DiagnosticFlow.tsx:53`, `:62-63`, `:95`), so any larger organization is priced as 1,000 employees. Percent of payroll is unaffected, dollars for larger organizations would be understated. At N = 1000 the output therefore shows percent of payroll only, with every dollar amount null and no dollar figure in any receipt (Decisions 15 and 17, Gemini round 2 failure mode 2). N = 999 carries both. The output states the cap.
+
+Framing rule: the engagement line reads as the gap between organizations like yours and the best-run ones. The total reads "what organizations like yours typically lose", never normal or acceptable. The engagement line never reads as the cost of disengagement as such, and never uses "full engagement" as the comparison.
 
 Headcount guard (Decisions 10 and 13): N is the intake value only when it is an `int` or `float`, is not a `bool`, is finite, and is at least 2. Anything else returns an uncalibrated result and `friction_tax_estimate` is null: "", a numeric string, None, True, `float("inf")`, `float("nan")`, 0, negatives, and 1 (a solo principal has no workforce the sources measure). There is no bucket-mean fallback. Note `bool` is a subclass of `int` in Python, so the guard must test it explicitly. The engine rule is the backstop, because `web/app/api/diagnostic/session/start/route.ts:22-23` checks only `typeof number` and `Number.isFinite` and accepts 0 and negatives, and `engine/main.py:220` defaults a missing value to 0. A live-path review on 2026-09-30 found no path that supplies a bucket label:
 
@@ -63,7 +65,8 @@ Vintages (every figure):
 | Figure | Source | Vintage | Verification status |
 |---|---|---|---|
 | 18% of salary, not-engaged | Gallup, "Increase Productivity at the Lowest Possible Cost" | 2020 article | Verification doc Section 1a |
-| 31% engaged (NE = 0.69) | Gallup Global Indicator: Employee Engagement (gallup.com/394373), 31% engaged and 17% actively disengaged | May 2026 | Verification doc Section 5 |
+| E_us = 0.31, U.S. engaged | Gallup Global Indicator: Employee Engagement (gallup.com/394373), 31% engaged in the U.S. (17% actively disengaged) | 2025 and May 2026 | Verification doc Section 5 |
+| E_bp = 0.70, best-practice average | Same Gallup indicator, average across best-practice organizations (Gallup Exceptional Workplace Award winners, Gallup clients, self-selected, spanning industries and geographies per gallup.com/workplace/643286) | 2025 | Verification doc Section 5 |
 | 42% preventable | Gallup, Tatel and Wigert, "42% of Employee Turnover Is Preventable but Often Ignored" (gallup.com/workplace/646538) | July 2024 | Verification doc Section 5. Self-reported by voluntary leavers. The 2019 figure was 52% |
 | 33.3% of salary per voluntary exit | Work Institute | 2017 Retention Report, derived from $5,506 on an $8/hour ($16,640) employee. Current method 33.3% of base salary (about 11% direct, 22% indirect) | Verification doc Section 5. Low-wage derivation applied to all salaries |
 | Quits rates by industry | BLS JOLTS Table 22, annual average quits rates, not seasonally adjusted | 2025 (release shows 2026 M01) | Verified by Claude Code 2026-09-30 |
@@ -115,7 +118,7 @@ Severity does not move the dollar figure (Decision 4). The dollar total is a fun
 
 New shape (point estimate, Decision 6):
 
-`friction_tax_estimate: { currency, typical_baseline: { total: { amount, percent_of_payroll }, channels: [ { channel, amount, percent_of_payroll, inputs: [ { name, value, source, vintage } ] } ] }, excess: null, driving_factors }`. `percent_of_payroll` is present on every channel and on the total at every N (engagement 12.42 for every profile, turnover q x 0.42 x 0.333 x 100). `amount` is null at N = 1000, the intake cap (Decision 17), and a number below it. The decision-time receipt is a driving factor with no `amount`. `low` and `high` are removed. `friction_tax_estimate` is null when uncalibrated or when no dollar channel is selected (for example only `paper_shield` identified). Receipts, including the decision-time receipt, move to a sibling `private_output.friction_receipts` so they can render when the estimate is null (adopted 2026-09-30). They still render only inside the `FRICTION_DOLLARS_VISIBLE` branch (`web/components/PrivateOutput.tsx:437-445`).
+`friction_tax_estimate: { currency, typical_baseline: { total: { amount, percent_of_payroll }, channels: [ { channel, amount, percent_of_payroll, inputs: [ { name, value, source, vintage } ] } ] }, excess: null, driving_factors }`. `percent_of_payroll` is present on every channel and on the total at every N (engagement 7.02 for every profile, turnover q x 0.42 x 0.333 x 100). `amount` is null at N = 1000, the intake cap (Decision 17), and a number below it. The decision-time receipt is a driving factor with no `amount`. `low` and `high` are removed. `friction_tax_estimate` is null when uncalibrated or when no dollar channel is selected (for example only `paper_shield` identified). Receipts, including the decision-time receipt, move to a sibling `private_output.friction_receipts` so they can render when the estimate is null (adopted 2026-09-30). They still render only inside the `FRICTION_DOLLARS_VISIBLE` branch (`web/components/PrivateOutput.tsx:437-445`).
 
 Engine (Python): `engine/contract.py:1137-1149` (build), `:693-757` (receipts), `:405-532` (ledger, drop `dollar_exposure`, add `channels`), `:1191-1207` (`_cost_parts` and `inaction_cost_*`), `:35` and `:719` (import), `api/engine.py:283-289` (condensed).
 
@@ -142,27 +145,27 @@ Web consumers that change (all read live):
 
 ## 6b. Worked figures (two channels, actual headcount, May 2025 inputs)
 
-NE = 0.69, no partial-year discount, q = JOLTS monthly x 12. Engagement is 12.42% of payroll for every profile (0.69 x 0.18). Only the turnover channel varies by industry.
+E_bp - E_us = 0.70 - 0.31 = 0.39, no partial-year discount, q = JOLTS monthly x 12. Engagement is 7.02% of payroll for every profile (0.39 x 0.18). Only the turnover channel varies by industry.
 
 | Employees / industry | W | Quit rate (monthly, annual) | Payroll | Engagement | Turnover | Total | Eng % | Turn % | Total % of payroll |
 |---|---:|---|---:|---:|---:|---:|---:|---:|---:|
-| 12 / Retail & Hospitality | $42,024 | 3.37, 40.4% | $504,288 | $62,633 | $28,497 | $91,130 | 12.4% | 5.7% | 18.1% above line |
-| 12 / Other | $67,977 | 2.20, 26.4% | $815,724 | $101,313 | $30,119 | $131,432 | 12.4% | 3.7% | 16.1% above line |
-| 60 / Construction | $72,146 | 1.80, 21.6% | $4,328,760 | $537,632 | $130,771 | $668,403 | 12.4% | 3.0% | 15.4% above line |
-| 60 / Government & Public Sector | $80,290 | 0.80, 9.6% | $4,817,400 | $598,321 | $64,681 | $663,002 | 12.4% | 1.3% | 13.8% |
-| 175 / Technology | $115,030 | 1.30, 15.6% | $20,130,250 | $2,500,177 | $439,205 | $2,939,382 | 12.4% | 2.2% | 14.6% |
-| 175 / Professional Services | $108,640 | 2.30, 27.6% | $19,012,000 | $2,361,290 | $733,889 | $3,095,179 | 12.4% | 3.9% | 16.3% above line |
-| 400 / Nonprofit & Education | $72,765 | 1.64, 19.7% | $29,106,000 | $3,614,965 | $800,891 | $4,415,856 | 12.4% | 2.8% | 15.2% above line |
-| 400 / Manufacturing | $69,131 | 1.40, 16.8% | $27,652,400 | $3,434,428 | $649,734 | $4,084,162 | 12.4% | 2.3% | 14.8% |
-| 800 / Healthcare & Life Sciences | $70,969 | 2.00, 24.0% | $56,775,200 | $7,051,480 | $1,905,739 | $8,957,219 | 12.4% | 3.4% | 15.8% above line |
-| 800 / Transportation & Warehousing | $64,331 | 2.20, 26.4% | $51,464,800 | $6,391,928 | $1,900,237 | $8,292,165 | 12.4% | 3.7% | 16.1% above line |
-| 1,000 / Financial Services (at the cap) | $100,842 | 1.30, 15.6% | withheld | null | null | null | 12.4% | 2.2% | 14.6% |
+| 12 / Retail & Hospitality | $42,024 | 3.37, 40.4% | $504,288 | $35,401 | $28,497 | $63,898 | 7.02% | 5.7% | 12.7% |
+| 12 / Other | $67,977 | 2.20, 26.4% | $815,724 | $57,264 | $30,119 | $87,383 | 7.02% | 3.7% | 10.7% |
+| 60 / Construction | $72,146 | 1.80, 21.6% | $4,328,760 | $303,879 | $130,771 | $434,650 | 7.02% | 3.0% | 10.0% |
+| 60 / Government & Public Sector | $80,290 | 0.80, 9.6% | $4,817,400 | $338,181 | $64,681 | $402,863 | 7.02% | 1.3% | 8.4% |
+| 175 / Technology | $115,030 | 1.30, 15.6% | $20,130,250 | $1,413,144 | $439,205 | $1,852,349 | 7.02% | 2.2% | 9.2% |
+| 175 / Professional Services | $108,640 | 2.30, 27.6% | $19,012,000 | $1,334,642 | $733,889 | $2,068,531 | 7.02% | 3.9% | 10.9% |
+| 400 / Nonprofit & Education | $72,765 | 1.64, 19.7% | $29,106,000 | $2,043,241 | $800,891 | $2,844,132 | 7.02% | 2.8% | 9.8% |
+| 400 / Manufacturing | $69,131 | 1.40, 16.8% | $27,652,400 | $1,941,198 | $649,734 | $2,590,933 | 7.02% | 2.3% | 9.4% |
+| 800 / Healthcare & Life Sciences | $70,969 | 2.00, 24.0% | $56,775,200 | $3,985,619 | $1,905,739 | $5,891,358 | 7.02% | 3.4% | 10.4% |
+| 800 / Transportation & Warehousing | $64,331 | 2.20, 26.4% | $51,464,800 | $3,612,829 | $1,900,237 | $5,513,066 | 7.02% | 3.7% | 10.7% |
+| 1,000 / Financial Services (at the cap) | $100,842 | 1.30, 15.6% | withheld | null | null | null | 7.02% | 2.2% | 9.2% |
 | 1 / any industry | | | null | null | null | null | | | null (N below 2, Decision 13) |
 
-The largest row is 1,000 employees, the intake ceiling (known limit, Section 2), where dollars are withheld and only percent of payroll is shown (Decision 17). Totals run 13.8% to 18.1% of payroll. 7 of the 11 priced profiles are above 15%. The 15% line is Claude.ai's reference line, not a cited threshold. The removal of the partial-year discount raises every total (0.6 to 2.5 points of payroll depending on the industry quit rate). Percent of payroll does not depend on headcount, only dollars do.
+The largest row is 1,000 employees, the intake ceiling (known limit, Section 2), where dollars are withheld and only percent of payroll is shown (Decision 17). Totals run 8.4% to 12.7% of payroll. 0 of the 11 priced profiles are above 15%. The 15% line is Claude.ai's reference line, not a cited threshold. Percent of payroll does not depend on headcount, only dollars do.
 
 What the benchmarks do and do not show:
-- **The engagement channel's only benchmark is Gallup's own worked example** (verification doc Section 1a: 10,000 x 67% x $50,000 x 18% = $60.3M on $500M payroll, 12.06%). That is circular. The channel applies Gallup's formula, so 12.42% against Gallup's 12.06% confirms arithmetic, not magnitude. No independent check of the engagement magnitude was found.
+- **The engagement channel has no independent magnitude check.** It applies Gallup's own 18% method (verification doc Section 1a worked example: 10,000 x 67% x $50,000 x 18% = $60.3M on $500M payroll, 12.06%) to a gap chosen by decision 18. The full-engagement basis (0.69 x 0.18 = 12.42%) was rejected in Gemini round 2 as overstating a typical, fixable loss. The best-practice gap (7.02%) rests on Gallup's own best-practice average, a Gallup-sourced figure, so agreement with Gallup material confirms arithmetic, not magnitude.
 - Turnover has no independent payroll-percentage benchmark either. The SHRM 50% to 200% of salary range (`prompts/friction-tax-unit-decision.md:16`) is a per-exit cost and is not comparable.
 - Old engine range, for orientation only: 5% to 25% of payroll before the severity scalar (`prompts/friction-tax-state-multiplier-methodology.md:48`).
 
@@ -172,7 +175,7 @@ Intake fields: headcount (integer, minimum 1, `engine/data/intake.py:54-62`), in
 
 | Source | Assumption | Eligibility boundary (what I could establish) | Extremes | Status |
 |---|---|---|---|---|
-| Gallup 18% and engaged 31% | An average not-engaged US employee costs 18% of salary at any employer | The 18% comes from a global example ("Globally, 67%...") paired with a US engaged share (31%, May 2026), a geographic mismatch disclosed, not adjusted. Not segmented by employer size or industry in the material | 12 employees: Gallup's share is not testable for a single small team. Government and nonprofit: US sample includes them, not confirmed from source | Partly unverified |
+| Gallup 18% and engaged 31% | An average not-engaged US employee costs 18% of salary at any employer | The 18% comes from a global example ("Globally, 67%...") paired with a US engaged share (31%, May 2026), a geographic mismatch disclosed, not adjusted. The 0.70 best-practice level is the average of Gallup Exceptional Workplace Award winners and Gallup clients, a self-selected population (Gallup states it spans industries and geographies), and the 0.39 gap applies the national U.S. engaged share to every client regardless of industry or size. Not segmented by employer size or industry in the material | 12 employees: Gallup's share is not testable for a single small team. Government and nonprofit: US sample includes them, not confirmed from source | Partly unverified |
 | Gallup 42% preventable (July 2024) | Share of voluntary exits that were preventable | Self-reported by leavers (their own view of preventability), not an employer record | Unknown by size and industry | Self-report limit |
 | Work Institute 33.3% | Cost per voluntary exit is a flat 33.3% of salary | Low-wage derivation (2017 Retention Report, $8/hour basis). Gallup's same July 2024 article gives role tiers: about 200% of salary for leaders and managers, 80% technical, 40% frontline | High-wage end: Technology ($115,030), Professional Services ($108,640), Financial Services ($100,842) are where a flat 33.3% is most likely to understate. Low-wage end (Retail & Hospitality $42,024) is the derivation's home range | Limit at the high-wage end |
 | JOLTS Table 22 | The industry quits rate applies to a client in that industry | Verified: nonfarm establishment survey, sector and supersector rows, no size-class cut in Table 22 | 12 and 1,000 employees get the same blended industry rate. Nonprofit & Education and Other are built or blended rows | Applies to industry, untested by size |
@@ -189,7 +192,8 @@ The Gallup 18% with the 69% population and the JOLTS rate assume US employers. P
 - `tools/test_contract.py`: `:441` estimate shape, `:1047-1150` ledger (`dollar_exposure` cross-check becomes a `channels` check), `inaction_cost` assertions.
 - Web: `web/lib/output-text.test.ts:294,372` (keep the hidden-flag assertion), `web/components/PrivateOutput.friction.test.ts:33-49`, `web/lib/diagnostic-completion-brand.test.ts:172-190`, plus the server-render test that no friction dollar reaches the report screen (stays as is).
 - Cap tests (Decision 17): N = 1000 returns `percent_of_payroll` on each channel and the total with every `amount` null and no dollar figure in any `driving_factors` text, N = 999 returns percents and amounts, `percent_of_payroll` is present at every N, and the web consumers above render percent-only when `amount` is null.
-- New: framing-rule assertion ("what organizations like yours typically lose", absence of "normal" or "acceptable") on any surface showing the figure.
+- New: framing-rule assertions on any surface showing the figure: the total contains "what organizations like yours typically lose", the engagement line contains the gap-to-best-run wording, and neither contains "normal", "acceptable" or "full engagement".
+- Engagement formula: a hand-computed fixture at 0.39 x 0.18, and a floor test (E_us at or above E_bp returns 0 engagement, never negative).
 - Calibration impact: expected none. `tools/calibration_runner.py` and `engine/test_suite.py` do not reference friction tax. Confirm by re-running the 175-profile suite after the build.
 - Live production round-trip check required for the payload and condensed route changes (CLAUDE.md, 2026-08-27).
 
@@ -198,7 +202,7 @@ The Gallup 18% with the 69% population and the JOLTS rate assume US employers. P
 1. Is Option A (states select channels, severity inert) defensible under P4?
 2. Is JOLTS annualization correct as specified (monthly quits rate x 12 from Table 22's footnote definition)?
 3. Is Work Institute's flat 33.3% acceptable versus Gallup's role-tiered 40/80/200% for a population whose role mix is unknown?
-4. Is a two-channel baseline of roughly 13.8% to 18.1% of payroll defensible under the framing rule?
+4. Is a two-channel baseline of roughly 8.4% to 12.7% of payroll defensible under the framing rule?
 5. Is the vacancy-gap overlap between the engagement channel and Work Institute's indirect cost small enough to disclose rather than adjust?
 6. Is a point estimate preferable to a range with no cited uncertainty?
 7. Does removing decision time leave any remaining double count between the engagement and turnover channels?
@@ -227,3 +231,10 @@ Round 2 (2026-09-30):
 - Q7: CONFIRM overstated. Gallup's exclusion of turnover does not cover Work Institute's ~22% indirect cost, which overlaps the engagement channel during vacancy and ramp-up. Claude.ai verification, 2026-09-30.
 - Failure modes: (1) mapping lock, resolved by decision 16. (2) cap understatement, resolved by decision 17.
 - Follow-up sent on Q4 and Q5.
+
+Round 2 follow-up (2026-09-30):
+- Q5: CONFIRM, accepted. Vacancy overlap disclosed, not adjusted.
+- Q4: REJECT on magnitude. Gemini's proposed fix (engagement as receipt only) had no verifiable source. Claude.ai proposed the cited alternative (the Gallup best-practice 70%), and Pete chose it as decision 18.
+- Gemini answered from prompt text only, since it could not open the attachments.
+
+Decision 18 confirm (2026-09-30): CONFIRM. Gemini, single question in a fresh thread: measuring against an achievable best-practice level isolates the recoverable loss rather than an ideal. No sources cited.
