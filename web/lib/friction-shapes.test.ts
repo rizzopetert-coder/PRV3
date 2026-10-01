@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  buildResultsText, frictionTypicalLossText, frictionReceiptsOf, groupLedgerRows,
+  buildResultsText as buildResultsTextReal, frictionTypicalLossText, frictionReceiptsOf, groupLedgerRows,
   FRICTION_TYPICAL_LOSS_LABEL,
 } from "./output-text";
 import type { PrivateOutputPayload } from "./types";
@@ -8,6 +8,14 @@ import { BASE_PRIVATE_PAYLOAD } from "./friction-test-base";
 import {
   NEW_ESTIMATE, CAPPED_ESTIMATE, NEW_RECEIPTS, NEW_LEDGER, OLD_ESTIMATE, OLD_LEDGER, FRICTION_DOLLAR_STRINGS,
 } from "./friction-test-fixtures";
+// Legal is forced visible in these tests (they cover the legal and cost comparison text).
+// The default-hidden behavior is covered in lib/output-text.legal.test.ts.
+const buildResultsText = (
+  payload: Parameters<typeof buildResultsTextReal>[0],
+  tactical?: Parameters<typeof buildResultsTextReal>[1],
+  options: NonNullable<Parameters<typeof buildResultsTextReal>[2]> = {},
+) => buildResultsTextReal(payload, tactical, { legalDollarsVisible: true, ...options });
+
 
 // Stage 6 consumer tests for lib/output-text.ts: the helpers and buildResultsText
 // (Copy results) read the new, older and missing shapes without throwing.
