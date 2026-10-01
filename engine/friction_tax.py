@@ -66,6 +66,7 @@ from enum import Enum
 from typing import Literal, Optional
 
 from engine.data.jurisdiction import JURISDICTION_TABLE
+from engine.data.state_criteria import STATE_CRITERIA
 
 _logger = logging.getLogger(__name__)
 
@@ -2170,10 +2171,10 @@ for _cluster_num, _expected_count in _LEGAL_CLUSTER_COUNTS_EXPECTED.items():
         f"Cluster {_cluster_num}: expected {_expected_count} states, found {_actual_count}"
     )
 for _lc_sid, _lc_cluster in LEGAL_COMPLIANCE_CLUSTER.items():
-    assert _lc_sid in STATE_MULTIPLIERS, (
+    assert _lc_sid in STATE_CRITERIA, (
         f"LEGAL_COMPLIANCE_CLUSTER references unknown state {_lc_sid!r}"
     )
-    _lc_score = STATE_MULTIPLIERS[_lc_sid].criteria["legal"].score
+    _lc_score = STATE_CRITERIA[_lc_sid].legal
     assert _lc_score in (1, 2), (
         f"{_lc_sid}: classified into Cluster {_lc_cluster} but its recorded "
         f"'legal' score is {_lc_score}, not in {{1, 2}} -- Addendum 10's "
@@ -4163,11 +4164,11 @@ def _single_state_legal_pricing(
     if cluster is None:
         return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
             coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
-    entry = STATE_MULTIPLIERS.get(state_id)
+    entry = STATE_CRITERIA.get(state_id)
     if entry is None:
         return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
             coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
-    score = entry.criteria["legal"].score
+    score = entry.legal
     if score == 0:
         return LegalPricingResult(status=LegalPricingStatus.NOT_APPLICABLE, dollar_range=None,
             coverage_confidence="NOT_APPLICABLE", partial_state_flag=False)
