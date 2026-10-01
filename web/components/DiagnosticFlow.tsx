@@ -184,12 +184,12 @@ interface IntakeFormState {
   significant_event_elaboration: string;
 }
 
-// Source of truth is engine/friction_tax.py's ORG_TYPE_SCALARS keys,
-// same list web/components/SelfSelectIntakeModal.tsx already carries as
-// its own separately-declared constant (that file's own docstring notes
-// it must be kept in sync manually) -- duplicated here rather than
-// consolidated into a shared export, matching this codebase's existing
-// accepted duplication precedent, not a new pattern.
+// Source of truth is engine/data/intake.py's INTAKE_FIELDS["org_type"].
+// tools/test_org_type_lists.py fails if this list drifts from it. Same
+// list web/components/SelfSelectIntakeModal.tsx carries as its own
+// separately-declared constant, duplicated here rather than consolidated
+// into a shared export, matching this codebase's existing accepted
+// duplication precedent, not a new pattern.
 const ORG_TYPE_OPTIONS = [
   "Founder-led",
   "PE or VC-backed",
