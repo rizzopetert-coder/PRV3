@@ -179,8 +179,15 @@ const ASSET_AXIS_NAMES: Record<string, string> = {
 // rebuilt. The engine still computes them and the payload still carries
 // them. Set to true to restore the dollar ledger, its calculation steps,
 // its footnotes and the friction line in the cost comparison. Legal
-// exposure is not affected by this switch.
+// exposure is not affected by this switch (see LEGAL_DOLLARS_VISIBLE).
 export const FRICTION_DOLLARS_VISIBLE = false;
+
+// Legal dollar switch (Pete's decision, same pattern as above): the legal
+// exposure figure, its band, its caveats, the calculation receipts and the
+// legal line in the cost comparison are hidden on both brands. The engine
+// still computes them and the payload still carries them. Set to true to
+// restore them, on screen and in Copy results.
+export const LEGAL_DOLLARS_VISIBLE = false;
 
 // Ledger copy while friction dollars are hidden.
 export const FRICTION_LEDGER_HEADING_NO_DOLLARS = "The answers behind these conditions";
@@ -273,21 +280,23 @@ export function buildConditionRows(payload: PrivateOutputPayload): ConditionRowD
 // tacticalResults: the hr-dx TC answers, the same data PrivateOutput passes
 // to TacticalReview. Only read when Call 2 failed (no tactical_findings),
 // where the screen shows referral chips over the answer list.
-// options.frictionDollarsVisible defaults to FRICTION_DOLLARS_VISIBLE, the
-// same switch the screen reads. Tests pass it to cover both states.
+// options.frictionDollarsVisible and options.legalDollarsVisible default to
+// FRICTION_DOLLARS_VISIBLE and LEGAL_DOLLARS_VISIBLE, the same switches the
+// screen reads. Tests pass them to cover both states.
 export function buildResultsText(
   payload: PrivateOutputPayload,
   tacticalResults?: TacticalSectionResult[],
-  options: { frictionDollarsVisible?: boolean } = {},
+  options: { frictionDollarsVisible?: boolean; legalDollarsVisible?: boolean } = {},
 ): string {
   const frictionVisible = options.frictionDollarsVisible ?? FRICTION_DOLLARS_VISIBLE;
+  const legalVisible = options.legalDollarsVisible ?? LEGAL_DOLLARS_VISIBLE;
   // Each block is one paragraph or list; blocks are separated by a blank line.
   const blocks: string[][] = [];
   const add = (block: string[]) => {
     if (block.length > 0) blocks.push(block);
   };
 
-  const legal = payload.legal_tail_risk_exposure;
+  const legal = legalVisible ? payload.legal_tail_risk_exposure : null;
   const legalHasPrice = legal !== null && legal.low !== null && legal.high !== null;
   const conditionRows = buildConditionRows(payload);
   const stateNameById = new Map<string, string>([
@@ -414,8 +423,11 @@ export function buildResultsText(
   const friction = frictionVisible ? payload.friction_tax_estimate : null;
   const frictionText = frictionTypicalLossText(friction);
   const scc = payload.service_cost_comparison;
-  if (scc && (frictionText || legalHasPrice)) {
-    const block = ["Cost comparison:"];
+  // With the legal figure hidden and no friction line, the card becomes a
+  // pricing-only "Pricing" block, mirroring the on-screen Pricing card.
+  const pricingOnly = Boolean(scc) && !frictionText && !legalHasPrice && !legalVisible;
+  if (scc && (frictionText || legalHasPrice || pricingOnly)) {
+    const block = [pricingOnly ? "Pricing:" : "Cost comparison:"];
     if (frictionText) block.push(`— ${FRICTION_TYPICAL_LOSS_LABEL}: ${frictionText}`);
     if (legalHasPrice) block.push(`— Legal exposure, one-time if a claim arises: ${money(legal!.low!, legal!.high!)}`);
     const service = scc.target_service_name || payload.resolution_family;
