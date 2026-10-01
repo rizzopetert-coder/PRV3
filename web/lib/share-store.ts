@@ -45,13 +45,26 @@ function shareKey(id: string): string {
 // Redis until their 30-day TTL ends. Both fields were removed from
 // ShareableOutputPayload, and every reader (GET /api/share/[id] and the
 // /share/[id] page) goes through this function, so they are stripped here.
+//
+// Stage 4 (R6, friction tax rebuild): the strip also names friction_receipts
+// and channels, the two fields the rebuild adds to the private output. They are
+// never written to a share (the write is a whitelist), this makes sure a record
+// that somehow carried one still cannot reach a reader.
 type LegacyShareRecord = ShareableOutputPayload & {
   friction_tax_estimate?: unknown;
   legal_tail_risk_band?: unknown;
+  friction_receipts?: unknown;
+  channels?: unknown;
 };
 
 function stripRetiredFields(record: LegacyShareRecord): ShareableOutputPayload {
-  const { friction_tax_estimate: _friction, legal_tail_risk_band: _legal, ...rest } = record;
+  const {
+    friction_tax_estimate: _friction,
+    legal_tail_risk_band: _legal,
+    friction_receipts: _receipts,
+    channels: _channels,
+    ...rest
+  } = record;
   return rest;
 }
 
