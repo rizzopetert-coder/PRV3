@@ -10,7 +10,9 @@ import type {
   TacticalFinding,
   TacticalSectionResult,
 } from "@/lib/types";
-import { formatUsdRange } from "@/lib/output-text";
+import {
+  formatUsdRange, frictionTypicalLossText, FRICTION_TYPICAL_LOSS_LABEL,
+} from "@/lib/output-text";
 
 // Phase 3 report blocks (Pete, 2026-09-27). Brand-neutral: every brand-
 // specific value (service names, referral chips) arrives as data.
@@ -75,7 +77,10 @@ export function CostComparison({
 }) {
   if (!comparison) return null;
   const legalPriced = legal !== null && legal.low !== null && legal.high !== null;
-  if (!friction && !legalPriced) return null;
+  // Tolerant of the two-channel estimate (a dollar figure, or the percent of
+  // payroll at the intake cap), the older { low, high } shape, or null.
+  const frictionText = frictionTypicalLossText(friction);
+  if (!frictionText && !legalPriced) return null;
   const service = comparison.target_service_name || fallbackServiceName;
   const priced =
     comparison.service_estimate_low !== null && comparison.service_estimate_high !== null;
@@ -85,10 +90,10 @@ export function CostComparison({
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-md border border-gray-200 px-4 py-3 space-y-2">
           <p className="text-[11px] text-slate">If these conditions go unaddressed</p>
-          {friction && (
+          {frictionText && (
             <div>
-              <p className="text-sm font-medium text-charcoal">{rangeText(friction.low, friction.high)}</p>
-              <p className="text-[11px] text-slate">Friction tax, recurring every year</p>
+              <p className="text-sm font-medium text-charcoal">{frictionText}</p>
+              <p className="text-[11px] text-slate">{FRICTION_TYPICAL_LOSS_LABEL}</p>
             </div>
           )}
           {legalPriced && (
