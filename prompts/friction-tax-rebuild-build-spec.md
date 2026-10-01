@@ -271,3 +271,13 @@ Section 10 steps map to the stages used in Phase 0 reporting: Stage 1 = step 2 (
 ### W and q primary-source check (Claude Code, 2026-09-30)
 
 The verification doc records the method for W (Section 2b mapping, `nat3d_M2025_dl.xlsx`) but contains no W table and no JOLTS values, so both were checked against primary files this session. W: `oesm25in4.zip` (`nat3d_M2025_dl.xlsx`, and `nat3d_owner_M2025_dl.xlsx` for privately owned rows 611 and 622), all-occupation A_MEAN weighted by TOT_EMP over the Section 2b mapping. All 11 match Section 3 to the dollar, and employment totals match Section 2b. The ownership codes disclosed in Section 3 were confirmed (713 and 721 are code 57, 491 is code 1, government 999000 is code 123). q: BLS JOLTS Table 22, annual average quits rates, 2025 column (read from bls.gov/news.release/jolts.t22.htm, last modified March 13, 2026). The Table 22 footnote defines the annual average as the sum of 12 monthly quits as a percent of the sum of 12 monthly employment, so the value is an average monthly rate and x12 annualizes it. All nine direct rows match. The two blended rows recompute from OEWS employment: Retail & Hospitality 3.367 rounds to 3.37, Nonprofit & Education 1.6395 rounds to 1.64. No Section 3 value changed.
+
+### Accepted interpretation calls (Pete, accepted after Stages 4 and 6)
+
+- `driving_factors` is dropped from `friction_tax_estimate`, because the receipts moved to `private_output.friction_receipts`. Section 6's shape line, which lists `driving_factors` inside the estimate, was internally inconsistent with the adopted "receipts move to a sibling" decision. The estimate carries `currency`, `typical_baseline` and `excess` only.
+- The ledger footnote (`FRICTION_TAX_LEDGER_FOOTNOTE`) and the ledger standalone note (`FRICTION_TAX_LEDGER_STANDALONE_NOTE`) are deleted, because they described severity-scaled per-row estimates and were false under the new model. They only ever rendered behind `FRICTION_DOLLARS_VISIBLE`.
+- The share-payload strip covers the four top-level names (`friction_tax_estimate`, `legal_tail_risk_band`, `friction_receipts`, `channels`). The ledger, which carries `channels` on each row, is never written to a share (the write is a whitelist), and the guard test scans any depth.
+
+### Stage 5 field name
+
+The spec does not name the condensed single value. The engine returns `condensed_departure_cost: { amount, currency }` (industry wage, OEWS May 2025, times 0.333, `amount` null for an unrecognized industry) from `/api/condensed-complete`, and the condensed payload carries `departure_cost` of the same shape. The retired `condensed_financial_range` and `financial_range` are read as no figure, never converted, because the basis differs.
