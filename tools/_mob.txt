@@ -6,7 +6,7 @@
 
 
 
-\\\#\\\# MOB v4.332
+\\\#\\\# MOB v4.333
 
   
 
@@ -1798,6 +1798,8 @@ Last updated: This session (Claude Code), 2026-09-30/10-01 -- rewritten per conv
 | **Condensed departure figure is industry wage x 0.333, a single value, behind the flag** | LOCKED 2026-09-30, Pete (R2). The condensed cost of one departure is the industry wage (OEWS May 2025) times 0.333, returned as `condensed_departure_cost` by the engine and carried as `departure_cost` in the payload, rendered only behind `FRICTION_DOLLARS_VISIBLE`. The old 0.50 to 0.75 range is retired, and its fields are read as no figure, never converted. Hidden branch shows no block and no copy. Commits `060603b` (hide), `e27658a..b3e794e` (single value). | This session (Claude Code), 2026-09-30/10-01 | MOB v4.331 |
 
 | **Cross-project payload changes use expand/contract** | LOCKED 2026-10-01 (date corrected from 2026-09-30, see Section 16), Pete. prv-3 and prv3-engine deploy separately from one push, so a payload shape change that crosses them is done in two pushes. Expand: the engine emits both the old and the new field for one deploy cycle, and the web reads the new one tolerantly. Contract: a later push removes the old field once the web reads only the new one. Reason: the Stage 5 deploy race (a window of about 30 seconds where an old-web client would have thrown on `payload.financial_range`). Also in CLAUDE.md Engine Rules. | This session (Claude Code), 2026-09-30/10-01 | MOB v4.331 |
+
+| **Dates in records come from git and the local clock (ET)** | LOCKED 2026-10-01, Pete. Dates in MOB, spec and handoff entries come from git commit timestamps and the local clock (ET), stamped by Claude Code. Dates in Claude.ai prompts are not authoritative and are not copied into records. PRV3 dates by local clock, consistent with the v4.330 closeout stamp (22:23 EDT, 2026-09-30). Reason: Claude.ai stamped this session's rulings 2026-09-30 from the prior handoff's close date, see the Section 16 correction note. Also in CLAUDE.md, Closeout Protocol. | This session (Claude Code), 2026-10-01 | MOB v4.333 |
 
 
 
@@ -7254,4 +7256,6 @@ MOB v4.331.
 
 **Step-Back input (2026-10-03).** The Principal Brief, Section 10, Output Precision: PRV2's output was comprehensive, PRV3's output is precise, length is not depth, and a verdict naming one true thing beats a report naming nothing new. The 36-condition full-prose on-screen output, mirrored by the 2026-09-28 Copy results lock (Section 14), is in tension with that principle. Principle versus lock, a question for Pete, not a defect. This answers the v4.331 note that the Brief was unavailable to Claude Code. Recorded in the 13b Copy results item.
 
-MOB v4.332.
+Ruling (Pete, 2026-10-01): local clock (ET). The items listed as ambiguous are correct as 2026-09-30 and stay unchanged. Only the six re-dated items moved.
+
+MOB v4.333.
