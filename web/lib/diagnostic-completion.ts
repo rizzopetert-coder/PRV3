@@ -196,6 +196,7 @@ export async function completeDiagnosticSession(
 
     friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
     friction_tax_ledger: engineResult.private_output.friction_tax_ledger,
+    friction_receipts: engineResult.private_output.friction_receipts ?? [],
     legal_tail_risk_exposure: engineResult.private_output.legal_tail_risk_exposure,
 
     cascade_risk: engineResult.private_output.cascade_risk,
