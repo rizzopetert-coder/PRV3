@@ -33,6 +33,10 @@ from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
 from engine.friction_tax import (
     compute_friction_tax, compute_legal_compliance_exposure,
     compute_legal_per_state_breakdown,
+    ENGAGEMENT_BEST_PRACTICE, ENGAGEMENT_US, NOT_ENGAGED_COST_SHARE,
+    TURNOVER_PREVENTABLE_SHARE, TURNOVER_COST_SHARE,
+    DECISION_TIME_SHARE_OF_TIME, DECISION_TIME_INEFFECTIVE_SHARE,
+    FRICTION_FRAMING_TOTAL, FRICTION_FRAMING_ENGAGEMENT_GAP,
 )
 from engine.data.state_criteria import STATE_CRITERIA
 from engine.resolution_families import (
@@ -410,25 +414,20 @@ def _build_friction_tax_ledger(
     intake_data: IntakeData,
 ) -> list:
     """
-    Per-condition/state friction tax ledger row: risk label, dollar
-    exposure, and a ranked top-contributing-answers list -- one row per
-    entry in identified_states, in that same order.
+    Per-condition/state friction tax ledger row: risk label, the channels
+    the state switches on, and a ranked top-contributing-answers list -- one
+    row per entry in identified_states, in that same order.
 
     risk_label reuses each state's own severity tier from `by_state`
     (already computed by assemble_output() above) rather than a new
     risk-classification mechanism -- least-disruptive-contract, per
     Gemini's cleared architecture.
 
-    dollar_exposure reuses compute_friction_tax() called with a single-
-    element state_ids list, using THIS state's own tier (not the lead
-    state's, unlike the aggregate friction_tax_estimate above) -- with
-    exactly one identified state, compute_friction_tax()'s own combined-
-    criterion aggregation collapses to that state's untouched criterion
-    scores (confirmed by that function's own docstring and
-    tools/test_friction_tax.py's continuity assertions), so this is a
-    real per-state standalone estimate, not an approximation. None when
-    that single-state call isn't calibration_complete (same null
-    contract as friction_tax_estimate itself).
+    channels lists which friction channels this state switches on
+    (engagement when its productivity score is above 0, turnover when its
+    turnover score is above 0, decision_time when its decision_quality
+    score is above 0), read from engine/data/state_criteria.py. No dollar
+    figure is carried per state (friction tax rebuild, Stage 4).
 
     top_contributing_answers reuses _build_signal_map_context()'s own
     replay technique (engine/main.py) -- a fresh scratch
@@ -464,22 +463,14 @@ def _build_friction_tax_ledger(
         state_id = s["state_id"]
         risk_label = tier_by_state.get(state_id, "Emerging")
 
-        friction_result = compute_friction_tax(
-            state_ids=[state_id],
-            severity_tier=risk_label,
-            org_size=intake_data.headcount,
-            industry=intake_data.industry,
-            org_type=intake_data.org_type,
-        )
-        dollar_exposure = (
-            {
-                "low":      friction_result["low"],
-                "high":     friction_result["high"],
-                "currency": friction_result["currency"],
-            }
-            if friction_result["calibration_complete"]
-            else None
-        )
+        criteria = STATE_CRITERIA.get(state_id)
+        channels = [
+            name for name, field in (
+                ("engagement", "productivity"), ("turnover", "turnover"),
+                ("decision_time", "decision_quality"),
+            )
+            if criteria is not None and getattr(criteria, field) > 0
+        ]
 
         salience = SALIENCE_PROFILES.get(state_id)
         scored: list = []
@@ -526,7 +517,7 @@ def _build_friction_tax_ledger(
             "state_id":                 state_id,
             "state_name":               s["state_name"],
             "risk_label":               risk_label,
-            "dollar_exposure":          dollar_exposure,
+            "channels":                 channels,
             "top_contributing_answers": top_contributing_answers,
         })
 
@@ -691,44 +682,88 @@ def _receipt(category: str, rationale: str, triggering_answer: Optional[str] = N
     return receipt
 
 
-def _friction_driving_factors(
-    friction_result: dict, identified_states: list, severity_tier: str,
-    intake_data, answers_log: list,
+def _pct(value: float) -> str:
+    """A percent of payroll to at most 2 decimals, trailing zeros dropped."""
+    return f"{value:.2f}".rstrip("0").rstrip(".")
+
+
+def _friction_receipts(
+    friction_result: dict, identified_states: list, intake_data, answers_log: list,
 ) -> list:
-    """The friction tax math, step by step, from compute_friction_tax()'s
-    own intermediate figures. [] when uncalibrated."""
-    c = friction_result.get("components")
-    if not friction_result.get("calibration_complete") or not c:
-        return []
-    if c["org_type_scalar"] == 1.0:
-        org_type_text = f"No adjustment for {intake_data.org_type} organizations."
-    else:
-        org_type_text = (
-            f"Adjusted by a factor of {c['org_type_scalar']:.2f} for {intake_data.org_type} "
-            f"organizations, giving a baseline of {_usd(c['adjusted_baseline'])}."
-        )
-    receipts = [
-        _receipt(
-            "Payroll baseline",
-            f"Estimated annual payroll for a {friction_result['org_size_label']} person "
-            f"{intake_data.industry} organization: {_usd(c['payroll_floor'])}.",
-        ),
-        _receipt("Organization type", org_type_text),
-    ]
+    """The friction figure's receipts, step by step, from compute_friction_tax()'s
+    own result: payroll, each dollar channel with its cited inputs, the conditions
+    that switch channels on (each quoting the respondent's own evidence), the
+    decision-time context with no dollar value, and the total. Receipts render
+    even when the estimate is null, so a state set with no dollar channel (only
+    paper_shield) still gets its condition and decision-time receipts. At the
+    intake cap no receipt carries a dollar figure and the cap is stated. [] when
+    nothing applies."""
+    receipts: list = []
+    estimate = friction_result.get("estimate")
+    withheld = friction_result.get("amounts_withheld")
+    channels = {}
+    if estimate:
+        base = estimate["typical_baseline"]
+        channels = {c["channel"]: c for c in base["channels"]}
+        if withheld:
+            receipts.append(_receipt(
+                "Payroll baseline",
+                "Intake counts organizations up to 1,000 employees and prices any larger "
+                "organization as 1,000. Dollar amounts are withheld for that reason and "
+                "only percent of payroll is shown.",
+            ))
+        else:
+            receipts.append(_receipt(
+                "Payroll baseline",
+                f"Estimated annual payroll for {friction_result['headcount']:,.0f} "
+                f"{intake_data.industry} employees at the {intake_data.industry} average "
+                f"wage of {_usd(friction_result['wage'])}: {_usd(friction_result['payroll'])}.",
+            ))
+
+    def with_amount(text: str, channel: dict) -> str:
+        if channel["amount"] is None:
+            return text + "."
+        return text + f", about {_usd(channel['amount'])} a year."
+
+    if "engagement" in channels:
+        c = channels["engagement"]
+        receipts.append(_receipt(
+            "Engagement",
+            with_amount(
+                f"This is {FRICTION_FRAMING_ENGAGEMENT_GAP}. Gallup finds "
+                f"{ENGAGEMENT_US:.0%} of U.S. employees engaged against an average of "
+                f"{ENGAGEMENT_BEST_PRACTICE:.0%} in its best-practice organizations, and "
+                f"each employee below that level costs about {NOT_ENGAGED_COST_SHARE:.0%} "
+                f"of salary. That is {_pct(c['percent_of_payroll'])}% of payroll", c,
+            ),
+        ))
+    if "turnover" in channels:
+        c = channels["turnover"]
+        receipts.append(_receipt(
+            "Turnover",
+            with_amount(
+                f"{friction_result['annual_quit_rate_percent']:.1f}% of employees in "
+                f"{intake_data.industry} leave each year (BLS JOLTS, 2025). Gallup finds "
+                f"{TURNOVER_PREVENTABLE_SHARE:.0%} of voluntary exits are preventable, and "
+                f"Work Institute puts the cost of each exit at about "
+                f"{TURNOVER_COST_SHARE:.1%} of salary. That is "
+                f"{_pct(c['percent_of_payroll'])}% of payroll", c,
+            ),
+        ))
     used_answers: set = set()
     for s in identified_states:
         entry = STATE_CRITERIA.get(s["state_id"])
         if entry is None:
             continue
-        channels = [
+        labels = [
             label for key, label in _FRICTION_CHANNEL_LABELS.items()
             if getattr(entry, key) > 0
         ]
-        if not channels:
+        if not labels:
             continue
         receipts.append(_receipt(
             "Condition",
-            f"{s['state_name']} adds cost through {_join_words(channels)}.",
+            f"{s['state_name']} adds cost through {_join_words(labels)}.",
             _pick_distinct(
                 _top_observation_texts(
                     s["state_id"], answers_log, intake_data, limit=None,
@@ -737,24 +772,23 @@ def _friction_driving_factors(
                 used_answers,
             ),
         ))
-    share = (
-        f"Together these conditions put {c['combined_multiplier']:.1%} of that baseline at risk"
-    )
-    if c["multi_channel_severity_loading"] > 1.0:
-        share += (
-            f", raised by a factor of {c['multi_channel_severity_loading']:.2f} because "
-            f"the cost spreads across {c['breadth']} channels"
+    if friction_result.get("decision_time_receipt"):
+        receipts.append(_receipt(
+            "Decision time",
+            f"Managers spend about {DECISION_TIME_SHARE_OF_TIME:.0%} of their time on "
+            f"decisions and about {DECISION_TIME_INEFFECTIVE_SHARE:.0%} of that time is used "
+            f"ineffectively (McKinsey, 2019). No dollar value is applied. The survey sample "
+            f"skews toward senior leaders at larger companies than most clients, so this is "
+            f"context and not a priced channel.",
+        ))
+    if estimate:
+        total = estimate["typical_baseline"]["total"]
+        text = (
+            f"Together, {FRICTION_FRAMING_TOTAL} is "
+            f"{_pct(total['percent_of_payroll'])}% of payroll"
         )
-    receipts.append(_receipt("Share of payroll at risk", share + "."))
-    receipts.append(_receipt(
-        "Severity",
-        f"Multiplied by {c['severity_scalar']:.2f} for {severity_tier} severity.",
-    ))
-    receipts.append(_receipt(
-        "Estimate",
-        f"Low estimate {_usd(friction_result['low'])}. The high estimate is 1.4 times "
-        f"the low, {_usd(friction_result['high'])}.",
-    ))
+        text += "." if total["amount"] is None else f", about {_usd(total['amount'])} a year."
+        receipts.append(_receipt("Total", text))
     return receipts
 
 
@@ -1123,30 +1157,17 @@ def assemble_output(
         routing, priv, session.accumulated_vector,
     )
 
+    # Two-channel friction estimate (Stage 4): identified states only switch
+    # channels on, severity is not an input. Receipts are a sibling field so
+    # they exist even when the estimate is null.
     friction_tax_result = compute_friction_tax(
         state_ids=[s["state_id"] for s in identified_states],
-        # Checkpoint 3: lead_severity_tier, not sev.tier. compute_friction_tax()
-        # itself is unchanged (out of scope, not one of this checkpoint's
-        # named files) -- it takes one severity_tier scalar applied across
-        # the full state_ids list, so the lead state's own tier is the only
-        # per-state value this single-scalar call site can meaningfully use.
-        severity_tier=lead_severity_tier,
         org_size=session.intake.headcount,
         industry=session.intake.industry,
-        org_type=session.intake.org_type,
     )
-    friction_tax_estimate = (
-        {
-            "low":      friction_tax_result["low"],
-            "high":     friction_tax_result["high"],
-            "currency": friction_tax_result["currency"],
-            "driving_factors": _friction_driving_factors(
-                friction_tax_result, identified_states, lead_severity_tier,
-                session.intake, answers_log or [],
-            ),
-        }
-        if friction_tax_result["calibration_complete"]
-        else None
+    friction_tax_estimate = friction_tax_result["estimate"]
+    friction_receipts = _friction_receipts(
+        friction_tax_result, identified_states, session.intake, answers_log or [],
     )
     legal_result = compute_legal_compliance_exposure(
         state_ids=[s["state_id"] for s in identified_states],
@@ -1188,15 +1209,9 @@ def assemble_output(
     asset_evidence = _build_asset_evidence(
         session.accumulated_vector, answers_log or [], session.intake,
     )
-    # service_cost_comparison (Phase 1, Pete: ship with nulls). Inaction
-    # cost counts friction tax and legal exposure only where each is priced.
-    _cost_parts = [
-        (friction_tax_estimate["low"], friction_tax_estimate["high"])
-        if friction_tax_estimate else None,
-        (legal_tail_risk_exposure["low"], legal_tail_risk_exposure["high"])
-        if legal_tail_risk_exposure and legal_tail_risk_exposure["low"] is not None else None,
-    ]
-    _cost_parts = [p for p in _cost_parts if p is not None]
+    # service_cost_comparison (Phase 1, Pete: ship with nulls). R5: no inaction
+    # cost fields. The typical-loss line reads friction_tax_estimate and the
+    # tail-risk line reads legal_tail_risk_exposure, never a sum.
     if brand == "hr_diagnostic":
         _target_service = HR_DIAGNOSTIC_FAMILY_NAME if effective_resolution_routing else ""
     else:
@@ -1204,8 +1219,6 @@ def assemble_output(
     service_cost_comparison = (
         {
             "target_service_name":   _target_service,
-            "inaction_cost_low":     round(sum(p[0] for p in _cost_parts), 2) if _cost_parts else None,
-            "inaction_cost_high":    round(sum(p[1] for p in _cost_parts), 2) if _cost_parts else None,
             "service_estimate_low":  None,
             "service_estimate_high": None,
             "pricing_model_note":    "",
@@ -1217,6 +1230,7 @@ def assemble_output(
         "resolution_routing":      effective_resolution_routing,
         "friction_tax_estimate":   friction_tax_estimate,
         "friction_tax_ledger":     friction_tax_ledger,
+        "friction_receipts":       friction_receipts,
         "legal_tail_risk_exposure": legal_tail_risk_exposure,
         "cascade_risk":            compute_cascade_risk(session.accumulated_vector),
         "causation_pattern":       causation_pattern_obj,
@@ -1362,7 +1376,7 @@ _JURISDICTION_FLAGS_FIELDS = {
 }
 _PRIVATE_OUTPUT_FIELDS = {
     "opening_text", "resolution_routing", "friction_tax_estimate",
-    "friction_tax_ledger", "legal_tail_risk_exposure", "cascade_risk",
+    "friction_tax_ledger", "friction_receipts", "legal_tail_risk_exposure", "cascade_risk",
     "causation_pattern", "trajectory", "urgency_window",
 }
 _SHAREABLE_OUTPUT_FIELDS = {
