@@ -120,3 +120,172 @@ Prompt served: "People often know more about what's really going on than what ge
 Answer:
 "Nobody reports near-misses anymore, and everybody knows why. Last year an operator reported one and his supervisor tore into him in front of the whole line. The lesson landed. Our numbers say safety is fine, and the people on second shift know it isn't. The other thing people would say privately is that a few supervisors are the reason new hires quit, and that those supervisors are safe because their lines hit the throughput numbers the new owners care about. Most of our supervisors were great machinists who got promoted and were never taught how to lead people. On top of that, second shift has been on mandatory overtime for most of the year and people are worn down."
 --- END ---
+
+## RESULTS (Phase C, scored against the registered wording, nothing revised)
+
+Run: session `7iBkb-KjwIxTOAQKwYhge`, production, tagged `x-prv3-test-run: 1` on session/start. 54 answers (32 before the narrative, 22 after), the narrative fired early after Q27B and was answered with the registered text, completed through Q51. Files: result payload `C:\Users\rizzo\Downloads\prv3-experiment-01-result.json`, exact Copy results text from the real `buildResultsText` `C:\Users\rizzo\Downloads\prv3-experiment-01-copy-results.md`, full request and response log `C:\Users\rizzo\Downloads\prv3-experiment-01-run.json`. Instrument export `C:\Users\rizzo\Downloads\prv3-experiment-01-instrument.md`.
+
+### Scorecard
+
+| Hypothesis | Verdict | One line |
+|---|---|---|
+| H1 Precision | H1-ideal FAILS, H1-engine HOLDS | 38 conditions qualify, spread 4.2% of the top score, ranks 4 to 13 tie. Structural, not a driver artifact. |
+| H2 Identification | FAILS | Primary is the_arbitrary_standard. the_unformed_leader did not qualify, the_unreported_hazard is rank 25. Only pay_exposure is in the top 15. |
+| H3 Exclusion | FAILS | 1 of 5 excluded (human_displacement_anxiety, rank 36). The other four rank 8 to 23. |
+| H4 Severity | FAILS | Lead tier is Emerging, not Entrenched. |
+| H5 Pathway | FAILS as registered, HOLDS under the generic reading | Neither named state led. See below. |
+| H6 Legal | FAILS (one of two) | Wage and hour is in the top two, Workplace safety and regulatory is 4th of 5. |
+| H7 Strength | FAILS | The strength block names Authority only. |
+| H8 Receipt fit | PARTIAL | Fit claim HOLDS (17 of 19 quotes do not support their category). Order-mechanism claim FAILS (3 of 20). |
+
+### H1 Precision
+
+- Qualifying count (`all_qualified_states`): **38**.
+- Score at rank 1: **0.963932** (the_arbitrary_standard). Score at last qualifying rank (38): **0.923570** (cultural_overtime).
+- Spread rank 1 to last: 0.040362, **4.19% of the top score**.
+- Distinct score values across the 38: **14**.
+- Tie groups (all): 10 states at 0.948280, 2 states at 0.936306, 5 states at 0.934109, 11 states at 0.923570. In the top 5: ranks 4 and 5 are tied at 0.948280, and that tie group continues through rank 13. Rank 1 is not tied.
+- Margin rank 1 to rank 2: **0.000125** (0.013% of the top score). Rank 1 to rank 3: 0.001066. Not visible.
+- **H1-ideal** (10 or fewer qualify, rank 1 untied, visible margin): FAILS. Rank 1 is untied, but 38 qualify and the margin over rank 2 is invisible.
+- **H1-engine** (25 or more qualify, spread 10% or less, a tie in the top 5): HOLDS on all three parts (38 is 25 or more, 4.19% is 10% or less, ranks 4 and 5 tie).
+- Verdict: **H1-engine holds, the 43-condition result was structural, not a driver artifact.** A differentiated respondent still gets 38 qualifying conditions and a 4.2% spread.
+
+### H2 and H3 full ranked list
+
+| Rank | State | Score | Tier |
+|---:|---|---:|---|
+| 1 | the_arbitrary_standard | 0.963932 | Emerging |
+| 2 | invisible_influence_architecture | 0.963807 | Emerging |
+| 3 | planning_authority_gap | 0.962866 | Emerging |
+| 4 | the_uninitiated | 0.948280 | Emerging |
+| 5 | leadership_continuity_risk | 0.948280 | Emerging |
+| 6 | decision_paralysis | 0.948280 | Emerging |
+| 7 | the_policy_lag | 0.948280 | Emerging |
+| 8 | dueling_narratives | 0.948280 | Emerging |
+| 9 | transition_paralysis | 0.948280 | Emerging |
+| 10 | the_lost_map | 0.948280 | Emerging |
+| 11 | pay_exposure | 0.948280 | Emerging |
+| 12 | the_pay_fog | 0.948280 | Emerging |
+| 13 | compression_crisis | 0.948280 | Emerging |
+| 14 | the_paper_tiger | 0.948254 | Emerging |
+| 15 | silosolation | 0.946903 | Emerging |
+| 16 | the_suppression_filter | 0.945763 | Emerging |
+| 17 | invisible_performance_management | 0.939271 | Emerging |
+| 18 | what_nobody_says | 0.939236 | Emerging |
+| 19 | the_unexamined_algorithm | 0.939095 | Emerging |
+| 20 | culture_drift | 0.936306 | Emerging |
+| 21 | wellbeing_theater | 0.936306 | Emerging |
+| 22 | identity_erosion | 0.934109 | Emerging |
+| 23 | the_culture_that_wasnt | 0.934109 | Emerging |
+| 24 | narrative_lock | 0.934109 | Emerging |
+| 25 | the_unreported_hazard | 0.934109 | Emerging |
+| 26 | the_unlocked_door | 0.934109 | Emerging |
+| 27 | distributed_culture_fragmentation | 0.926603 | Emerging |
+| 28 | the_diversity_ceiling | 0.923570 | Emerging |
+| 29 | the_burned_credibility | 0.923570 | Emerging |
+| 30 | invisible_burnout | 0.923570 | Emerging |
+| 31 | the_basement_standard | 0.923570 | Emerging |
+| 32 | the_inside_track | 0.923570 | Emerging |
+| 33 | groundhog_day | 0.923570 | Emerging |
+| 34 | the_wrong_reward | 0.923570 | Emerging |
+| 35 | the_broken_compass | 0.923570 | Emerging |
+| 36 | human_displacement_anxiety | 0.923570 | Emerging |
+| 37 | motivational_architecture_failure | 0.923570 | Emerging |
+| 38 | cultural_overtime | 0.923570 | Emerging |
+
+- H2 evidence: the_unformed_leader not qualified, the_unreported_hazard rank 25, what_nobody_says rank 18, cultural_overtime rank 38, pay_exposure rank 11. Primary state is the_arbitrary_standard. Both named states in the top 5: no. what_nobody_says, cultural_overtime and pay_exposure in the top 15: only pay_exposure (rank 11). FAILS.
+- H3 evidence: identity_erosion rank 22, the_unexamined_algorithm rank 19, dueling_narratives rank 8, human_displacement_anxiety rank 36, the_culture_that_wasnt rank 23. "Rank below 25" read either as rank number above 25 or as rank 25 or worse gives the same result (no state sits at exactly 25 among the five): only human_displacement_anxiety is excluded. FAILS under both readings.
+
+### H4 Severity
+
+- Lead condition (the_arbitrary_standard) tier: **Emerging**, score_0_100 0. Top-level severity: Emerging. Every one of the 38 conditions is Emerging. Non-zero severity scores exist only for invisible_burnout (25), culture_drift, wellbeing_theater and identity_erosion (16.7 each). FAILS.
+- Severity inputs that fired: SEVER-27 B ("It's been a year or more.", duration_band 6_18mo), SEVER-06 B ("It's been building for a year or more.", duration_band 6_18mo), SEVER-10 B ("Leadership is aware but hasn't addressed it directly.", population_band under_10pct). No answer given maps to the 18mo_plus band, so the registered driver ("duration answers of 18 months or more") did not occur on this path. Reported trajectory: duration_band 6_18mo, direction escalating.
+
+### H5 Pathway
+
+- Displayed resolution pathway: **First Call + People Tactics & Strategy** (routing Intervention + Roadmap). Primary state's own family in the state registry: Intervention + Roadmap (the_arbitrary_standard), which the display translates to First Call + People Tactics & Strategy.
+- As registered: the hypothesis defines a match only for two cases (the_unformed_leader leading, the_unreported_hazard leading). Neither led, so neither registered pairing applies. Scored FAILS.
+- Under the generic reading (the pathway matches the primary state's family): HOLDS, the displayed family is the primary's family.
+- Both readings reported. The wording as registered is ambiguous about the case where a different state leads.
+
+### H6 Legal
+
+Categories ranked by their contribution to the total (receipt amounts, within-category geometric weights 1, 1/2, 1/4, as the engine applies them). Reconstructed total $1,710,286 to $2,214,630 against the payload's $1,709,654 to $2,213,397 (receipt amounts are rounded to 3 significant figures).
+
+| Rank (by low) | Legal category | Steps | Weighted low | Weighted high | Share of low | Share of high |
+|---:|---|---:|---:|---:|---:|---:|
+| 1 | Individual employment claims | 2 | $675,000 | $675,000 | 39.5% | 30.5% |
+| 2 | Wage and hour | 2 | $494,500 | $989,500 | 28.9% | 44.7% |
+| 3 | Whistleblower and retaliation | 4 | $321,875 | $321,875 | 18.8% | 14.5% |
+| 4 | Workplace safety and regulatory | 4 | $180,525 | $180,525 | 10.6% | 8.2% |
+| 5 | Class or systemic discrimination | 8 | $38,386 | $47,730 | 2.2% | 2.2% |
+
+- By the low end: Individual employment claims, Wage and hour, Whistleblower and retaliation, Workplace safety and regulatory, Class or systemic discrimination. By the high end Wage and hour is first.
+- Registered: the two largest are Workplace safety and regulatory, and Wage and hour. Wage and hour is in the top two on either end. Workplace safety and regulatory is 4th of 5 on both. FAILS (one of two correct).
+
+### H7 Strength
+
+"Where strength shows up" text, verbatim from the Copy results:
+
+```
+Where strength shows up:
+Your answers show the most strength in Authority.
+— Decisions here get made by the right people, and they stay made.
+— This organization has dedicated HR leadership that operates with real authority.
+— Decisions here get from idea to final call without stalling.
+```
+
+It names Authority only. Alliance and Aptitude are not named. FAILS.
+
+### H8 Receipt fit
+
+(i) Every legal receipt (20 receipts plus the Total line). Classifications are mine, for Pete to check.
+
+| # | Legal category | Condition | Quoted answer | Question it came from | Verdict | Reasoning |
+|---:|---|---|---|---|---|---|
+| 1 | Class or systemic discrimination | The Arbitrary Standard | The direction is clear, but there's real skepticism about whether it'll be followed through on. | Q13 | DOES NOT SUPPORT | about belief that leadership will follow through, nothing on unequal treatment of groups |
+| 2 | Class or systemic discrimination | The Pay Fog | There's been an external legal claim, EEOC charge, or regulatory inquiry. | Q06 | SUPPORTS (on its face) | the printed words name an EEOC charge, a discrimination-relevant claim type, though this respondent's real event was the OSHA citation |
+| 3 | Class or systemic discrimination | Pay Exposure | This organization is more dependent on certain people than it should be, even if it hasn't been tested yet. | Q23 | DOES NOT SUPPORT | key-person dependence says nothing about pay differences between groups |
+| 4 | Class or systemic discrimination | The Unexamined Algorithm | Whether a concern gets addressed here depends more on the person than the process. | Q04 | DOES NOT SUPPORT | concerns depending on the person is not an algorithm or bias finding |
+| 5 | Class or systemic discrimination | Distributed Culture Fragmentation | Turnover concentrates under specific managers or in specific teams. | Q07 | DOES NOT SUPPORT | turnover clustering under managers is attrition, not a discrimination pattern as printed |
+| 6 | Class or systemic discrimination | The Diversity Ceiling | What people hear informally here doesn't match what comes through formal channels. | Q08 | DOES NOT SUPPORT | informal versus formal information channels does not bear on representation |
+| 7 | Class or systemic discrimination | The Inside Track | People here participate in change, but they don't really invest in it. | Q17 | DOES NOT SUPPORT | participating without investing in change is unrelated to discrimination |
+| 8 | Class or systemic discrimination | The Wrong Reward | Some high performers here are carrying more than is healthy long term. | Q24 | DOES NOT SUPPORT | high performers overloaded is a workload finding, not discrimination |
+| 9 | Whistleblower and retaliation | The Policy Lag | There are gaps between what this organization says internally and externally, and people are aware of them. | Q19 | DOES NOT SUPPORT | a public versus internal message gap is not retaliation for reporting |
+| 10 | Whistleblower and retaliation | Dueling Narratives | Communication here is inconsistent, it varies a lot by team or manager. | Q30 | DOES NOT SUPPORT | inconsistent communication by team is not retaliation or whistleblower exposure |
+| 11 | Whistleblower and retaliation | The Suppression Filter | Cross-functional work here happens, but there's more friction at the seams than there should be. | Q26 | DOES NOT SUPPORT | cross-functional friction is not filtering of bad news or retaliation |
+| 12 | Whistleblower and retaliation | The Basement Standard | This organization's culture is drifting, things feel different from what it's been. | Q27B | DOES NOT SUPPORT | culture drifting is general, nothing about speaking up being punished |
+| 13 | Wage and hour | Cultural Overtime | This organization reflects on what happens, but doesn't always follow through on the learning. | Q32 | DOES NOT SUPPORT | learning from experience has no hours, pay or overtime content |
+| 14 | Wage and hour | Compression Crisis | Continuity plans exist here, but there's real doubt they're current or would hold up under pressure. | Q33 | DOES NOT SUPPORT | doubt about continuity plans is unrelated to wage and hour |
+| 15 | Individual employment claims | The Paper Tiger | Underperformance gets addressed eventually, but it takes longer than it should. | Q05 | SUPPORTS | slow handling of underperformance is the exact individual-claim exposure (documented cause, inconsistent management) |
+| 16 | Individual employment claims | Invisible Performance Management | (no quote) | none | NO QUOTE | the receipt printed no evidence line |
+| 17 | Workplace safety and regulatory | The Unreported Hazard | There are visible exceptions here to what this organization says it values. | Q11 | DOES NOT SUPPORT | as printed it is about actions versus stated values, no safety or reporting content |
+| 18 | Workplace safety and regulatory | The Unlocked Door | Manager quality is uneven here, some strong, some struggling. | Q12 | DOES NOT SUPPORT | uneven manager quality is not a safety or regulatory finding as printed |
+| 19 | Workplace safety and regulatory | Invisible Burnout | Advancement happens here, but the criteria aren't always transparent. | Q15 | DOES NOT SUPPORT | unclear advancement criteria is not a safety or regulatory finding |
+| 20 | Workplace safety and regulatory | Groundhog Day | This isn't something this organization has looked at closely enough to answer with confidence. | Q16 | DOES NOT SUPPORT | a non-answer (not examined closely) cannot support any category |
+
+Totals: SUPPORTS 2, DOES NOT SUPPORT 17, NO QUOTE 1. Of the 19 quoted receipts, 17 (89%) do not support their category, so the 50% threshold in the first sentence of H8 **HOLDS**. Counting all 20 receipts the figure is 17 of 20 (85%).
+
+(ii) Order mechanism. Receipt i quoting the i-th answered question: **3 of 20** match when counted over all answered questions in session order (follow-ups included), **1 of 20** when counted over core questions only. The quoted questions in receipt order are Q13, Q06, Q23, Q04, Q07, Q08, Q17, Q24, Q19, Q30, Q26, Q27B, Q32, Q33, Q05, Q11, Q12, Q15, Q16, which is not question order. The second sentence of H8 (quotes follow question order) **FAILS**.
+
+Actual selection rule (`engine/contract.py`). `_legal_driving_factors` (line 795) walks the priced conditions in breakdown order, which is grouped by legal category. For each condition it calls `_top_observation_texts` (line 616) and then `_pick_distinct` (line 667, used at line 821 with `min_weight=_RECEIPT_EVIDENCE_MIN_WEIGHT`, constant 0.20 at line 613). `_top_observation_texts` replays every answered option, keeps only options with authored observation text and a problem-context valence, ranks them by salience-weighted liability contribution against **that condition's own profile** (`SALIENCE_PROFILES[state_id]`), and drops anything under 0.20. `_pick_distinct` then takes the highest-ranked text **not already quoted by an earlier receipt**. The legal category is never an input. I reproduced all 20 of 20 receipts exactly with this rule using the run's answer log. Distinctness means a later receipt cannot reuse an answer an earlier receipt quoted, so it falls to a lower-ranked answer of its own condition. Receipt 16 (Invisible Performance Management) carries no quote, and I did not trace the reason beyond the rule above. So the selection is relevance to the condition's profile, then distinctness. It is neither question order nor relevance to the legal category.
+
+### Comparison with the synthetic baseline (Technology/175, always the second option, 43 conditions)
+
+| Measure | Synthetic baseline | This run (Granite Ridge, differentiated) |
+|---|---:|---:|
+| Qualifying count | 43 | 38 |
+| Top-to-last spread, % of top score | 5.1% | 4.2% |
+| Tie at rank 1 | yes (5-way tie) | no (rank 1 leads rank 2 by 0.000125) |
+| Distinct score values | 19 | 14 |
+| Distinct answers supporting the whole ledger | 9 | 7 |
+| Copy results characters | 25,701 | 22,960 |
+| Copy results words | 3,960 | 3,497 |
+| Legal receipts (excluding the Total line) | 21 | 20 |
+
+### Observations
+
+- Q28 and SEVER-27 both display as "Follow-up 6A", a cosmetic label collision (noted for 13b at the next closeout).
+- the_unformed_leader, the state most directly described by the persona's central finding (untrained supervisors promoted for skill), did not qualify at all.
+- The answer map chose the 6_18mo option on SEVER-27, SEVER-06 and SEVER-10, so no 18mo_plus duration answer was given on this path. The persona's 18-month supervision problem had no duration question asked about it that I can identify.
+- Persona limit recorded in the answer map still stands: one jurisdiction only.
