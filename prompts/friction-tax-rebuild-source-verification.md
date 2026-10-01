@@ -145,6 +145,7 @@ Stated limits, not adjusted:
 - US engagement: Gallup Global Indicator: Employee Engagement (gallup.com/394373), "As of May 2026, 31% of U.S. employees are engaged and 17% are actively disengaged." Not-engaged share for the engagement channel = 69%, consistent with the SOGW cost method covering both not engaged and actively disengaged. The spec draft's statement that the 2020 article's 67% "equals 100 minus the engaged share" does not reconcile for any year and is not the basis for 69%.
 - 42% preventable: Gallup, "42% of Employee Turnover Is Preventable but Often Ignored," Tatel and Wigert, July 2024 (gallup.com/workplace/646538). Self-reported by voluntary leavers ("at least from the employee perspective"). Gallup's 2019 figure was 52%. Same article gives role-tiered replacement costs: about 200% of salary for leaders and managers, 80% technical, 40% frontline.
 - Work Institute 33.3%: 2017 Retention Report, derived from a conservative $5,506 turnover cost on an $8/hour ($16,640) employee. The current Work Institute method is 33.3% of base salary, about 11% direct and 22% indirect. Limit: derived from a low-wage basis and applied to all salaries.
+- Best-practice benchmark: Gallup Global Indicator: Employee Engagement (gallup.com/394373): in 2025, 20% engaged globally and 31% in the U.S., against an average of 70% in best-practice organizations. Best-practice organizations are Gallup Exceptional Workplace Award winners, Gallup clients and self-selected, which the spec must disclose. Gallup states they span industries and geographies (gallup.com/workplace/643286).
 
 ## Decisions (Pete, 2026-09-30)
 
@@ -171,3 +172,4 @@ Stated limits, not adjusted:
     Narrowed by decision 17: at the cap, dollars are withheld and only percent of payroll is shown.
 16. OEWS industry mapping (Section 2b) locked as committed, with decision 12 rows.
 17. At the 1,000 intake ceiling, the output shows percent of payroll only, with no dollar figure (Gemini round 2 failure mode 2: dollars would understate for larger organizations).
+18. Engagement channel measured against Gallup's best-practice level, not full engagement: P x (0.70 - 0.31) x 0.18 = 7.02% of payroll. Gemini round 2 follow-up Q4 rejected the full-engagement basis (12.42%) as overstating a typical, fixable loss. Pete chose the best-practice gap (option B). Supersedes the 0.69 not-engaged population in decision 1 for pricing. Decision 1 still governs which population the 18% describes.
