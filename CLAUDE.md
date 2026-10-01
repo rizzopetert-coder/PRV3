@@ -180,7 +180,7 @@ No session may assert as current fact something it cannot verify from its own en
   from one push, so there is a window where the web runs against the other shape. Expand: the engine emits both the old
   and the new field for one deploy cycle and the web reads the new one tolerantly (old, new and missing shapes all safe,
   a throw in a hidden or gated path still counts as unsafe). Contract: a later push removes the old field once the web
-  reads only the new one. Locked 2026-09-30, Pete, after the Stage 5 deploy race (an old-web client would have thrown
+  reads only the new one. Locked 2026-10-01 (date corrected from 2026-09-30, see `tools/_mob.txt` Section 16), Pete, after the Stage 5 deploy race (an old-web client would have thrown
   on `payload.financial_range` for about 30 seconds). Also in `tools/_mob.txt` Section 14.
 
 ---
@@ -205,7 +205,7 @@ No session may assert as current fact something it cannot verify from its own en
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.331 |
+| MOB version | v4.332 |
 | Session continuity | Mem0 — see Section 12 |
 | Engine state count | 58 (locked) |
 | Test suite minimum (Phase 1) | 171 profiles across 57 states |
