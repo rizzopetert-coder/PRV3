@@ -3,8 +3,8 @@ Tests for engine/data/state_criteria.py (friction tax rebuild, Stage 1).
 
   1. Registry: the 58 state ids match engine/data/states.py exactly
   2. Every state carries four integer scores in [0, 2], none a bool
-  3. Interim drift guard: every score equals STATE_MULTIPLIERS (removed with
-     STATE_MULTIPLIERS in Stage 4, delete this section then)
+  3. Frozen sha256 fingerprint of the score table and eight hardcoded spot checks
+     (replaced the interim equality with STATE_MULTIPLIERS, removed in Stage 4)
   4. Legal: every LEGAL_COMPLIANCE_CLUSTER state has a legal score in {1, 2}
      (the assertion engine/friction_tax.py makes at import time), and the one
      state with a legal score but no cluster is the known the_inner_circle
@@ -23,7 +23,10 @@ sys.path.insert(0, str(Path(__file__).parents[1]))
 
 from engine.data.state_criteria import STATE_CRITERIA, StateCriteria
 from engine.data.states import STATE_PROFILES
-from engine.friction_tax import LEGAL_COMPLIANCE_CLUSTER, STATE_MULTIPLIERS
+import hashlib
+import json
+
+from engine.friction_tax import LEGAL_COMPLIANCE_CLUSTER
 
 PASS = []
 FAIL = []
@@ -56,10 +59,26 @@ check("every score is an int in [0, 2] and not a bool", not bad, f"bad: {bad[:5]
 check("StateCriteria has exactly the four fields", tuple(StateCriteria.__dataclass_fields__) == FIELDS,
       f"got {tuple(StateCriteria.__dataclass_fields__)}")
 
-# -- 3. interim drift guard against STATE_MULTIPLIERS ------------------------
-drift = [(sid, f) for sid in STATE_CRITERIA for f in FIELDS
-         if getattr(STATE_CRITERIA[sid], f) != STATE_MULTIPLIERS[sid].criteria[f].score]
-check("every score equals STATE_MULTIPLIERS[state].criteria[criterion].score (interim)", not drift, f"drift: {drift[:5]}")
+# -- 3. frozen fingerprint (replaces the interim equality with STATE_MULTIPLIERS) ----
+# sha256 of the canonical 58 x 4 score table, captured 2026-10-01 while
+# STATE_MULTIPLIERS still existed and every score was equal to it. Editing any
+# score changes the hash and fails here, a deliberate score change updates this
+# constant in the same commit.
+_canon = json.dumps(
+    {sid: [c.turnover, c.productivity, c.decision_quality, c.legal] for sid, c in sorted(STATE_CRITERIA.items())},
+    separators=(",", ":"), sort_keys=True,
+)
+check("the 58 x 4 score table matches its frozen fingerprint",
+      hashlib.sha256(_canon.encode()).hexdigest() == "4eb21b87c9feedec2f86259251d9d7a0f1dedff787aa9eb617e32139f56de251",
+      f"got {hashlib.sha256(_canon.encode()).hexdigest()}")
+_spot = {
+    "the_overloaded_manager": (2, 1, 1, 0), "decision_paralysis": (1, 2, 2, 0), "paper_shield": (0, 0, 2, 0),
+    "the_founders_grip": (2, 2, 2, 0), "the_basement_standard": (1, 2, 2, 1), "the_inner_circle": (1, 0, 2, 1),
+    "the_paper_tiger": (1, 0, 0, 2), "the_lost_map": (0, 2, 2, 0),
+}
+check("eight spot-checked states hold their hardcoded scores (turnover, productivity, decision_quality, legal)",
+      all((c.turnover, c.productivity, c.decision_quality, c.legal) == _spot[s] for s, c in STATE_CRITERIA.items() if s in _spot)
+      and all(s in STATE_CRITERIA for s in _spot))
 
 # -- 4. legal ----------------------------------------------------------------
 check("every LEGAL_COMPLIANCE_CLUSTER state exists in STATE_CRITERIA with a legal score in {1, 2}",
