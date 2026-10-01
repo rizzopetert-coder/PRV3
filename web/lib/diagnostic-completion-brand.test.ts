@@ -158,19 +158,21 @@ describe("completeDiagnosticSession Phase 1 pass-through", () => {
     expect("service_cost_comparison" in result).toBe(false);
     expect(result.tactical_findings).toEqual([]);
     expect(result.all_qualified_states).toEqual([]);
+    expect(result.friction_receipts).toEqual([]);
     expect(result.synthesis.executive_summary).toBe("");
   });
 
   it("engine with the new fields: passed through intact", async () => {
     const base = engineResult("Intervention", true);
     const extra = {
+      friction_receipts: [{ category: "Total", rationale: "Together, what organizations like yours typically lose is 9.2% of payroll." }],
       asset_evidence: {
         strongest_axes: ["authority"],
         contributing_signals: [{ axis: "authority", observation_text: "Decisions get made." }],
         net_scores: { aptitude: 0, authority: 1, alliance: 0, attitude: 0 },
       },
       service_cost_comparison: {
-        target_service_name: "HR Consulting", inaction_cost_low: 10, inaction_cost_high: 14,
+        target_service_name: "HR Consulting",
         service_estimate_low: null, service_estimate_high: null, pricing_model_note: "",
       },
       tactical_findings: [{
@@ -187,6 +189,7 @@ describe("completeDiagnosticSession Phase 1 pass-through", () => {
     const res = await completeDiagnosticSession(session("hr_diagnostic"));
     const result = (await res.json()).result;
     expect(result.asset_evidence).toEqual(extra.asset_evidence);
+    expect(result.friction_receipts).toEqual(extra.friction_receipts);
     expect(result.service_cost_comparison).toEqual(extra.service_cost_comparison);
     expect(result.tactical_findings).toEqual(extra.tactical_findings);
     expect(result.all_qualified_states).toEqual(extra.all_qualified_states);
