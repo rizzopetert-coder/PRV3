@@ -68,11 +68,15 @@ export function CostComparison({
   comparison,
   friction,
   legal,
+  legalHidden = false,
   fallbackServiceName,
 }: {
   comparison?: ServiceCostComparison;
   friction: FrictionTaxEstimate | null;
   legal: LegalTailRiskExposure | null;
+  // True while LEGAL_DOLLARS_VISIBLE is false. When neither dollar line shows,
+  // the card becomes a pricing-only "Pricing" card instead of disappearing.
+  legalHidden?: boolean;
   fallbackServiceName: string;
 }) {
   if (!comparison) return null;
@@ -80,10 +84,36 @@ export function CostComparison({
   // Tolerant of the two-channel estimate (a dollar figure, or the percent of
   // payroll at the intake cap), the older { low, high } shape, or null.
   const frictionText = frictionTypicalLossText(friction);
-  if (!frictionText && !legalPriced) return null;
+  const pricingOnly = !frictionText && !legalPriced && legalHidden;
+  if (!frictionText && !legalPriced && !pricingOnly) return null;
   const service = comparison.target_service_name || fallbackServiceName;
   const priced =
     comparison.service_estimate_low !== null && comparison.service_estimate_high !== null;
+  const pricingBody = (
+    <>
+      {service && <p className="text-[11px] text-slate mb-1">{service}</p>}
+      {priced ? (
+        <p className="text-sm font-medium text-charcoal">
+          {rangeText(comparison.service_estimate_low!, comparison.service_estimate_high!)}
+        </p>
+      ) : (
+        <p className="text-sm font-medium text-charcoal">Ask for pricing</p>
+      )}
+      <p className="text-[11px] text-slate mt-1">
+        {priced && comparison.pricing_model_note
+          ? comparison.pricing_model_note
+          : "Scoped to what this diagnostic found."}
+      </p>
+    </>
+  );
+  if (pricingOnly) {
+    return (
+      <div className="py-4">
+        <p className="text-[11px] uppercase tracking-wide text-slate mb-3">Pricing</p>
+        <div className="rounded-md border border-gray-200 px-4 py-3 sm:max-w-xs">{pricingBody}</div>
+      </div>
+    );
+  }
   return (
     <div className="py-4">
       <p className="text-[11px] uppercase tracking-wide text-slate mb-3">Cost comparison</p>
@@ -103,21 +133,7 @@ export function CostComparison({
             </div>
           )}
         </div>
-        <div className="rounded-md border border-gray-200 px-4 py-3">
-          {service && <p className="text-[11px] text-slate mb-1">{service}</p>}
-          {priced ? (
-            <p className="text-sm font-medium text-charcoal">
-              {rangeText(comparison.service_estimate_low!, comparison.service_estimate_high!)}
-            </p>
-          ) : (
-            <p className="text-sm font-medium text-charcoal">Ask for pricing</p>
-          )}
-          <p className="text-[11px] text-slate mt-1">
-            {priced && comparison.pricing_model_note
-              ? comparison.pricing_model_note
-              : "Scoped to what this diagnostic found."}
-          </p>
-        </div>
+        <div className="rounded-md border border-gray-200 px-4 py-3">{pricingBody}</div>
       </div>
     </div>
   );
