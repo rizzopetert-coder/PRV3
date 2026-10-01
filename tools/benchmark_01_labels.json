@@ -1,0 +1,62 @@
+{
+ "P1-cautious": {
+  "label": "DOES NOT NAME",
+  "why": "Dominant problem is untrained supervisors promoted for technical skill. The summary says decisions depend on who is in the room and mentions turnover patterns and a regulatory inquiry, but never the supervision capability gap.",
+  "borderline": false
+ },
+ "P1-strong": {
+  "label": "DOES NOT NAME",
+  "why": "Closest in substance is people learning that speaking up changes nothing, plus turnover around certain managers. It still does not name supervisors who were never taught to lead.",
+  "borderline": true
+ },
+ "P2-cautious": {
+  "label": "DOES NOT NAME",
+  "why": "Says a known problem has not been addressed and experience depends on who you report to. It never says one individual is exempt from the standards others are held to.",
+  "borderline": true
+ },
+ "P2-strong": {
+  "label": "NAMES",
+  "why": "Says accountability bends depending on who is involved around a known, unresolved problem. That is the exempt-individual condition in substance, though no individual is identified.",
+  "borderline": true
+ },
+ "P3-cautious": {
+  "label": "NAMES",
+  "why": "Managers took on bigger roles during fast growth and their workload never shrank to make space. That is the span-without-support problem in substance.",
+  "borderline": false
+ },
+ "P3-strong": {
+  "label": "DOES NOT NAME",
+  "why": "Frames the problem as managers not prepared to lead at this scale. That is a capability framing, not span or workload without support. Mentions strain only generally.",
+  "borderline": false
+ },
+ "P4-cautious": {
+  "label": "NAMES",
+  "why": "States that decisions do not stick and get reopened, which is the registered problem.",
+  "borderline": false
+ },
+ "P4-strong": {
+  "label": "NAMES",
+  "why": "States decisions take too long and do not hold, with the same debates resurfacing.",
+  "borderline": false
+ },
+ "P5-cautious": {
+  "label": "DOES NOT NAME",
+  "why": "Never mentions pay, compensation or market position. Describes unassigned work and reliance on a few capable people.",
+  "borderline": false
+ },
+ "P5-strong": {
+  "label": "DOES NOT NAME",
+  "why": "Never mentions pay, compensation or market position. Describes a few people holding things together and untested backups.",
+  "borderline": false
+ },
+ "P6-cautious": {
+  "label": "NAMES",
+  "why": "Says the story told to candidates during recruiting does not hold up once they are inside, with attrition as the cost.",
+  "borderline": false
+ },
+ "P6-strong": {
+  "label": "NAMES",
+  "why": "Says the gap between what recruiting promises and what new hires find drives departures.",
+  "borderline": false
+ }
+}
