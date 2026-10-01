@@ -223,12 +223,21 @@ class PayrollBaselineEntry:
     citation_id: Optional[str]             # cross-reference key into a future citations table
 
 
+# FROZEN COPY, read ONLY by Legal/Compliance (friction tax rebuild, R1, Pete
+# 2026-09-30). Legal's Ohio compensatory-damages formula
+# (_oh_compensatory_damages_pricing) prices off this May 2023 table, and Legal
+# outputs must stay byte-identical to the Phase 0 baseline
+# (tools/capture_legal_baseline.py --check) while friction wages move to May
+# 2025 in _INDUSTRY_WAGE_DATA below. Do not edit these values. Moving Legal to
+# May 2025 wages is a separate future decision that deliberately changes the
+# Legal baseline, not part of the friction rebuild.
+#
 # Real BLS OEWS May 2023 mean annual wage figures, by industry, as
 # (wage, source, citation_id) tuples. 6 are single-sector lookups; 2
 # (Retail & Hospitality, Nonprofit & Education) are employment-weighted
 # means across multiple real BLS components, documented plainly below
 # rather than presented as a single sector pull.
-_INDUSTRY_WAGE_DATA: dict[str, tuple[float, str, str]] = {
+_LEGAL_WAGE_DATA_MAY2023: dict[str, tuple[float, str, str]] = {
     "Professional Services": (
         102670.0,
         "BLS OEWS May 2023 mean annual wage: $102,670. naics4_541000. CONFIRMED exact.",
@@ -343,10 +352,135 @@ _INDUSTRY_WAGE_DATA: dict[str, tuple[float, str, str]] = {
     ),
 }
 
+# BLS OEWS May 2025 mean annual wage W by engine industry, as (wage, source,
+# citation_id) tuples. Each is the employment-weighted mean of the 3-digit NAICS
+# all-occupation A_MEAN values over the industry mapping committed in
+# prompts/friction-tax-rebuild-source-verification.md Section 2b, with the
+# privately owned rows for NAICS 611 and 622 (Decision 12). Files: oesm25in4.zip,
+# nat3d_M2025_dl.xlsx and nat3d_owner_M2025_dl.xlsx. Verified against the primary
+# files 2026-09-30 (all 11 match prompts/friction-tax-rebuild-build-spec.md
+# Section 3). Read by get_industry_wage() and the PAYROLL_BASELINE_GRID build,
+# NOT by Legal/Compliance, which reads _LEGAL_WAGE_DATA_MAY2023 above.
+_INDUSTRY_WAGE_DATA: dict[str, tuple[float, str, str]] = {
+    "Professional Services": (
+        108640.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over NAICS 541 (Professional, Scientific, and Technical "
+        "Services). Total employment 10,800,470. Recomputed and re-verified "
+        "against the primary file on 2026-09-30. Mean annual wage: $108,640.",
+        "BLS_OEWS_2025_naics3_541",
+    ),
+    "Healthcare & Life Sciences": (
+        70969.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over NAICS 621, 622, 623 and 624. Total employment 22,889,480. "
+        "Recomputed and re-verified against the primary file on 2026-09-30. "
+        "NAICS 622 uses the privately owned rows (OWN_CODE 5) from "
+        "nat3d_owner_M2025_dl.xlsx (5,570,850 employees at $89,460), state and "
+        "local hospitals excluded (Decision 12). Mean annual wage: $70,969.",
+        "BLS_OEWS_2025_hc_621_624_private622",
+    ),
+    "Financial Services": (
+        100842.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over NAICS sector 52 (Finance and Insurance). Total employment "
+        "6,281,650. Recomputed and re-verified against the primary file on "
+        "2026-09-30. Mean annual wage: $100,842.",
+        "BLS_OEWS_2025_naics2_52",
+    ),
+    "Technology": (
+        115030.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over NAICS sector 51 (Information). Total employment 2,879,630. "
+        "Recomputed and re-verified against the primary file on 2026-09-30. "
+        "Sector 51 is broader than ideal for a Technology label (includes "
+        "telecom, broadcasting, publishing), carried over from the May 2023 "
+        "entry. Mean annual wage: $115,030.",
+        "BLS_OEWS_2025_sector51_information",
+    ),
+    "Manufacturing": (
+        69131.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over NAICS sectors 31-33. Total employment 12,654,340. "
+        "Recomputed and re-verified against the primary file on 2026-09-30. "
+        "Mean annual wage: $69,131.",
+        "BLS_OEWS_2025_naics2_31-33",
+    ),
+    "Retail & Hospitality": (
+        42024.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over NAICS sectors 44-45 plus 721 (Accommodation) and 722 (Food "
+        "Services and Drinking Places). Total employment 29,780,010. Recomputed "
+        "and re-verified against the primary file on 2026-09-30. 721 carries "
+        "ownership code 57 with no privately owned row published, left as "
+        "published and disclosed. Mean annual wage: $42,024.",
+        "BLS_OEWS_2025_retail_hospitality_weighted",
+    ),
+    "Nonprofit & Education": (
+        72765.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over NAICS 611 (privately owned rows, OWN_CODE 5, from "
+        "nat3d_owner_M2025_dl.xlsx: 3,344,880 employees at $73,400) plus 813 "
+        "(1,429,400 employees at $71,280). Total employment 4,774,280. "
+        "Recomputed and re-verified against the primary file on 2026-09-30. "
+        "State and local schools are excluded (Decision 12). Mean annual wage: "
+        "$72,765.",
+        "BLS_OEWS_2025_nonprofit_education_611private_813",
+    ),
+    "Government & Public Sector": (
+        80290.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over the OEWS government designation (999000, all ownership). "
+        "Total employment 10,242,890. Recomputed and re-verified against the "
+        "primary file on 2026-09-30. Federal, state and local government "
+        "excluding state and local schools, hospitals and the Postal Service. "
+        "Mean annual wage: $80,290.",
+        "BLS_OEWS_2025_sector99_government",
+    ),
+    "Construction": (
+        72146.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over NAICS sector 23. Total employment 8,298,380. Recomputed "
+        "and re-verified against the primary file on 2026-09-30. Mean annual "
+        "wage: $72,146.",
+        "BLS_OEWS_2025_naics2_23",
+    ),
+    "Transportation & Warehousing": (
+        64331.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over NAICS sectors 48-49. Total employment 7,448,650. "
+        "Recomputed and re-verified against the primary file on 2026-09-30. 491 "
+        "(Postal Service) is a federal ownership row with no private row "
+        "published, left as published and disclosed. Mean annual wage: $64,331.",
+        "BLS_OEWS_2025_naics2_48-49",
+    ),
+    "Other": (
+        67977.0,
+        "BLS OEWS May 2025, oesm25in4.zip, nat3d_M2025_dl.xlsx (national, "
+        "3-digit NAICS, all occupations 00-0000), employment-weighted mean of "
+        "A_MEAN over NAICS sectors 11, 21, 22, 42, 53, 55, 56 and 71, plus 811 "
+        "and 812 (sector 81 less 813). Total employment 27,796,970. Recomputed "
+        "and re-verified against the primary file on 2026-09-30. 713 carries "
+        "ownership code 57 with no privately owned row published, left as "
+        "published and disclosed. Mean annual wage: $67,977.",
+        "BLS_OEWS_2025_other_residual",
+    ),
+}
+
 def get_industry_wage(industry: str) -> Optional[float]:
     """
     Public accessor for _INDUSTRY_WAGE_DATA's per-employee mean annual wage
-    (BLS OEWS May 2023), keyed by the same 9 industry categories intake
+    (BLS OEWS May 2025), keyed by the same 11 industry categories intake
     already collects (engine/data/intake.py INTAKE_FIELDS["industry"]).
     Returns None on an unrecognized industry -- matches this file's
     existing lookup convention (PAYROLL_BASELINE_GRID.get(),
@@ -2800,7 +2934,7 @@ STATE_COVERAGE_THRESHOLDS.update({
         # tort, up to $350,000 (R.C. 2315.21(D)(2)(b)). Wired to PRICED
         # (Priority Queue item 9, this session) -- see
         # _oh_compensatory_damages_pricing() for the real formula:
-        # compensatory base = _INDUSTRY_WAGE_DATA x
+        # compensatory base = _LEGAL_WAGE_DATA_MAY2023 x
         # _JURISDICTION_MULTIPLIER_DATA["OH"] (prompts/oh-compensatory-
         # damages-pricing-plan.md). The small-employer/individual-
         # defendant branch omits the "OR 10% of net worth" alternative
@@ -3900,7 +4034,7 @@ def _oh_is_small_employer(headcount, industry: str) -> bool:
     Called by _oh_compensatory_damages_pricing() (Priority Queue item 9,
     this session) to route between R.C. 2315.21's two branches, now that
     a real compensatory-damages base exists (_JURISDICTION_MULTIPLIER_DATA
-    x _INDUSTRY_WAGE_DATA) for both branches to apply their multiplier
+    x _LEGAL_WAGE_DATA_MAY2023) for both branches to apply their multiplier
     to. Previously deliberately uncalled -- both branches resolved to
     the identical QUALITATIVE_ONLY LegalPricingResult, so invoking this
     helper would have computed a real answer and then discarded it.
@@ -3933,7 +4067,7 @@ def _oh_compensatory_damages_pricing(
     much) doesn't depend on which Legal-scoring taxonomy state triggered
     the check.
 
-    compensatory_base = _INDUSTRY_WAGE_DATA[industry]'s real BLS OEWS wage
+    compensatory_base = _LEGAL_WAGE_DATA_MAY2023[industry]'s real BLS OEWS wage
     x _JURISDICTION_MULTIPLIER_DATA["OH"]'s EEOC/QCEW-derived litigation-
     risk multiplier (prompts/oh-compensatory-damages-pricing-plan.md).
     "OH" is hardcoded, not looked up from a jurisdictions list -- this
@@ -3965,17 +4099,17 @@ def _oh_compensatory_damages_pricing(
     threads it through, and Ohio shouldn't be the one exception.
 
     Returns DATA_INTEGRITY_GAP if industry isn't a recognized
-    _INDUSTRY_WAGE_DATA key -- should never happen against real
+    _LEGAL_WAGE_DATA_MAY2023 key -- should never happen against real
     IntakeData.industry values (confirmed against the live
     engine/data/intake.py INTAKE_FIELDS list), so this signals a real
     data problem rather than an intentional design outcome, same
     convention as every other DATA_INTEGRITY_GAP in this file.
     """
-    wage_entry = _INDUSTRY_WAGE_DATA.get(industry)
+    wage_entry = _LEGAL_WAGE_DATA_MAY2023.get(industry)
     if wage_entry is None:
         _logger.warning(
             "OH compensatory-damages pricing data-integrity gap: "
-            "unrecognized industry=%r has no _INDUSTRY_WAGE_DATA entry",
+            "unrecognized industry=%r has no _LEGAL_WAGE_DATA_MAY2023 entry",
             industry,
         )
         return LegalPricingResult(status=LegalPricingStatus.DATA_INTEGRITY_GAP, dollar_range=None,
@@ -3998,7 +4132,7 @@ def _cluster_4_curve_for_org_type(
     """
     industry (Priority Queue item 9, this session) is used only by the
     Ohio state_specific_tiers branch below, to look up
-    _INDUSTRY_WAGE_DATA for _oh_compensatory_damages_pricing(). Every
+    _LEGAL_WAGE_DATA_MAY2023 for _oh_compensatory_damages_pricing(). Every
     other branch in this function is industry-independent, unchanged.
 
     Addendum 5's three org_type-gated sub-tracks. Status is
