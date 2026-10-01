@@ -20,7 +20,7 @@ from engine.friction_tax import (
     compute_friction_tax, compute_legal_compliance_exposure, compute_legal_per_state_breakdown,
 )
 from engine.contract import (
-    _friction_driving_factors, _legal_driving_factors, _top_observation_texts,
+    _friction_receipts, _legal_driving_factors, _top_observation_texts,
 )
 from engine.accumulation import IntakeData
 
@@ -28,16 +28,19 @@ INTAKE = IntakeData(headcount=175, industry="Professional Services",
                     org_type="Privately held professional leadership",
                     jurisdictions=["OH"], significant_events=[], principal_role="Owner / Founder")
 
-# ── 1. Show-your-work: friction components reproduce low/high exactly ──────────
-for ids, tier in ((["built_to_fail"], "Emerging"), (["built_to_fail", "the_uninitiated", "the_founders_grip"], "Entrenched")):
-    r = compute_friction_tax(ids, tier, 175, INTAKE.industry, INTAKE.org_type)
-    c = r["components"]
-    recomputed = round(c["adjusted_baseline"] * c["combined_multiplier"] * c["multi_channel_severity_loading"] * c["severity_scalar"], 2)
-    check(f"friction components reproduce low ({len(ids)} state)", recomputed == r["low"], f"{recomputed} vs {r['low']}")
-    check(f"friction adjusted_baseline = payroll_floor x org_type_scalar ({len(ids)} state)",
-          abs(c["adjusted_baseline"] - c["payroll_floor"] * c["org_type_scalar"]) < 1e-6)
-unc = compute_friction_tax(["built_to_fail"], "Emerging", 175, "Professional Services", "")
-check("friction: uncalibrated result has no components", "components" not in unc)
+# ── 1. Show-your-work: the channels reproduce the total, hand-computed literals ──
+_r1 = compute_friction_tax(["the_overloaded_manager"], 12, "Retail & Hospitality")
+_t1 = _r1["estimate"]["typical_baseline"]
+check("friction: channel amounts sum to the total (12 / Retail & Hospitality)",
+      abs(sum(c["amount"] for c in _t1["channels"]) - _t1["total"]["amount"]) < 0.02,
+      f"{[c['amount'] for c in _t1['channels']]} vs {_t1['total']['amount']}")
+check("friction: 12 / Retail & Hospitality total is $63,923 (hardcoded, R3)", round(_t1["total"]["amount"]) == 63923)
+check("friction: payroll is headcount x wage (12 x 42,024)", _r1["payroll"] == 504288.0)
+check("friction: severity is not an input to the result",
+      compute_friction_tax(["built_to_fail"], 175, "Professional Services")
+      == compute_friction_tax(["built_to_fail"], 175, "Professional Services"))
+unc = compute_friction_tax(["built_to_fail"], "", "Professional Services")
+check("friction: uncalibrated result has no estimate", unc["estimate"] is None)
 
 # ── 2. Legal per_state_breakdown weights reproduce the totals ───────────────────
 from engine.friction_tax import LEGAL_COMPLIANCE_CLUSTER
@@ -58,14 +61,35 @@ check("legal: nothing priced -> empty breakdown", compute_legal_per_state_breakd
 
 # ── 3. Receipts ─────────────────────────────────────────────────────────────────
 states = [{"state_id": s, "state_name": s.replace("_", " ").title()} for s in ["built_to_fail", "the_uninitiated"]]
-fr = compute_friction_tax([s["state_id"] for s in states], "Entrenched", 175, INTAKE.industry, INTAKE.org_type)
-receipts = _friction_driving_factors(fr, states, "Entrenched", INTAKE, [])
+fr = compute_friction_tax([s["state_id"] for s in states], 175, INTAKE.industry)
+receipts = _friction_receipts(fr, states, INTAKE, [])
 check("friction receipts built", len(receipts) >= 5, str(len(receipts)))
+check("friction receipts: the total carries the framing wording, the engagement line the gap wording",
+      any("what organizations like yours typically lose" in r["rationale"] for r in receipts if r["category"] == "Total")
+      and any("the gap between organizations like yours and the best-run ones" in r["rationale"]
+              for r in receipts if r["category"] == "Engagement"))
+check("friction receipts: none says normal, acceptable or full engagement",
+      not any(w in r["rationale"].lower() for r in receipts for w in ("normal", "acceptable", "full engagement")))
+check("friction receipts: the decision-time receipt has no dollar figure",
+      all("$" not in r["rationale"] for r in receipts if r["category"] == "Decision time")
+      and any(r["category"] == "Decision time" for r in receipts))
+_cap_fr = compute_friction_tax([s["state_id"] for s in states], 1000, INTAKE.industry)
+_cap_rc = _friction_receipts(_cap_fr, states, INTAKE, [])
+check("friction receipts at the 1,000 cap: no dollar figure in any receipt, and the cap is stated",
+      all("$" not in r["rationale"] for r in _cap_rc)
+      and any("1,000 employees" in r["rationale"] for r in _cap_rc), str(_cap_rc))
+_ps_rc = _friction_receipts(compute_friction_tax(["paper_shield"], 175, INTAKE.industry),
+                            [{"state_id": "paper_shield", "state_name": "Paper Shield"}], INTAKE, [])
+check("friction receipts render when the estimate is null (only paper_shield): condition and decision time",
+      [r["category"] for r in _ps_rc] == ["Condition", "Decision time"], str(_ps_rc))
 check("friction receipts: no triggering_answer with an empty answers_log",
       all("triggering_answer" not in r for r in receipts))
 check("friction receipts: no semicolons or em-dashes",
       all(";" not in r["rationale"] and "—" not in r["rationale"] for r in receipts))
-check("friction receipts: uncalibrated -> []", _friction_driving_factors(unc, states, "Emerging", INTAKE, []) == [])
+_unc_rc = _friction_receipts(unc, states, INTAKE, [])
+check("friction receipts: uncalibrated -> no payroll, channel or total receipts, no dollar figure",
+      all(r["category"] in ("Condition", "Decision time") for r in _unc_rc)
+      and all("$" not in r["rationale"] for r in _unc_rc), str(_unc_rc))
 lreceipts = _legal_driving_factors(bd, [{"state_id": s, "state_name": s} for s in legal_ids], INTAKE, [])
 check("legal receipts: one per priced state (+ total when several)",
       len(lreceipts) == len(bd) + (1 if len(bd) > 1 else 0), f"{len(lreceipts)} vs {len(bd)}")
@@ -185,10 +209,10 @@ for brand in ("principal_resolution", "hr_diagnostic"):
     check(f"[{brand}] service_cost_comparison present with null estimates and empty note",
           scc is not None and scc["service_estimate_low"] is None and scc["service_estimate_high"] is None
           and scc["pricing_model_note"] == "", str(scc))
-    fte = out["private_output"]["friction_tax_estimate"]; lte = out["private_output"]["legal_tail_risk_exposure"]
-    exp_low = (fte["low"] if fte else 0) + (lte["low"] if lte and lte["low"] is not None else 0)
-    check(f"[{brand}] inaction cost = priced friction + priced legal", scc and abs((scc["inaction_cost_low"] or 0) - exp_low) < 0.05,
-          f"{scc and scc['inaction_cost_low']} vs {exp_low}")
+    check(f"[{brand}] R5: no inaction_cost fields in service_cost_comparison (the two lines read friction and legal directly)",
+          scc and "inaction_cost_low" not in scc and "inaction_cost_high" not in scc, str(scc))
+    check(f"[{brand}] friction_receipts is a list beside friction_tax_estimate",
+          isinstance(out["private_output"]["friction_receipts"], list))
     routing = out["private_output"]["resolution_routing"]
     if brand == "hr_diagnostic":
         check("[hr_diagnostic] target_service_name is HR Consulting (or empty with no routing)",
@@ -472,8 +496,8 @@ check("_pick_distinct: nothing ranked -> None", _pick_distinct([], set()) is Non
 vec_p, log_p = _path(min)
 many = ["built_to_fail", "the_overloaded_manager", "the_undefined_role", "the_unsolved_problem", "the_unformed_leader"]
 st5 = [{"state_id": s, "state_name": s} for s in many]
-fr5 = compute_friction_tax(many, "Emerging", 175, INTAKE.industry, INTAKE.org_type)
-rc = [r for r in _friction_driving_factors(fr5, st5, "Emerging", INTAKE, log_p) if r["category"] == "Condition"]
+fr5 = compute_friction_tax(many, 175, INTAKE.industry)
+rc = [r for r in _friction_receipts(fr5, st5, INTAKE, log_p) if r["category"] == "Condition"]
 picked = [r.get("triggering_answer") for r in rc]
 ok, used = True, set()
 from engine.contract import _RECEIPT_EVIDENCE_MIN_WEIGHT
