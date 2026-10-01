@@ -1,5 +1,6 @@
 import type {
   PrivateIntakeEcho, FrictionTaxEstimate, FrictionTaxLedgerEntry, LegalTailRiskExposure,
+  EvidenceReceipt,
   AssetEvidence, ServiceCostComparison, TacticalFinding, QualifiedStateEntry,
 } from "@/lib/types";
 import type { AccumulatedVector, AnswerLogEntry } from "@/lib/session-store";
@@ -146,6 +147,7 @@ export interface EngineResult {
     resolution_routing: string;
     friction_tax_estimate: FrictionTaxEstimate | null;
     friction_tax_ledger: FrictionTaxLedgerEntry[];
+    friction_receipts?: EvidenceReceipt[];
     legal_tail_risk_exposure: LegalTailRiskExposure | null;
     cascade_risk: number;
     causation_pattern: {
