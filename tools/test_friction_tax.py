@@ -2,64 +2,25 @@
 PRV3 Output Layer -- Friction Tax Unit Tests
 
 Verifies:
-  1. SEVERITY_SCALAR: correct values for all three tiers
-  2. compute_friction_tax: calibration_complete=True on a real, fully
-     unmocked call -- all three calibration axes (grid, org_type,
-     STATE_MULTIPLIERS) are now populated. Expected low/high computed
-     from real, live values, not hardcoded
-  3. compute_friction_tax: calibration_complete=False for empty state list
-  4. compute_friction_tax: single-state case computed correctly against a
-     synthetic fixture whose criteria scores (not a bare multiplier) drive
-     the expected attritional_fraction -- the new design reads
-     STATE_MULTIPLIERS[sid].criteria directly, not .multiplier, so a
-     fixture must set real criteria scores to be meaningful
-  5. compute_friction_tax: high = low * 1.4
-  6. compute_friction_tax: correct severity scalar applied
-  7. compute_friction_tax: single-state continuity -- the new Step 1-3
-     aggregation path, with exactly one identified state, must collapse
-     EXACTLY (bit-for-bit) to that state's own stored STATE_MULTIPLIERS
-     entry, across several real states, not just reasoned about
-  8. compute_friction_tax: N=1 guard -- multi_channel_severity_loading
-     must be exactly 1.0 for a single identified state even when that
-     state's own criteria scores span all 3 attritional criteria (the
-     case most likely to accidentally trigger loading if the guard were
-     missing)
-  9. compute_friction_tax: multi-state Step 1 (per-criterion geometric
-     decay aggregation) computed against hand-derived expected values,
-     not just "did it run"
-  10. compute_friction_tax: multi-state Step 3 (multi_channel_severity_
-      loading, K=0.05, breadth 1-3) computed against hand-derived expected
-      values, including a case where one criterion stays at zero across
-      every identified state (breadth < 3)
-  11. compute_friction_tax: extrapolation beyond R_max=6 when multiple
-      high-scoring states are stacked -- combined_multiplier must exceed
-      0.25 rather than clamp, per the frozen-range design
-  12. compute_friction_tax: calibration_complete False when the grid cell
-      is forced back to None (org_type real, state_multiplier mocked)
-  13. compute_friction_tax: calibration_complete False when the org_type
-      scalar is forced back to None (grid real, state_multiplier mocked)
-  14. PAYROLL_BASELINE_GRID: exactly 54 cells, all combinations present,
-      every cell's payroll_floor_annual independently recomputed and
-      verified against industry_wage x headcount_midpoint
-  15. PAYROLL_BASELINE_GRID: all 9 industries (not just 6) carry a
-      source/citation_id
-  16. ORG_TYPE_SCALARS: exactly 6 entries matching IntakeData.org_type,
-      each with the correct finalized scalar value and a non-empty
-      source note
-  17. STATE_MULTIPLIERS: all state IDs match engine state registry
-  18. STATE_MULTIPLIERS: all 57 values are populated StateMultiplierEntry
-      records with a real multiplier in [0.05, 0.25] (Option A rescale)
-  19. STATE_MULTIPLIERS: every entry's criteria dict still carries all 4
-      keys including "legal" (needed by the separate Legal/Compliance
-      design), but raw_score sums only the 3 attritional criteria --
-      verified against several real states with a nonzero legal score,
-      not assumed
-  20. compute_friction_tax: calibration_complete is True across the
-      full real 6x9x6 (headcount x industry x org_type) combination
-      space with real, unmodified data -- exhaustive, not spot-checked
-  21. compute_friction_tax: state_ids mixing one real, populated state
-      with one unrecognized state_id must still yield
-      calibration_complete=False
+  1. The cited inputs are the decided values (Gallup 0.70, 0.31, 0.18, 0.42,
+     Work Institute 0.333) and the engagement factor is exactly 7.02 percent of
+     payroll in every industry, hardcoded, not derived from the tables
+  2. Hand-computed fixtures at actual headcount, expected values hardcoded as
+     literals from the spec's R3 worked figures (the 10 Section 6b rows)
+  3. The 1,000 intake cap withholds every dollar amount and keeps percent of
+     payroll, 999 carries both
+  4. The headcount guard: int or float of at least 2 prices at the actual N,
+     everything else is uncalibrated with no bucket fallback
+  5. Channel switch rule against the identified states: channels never stack or
+     scale by state count, severity is not an input, excess is null, a state set
+     with no dollar channel (paper_shield) returns a null estimate
+  6. Every industry has a W and a q, the stored JOLTS rates are the R3 rounded
+     values, every input carries a source and a vintage
+  7. Engagement floor: an engaged share at or above best practice prices zero,
+     never negative
+  8. The removed structures are gone (STATE_MULTIPLIERS, PAYROLL_BASELINE_GRID,
+     SEVERITY_SCALAR, ORG_TYPE_SCALARS, the 1.4x spread)
+  9. Stage 3 wage tables (frozen Legal copy and May 2025 friction wages)
   22. INDUSTRY_NON_EXEMPT_RATIO: 9 entries matching INDUSTRIES exactly
   23. LEGAL_COMPLIANCE_CLUSTER: all 30 states classified, correct
       per-cluster counts (4/11/2/6/7), every entry present in
@@ -90,20 +51,13 @@ Verifies:
       classified state whose 'legal' score is monkey-patched to 0
 """
 
+import inspect
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
 from engine.contract import _SPECIFIC_CAVEAT_TEXT
 from engine.friction_tax import (
-    SEVERITY_SCALAR,
-    STATE_MULTIPLIERS,
-    StateCriterionScore,
-    StateMultiplierEntry,
-    PAYROLL_BASELINE_GRID,
-    PayrollBaselineEntry,
-    ORG_TYPE_SCALARS,
-    OrgTypeScalarEntry,
     HEADCOUNT_BUCKETS,
     INDUSTRIES,
     HEADCOUNT_MIDPOINTS,
@@ -120,6 +74,7 @@ from engine.friction_tax import (
     resolve_damages_treatment,
 )
 from engine.data.states import STATE_PROFILES
+from engine.data.state_criteria import STATE_CRITERIA
 from engine.data.intake import INTAKE_FIELDS
 import engine.friction_tax as _ft
 
@@ -134,597 +89,186 @@ def check(label, condition, detail=""):
         FAIL.append(f"{label}: {detail}")
 
 
-def _synthetic_entry(turnover: int, productivity: int, decision_quality: int, legal: int = 0) -> StateMultiplierEntry:
-    """
-    Synthetic StateMultiplierEntry for monkey-patching -- not real
-    calibration data. The new compute_friction_tax() reads criteria
-    scores directly (Steps 1-3), not the stored .multiplier field, so a
-    useful test fixture must set real criteria scores. .multiplier /
-    raw_score are still derived via the real formula (not hardcoded) so
-    that a single-state continuity check against this fixture is
-    meaningful rather than a placeholder.
-    """
-    raw = turnover + productivity + decision_quality
-    return StateMultiplierEntry(
-        multiplier=_ft._attritional_fraction(raw),
-        raw_score=raw,
-        criteria={
-            "turnover": StateCriterionScore(score=turnover, rationale="test fixture, not real calibration data"),
-            "productivity": StateCriterionScore(score=productivity, rationale="test fixture, not real calibration data"),
-            "decision_quality": StateCriterionScore(score=decision_quality, rationale="test fixture, not real calibration data"),
-            "legal": StateCriterionScore(score=legal, rationale="test fixture, not real calibration data"),
-        },
-    )
-
-
 print("=" * 64)
 print("PRV3 Friction Tax -- Unit Tests")
 print("=" * 64)
 
 
-# -- 1. SEVERITY_SCALAR values --------------------------------------------------
+# -- 1. Cited inputs, hardcoded ----------------------------------------------------
 
-check(
-    "SEVERITY_SCALAR[Emerging] == 0.6",
-    SEVERITY_SCALAR.get("Emerging") == 0.6,
-    f"got {SEVERITY_SCALAR.get('Emerging')}",
-)
-check(
-    "SEVERITY_SCALAR[Entrenched] == 1.0",
-    SEVERITY_SCALAR.get("Entrenched") == 1.0,
-    f"got {SEVERITY_SCALAR.get('Entrenched')}",
-)
-check(
-    "SEVERITY_SCALAR[Endemic] == 1.4",
-    SEVERITY_SCALAR.get("Endemic") == 1.4,
-    f"got {SEVERITY_SCALAR.get('Endemic')}",
-)
+check("ENGAGEMENT_BEST_PRACTICE == 0.70 (Gallup, 2025)", _ft.ENGAGEMENT_BEST_PRACTICE == 0.70)
+check("ENGAGEMENT_US == 0.31 (Gallup, May 2026)", _ft.ENGAGEMENT_US == 0.31)
+check("NOT_ENGAGED_COST_SHARE == 0.18 (Gallup, 2020)", _ft.NOT_ENGAGED_COST_SHARE == 0.18)
+check("TURNOVER_PREVENTABLE_SHARE == 0.42 (Gallup, July 2024)", _ft.TURNOVER_PREVENTABLE_SHARE == 0.42)
+check("TURNOVER_COST_SHARE == 0.333 (Work Institute, 2017)", _ft.TURNOVER_COST_SHARE == 0.333)
+check("INTAKE_HEADCOUNT_CAP == 1000 and MIN_PRICED_HEADCOUNT == 2",
+      _ft.INTAKE_HEADCOUNT_CAP == 1000 and _ft.MIN_PRICED_HEADCOUNT == 2)
+
+_BOTH = ["the_overloaded_manager"]  # turnover 2, productivity 1, decision_quality 1
 
 
-# -- 2. calibration_complete True on a real, fully unmocked call ---------------
-# All three axes (grid, org_type, STATE_MULTIPLIERS) are real -- nothing
-# monkey-patched. Expected low/high derived from the real, live stored
-# multiplier (which itself IS the single-state continuity value under the
-# new design).
-
-result = compute_friction_tax(
-    state_ids=["decision_paralysis"],
-    severity_tier="Entrenched",
-    org_size=152,
-    industry="Professional Services",
-    org_type="Government",
-)
-_real_grid_entry_t2 = PAYROLL_BASELINE_GRID[("100-249", "Professional Services")]
-_real_org_type_scalar_t2 = ORG_TYPE_SCALARS["Government"].scalar
-_real_multiplier_t2 = STATE_MULTIPLIERS["decision_paralysis"].multiplier
-_expected_low_t2 = round(
-    _real_grid_entry_t2.payroll_floor_annual * _real_org_type_scalar_t2 * _real_multiplier_t2 * 1.0,
-    2,
-)
-check(
-    "calibration_complete True on a real, fully unmocked call (all three axes now populated)",
-    result["calibration_complete"] is True,
-    f"got calibration_complete={result['calibration_complete']}",
-)
-check(
-    "low computed correctly on a real, fully unmocked call",
-    result["low"] == _expected_low_t2,
-    f"expected {_expected_low_t2}, got low={result['low']}",
-)
-check(
-    "high == low * 1.4 on a real, fully unmocked call",
-    result["high"] == round(_expected_low_t2 * 1.4, 2),
-    f"expected {round(_expected_low_t2 * 1.4, 2)}, got high={result['high']}",
-)
-check(
-    "currency is USD",
-    result["currency"] == "USD",
-    f"got currency={result['currency']}",
-)
+def _channels(r):
+    return {c["channel"]: c for c in r["estimate"]["typical_baseline"]["channels"]}
 
 
-# -- 3. calibration_complete False for empty state list -------------------------
-
-result_empty = compute_friction_tax(
-    state_ids=[],
-    severity_tier="Entrenched",
-    org_size=152,
-    industry="Professional Services",
-    org_type="Government",
-)
-check(
-    "calibration_complete False for empty state_ids",
-    result_empty["calibration_complete"] is False,
-    f"got {result_empty['calibration_complete']}",
-)
-
-
-# -- 4-6. Correct computation when fully calibrated (single state) -------------
-# Grid and org_type are REAL and unmocked -- only STATE_MULTIPLIERS is
-# monkey-patched, with real criteria scores (not a bare multiplier, which
-# the new code no longer reads at runtime).
-
-_GRID_KEY = ("100-249", "Professional Services")
-_real_grid_entry = PAYROLL_BASELINE_GRID[_GRID_KEY]
-_real_org_type_scalar = ORG_TYPE_SCALARS["Government"].scalar
-
-check(
-    "sanity: real grid cell used for tests 4-13 is genuinely populated",
-    _real_grid_entry.payroll_floor_annual is not None,
-    "expected PAYROLL_BASELINE_GRID to be fully populated after this task",
-)
-
-_original_multiplier = STATE_MULTIPLIERS.get("decision_paralysis")
-_ft.STATE_MULTIPLIERS["decision_paralysis"] = _synthetic_entry(turnover=1, productivity=2, decision_quality=0)
-_fixture_fraction = _ft._attritional_fraction(3)  # 1+2+0 = 3
-
-result_cal = compute_friction_tax(
-    state_ids=["decision_paralysis"],
-    severity_tier="Entrenched",
-    org_size=152,
-    industry="Professional Services",
-    org_type="Government",
-)
-
-check(
-    "calibration_complete True when STATE_MULTIPLIERS is the only thing populated",
-    result_cal["calibration_complete"] is True,
-    f"got {result_cal['calibration_complete']}",
-)
-_expected_low = round(_real_grid_entry.payroll_floor_annual * _real_org_type_scalar * _fixture_fraction * 1.0, 2)
-check(
-    "low computed correctly (real payroll_floor_annual * real Government scalar * attritional_fraction(3) * severity_scalar)",
-    result_cal["low"] == _expected_low,
-    f"expected {_expected_low}, got {result_cal['low']}",
-)
-check(
-    "high == low * 1.4",
-    result_cal["high"] == round(result_cal["low"] * 1.4, 2),
-    f"expected {round(result_cal['low'] * 1.4, 2)}, got {result_cal['high']}",
-)
-
-# Severity scalar applied correctly -- Endemic should produce 1.4x
-result_endemic = compute_friction_tax(
-    state_ids=["decision_paralysis"],
-    severity_tier="Endemic",
-    org_size=152,
-    industry="Professional Services",
-    org_type="Government",
-)
-_expected_endemic_low = round(_real_grid_entry.payroll_floor_annual * _real_org_type_scalar * _fixture_fraction * 1.4, 2)
-check(
-    "Endemic severity scalar 1.4 applied to low",
-    result_endemic["low"] == _expected_endemic_low,
-    f"expected {_expected_endemic_low}, got {result_endemic['low']}",
-)
-
-_ft.STATE_MULTIPLIERS["decision_paralysis"] = _original_multiplier
-
-
-# -- 7. Single-state continuity across several real states ---------------------
-# CRITICAL per the locked design: with exactly one identified state, the
-# new Step 1-3 aggregation path MUST collapse EXACTLY to that state's own
-# stored STATE_MULTIPLIERS entry -- verified directly against several real
-# states spanning different raw_score values, not reasoned about.
-
-_continuity_sample = [
-    "identity_erosion", "compression_crisis", "invisible_performance_management",
-    "the_burned_credibility", "planning_authority_gap", "the_founders_grip",
-    "culture_drift", "paper_shield", "the_diversity_ceiling", "the_suppression_filter",
-]
-_continuity_mismatches = []
-for _sid in _continuity_sample:
-    _entry = STATE_MULTIPLIERS[_sid]
-    _r = compute_friction_tax(
-        state_ids=[_sid],
-        severity_tier="Entrenched",
-        org_size=152,
-        industry="Technology",
-        org_type="Founder-led",
-    )
-    _grid = PAYROLL_BASELINE_GRID[("100-249", "Technology")]
-    _expected = round(_grid.payroll_floor_annual * 1.0 * _entry.multiplier * 1.0, 2)
-    if _r["low"] != _expected:
-        _continuity_mismatches.append((_sid, _r["low"], _expected))
-check(
-    "single-state continuity: compute_friction_tax collapses exactly to STATE_MULTIPLIERS[sid].multiplier "
-    f"across {len(_continuity_sample)} real states",
-    len(_continuity_mismatches) == 0,
-    f"mismatches: {_continuity_mismatches}",
-)
-
-
-# -- 8. N=1 guard -- loading forced to 1.0 even when all 3 criteria are nonzero -
-
-# the_founders_grip: turnover=2, productivity=2, decision_quality=2 -- the
-# case most likely to accidentally trigger multi_channel_severity_loading
-# if the N=1 guard were missing or buggy (breadth would naturally be 3).
-_grip_entry = STATE_MULTIPLIERS["the_founders_grip"]
-_r_guard = compute_friction_tax(
-    state_ids=["the_founders_grip"],
-    severity_tier="Entrenched",
-    org_size=152,
-    industry="Technology",
-    org_type="Founder-led",
-)
-_grid_guard = PAYROLL_BASELINE_GRID[("100-249", "Technology")]
-_expected_guard = round(_grid_guard.payroll_floor_annual * 1.0 * _grip_entry.multiplier * 1.0 * 1.0, 2)
-check(
-    "N=1 guard: multi_channel_severity_loading forced to 1.0 for a single state whose own scores span all 3 criteria",
-    _r_guard["low"] == _expected_guard,
-    f"expected {_expected_guard} (loading=1.0 forced), got {_r_guard['low']} "
-    f"(would be {round(_expected_guard * 1.05, 2)} if loading incorrectly applied at breadth=3)",
-)
-
-
-# -- 9-10. Multi-state Step 1 (geometric decay) + Step 3 (breadth loading) -----
-# Hand-derived expected values, not just "did it run without error."
-
-_original_a = STATE_MULTIPLIERS.get("decision_paralysis")
-_original_b = STATE_MULTIPLIERS.get("the_exposed")
-
-# Case A: breadth < 3 -- decision_quality stays at 0 for both synthetic
-# states, so it must NOT count toward breadth or contribute to the
-# combined total.
-_ft.STATE_MULTIPLIERS["decision_paralysis"] = _synthetic_entry(turnover=2, productivity=1, decision_quality=0)
-_ft.STATE_MULTIPLIERS["the_exposed"] = _synthetic_entry(turnover=1, productivity=2, decision_quality=0)
-
-result_multi_a = compute_friction_tax(
-    state_ids=["decision_paralysis", "the_exposed"],
-    severity_tier="Entrenched",
-    org_size=152,
-    industry="Professional Services",
-    org_type="Government",
-)
-# Step 1: turnover scores [2,1] desc -> 2*1.0 + 1*0.5 = 2.5
-#         productivity scores [2,1] desc -> 2*1.0 + 1*0.5 = 2.5
-#         decision_quality scores [0,0] -> 0.0
-_combined_a = 2.5 + 2.5 + 0.0
-_fraction_a = _ft._attritional_fraction(_combined_a)
-# Step 3: breadth = 2 (decision_quality is 0 for both, excluded); N=2 so
-# the N=1 guard does NOT apply -- loading = 1.0 + 0.05*(2-1) = 1.05
-_loading_a = 1.0 + 0.05 * (2 - 1)
-_expected_multi_a = round(_real_grid_entry.payroll_floor_annual * _real_org_type_scalar * _fraction_a * _loading_a * 1.0, 2)
-check(
-    "multi-state Step 1 + Step 3: breadth=2 (one criterion at zero across both states, correctly excluded), "
-    "geometric decay 1.0/0.5 weights match hand-derived combined_criterion_score",
-    result_multi_a["low"] == _expected_multi_a,
-    f"expected {_expected_multi_a} (combined_raw_total={_combined_a}, loading={_loading_a}), got {result_multi_a['low']}",
-)
-
-# Case B: breadth = 3 -- every criterion nonzero on at least one state.
-_ft.STATE_MULTIPLIERS["decision_paralysis"] = _synthetic_entry(turnover=2, productivity=1, decision_quality=1)
-_ft.STATE_MULTIPLIERS["the_exposed"] = _synthetic_entry(turnover=1, productivity=2, decision_quality=1)
-
-result_multi_b = compute_friction_tax(
-    state_ids=["decision_paralysis", "the_exposed"],
-    severity_tier="Entrenched",
-    org_size=152,
-    industry="Professional Services",
-    org_type="Government",
-)
-# turnover [2,1] -> 2.5 ; productivity [2,1] -> 2.5 ; decision_quality [1,1] -> 1*1.0 + 1*0.5 = 1.5
-_combined_b = 2.5 + 2.5 + 1.5
-_fraction_b = _ft._attritional_fraction(_combined_b)
-_loading_b = 1.0 + 0.05 * (3 - 1)  # breadth=3, N=2 -- guard does not apply
-_expected_multi_b = round(_real_grid_entry.payroll_floor_annual * _real_org_type_scalar * _fraction_b * _loading_b * 1.0, 2)
-check(
-    "multi-state Step 1 + Step 3: breadth=3 (all criteria nonzero across the pair), "
-    "multi_channel_severity_loading == 1.10 (K=0.05, breadth 3)",
-    result_multi_b["low"] == _expected_multi_b,
-    f"expected {_expected_multi_b} (combined_raw_total={_combined_b}, loading={_loading_b}), got {result_multi_b['low']}",
-)
-
-_ft.STATE_MULTIPLIERS["decision_paralysis"] = _original_a
-_ft.STATE_MULTIPLIERS["the_exposed"] = _original_b
-
-
-# -- 11. Extrapolation beyond R_max=6 -------------------------------------------
-# Three synthetic states, all maxed at 2/2/2, stacked -- combined_raw_total
-# must exceed 6 and the resulting fraction must exceed 0.25 rather than
-# clamp, per the frozen-range design (prompts/friction-tax-multistate-
-# compounding-methodology.md).
-
-_original_c = STATE_MULTIPLIERS.get("the_dormant_talent")
-_ft.STATE_MULTIPLIERS["decision_paralysis"] = _synthetic_entry(turnover=2, productivity=2, decision_quality=2)
-_ft.STATE_MULTIPLIERS["the_exposed"] = _synthetic_entry(turnover=2, productivity=2, decision_quality=2)
-_ft.STATE_MULTIPLIERS["the_dormant_talent"] = _synthetic_entry(turnover=2, productivity=2, decision_quality=2)
-
-result_extrap = compute_friction_tax(
-    state_ids=["decision_paralysis", "the_exposed", "the_dormant_talent"],
-    severity_tier="Entrenched",
-    org_size=152,
-    industry="Professional Services",
-    org_type="Government",
-)
-# each criterion: scores [2,2,2] -> 2*1.0 + 2*0.5 + 2*0.25 = 2 + 1 + 0.5 = 3.5
-_combined_extrap = 3.5 * 3  # = 10.5, exceeds R_max=6
-_fraction_extrap = _ft._attritional_fraction(_combined_extrap)
-_loading_extrap = 1.0 + 0.05 * (3 - 1)  # breadth=3
-_expected_extrap = round(_real_grid_entry.payroll_floor_annual * _real_org_type_scalar * _fraction_extrap * _loading_extrap * 1.0, 2)
-check(
-    "combined_raw_total exceeds R_max=6 when 3 high-scoring states stack (extrapolation case)",
-    _combined_extrap > 6,
-    f"combined_raw_total={_combined_extrap}, expected > 6",
-)
-check(
-    "attritional_fraction extrapolates above 0.25 rather than clamping",
-    _fraction_extrap > 0.25,
-    f"got {_fraction_extrap}, expected > 0.25",
-)
-check(
-    "low computed correctly using the extrapolated (unclamped) fraction",
-    result_extrap["low"] == _expected_extrap,
-    f"expected {_expected_extrap}, got {result_extrap['low']}",
-)
-
-_ft.STATE_MULTIPLIERS["decision_paralysis"] = _original_a
-_ft.STATE_MULTIPLIERS["the_exposed"] = _original_b
-_ft.STATE_MULTIPLIERS["the_dormant_talent"] = _original_c
-
-
-# -- 12. calibration_complete False when the grid cell is forced to None -------
-# Grid is real everywhere by default now -- force this one cell's
-# payroll_floor_annual to None to construct the "grid missing" scenario.
-
-_original_grid_entry = _ft.PAYROLL_BASELINE_GRID[_GRID_KEY]
-_ft.STATE_MULTIPLIERS["decision_paralysis"] = _synthetic_entry(turnover=1, productivity=0, decision_quality=0)
-_ft.PAYROLL_BASELINE_GRID[_GRID_KEY] = PayrollBaselineEntry(
-    payroll_floor_annual=None, source="test", citation_id="test"
-)
-result_partial_1 = compute_friction_tax(
-    state_ids=["decision_paralysis"],
-    severity_tier="Entrenched",
-    org_size=152,
-    industry="Professional Services",
-    org_type="Government",
-)
-check(
-    "calibration_complete False when grid cell is forced to None (org_type and state_multiplier real/mocked)",
-    result_partial_1["calibration_complete"] is False,
-    f"got {result_partial_1['calibration_complete']}",
-)
-_ft.PAYROLL_BASELINE_GRID[_GRID_KEY] = _original_grid_entry
-
-
-# -- 13. calibration_complete False when the org_type scalar is forced to None -
-
-_original_founder_led_entry = _ft.ORG_TYPE_SCALARS["Founder-led"]
-_ft.ORG_TYPE_SCALARS["Founder-led"] = OrgTypeScalarEntry(
-    scalar=None, source="test", citation_id=None
-)
-result_partial_2 = compute_friction_tax(
-    state_ids=["decision_paralysis"],
-    severity_tier="Entrenched",
-    org_size=152,
-    industry="Professional Services",
-    org_type="Founder-led",
-)
-check(
-    "calibration_complete False when org_type scalar is forced to None (grid and state_multiplier real/mocked)",
-    result_partial_2["calibration_complete"] is False,
-    f"got {result_partial_2['calibration_complete']}",
-)
-_ft.ORG_TYPE_SCALARS["Founder-led"] = _original_founder_led_entry
-_ft.STATE_MULTIPLIERS["decision_paralysis"] = _original_multiplier
-
-
-# -- 14. PAYROLL_BASELINE_GRID: all 54 cells independently recomputed ----------
-
-_all_correct = True
-_mismatches = []
-for (hc, ind), entry in PAYROLL_BASELINE_GRID.items():
-    wage = _ft._INDUSTRY_WAGE_DATA[ind][0]
-    midpoint = HEADCOUNT_MIDPOINTS[hc].employees_per_firm
-    expected = round(wage * midpoint, 2)
-    if entry.payroll_floor_annual != expected:
-        _all_correct = False
-        _mismatches.append((hc, ind, entry.payroll_floor_annual, expected))
-
-check(
-    "PAYROLL_BASELINE_GRID has exactly 66 cells (6 headcount x 11 industry)",
-    len(PAYROLL_BASELINE_GRID) == 66,
-    f"got {len(PAYROLL_BASELINE_GRID)}",
-)
-expected_keys = {(hc, ind) for hc in HEADCOUNT_BUCKETS for ind in INDUSTRIES}
-check(
-    "PAYROLL_BASELINE_GRID keys exactly match all (headcount, industry) combinations",
-    set(PAYROLL_BASELINE_GRID.keys()) == expected_keys,
-    f"missing: {expected_keys - set(PAYROLL_BASELINE_GRID.keys())}, "
-    f"extra: {set(PAYROLL_BASELINE_GRID.keys()) - expected_keys}",
-)
-check(
-    "All 54 payroll_floor_annual values are non-None and match industry_wage x headcount_midpoint",
-    _all_correct,
-    f"mismatches: {_mismatches}",
-)
-
-
-# -- 15. All 9 industries now carry a source/citation_id ------------------------
-
-_by_industry_sourced = {
-    ind: all(
-        PAYROLL_BASELINE_GRID[(hc, ind)].source is not None
-        and PAYROLL_BASELINE_GRID[(hc, ind)].citation_id is not None
-        for hc in HEADCOUNT_BUCKETS
-    )
+_eng_pcts = {
+    ind: _channels(compute_friction_tax(_BOTH, 175, ind))["engagement"]["percent_of_payroll"]
     for ind in INDUSTRIES
 }
-check(
-    "All 11 industries carry a source/citation_id across all 6 headcount buckets",
-    all(_by_industry_sourced.values()),
-    f"unsourced industries: {[k for k, v in _by_industry_sourced.items() if not v]}",
-)
+check("engagement is exactly 7.02 percent of payroll in all 11 industries (0.39 x 0.18, hardcoded)",
+      set(_eng_pcts.values()) == {7.02} and len(_eng_pcts) == 11, f"got {_eng_pcts}")
 
+# -- 2. Hand-computed fixtures (spec 6b, R3 rounded rates), literals ----------------
+# (employees, industry, engagement $, turnover $, total $), whole dollars. Computed
+# by hand as P x 0.0702 and P x (monthly x 12 / 100) x 0.42 x 0.333, P = N x W.
 
-# -- 16. ORG_TYPE_SCALARS completeness and correctness --------------------------
-
-_EXPECTED_ORG_TYPE_SCALARS = {
-    "Founder-led": 1.00,
-    "PE or VC-backed": 1.00,
-    "Privately held professional leadership": 1.00,
-    "Nonprofit": 1.00,
-    "Publicly traded": 1.00,
-    "Government": 1.05,
-}
-check(
-    "ORG_TYPE_SCALARS has exactly 6 entries matching IntakeData.org_type",
-    set(ORG_TYPE_SCALARS.keys()) == set(_EXPECTED_ORG_TYPE_SCALARS.keys()),
-    f"got {set(ORG_TYPE_SCALARS.keys())}",
-)
-check(
-    "ORG_TYPE_SCALARS keys exactly match the live INTAKE_FIELDS['org_type'] list",
-    set(ORG_TYPE_SCALARS.keys()) == set(INTAKE_FIELDS["org_type"]),
-    f"MOB/intake mismatch: {set(ORG_TYPE_SCALARS.keys()) ^ set(INTAKE_FIELDS['org_type'])}",
-)
-for org_type, expected_scalar in _EXPECTED_ORG_TYPE_SCALARS.items():
-    entry = ORG_TYPE_SCALARS.get(org_type)
+_FIXTURES = [
+    (12, "Retail & Hospitality", 35401, 28522, 63923),
+    (12, "Other", 57264, 30119, 87383),
+    (60, "Construction", 303879, 130771, 434650),
+    (60, "Government & Public Sector", 338181, 64681, 402863),
+    (175, "Technology", 1413144, 439205, 1852349),
+    (175, "Professional Services", 1334642, 733889, 2068531),
+    (400, "Nonprofit & Education", 2043241, 801127, 2844368),
+    (400, "Manufacturing", 1941198, 649734, 2590933),
+    (800, "Healthcare & Life Sciences", 3985619, 1905739, 5891358),
+    (800, "Transportation & Warehousing", 3612829, 1900237, 5513066),
+]
+for _n, _ind, _eng, _turn, _tot in _FIXTURES:
+    _r = compute_friction_tax(_BOTH, _n, _ind)
+    _ch = _channels(_r)
+    _total = _r["estimate"]["typical_baseline"]["total"]
     check(
-        f"ORG_TYPE_SCALARS[{org_type!r}].scalar == {expected_scalar}",
-        entry is not None and entry.scalar == expected_scalar,
-        f"got {entry.scalar if entry else None}",
+        f"{_n} / {_ind}: engagement ${_eng:,}, turnover ${_turn:,}, total ${_tot:,}",
+        round(_ch["engagement"]["amount"]) == _eng
+        and round(_ch["turnover"]["amount"]) == _turn
+        and round(_total["amount"]) == _tot,
+        f"got {_ch['engagement']['amount']}, {_ch['turnover']['amount']}, {_total['amount']}",
     )
-check(
-    "All ORG_TYPE_SCALARS entries carry a non-empty source note",
-    all(e.source is not None and len(e.source) > 0 for e in ORG_TYPE_SCALARS.values()),
-    "found an entry with no source note",
-)
+_r_retail = compute_friction_tax(_BOTH, 12, "Retail & Hospitality")
+check("12 / Retail & Hospitality annual quit rate is 3.37 x 12 = 40.44 percent (R3, rounded monthly rate)",
+      _r_retail["annual_quit_rate_percent"] == 40.44, f"got {_r_retail['annual_quit_rate_percent']}")
+check("12 / Retail & Hospitality payroll is 12 x 42,024 = 504,288 and the total is 12.6759 percent",
+      _r_retail["payroll"] == 504288.0
+      and _r_retail["estimate"]["typical_baseline"]["total"]["percent_of_payroll"] == 12.6759,
+      f"got {_r_retail['payroll']}, {_r_retail['estimate']['typical_baseline']['total']}")
+check("every fixture total is between 8.4 and 12.7 percent of payroll (spec 6b)",
+      all(8.3 < compute_friction_tax(_BOTH, 175, ind)["estimate"]["typical_baseline"]["total"]["percent_of_payroll"] < 12.8
+          for ind in INDUSTRIES))
+_r_fl = compute_friction_tax(_BOTH, 150.5, "Technology")
+check("a float headcount prices at the actual N: 150.5 x 115,030 payroll",
+      _r_fl["payroll"] == 150.5 * 115030.0 and _r_fl["headcount"] == 150.5, f"got {_r_fl['payroll']}")
 
+# -- 3. The 1,000 intake cap ---------------------------------------------------------
 
-# -- 17. STATE_MULTIPLIERS keys match state registry ----------------------------
+_cap = compute_friction_tax(_BOTH, 1000, "Financial Services")
+_cap_ch = _channels(_cap)
+check("N = 1000: every amount is null, percent of payroll present on each channel and the total",
+      _cap["amounts_withheld"] is True and _cap["payroll"] is None
+      and _cap["estimate"]["typical_baseline"]["total"]["amount"] is None
+      and _cap_ch["engagement"]["amount"] is None and _cap_ch["turnover"]["amount"] is None
+      and _cap_ch["engagement"]["percent_of_payroll"] == 7.02
+      and _cap_ch["turnover"]["percent_of_payroll"] == 2.1818
+      and _cap["estimate"]["typical_baseline"]["total"]["percent_of_payroll"] == 9.2018,
+      f"got {_cap}")
+check("N = 1000: no wage or employee-count input is carried, so no dollar figure leaks through inputs",
+      all(not any("wage" in i["name"].lower() or i["name"] == "Employees" for i in c["inputs"])
+          for c in _cap_ch.values()))
+_just = compute_friction_tax(_BOTH, 999, "Financial Services")
+check("N = 999 carries both percent and amounts",
+      _just["amounts_withheld"] is False and _just["estimate"]["typical_baseline"]["total"]["amount"] is not None
+      and all(c["amount"] is not None for c in _channels(_just).values()))
+_over = compute_friction_tax(_BOTH, 1200, "Financial Services")
+check("N = 1200 (above the intake ceiling) is withheld the same way",
+      _over["amounts_withheld"] is True and _over["estimate"]["typical_baseline"]["total"]["amount"] is None)
 
-registry_ids = set(STATE_PROFILES.keys())
-multiplier_ids = set(STATE_MULTIPLIERS.keys())
-missing_from_multipliers = registry_ids - multiplier_ids
-extra_in_multipliers = multiplier_ids - registry_ids
+# -- 4. Headcount guard ----------------------------------------------------------------
 
-check(
-    "STATE_MULTIPLIERS covers all registry state IDs",
-    len(missing_from_multipliers) == 0,
-    f"missing: {missing_from_multipliers}",
-)
-check(
-    "STATE_MULTIPLIERS has no extra IDs not in registry",
-    len(extra_in_multipliers) == 0,
-    f"extra: {extra_in_multipliers}",
-)
+for _bad in ("", None, "150", True, False, float("inf"), float("-inf"), float("nan"), 0, -5, 1, 1.9):
+    _rb = compute_friction_tax(_BOTH, _bad, "Technology")
+    check(f"headcount {_bad!r} is uncalibrated, null estimate, no bucket fallback",
+          _rb["estimate"] is None and _rb["calibration_complete"] is False and _rb["headcount"] is None,
+          f"got {_rb}")
+check("headcount 2 is the smallest priced N", compute_friction_tax(_BOTH, 2, "Technology")["estimate"] is not None)
+check("headcount 2.0 (float) prices", compute_friction_tax(_BOTH, 2.0, "Technology")["estimate"] is not None)
 
+# -- 5. Channel switch rule ------------------------------------------------------------
 
-# -- 18. All 57 multipliers are populated in [0.05, 0.25] (Option A rescale) ---
+check("only paper_shield (decision_quality only): null estimate, decision-time receipt on, no dollar channel",
+      compute_friction_tax(["paper_shield"], 100, "Technology")["estimate"] is None
+      and compute_friction_tax(["paper_shield"], 100, "Technology")["decision_time_receipt"] is True
+      and compute_friction_tax(["paper_shield"], 100, "Technology")["channels_on"] == [])
+_t_only = compute_friction_tax(["the_paper_tiger"], 175, "Technology")  # turnover 1, productivity 0, dq 0
+check("a turnover-only state switches on the turnover channel alone, no decision-time receipt",
+      _t_only["channels_on"] == ["turnover"] and list(_channels(_t_only)) == ["turnover"]
+      and _t_only["decision_time_receipt"] is False)
+_p_only = compute_friction_tax(["the_lost_map"], 175, "Technology")  # productivity 2, turnover 0, dq 2
+check("a productivity-only state switches on the engagement channel alone, with the decision-time receipt",
+      _p_only["channels_on"] == ["engagement"] and list(_channels(_p_only)) == ["engagement"]
+      and _p_only["decision_time_receipt"] is True)
+_one = compute_friction_tax(["the_overloaded_manager"], 175, "Technology")
+_many = compute_friction_tax(
+    ["the_overloaded_manager", "decision_paralysis", "the_founders_grip", "the_paper_tiger", "the_lost_map"],
+    175, "Technology")
+check("multi-state sets do not stack: five states give the same figure as one when both channels are already on",
+      _one["estimate"] == _many["estimate"], f"one {_one['estimate']['typical_baseline']['total']} many {_many['estimate']['typical_baseline']['total']}")
+check("a channel is on when any identified state scores above 0 on it (turnover-only plus productivity-only = both)",
+      compute_friction_tax(["the_paper_tiger", "the_lost_map"], 175, "Technology")["estimate"]
+      == _one["estimate"])
+check("severity is not an input: the signature is (state_ids, org_size, industry)",
+      list(inspect.signature(compute_friction_tax).parameters) == ["state_ids", "org_size", "industry"])
+check("excess is null and the result is a point estimate (no low or high)",
+      _one["estimate"]["excess"] is None and "low" not in _one and "high" not in _one["estimate"]
+      and "low" not in _one["estimate"])
+check("an unknown state id gives a null estimate", compute_friction_tax(["not_a_state"], 175, "Technology")["estimate"] is None)
+check("a known state mixed with an unknown one gives a null estimate",
+      compute_friction_tax(["the_overloaded_manager", "not_a_state"], 175, "Technology")["estimate"] is None)
+check("an empty state list gives a null estimate", compute_friction_tax([], 175, "Technology")["estimate"] is None)
+check("an unknown industry gives a null estimate", compute_friction_tax(_BOTH, 175, "Not An Industry")["estimate"] is None)
 
-non_populated = {k: v for k, v in STATE_MULTIPLIERS.items() if v is None}
-check(
-    "All STATE_MULTIPLIERS are populated (no CALIBRATION TARGET placeholders remain)",
-    len(non_populated) == 0,
-    f"still-None entries: {non_populated}",
-)
-check(
-    "STATE_MULTIPLIERS has exactly len(STATE_PROFILES) entries",
-    len(STATE_MULTIPLIERS) == len(STATE_PROFILES),
-    f"got {len(STATE_MULTIPLIERS)}, expected {len(STATE_PROFILES)}",
-)
-check(
-    "Every STATE_MULTIPLIERS value is a StateMultiplierEntry with a real multiplier in [0.05, 0.25] (Option A)",
-    all(
-        isinstance(v, StateMultiplierEntry) and v.multiplier is not None and 0.05 <= v.multiplier <= 0.25
-        for v in STATE_MULTIPLIERS.values()
-    ),
-    "found a non-StateMultiplierEntry value or an out-of-range multiplier",
-)
+# -- 6. Tables and provenance ----------------------------------------------------------
 
+_Q = {
+    "Professional Services": 2.30, "Healthcare & Life Sciences": 2.00, "Financial Services": 1.30,
+    "Technology": 1.30, "Manufacturing": 1.40, "Retail & Hospitality": 3.37,
+    "Nonprofit & Education": 1.64, "Government & Public Sector": 0.80, "Construction": 1.80,
+    "Transportation & Warehousing": 2.20, "Other": 2.20,
+}
+check("QUITS_MONTHLY_RATE_2025 holds the R3 rounded 2-decimal monthly rates, all 11 industries",
+      {k: v[0] for k, v in _ft.QUITS_MONTHLY_RATE_2025.items()} == _Q)
+check("every industry has a wage W and a quits rate q",
+      all(_ft.get_industry_wage(i) is not None and i in _ft.QUITS_MONTHLY_RATE_2025 for i in INDUSTRIES))
+_all_inputs = [i for ind in INDUSTRIES for c in _channels(compute_friction_tax(_BOTH, 175, ind)).values() for i in c["inputs"]]
+check("every input carries a name, a value, a source and a vintage",
+      all(i["name"] and i["value"] is not None and i["source"] and i["vintage"] for i in _all_inputs))
+check("the vintages are the cited ones",
+      {"2025", "May 2026", "2020", "July 2024", "2017", "May 2025", "this session"} == {i["vintage"] for i in _all_inputs},
+      f"got {sorted({i['vintage'] for i in _all_inputs})}")
+check("the engagement inputs are 0.70, 0.31 and 0.18, the turnover inputs include 0.42 and 0.333",
+      [i["value"] for i in _channels(_one)["engagement"]["inputs"][:3]] == [0.70, 0.31, 0.18]
+      and [i["value"] for i in _channels(_one)["turnover"]["inputs"][1:3]] == [0.42, 0.333])
+check("framing constants carry the required wording and none of the forbidden words",
+      "what organizations like yours typically lose" == _ft.FRICTION_FRAMING_TOTAL
+      and "the gap between organizations like yours and the best-run ones" == _ft.FRICTION_FRAMING_ENGAGEMENT_GAP
+      and not any(w in (_ft.FRICTION_FRAMING_TOTAL + _ft.FRICTION_FRAMING_ENGAGEMENT_GAP).lower()
+                  for w in ("normal", "acceptable", "full engagement")))
 
-# -- 19. criteria dict still carries "legal", excluded from raw_score ----------
-# Legal/Compliance is split out to its own design (prompts/friction-tax-
-# legal-compliance-methodology.md) but its score must still be recorded
-# per state, not deleted -- verified against several real states with a
-# nonzero legal score, not assumed.
+# -- 7. Engagement floor ---------------------------------------------------------------
 
-_legal_sample = ["hr_capture", "the_paper_tiger", "disparate_impact_architecture", "cultural_overtime"]
-_legal_check_failures = []
-for _sid in _legal_sample:
-    _entry = STATE_MULTIPLIERS[_sid]
-    if "legal" not in _entry.criteria:
-        _legal_check_failures.append((_sid, "legal key missing"))
-        continue
-    if _entry.criteria["legal"].score <= 0:
-        _legal_check_failures.append((_sid, f"expected nonzero legal score, got {_entry.criteria['legal'].score}"))
-    _three_criterion_sum = (
-        _entry.criteria["turnover"].score
-        + _entry.criteria["productivity"].score
-        + _entry.criteria["decision_quality"].score
-    )
-    if _entry.raw_score != _three_criterion_sum:
-        _legal_check_failures.append(
-            (_sid, f"raw_score {_entry.raw_score} != 3-criterion sum {_three_criterion_sum} "
-                   f"(legal={_entry.criteria['legal'].score} correctly excluded)")
-        )
-check(
-    "criteria dict retains a nonzero 'legal' score where expected, but raw_score sums only the 3 attritional criteria",
-    len(_legal_check_failures) == 0,
-    f"failures: {_legal_check_failures}",
-)
+_saved_us = _ft.ENGAGEMENT_US
+_ft.ENGAGEMENT_US = 0.80
+_floor = _channels(compute_friction_tax(_BOTH, 175, "Technology"))["engagement"]
+_ft.ENGAGEMENT_US = _saved_us
+check("E_us at or above E_bp prices zero engagement, never negative",
+      _floor["percent_of_payroll"] == 0.0 and _floor["amount"] == 0.0, f"got {_floor}")
 
-check(
-    "every STATE_MULTIPLIERS criteria dict has exactly the 4 keys (turnover, productivity, decision_quality, legal)",
-    all(
-        set(v.criteria.keys()) == {"turnover", "productivity", "decision_quality", "legal"}
-        for v in STATE_MULTIPLIERS.values()
-    ),
-    "found a state with a criteria dict missing or adding a key",
-)
+# -- 8. Removed structures --------------------------------------------------------------
 
-
-# -- 20. calibration_complete True across the full real 6x9x6 space ------------
-# Exhaustive, not spot-checked. All three calibration axes are now real
-# and populated for every combination -- confirms calibration_complete
-# genuinely returns True everywhere real data is used, not just in the
-# single spot-checked case from test 2.
-
-_any_unexpectedly_incomplete = []
-for hc in HEADCOUNT_BUCKETS:
-    for ind in INDUSTRIES:
-        for ot in ORG_TYPE_SCALARS.keys():
-            r = compute_friction_tax(
-                state_ids=["decision_paralysis"],
-                severity_tier="Entrenched",
-                org_size=round(HEADCOUNT_MIDPOINTS[hc].employees_per_firm),
-                industry=ind,
-                org_type=ot,
-            )
-            if r["calibration_complete"] is not True:
-                _any_unexpectedly_incomplete.append((hc, ind, ot))
-
-check(
-    "calibration_complete is True for all 324 real (headcount, industry, org_type) combinations",
-    len(_any_unexpectedly_incomplete) == 0,
-    f"unexpectedly incomplete: {_any_unexpectedly_incomplete}",
-)
-
-
-# -- 21. Mixed known/unknown state_ids -- calibration_complete stays False -----
-# Covers a genuine edge case: a state_ids list mixing one real, populated
-# state with one unrecognized state_id must still yield
-# calibration_complete=False -- the unrecognized id resolves to None and
-# the all(e is not None ...) check must catch it even when mixed with
-# real values, not just when every id in the list is unrecognized.
-
-result_mixed = compute_friction_tax(
-    state_ids=["decision_paralysis", "not_a_real_state"],
-    severity_tier="Entrenched",
-    org_size=692,
-    industry="Technology",
-    org_type="Nonprofit",
-)
-check(
-    "calibration_complete False when state_ids mixes one real state with one unrecognized state",
-    result_mixed["calibration_complete"] is False,
-    f"got {result_mixed['calibration_complete']}",
-)
-check(
-    "low/high are None when any state_id in the list is unrecognized",
-    result_mixed["low"] is None and result_mixed["high"] is None,
-    f"got low={result_mixed['low']}, high={result_mixed['high']}",
-)
+for _gone in ("STATE_MULTIPLIERS", "PAYROLL_BASELINE_GRID", "SEVERITY_SCALAR", "ORG_TYPE_SCALARS",
+              "StateMultiplierEntry", "StateCriterionScore", "PayrollBaselineEntry", "OrgTypeScalarEntry",
+              "_attritional_fraction", "_MULTI_CHANNEL_SEVERITY_LOADING_K", "_R_MAX", "_FRACTION_MAX",
+              "_DEFAULT_SEVERITY_SCALAR"):
+    check(f"{_gone} is removed from engine.friction_tax", not hasattr(_ft, _gone))
 
 
 # -- 22-23. INDUSTRY_NON_EXEMPT_RATIO / LEGAL_COMPLIANCE_CLUSNTER import-time -----
@@ -773,11 +317,11 @@ check(
 )
 _unclassified_or_bad_score = [
     sid for sid in LEGAL_COMPLIANCE_CLUSTER
-    if sid not in STATE_MULTIPLIERS
-    or STATE_MULTIPLIERS[sid].criteria["legal"].score not in (1, 2)
+    if sid not in STATE_CRITERIA
+    or STATE_CRITERIA[sid].legal not in (1, 2)
 ]
 check(
-    "Every LEGAL_COMPLIANCE_CLUSTER state exists in STATE_MULTIPLIERS with a 'legal' score in {1, 2}",
+    "Every LEGAL_COMPLIANCE_CLUSTER state exists in STATE_CRITERIA with a 'legal' score in {1, 2}",
     len(_unclassified_or_bad_score) == 0,
     f"failures: {_unclassified_or_bad_score}",
 )
@@ -941,7 +485,7 @@ check(
 # scope_fraction(score=2 -> 0.75); low/high = affected x admin/litigation
 # rate.
 
-_co_score = STATE_MULTIPLIERS["cultural_overtime"].criteria["legal"].score
+_co_score = STATE_CRITERIA["cultural_overtime"].legal
 _co_midpoint = HEADCOUNT_MIDPOINTS["250-499"].employees_per_firm
 _co_ratio = INDUSTRY_NON_EXEMPT_RATIO["Manufacturing"]
 _co_affected = _co_midpoint * _co_ratio * (0.75 if _co_score == 2 else 0.25)
@@ -1000,7 +544,7 @@ check(
     },
     f"got {_r_4b}",
 )
-_dn_score = STATE_MULTIPLIERS["dueling_narratives"].criteria["legal"].score
+_dn_score = STATE_CRITERIA["dueling_narratives"].legal
 check(
     "sanity: dueling_narratives real legal score is 1, needed for the 4b floor check below",
     _dn_score == 1,
@@ -1062,7 +606,7 @@ check(
 
 import dataclasses as _dc
 # Legal reads engine/data/state_criteria.py STATE_CRITERIA (Stage 1), so the
-# monkey-patch targets that table, not STATE_MULTIPLIERS.
+# monkey-patch targets that table.
 _original_btf = _ft.STATE_CRITERIA["built_to_fail"]
 _ft.STATE_CRITERIA["built_to_fail"] = _dc.replace(_original_btf, legal=0)
 _r_zero_score = compute_legal_compliance_exposure(
@@ -1343,7 +887,7 @@ finally:
 # 15, which can never be lower than a CONFIRMED state's own threshold, so it
 # can never flip a CONFIRMED-driven outcome) -- temporarily monkey-patches
 # TX's entry to a synthetic lower threshold, same save/mutate/restore
-# convention already used elsewhere in this file for STATE_MULTIPLIERS.
+# convention already used elsewhere in this file for STATE_CRITERIA.
 
 _original_tx_entry = STATE_COVERAGE_THRESHOLDS["TX"]
 try:
@@ -1713,9 +1257,9 @@ check(
     "sanity: the_arbitrary_standard is a real Cluster 2 state with a non-zero legal score, needed for "
     "the check below",
     _ft.LEGAL_COMPLIANCE_CLUSTER.get("the_arbitrary_standard") == 2
-    and _ft.STATE_MULTIPLIERS["the_arbitrary_standard"].criteria["legal"].score > 0,
+    and _ft.STATE_CRITERIA["the_arbitrary_standard"].legal > 0,
     f"got cluster={_ft.LEGAL_COMPLIANCE_CLUSTER.get('the_arbitrary_standard')!r}, "
-    f"score={_ft.STATE_MULTIPLIERS['the_arbitrary_standard'].criteria['legal'].score!r}",
+    f"score={_ft.STATE_CRITERIA['the_arbitrary_standard'].legal!r}",
 )
 check(
     "Cluster 2, CA (uncapped): is_floor is NOT set (stays False) -- Cluster 2's dollar values are two "
@@ -1956,7 +1500,7 @@ check(
     "sanity: the_arbitrary_standard is a real Cluster 2 state with a non-zero legal score, needed "
     "for the check below",
     _ft.LEGAL_COMPLIANCE_CLUSTER.get("the_arbitrary_standard") == 2
-    and _ft.STATE_MULTIPLIERS["the_arbitrary_standard"].criteria["legal"].score > 0,
+    and _ft.STATE_CRITERIA["the_arbitrary_standard"].legal > 0,
     f"got cluster={_ft.LEGAL_COMPLIANCE_CLUSTER.get('the_arbitrary_standard')!r}",
 )
 _r_oh_c2 = _ft._single_state_legal_pricing(
