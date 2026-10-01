@@ -1,5 +1,6 @@
 import type { CondensedOutputPayload } from "@/lib/types";
-import { formatUsdRange, FRICTION_DOLLARS_VISIBLE } from "@/lib/output-text";
+import { formatUsd, FRICTION_DOLLARS_VISIBLE } from "@/lib/output-text";
+import { departureCostAmount } from "@/lib/condensed-departure-cost";
 import {
   AXES,
   LIVE_CENTER,
@@ -86,8 +87,8 @@ interface CondensedOutputProps {
 }
 
 export default function CondensedOutput({ payload }: CondensedOutputProps) {
-  const { low, high } = payload.financial_range;
-  const hasFinancialRange = low !== null && high !== null;
+  // Tolerant of the new single value, the old range payload and a missing value.
+  const departureCost = departureCostAmount(payload);
   const more = payload.additional_condition_count ?? 0;
 
   return (
@@ -138,11 +139,16 @@ export default function CondensedOutput({ payload }: CondensedOutputProps) {
         <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
           Estimated cost of one departure in this pattern
         </p>
-        {hasFinancialRange ? (
+        {/* UNREVIEWED COPY (Stage 5 draft, needs Pete's review before any flag flip):
+            the parenthetical states the basis of the figure, the industry average wage
+            x 0.333 (Work Institute). */}
+        {departureCost !== null ? (
           <p className="text-sm text-charcoal">
-            {formatUsdRange(low!, high!)}{" "}
+            {formatUsd(departureCost)}{" "}
             <span className="text-gray-400">
-              (roughly 50–75% of one departing employee&apos;s estimated salary)
+              (about one third of one employee&apos;s annual pay at the average wage in your
+              industry, based on the Work Institute&apos;s estimate of what one voluntary
+              departure costs)
             </span>
           </p>
         ) : (
