@@ -8,10 +8,9 @@ import {
   JURISDICTION_OPTIONS,
 } from "@/components/DiagnosticFlow";
 
-// Source of truth is engine/friction_tax.py's ORG_TYPE_SCALARS keys --
-// verified verbatim against that table (2026-09-08), not assumed.
-// Keep in sync manually if that table's keys ever change; also mirrors
-// engine/data/intake.py's INTAKE_FIELDS["org_type"] list.
+// Source of truth is engine/data/intake.py's INTAKE_FIELDS["org_type"].
+// tools/test_org_type_lists.py fails if this list drifts from it, and
+// from the same list in web/components/DiagnosticFlow.tsx.
 const ORG_TYPE_OPTIONS = [
   "Founder-led",
   "PE or VC-backed",
