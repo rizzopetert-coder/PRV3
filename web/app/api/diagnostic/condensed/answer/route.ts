@@ -13,6 +13,7 @@ import {
   invokeCondensedComplete,
 } from "@/lib/engine-client";
 import { translateResolutionFamily } from "@/lib/resolution-family";
+import { departureCostFromEngine } from "@/lib/condensed-departure-cost";
 import type { PrivateIntakeEcho, CondensedOutputPayload } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
@@ -152,7 +153,7 @@ export async function POST(request: NextRequest) {
     headline: engineResult.synthesis?.headline ?? "",
     verdict_text: engineResult.synthesis?.liability_condition_text ?? "",
     additional_condition_count: Math.max(0, engineResult.identified_states.length - 1),
-    financial_range: engineResult.condensed_financial_range,
+    departure_cost: departureCostFromEngine(engineResult),
   };
 
   return NextResponse.json({
