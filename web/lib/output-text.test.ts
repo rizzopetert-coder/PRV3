@@ -1,10 +1,18 @@
 import { describe, it, expect } from "vitest";
 import {
-  buildResultsText, firstSentence, joinNames, buildCoreCluster, OHIO_NET_WORTH_CAVEAT,
+  buildResultsText as buildResultsTextReal, firstSentence, joinNames, buildCoreCluster, OHIO_NET_WORTH_CAVEAT,
   groupLedgerRows, formatUsd, formatUsdRange, FRICTION_TYPICAL_LOSS_LABEL,
   FRICTION_DOLLARS_VISIBLE, FRICTION_LEDGER_HEADING_NO_DOLLARS, FRICTION_LEDGER_NOTE_NO_DOLLARS,
 } from "./output-text";
 import type { PrivateOutputPayload, StateRef, TacticalSectionResult } from "./types";
+// Legal is forced visible in these tests (they cover the legal and cost comparison text).
+// The default-hidden behavior is covered in lib/output-text.legal.test.ts.
+const buildResultsText = (
+  payload: Parameters<typeof buildResultsTextReal>[0],
+  tactical?: Parameters<typeof buildResultsTextReal>[1],
+  options: NonNullable<Parameters<typeof buildResultsTextReal>[2]> = {},
+) => buildResultsTextReal(payload, tactical, { legalDollarsVisible: true, ...options });
+
 
 // A full payload with every optional field populated -- confirms every
 // listed field (visible Blocks 1-4d, plus the fields PrivateOutput.tsx
