@@ -2,7 +2,7 @@
 // web/lib/types.ts
 //
 // Authoritative type contracts for PrivateOutputPayload and ShareableOutputPayload.
-// Imported by: output-renderer.ts, /api/result, /api/share/create, /api/share/[id]
+// Imported by: /api/result, /api/share/create, /api/share/[id]
 //
 // Clinical boundary enforced here:
 //   - ShareableOutputPayload never contains synthesis
@@ -132,41 +132,61 @@ export interface PrivateIntakeEcho extends ShareableIntakeEcho {
 }
 
 /**
- * Friction tax estimate.
- * Populated with a real computed value in both private-output paths
- * (web/app/api/result/route.ts, web/app/api/diagnostic/session/answer/route.ts
- * both read engineResult.private_output.friction_tax_estimate directly)
- * now that STATE_MULTIPLIERS is fully calibrated (Option A rescale,
- * 2026-08-03) -- no longer a "Phase 3" TODO. Still hardcoded null in the
- * shareable path (web/app/api/share/create/route.ts) -- a known,
- * separate bug (prompts/friction-tax-legal-compliance-methodology.md,
- * Addendum 11, Finding 1), not a calibration gap. Components render
- * Option B treatment when null:
- * "Economic impact estimate available after full diagnostic."
+ * Friction tax estimate (two-channel rebuild). A point estimate of what
+ * organizations like the client's typically lose each year, as two dollar
+ * channels (engagement and turnover) built from cited inputs, shown as the gap to
+ * the best-run organizations and never as a normal or acceptable level.
+ * percent_of_payroll is present on every channel and on the total. amount is null
+ * at the 1,000 intake cap (dollars withheld, only the percent is shown). The whole
+ * estimate is null when the headcount cannot be priced or no identified state
+ * switches on a dollar channel. Receipts are a sibling field,
+ * PrivateOutputPayload.friction_receipts, not part of this object.
+ *
+ * Older payloads carried { low, high, driving_factors } (a Preview record, or the
+ * minutes between the web and engine deploys of the rebuild), so every reader goes
+ * through frictionTypicalLossText() and frictionReceiptsOf() in lib/output-text.ts
+ * and tolerates that shape, this one, or null. Components render Option B
+ * treatment when null.
  */
-export interface FrictionTaxEstimate {
-  low: number;
-  high: number;
-  currency: string;
-  // Phase 1 show-your-work (engine: _friction_driving_factors()).
-  driving_factors?: EvidenceReceipt[];
+export interface FrictionChannelInput {
+  name: string;
+  value: number;
+  source: string;
+  vintage: string;
 }
+
+export interface FrictionChannel {
+  channel: "engagement" | "turnover";
+  amount: number | null;
+  percent_of_payroll: number;
+  inputs: FrictionChannelInput[];
+}
+
+export interface FrictionTaxEstimate {
+  currency: string;
+  typical_baseline: {
+    total: { amount: number | null; percent_of_payroll: number };
+    channels: FrictionChannel[];
+  };
+  excess: null;
+}
+
+/** The friction channels a state switches on (engine/contract.py ledger rows). */
+export type FrictionLedgerChannel = "engagement" | "turnover" | "decision_time";
 
 /**
  * Friction tax ledger row -- one per condition/state in identified_states,
- * same order. Sibling to friction_tax_estimate on PrivateOutputPayload, not
- * a replacement -- friction_tax_estimate stays the aggregate figure, this
- * is the per-condition breakdown behind it. Gemini-cleared architecture,
- * built engine/contract.py's _build_friction_tax_ledger().
+ * same order. Sibling to friction_tax_estimate on PrivateOutputPayload.
+ * Gemini-cleared architecture, built in engine/contract.py's
+ * _build_friction_tax_ledger().
  *
  * risk_label reuses the state's own severity tier (same value StateSeverityEntry
  * carries) -- no new risk classification invented.
  *
- * dollar_exposure reuses compute_friction_tax() called for this one state
- * alone. null under the same calibration_complete=false conditions
- * friction_tax_estimate itself can be null under (e.g. Path 1's org_type
- * gap -- session.intake.org_type is always "" for Path 1 today, a
- * pre-existing condition this field inherits, not a new gap).
+ * channels lists which friction channels this state switches on (read from
+ * engine/data/state_criteria.py). There is no per-state dollar figure: the
+ * rebuild prices the state set once, not per state. Older rows carried
+ * dollar_exposure, readers ignore it.
  *
  * top_contributing_answers is a ranked list of authored
  * AnswerOption.observation_text strings (skip-and-backfill: an unauthored
@@ -179,7 +199,7 @@ export interface FrictionTaxLedgerEntry {
   state_id: string;
   state_name: string;
   risk_label: SeverityTier;
-  dollar_exposure: { low: number; high: number; currency: string } | null;
+  channels: FrictionLedgerChannel[];
   top_contributing_answers: string[];
 }
 
@@ -351,7 +371,7 @@ export interface PrivateOutputPayload {
 
   // Visualize Your Data (Layer 2). NEW SIBLING field, deliberately not
   // nested inside severity above -- severity is a bare string read by
-  // 9 real call sites (PrivateOutput.tsx, output-renderer.ts,
+  // 9 real call sites (PrivateOutput.tsx,
   // ShareableOutput.tsx, CondensedOutput.tsx); changing its type would
   // break all of them. Both real PrivateOutputPayload builders
   // (answer/route.ts, result/route.ts) populate it unconditionally --
@@ -380,6 +400,13 @@ export interface PrivateOutputPayload {
   // reason severity_by_state below is optional -- that near-mirror type
   // predates this field and omits every field added after it was written.
   friction_tax_ledger?: FrictionTaxLedgerEntry[];
+
+  // Friction receipts (two-channel rebuild): payroll, each channel with its
+  // cited inputs, the conditions that switch channels on, the decision-time
+  // context (no dollar value) and the total. A sibling of friction_tax_estimate
+  // so it exists even when the estimate is null. Optional: older payloads and
+  // DevDiagnosticPreviewPayload predate it. Never shared, see share-store.ts.
+  friction_receipts?: EvidenceReceipt[];
 
   // Legal/Compliance tail-risk exposure (nullable) -- Addendum 11.
   legal_tail_risk_exposure: LegalTailRiskExposure | null;
@@ -575,8 +602,6 @@ export interface AssetEvidence {
 // Service estimates stay null until pricing exists (parked decision).
 export interface ServiceCostComparison {
   target_service_name: string;
-  inaction_cost_low: number | null;
-  inaction_cost_high: number | null;
   service_estimate_low: number | null;
   service_estimate_high: number | null;
   pricing_model_note: string;
