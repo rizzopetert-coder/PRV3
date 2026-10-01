@@ -1060,13 +1060,11 @@ check(
     f"got {_r_never_classified}",
 )
 
-_original_btf = STATE_MULTIPLIERS.get("built_to_fail")
-_ft.STATE_MULTIPLIERS["built_to_fail"] = _synthetic_entry(
-    turnover=_original_btf.criteria["turnover"].score,
-    productivity=_original_btf.criteria["productivity"].score,
-    decision_quality=_original_btf.criteria["decision_quality"].score,
-    legal=0,
-)
+import dataclasses as _dc
+# Legal reads engine/data/state_criteria.py STATE_CRITERIA (Stage 1), so the
+# monkey-patch targets that table, not STATE_MULTIPLIERS.
+_original_btf = _ft.STATE_CRITERIA["built_to_fail"]
+_ft.STATE_CRITERIA["built_to_fail"] = _dc.replace(_original_btf, legal=0)
 _r_zero_score = compute_legal_compliance_exposure(
     state_ids=["built_to_fail"],
     org_size=152,
@@ -1083,7 +1081,7 @@ check(
     },
     f"got {_r_zero_score}",
 )
-_ft.STATE_MULTIPLIERS["built_to_fail"] = _original_btf
+_ft.STATE_CRITERIA["built_to_fail"] = _original_btf
 
 check(
     "compute_legal_compliance_exposure returns None/None for an empty state_ids list",
