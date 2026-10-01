@@ -33,3 +33,82 @@ H7 Strength: "Where strength shows up" names Alliance or Aptitude, not Authority
 H8 Receipt fit: 50% or more of the legal "Based on your answers" quotes do not plausibly support their legal category. The quotes follow question order (receipt i quotes the i-th answered question) rather than relevance.
 Falsification: each hypothesis is scored HOLDS / FAILS / PARTIAL against the live result, with the evidence. No hypothesis is revised after the run.
 --- END ---
+
+## ANSWER MAP (chosen by Claude.ai from on-screen text only, before the run)
+
+--- ANSWER MAP ---
+Intake:
+- About how many employees? 640
+- Industry: Manufacturing
+- Organization type: PE or VC-backed
+- Your role level: C-suite
+- Tenure in this role: 1-3 years
+- Direct reports: 6-15
+- Primary jurisdiction: MA
+- Significant events: "Acquisition or merger" and "External legal claim or regulatory inquiry" (the OSHA citation, at the edge of the 18-month window).
+Persona limit, recorded: the Nashua NH and Dayton OH plants cannot be entered, because jurisdiction takes one state.
+
+Core questions (answer | why, from the persona):
+Q01 A | executive decision rights are clear and stick
+Q02 A | sponsor-backed, strategic HR with real authority
+Q03B B | a pattern: turnover under specific supervisors
+Q04 B | raising concerns depends on the supervisor and shift
+Q05 B | underperformance gets addressed slowly; supervisors rarely give feedback
+Q06 [A] | the OSHA citation; nothing else applies
+Q07 B | losses concentrate under a handful of second-shift supervisors
+Q08 D | the floor talk on hazards differs from what formal near-miss reporting shows
+Q09 A | the senior team is stable and works well; the CEO stayed
+Q10 B | processes exist; discipline is applied inconsistently
+Q11 B | mostly consistent, with visible exceptions (the public reprimand)
+Q12 B | uneven: supervisors were promoted for skill, not trained
+Q13 D | the sponsor's direction is clear; the floor is skeptical about follow-through
+Q14 B | competitive externally after the new-hire raises, inconsistent internally (compression)
+Q15 B | advancement happens; supervisor selection rests on technical skill, not clear criteria
+Q16 E | not examined closely; no complaints known
+Q17 C | the post-acquisition KPI rollout gets participation without investment
+Q18 B | policies exist; not confident people report (near-misses dropped)
+Q19 B | mostly consistent, some known gaps
+Q20 B | some overlap, mainly supervisors' authority on discipline
+Q21 A | decisions move at the executive level
+Q22 B | mostly current; some not reviewed since the acquisition
+Q23 B | dependent on key senior machinists; not tested yet
+Q24 B | high performers are carrying second-shift overtime
+Q25 B | promote from within, development inconsistent (the supervisor pipeline)
+Q26 B | friction at the seams between shifts and plants
+Q27B B | drifting since the acquisition
+Q30 C | communication varies by supervisor
+Q32 B | reflect but partial follow-through (the OSHA response)
+Q33 B | plans exist; currency uncertain after the acquisition
+Q34 B | structural: promoting technicians into supervision with no preparation
+Q35 D | supervisor underperformance isn't discussed until something forces it
+Q36 B | conversations happen but drag
+Q37 C | problems surface when something breaks (the citation)
+Q38 B | covered, with a real gap
+Q39 D | the CHRO's read is that the supervisor role was never set up to succeed
+Q40 A | the predecessor (HR director) left for an unrelated reason around the acquisition
+Q41 A | the CHRO has the resources the role needs
+Q42 B | waits briefly
+Q43 A | no senior departures
+Q44 D | the problem supervisors are known up to the CHRO and plant managers; nothing has changed
+Q46 D | people now decide whether to bother reporting (near-misses)
+Q47 B | relief for overloaded supervisors discussed (hiring); not materialized
+Q48 B | inconsistent discipline noticed informally, never raised formally
+Q49 C | fixing tenured pay compression is talked about, nothing done
+Q50 B | some response, softer
+Q51 A | executive inclusion is by role and relevance
+
+Follow-ups expected on this path:
+Q28 B | after the citation: process updates, root cause unclear
+SEVER-27 B | the citation was a year or more ago
+SEVER-06 B | overtime is 9 months long, on top of a post-acquisition push. "A year or more" is the closest option; "past six months" is false.
+SEVER-10 B | leadership is aware but hasn't addressed it directly
+Q45 B | deprioritized behind hiring gaps and the overtime crisis
+
+Distinguishers, if the checkpoint asks them:
+DIST-CM-01 B | the supervisors' span and scope haven't changed; the problem is chronic
+DIST-CM-02 B | asked about development needs, the answers are vague
+DIST-CC-01 A | departures are mostly first-year
+DIST-CC-02 C | the closest framing to "supervisors don't match what leadership says"
+
+Narrative: written by Claude.ai after the live prompt appears. Not pre-written.
+--- END ---
