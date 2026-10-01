@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { PrivateOutputPayload } from "@/lib/types";
+import { NEW_ESTIMATE, NEW_RECEIPTS, NEW_LEDGER, FRICTION_DOLLAR_STRINGS } from "@/lib/friction-test-fixtures";
 
 // Option C (friction dollars hidden): render the real report component on
 // the server and confirm no friction-derived dollar figure reaches the
@@ -30,15 +31,9 @@ const payload = {
   severity_by_state: [{ state_id: "built_to_fail", tier: "Emerging", score_0_100: 20 }],
   resolution_family: "People Tactics & Strategy",
   resolution_routing: "Roadmap",
-  friction_tax_estimate: {
-    low: 1234567, high: 1728394, currency: "USD",
-    driving_factors: [{ category: "Payroll baseline", rationale: "Estimated annual payroll: $9,870,000." }],
-  },
-  friction_tax_ledger: [{
-    state_id: "built_to_fail", state_name: "Built to Fail", risk_label: "Emerging",
-    dollar_exposure: { low: 555555, high: 777777, currency: "USD" },
-    top_contributing_answers: ["Some processes here are out of date or inconsistently followed."],
-  }],
+  friction_tax_estimate: NEW_ESTIMATE,
+  friction_receipts: NEW_RECEIPTS,
+  friction_tax_ledger: NEW_LEDGER,
   legal_tail_risk_exposure: {
     low: 100000, high: 450000, currency: "USD", band: "Elevated",
     caveat: "A directional estimate.", has_unpriced_conditions: false, unpriced_state_ids: [],
@@ -46,7 +41,7 @@ const payload = {
     specific_caveat: null,
   },
   service_cost_comparison: {
-    target_service_name: "People Tactics & Strategy", inaction_cost_low: 1334567, inaction_cost_high: 2178394,
+    target_service_name: "People Tactics & Strategy",
     service_estimate_low: null, service_estimate_high: null, pricing_model_note: "",
   },
   cascade_risk: 0,
@@ -71,7 +66,7 @@ describe("PrivateOutput with friction dollars hidden (option C)", () => {
   })).replace(/<!-- -->/g, "");
 
   it("renders no friction-derived figure, heading, footnote or calculation step", () => {
-    for (const s of ["$1,230,000", "$1,730,000", "$556,000", "$778,000", "$9,870,000",
+    for (const s of [...FRICTION_DOLLAR_STRINGS,
                      "Friction tax", "Highest standalone", "Payroll baseline", "recurring every year",
                      "Sources include", "Drives cost through"]) {
       expect(html).not.toContain(s);
