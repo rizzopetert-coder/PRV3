@@ -44,6 +44,8 @@ Report to Pete:
 ## Closeout Protocol
 When Pete says "close session", "wrap up", "end session", or similar, execute all steps in sequence without being prompted for each.
 
+**Date rule (Pete, 2026-10-01).** Dates in MOB, spec and handoff entries come from git commit timestamps and the local clock (ET), stamped by Claude Code. Dates in Claude.ai prompts are not authoritative and are not copied into records.
+
 Diary write fires before /compact — if already compacted, skip Step 1 and note the gap in the MOB session log. (The former reason for this — "/compact disconnects the MCP server" — was specific to the mempalace_* MCP connection. Step 1 now runs as a plain subprocess call, independent of MCP state, so this constraint likely no longer applies. Not empirically tested this session; flag if compaction is ever observed to interfere.)
 
 ### Step 1 — Diary Write
@@ -205,7 +207,7 @@ No session may assert as current fact something it cannot verify from its own en
 | Item | Value |
 |---|---|
 | MOB file | `tools/_mob.txt` |
-| MOB version | v4.332 |
+| MOB version | v4.333 |
 | Session continuity | Mem0 — see Section 12 |
 | Engine state count | 58 (locked) |
 | Test suite minimum (Phase 1) | 171 profiles across 57 states |
