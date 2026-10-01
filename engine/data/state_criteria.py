@@ -1,19 +1,20 @@
 """
 Per-state criterion scores (0, 1 or 2) for the four friction/legal criteria.
 
-Scores only. Each value was copied from the live
+Scores only. Each value was copied from the former
 engine.friction_tax.STATE_MULTIPLIERS[state].criteria[criterion].score on
 2026-09-30 by tools/patch_stage1_state_criteria.py (friction tax rebuild,
 Stage 1, prompts/friction-tax-rebuild-build-spec.md Section 4 and Section 10
-step 2). The rationale text stays in STATE_MULTIPLIERS until that table is
-removed in Stage 4.
+step 2). STATE_MULTIPLIERS, with its per-score rationale text, was removed in
+Stage 4. The rationale text is in git history before that commit, and
+tools/test_state_criteria.py pins these scores with a frozen fingerprint.
 
 Uses:
   turnover, productivity, decision_quality
       A score above 0 switches the matching friction channel on for a state
       (turnover -> Turnover channel, productivity -> Engagement channel,
       decision_quality -> decision-time receipt). Read by
-      engine/contract.py's receipts today and by the two-channel function after
+      engine/contract.py's receipts and ledger and by the two-channel function in
       Stage 4.
   legal
       Read by Legal/Compliance (engine/friction_tax.py). Legal must not depend
