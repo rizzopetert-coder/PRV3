@@ -293,6 +293,9 @@ INTAKE_FIELDS = {
         "Transportation & Warehousing",
         "Other",
     ],
+    # Source of truth for the org type option list. The two web lists
+    # (web/components/DiagnosticFlow.tsx, SelfSelectIntakeModal.tsx) must equal
+    # it, enforced by tools/test_org_type_lists.py.
     "org_type": [
         "Founder-led",
         "PE or VC-backed",
