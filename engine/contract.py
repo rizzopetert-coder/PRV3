@@ -32,8 +32,9 @@ from engine.narrative import NarrativeExtractionResult
 from engine.severity import SeverityResult, SEVERITY_TIER_DESCRIPTIONS
 from engine.friction_tax import (
     compute_friction_tax, compute_legal_compliance_exposure,
-    compute_legal_per_state_breakdown, STATE_MULTIPLIERS,
+    compute_legal_per_state_breakdown,
 )
+from engine.data.state_criteria import STATE_CRITERIA
 from engine.resolution_families import (
     apply_causation_override, translate_resolution_family, HR_DIAGNOSTIC_FAMILY_NAME,
 )
@@ -716,12 +717,12 @@ def _friction_driving_factors(
     ]
     used_answers: set = set()
     for s in identified_states:
-        entry = STATE_MULTIPLIERS.get(s["state_id"])
+        entry = STATE_CRITERIA.get(s["state_id"])
         if entry is None:
             continue
         channels = [
             label for key, label in _FRICTION_CHANNEL_LABELS.items()
-            if entry.criteria[key].score > 0
+            if getattr(entry, key) > 0
         ]
         if not channels:
             continue
