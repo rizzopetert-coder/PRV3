@@ -110,6 +110,53 @@ function money(low: number, high: number): string {
   return formatUsdRange(low, high);
 }
 
+// A percent of payroll to at most 2 decimals, trailing zeros dropped (7.02, 12.68).
+function formatPercent(value: number): string {
+  return value.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+// The typical-loss line for a friction estimate, tolerant of every shape that can
+// reach the client: the two-channel estimate (a dollar figure, or the percent of
+// payroll at the 1,000 intake cap where amounts are withheld), the older
+// { low, high } shape (a Preview record, or the minutes between the web and engine
+// deploys), or null and anything else. Never throws.
+export function frictionTypicalLossText(friction: unknown): string | null {
+  if (!friction || typeof friction !== "object") return null;
+  const f = friction as Record<string, unknown>;
+  const baseline = f.typical_baseline;
+  const total = baseline && typeof baseline === "object"
+    ? (baseline as Record<string, unknown>).total
+    : undefined;
+  if (total && typeof total === "object") {
+    const t = total as Record<string, unknown>;
+    if (typeof t.amount === "number" && Number.isFinite(t.amount)) return formatUsd(t.amount);
+    if (typeof t.percent_of_payroll === "number" && Number.isFinite(t.percent_of_payroll)) {
+      return `${formatPercent(t.percent_of_payroll)}% of payroll`;
+    }
+    return null;
+  }
+  if (typeof f.low === "number" && typeof f.high === "number") return formatUsdRange(f.low, f.high);
+  return null;
+}
+
+// The friction receipts, from the sibling field (new) or the estimate's own
+// driving_factors (older payloads). undefined when neither exists.
+export function frictionReceiptsOf(
+  payload: { friction_receipts?: unknown; friction_tax_estimate?: unknown },
+): EvidenceReceipt[] | undefined {
+  if (Array.isArray(payload.friction_receipts)) return payload.friction_receipts as EvidenceReceipt[];
+  const est = payload.friction_tax_estimate;
+  if (est && typeof est === "object") {
+    const legacy = (est as Record<string, unknown>).driving_factors;
+    if (Array.isArray(legacy)) return legacy as EvidenceReceipt[];
+  }
+  return undefined;
+}
+
+// Shared label for the typical-loss line (screen and Copy results).
+export const FRICTION_TYPICAL_LOSS_LABEL =
+  "What organizations like yours typically lose to friction each year";
+
 function receiptLines(title: string, receipts: EvidenceReceipt[] | undefined): string[] {
   if (!receipts || receipts.length === 0) return [];
   const out = [title];
@@ -127,27 +174,6 @@ const ASSET_AXIS_NAMES: Record<string, string> = {
   attitude: "Attitude",
 };
 
-// Block 4f footnote. Shared with PrivateOutput.tsx so the screen and the
-// copied text cannot drift.
-export const FRICTION_TAX_LEDGER_FOOTNOTE =
-  "Estimates are calculated from your organization's size, industry, and " +
-  "structure, then scaled to how deeply organizational risk conditions " +
-  "have taken root. The financial risk range draws on published research " +
-  "including public wage and compensation data and studies on turnover, " +
-  "disengagement, and lost productivity. Sources include McKinsey, SHRM, " +
-  "Gallup, and other widely-recognized credible sources. Figures shown as " +
-  "a range reflect the actual uncertainty identified in your diagnostic " +
-  "result, and are not indicative of imprecision in the diagnosis.";
-
-// Ledger note (P2, Pete 2026-09-28): rows are standalone estimates and do
-// not add up to the friction tax total. Shared with PrivateOutput.tsx.
-export const FRICTION_TAX_LEDGER_STANDALONE_NOTE =
-  "Each row estimates what that condition would cost on its own. Conditions " +
-  "that rest on the same answers share a row, which shows the highest of their " +
-  "individual estimates. The rows do not add up to the friction tax total, " +
-  "because the total counts overlapping conditions at decreasing weight rather " +
-  "than adding them in full.";
-
 // Friction dollar switch (Pete, 2026-09-28, option C): friction-tax dollar
 // figures are hidden on both brands until the friction methodology is
 // rebuilt. The engine still computes them and the payload still carries
@@ -162,22 +188,13 @@ export const FRICTION_LEDGER_NOTE_NO_DOLLARS = "Conditions that rest on the same
 
 // One ledger row per distinct evidence set (P2). Rows whose
 // top_contributing_answers are the same set (order ignored) merge into
-// one group that names every condition and carries the highest standalone
-// estimate among them. Rows with no evidence are never grouped: an empty
-// list is not shared evidence. Group order follows first appearance.
+// one group that names every condition. Rows with no evidence are never
+// grouped: an empty list is not shared evidence. Group order follows first
+// appearance. Rows carry no dollar figure (the rebuild prices the state set
+// once), and an older row's dollar_exposure is ignored.
 export interface LedgerGroup {
   conditions: Array<{ state_id: string; name: string; risk_label: SeverityTier }>;
-  dollar_exposure: FrictionTaxLedgerEntry["dollar_exposure"];
   top_contributing_answers: string[];
-}
-
-function higherEstimate(
-  a: FrictionTaxLedgerEntry["dollar_exposure"],
-  b: FrictionTaxLedgerEntry["dollar_exposure"],
-): boolean {
-  if (!a) return false;
-  if (!b) return true;
-  return a.high > b.high || (a.high === b.high && a.low > b.low);
 }
 
 export function groupLedgerRows(
@@ -192,21 +209,16 @@ export function groupLedgerRows(
       name: nameById?.get(row.state_id) ?? row.state_name,
       risk_label: row.risk_label,
     };
-    const key = row.top_contributing_answers.length > 0
-      ? JSON.stringify([...row.top_contributing_answers].sort())
-      : null;
+    const answers = Array.isArray(row.top_contributing_answers) ? row.top_contributing_answers : [];
+    const key = answers.length > 0 ? JSON.stringify([...answers].sort()) : null;
     const existing = key ? byEvidence.get(key) : undefined;
     if (existing) {
       existing.conditions.push(condition);
-      if (higherEstimate(row.dollar_exposure, existing.dollar_exposure)) {
-        existing.dollar_exposure = row.dollar_exposure;
-      }
       continue;
     }
     const group: LedgerGroup = {
       conditions: [condition],
-      dollar_exposure: row.dollar_exposure,
-      top_contributing_answers: row.top_contributing_answers,
+      top_contributing_answers: answers,
     };
     groups.push(group);
     if (key) byEvidence.set(key, group);
@@ -381,46 +393,30 @@ export function buildResultsText(
     add(receiptLines("How the legal figure was calculated:", legal.driving_factors));
   }
 
-  // Friction tax ledger, with its footnote and calculation steps. The screen
-  // shows the friction receipts inside the ledger, so they share its gate.
-  const ledger = payload.friction_tax_ledger ?? [];
-  if (ledger.length > 0 && !frictionVisible) {
-    // Friction dollars hidden: the conditions and the answers behind
-    // them. No figures, no footnotes, no calculation steps.
-    const block = [`${FRICTION_LEDGER_HEADING_NO_DOLLARS}:`];
+  // Friction tax ledger. While friction dollars are hidden: the conditions and
+  // the answers behind them, no figures, no receipts. Visible: the same rows,
+  // then the calculation receipts. Rows carry no per-condition dollar figure.
+  const ledger = Array.isArray(payload.friction_tax_ledger) ? payload.friction_tax_ledger : [];
+  if (ledger.length > 0) {
+    const block = [frictionVisible ? "Friction tax ledger:" : `${FRICTION_LEDGER_HEADING_NO_DOLLARS}:`];
     for (const group of groupLedgerRows(ledger, stateNameById)) {
       block.push(`— ${group.conditions.map((c) => `${c.name} (${c.risk_label})`).join(", ")}`);
       for (const t of group.top_contributing_answers) block.push(`  ${t}`);
     }
     add(block);
-    add([FRICTION_LEDGER_NOTE_NO_DOLLARS]);
-  } else if (ledger.length > 0) {
-    const block = ["Friction tax ledger:"];
-    for (const group of groupLedgerRows(ledger, stateNameById)) {
-      const d = group.dollar_exposure;
-      const grouped = group.conditions.length > 1;
-      const figure = d ? formatUsdRange(d.low, d.high) : null;
-      const amount = figure === null
-        ? `Estimate not available for ${grouped ? "these conditions" : "this condition"}.`
-        : grouped
-          ? `highest standalone estimate in this group, ${figure}`
-          : figure.includes("–") ? figure : `Estimated exposure: ${figure}`;
-      const names = group.conditions.map((c) => `${c.name} (${c.risk_label})`).join(", ");
-      block.push(`— ${names}: ${amount}`);
-      for (const t of group.top_contributing_answers) block.push(`  ${t}`);
-    }
-    add(block);
-    add([FRICTION_TAX_LEDGER_STANDALONE_NOTE]);
-    add([FRICTION_TAX_LEDGER_FOOTNOTE]);
-    add(receiptLines("How the friction tax was calculated:", payload.friction_tax_estimate?.driving_factors));
+    if (!frictionVisible) add([FRICTION_LEDGER_NOTE_NO_DOLLARS]);
+  }
+  if (frictionVisible) {
+    add(receiptLines("How the friction tax was calculated:", frictionReceiptsOf(payload)));
   }
 
   // Cost comparison (same gate as the on-screen CostComparison).
   const friction = frictionVisible ? payload.friction_tax_estimate : null;
+  const frictionText = frictionTypicalLossText(friction);
   const scc = payload.service_cost_comparison;
-  if (scc && (friction || legalHasPrice)) {
+  if (scc && (frictionText || legalHasPrice)) {
     const block = ["Cost comparison:"];
-    if (friction) block.push(`— Friction tax, recurring every year: ${money(friction.low, friction.high)}`);
+    if (frictionText) block.push(`— ${FRICTION_TYPICAL_LOSS_LABEL}: ${frictionText}`);
     if (legalHasPrice) block.push(`— Legal exposure, one-time if a claim arises: ${money(legal!.low!, legal!.high!)}`);
     const service = scc.target_service_name || payload.resolution_family;
     const priced = scc.service_estimate_low !== null && scc.service_estimate_high !== null;
