@@ -6,6 +6,7 @@ import type {
   SeverityTier,
   ResolutionFamily,
   FrictionTaxEstimate,
+  EvidenceReceipt,
   LegalTailRiskExposure,
   PrivateIntakeEcho,
   DimensionSummary,
@@ -41,6 +42,7 @@ export interface DevDiagnosticPreviewPayload {
   resolution_family: ResolutionFamily;
   resolution_routing: string;
   friction_tax_estimate: FrictionTaxEstimate | null;
+  friction_receipts?: EvidenceReceipt[];
   legal_tail_risk_exposure: LegalTailRiskExposure | null;
   intake: PrivateIntakeEcho;
   dimension_summary: DimensionSummary;
