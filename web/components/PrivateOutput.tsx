@@ -12,7 +12,7 @@ import ShareButton from "@/components/ShareButton";
 import CopyResultsButton from "@/components/CopyResultsButton";
 import { ConstellationField, severityAccentTokens } from "@/components/ConstellationField";
 import {
-  buildConditionRows, FRICTION_DOLLARS_VISIBLE, FRICTION_LEDGER_HEADING_NO_DOLLARS,
+  buildConditionRows, FRICTION_DOLLARS_VISIBLE, LEGAL_DOLLARS_VISIBLE, FRICTION_LEDGER_HEADING_NO_DOLLARS,
   FRICTION_LEDGER_NOTE_NO_DOLLARS, frictionReceiptsOf,
   formatUsdRange, groupLedgerRows, joinNames, OHIO_NET_WORTH_CAVEAT,
 } from "@/lib/output-text";
@@ -150,7 +150,10 @@ export default function PrivateOutput({
   // coverage_basis/has_partial_jurisdictions caveats only apply when a
   // priced range exists (legal.low !== null) -- coverage_basis is
   // meaningless without one, per the spec this block was built from.
-  const legal = payload.legal_tail_risk_exposure;
+  // Hidden on both brands while LEGAL_DOLLARS_VISIBLE is false (the same
+  // pattern as the friction switch): null here removes Block 4d and the
+  // legal line of the cost comparison.
+  const legal = LEGAL_DOLLARS_VISIBLE ? payload.legal_tail_risk_exposure : null;
   const legalHasPrice = legal !== null && legal.low !== null && legal.high !== null;
   const legalCoverageCaveat =
     legalHasPrice && legal!.coverage_basis === "federal_baseline"
@@ -426,7 +429,8 @@ export default function PrivateOutput({
       <CostComparison
         comparison={payload.service_cost_comparison}
         friction={FRICTION_DOLLARS_VISIBLE ? payload.friction_tax_estimate : null}
-        legal={payload.legal_tail_risk_exposure}
+        legal={legal}
+        legalHidden={!LEGAL_DOLLARS_VISIBLE}
         fallbackServiceName={payload.resolution_family}
       />
 
