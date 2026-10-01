@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   buildResultsText, firstSentence, joinNames, buildCoreCluster, OHIO_NET_WORTH_CAVEAT,
-  FRICTION_TAX_LEDGER_STANDALONE_NOTE, groupLedgerRows, formatUsd, formatUsdRange,
+  groupLedgerRows, formatUsd, formatUsdRange, FRICTION_TYPICAL_LOSS_LABEL,
   FRICTION_DOLLARS_VISIBLE, FRICTION_LEDGER_HEADING_NO_DOLLARS, FRICTION_LEDGER_NOTE_NO_DOLLARS,
 } from "./output-text";
 import type { PrivateOutputPayload, StateRef, TacticalSectionResult } from "./types";
@@ -38,7 +38,17 @@ const FULL_PAYLOAD: PrivateOutputPayload = {
   ],
   resolution_family: "People Tactics & Strategy",
   resolution_routing: "Routing description text.",
-  friction_tax_estimate: { low: 50000, high: 120000, currency: "USD" },
+  friction_tax_estimate: {
+    currency: "USD",
+    typical_baseline: {
+      total: { amount: 63923.24, percent_of_payroll: 12.6759 },
+      channels: [
+        { channel: "engagement", amount: 35401.02, percent_of_payroll: 7.02, inputs: [] },
+        { channel: "turnover", amount: 28522.22, percent_of_payroll: 5.6559, inputs: [] },
+      ],
+    },
+    excess: null,
+  },
   legal_tail_risk_exposure: {
     low: 100000,
     high: 450000,
@@ -273,18 +283,26 @@ describe("buildResultsText -- Phase 3 sections", () => {
     ...FULL_PAYLOAD,
     synthesis: { ...FULL_PAYLOAD.synthesis, executive_summary: "The summary sentence." },
     friction_tax_estimate: {
-      low: 50000, high: 70000, currency: "USD",
-      driving_factors: [{ category: "Payroll baseline", rationale: "Estimated annual payroll: $1,000,000." }],
+      currency: "USD",
+      typical_baseline: {
+        total: { amount: 63923.24, percent_of_payroll: 12.6759 },
+        channels: [
+          { channel: "engagement", amount: 35401.02, percent_of_payroll: 7.02, inputs: [] },
+          { channel: "turnover", amount: 28522.22, percent_of_payroll: 5.6559, inputs: [] },
+        ],
+      },
+      excess: null,
     },
+    friction_receipts: [{ category: "Payroll baseline", rationale: "Estimated annual payroll: $1,000,000." }],
     friction_tax_ledger: [
       {
         state_id: "the_paper_tiger", state_name: "The Paper Tiger", risk_label: "Entrenched",
-        dollar_exposure: { low: 20000, high: 28000, currency: "USD" },
+        channels: ["turnover"],
         top_contributing_answers: ["Decisions get made, then get reopened."],
       },
       {
         state_id: "state_b", state_name: "State B", risk_label: "Emerging",
-        dollar_exposure: null, top_contributing_answers: [],
+        channels: [], top_contributing_answers: [],
       },
     ],
     legal_tail_risk_exposure: {
@@ -292,7 +310,7 @@ describe("buildResultsText -- Phase 3 sections", () => {
       driving_factors: [{ category: "Wage and hour", rationale: "State X: $100,000.", triggering_answer: "Time records are informal." }],
     },
     service_cost_comparison: {
-      target_service_name: "", inaction_cost_low: 150000, inaction_cost_high: 520000,
+      target_service_name: "",
       service_estimate_low: null, service_estimate_high: null, pricing_model_note: "",
     },
     asset_evidence: {
@@ -318,10 +336,10 @@ describe("buildResultsText -- Phase 3 sections", () => {
     expect(text).not.toContain("1.9");
     expect(text).not.toContain("net asset signal");
   });
-  it("includes the friction tax ledger rows, the footnote, and the friction receipts", () => {
-    expect(text).toContain("— The Paper Tiger (Entrenched): $20,000 – $28,000\n  Decisions get made, then get reopened.");
-    expect(text).toContain("— State B (Emerging): Estimate not available for this condition.");
-    expect(text).toContain("Estimates are calculated from your organization's size");
+  it("includes the friction tax ledger rows (no per-row figure) and the friction receipts", () => {
+    expect(text).toContain("Friction tax ledger:\n— The Paper Tiger (Entrenched)\n  Decisions get made, then get reopened.\n— State B (Emerging)");
+    expect(text).not.toContain("Estimates are calculated");
+    expect(text).not.toContain("Estimate not available");
     expect(text).toContain("How the friction tax was calculated:\n— Payroll baseline: Estimated annual payroll: $1,000,000.");
   });
   it("includes the legal receipts, with the triggering answer when present", () => {
@@ -331,7 +349,7 @@ describe("buildResultsText -- Phase 3 sections", () => {
   });
   it("includes the cost comparison with separate timeframes, never a combined total", () => {
     expect(text).toContain("Cost comparison:");
-    expect(text).toContain("— Friction tax, recurring every year: $50,000 – $70,000");
+    expect(text).toContain(`— ${FRICTION_TYPICAL_LOSS_LABEL}: $63,900`);
     expect(text).toContain("— Legal exposure, one-time if a claim arises: $100,000 – $450,000");
     expect(text).toContain("— People Tactics & Strategy: Ask for pricing.");
     expect(text).not.toContain("520,000");
@@ -347,34 +365,34 @@ describe("buildResultsText -- Phase 3 sections", () => {
     });
     expect(zero).not.toContain("Where strength shows up");
   });
-  it("groups ledger rows with the same evidence set into one row, highest standalone estimate, evidence once", () => {
+  it("groups ledger rows with the same evidence set into one row, evidence once", () => {
     const shared = ["Answer one.", "Answer two."];
     const grouped = buildResultsText({
       ...phase3,
       friction_tax_ledger: [
         { state_id: "a", state_name: "Cond A", risk_label: "Emerging",
-          dollar_exposure: { low: 100400, high: 140560, currency: "USD" }, top_contributing_answers: shared },
+          channels: ["turnover"], top_contributing_answers: shared },
         { state_id: "b", state_name: "Cond B", risk_label: "Entrenched",
-          dollar_exposure: { low: 300499, high: 420699, currency: "USD" }, top_contributing_answers: [...shared].reverse() },
+          channels: ["engagement"], top_contributing_answers: [...shared].reverse() },
         { state_id: "c", state_name: "Cond C", risk_label: "Emerging",
-          dollar_exposure: { low: 200500, high: 280700, currency: "USD" }, top_contributing_answers: ["Answer three."] },
+          channels: [], top_contributing_answers: ["Answer three."] },
       ],
     }, undefined, { frictionDollarsVisible: true });
     expect(grouped).toContain(
-      "— Cond A (Emerging), Cond B (Entrenched): highest standalone estimate in this group, $300,000 – $421,000\n  Answer one.\n  Answer two.",
+      "— Cond A (Emerging), Cond B (Entrenched)\n  Answer one.\n  Answer two.",
     );
     expect(grouped.split("Answer one.").length - 1).toBe(1);
-    expect(grouped).toContain("— Cond C (Emerging): $201,000 – $281,000\n  Answer three.");
-    expect(grouped).toContain(FRICTION_TAX_LEDGER_STANDALONE_NOTE);
+    expect(grouped).toContain("— Cond C (Emerging)\n  Answer three.");
+    expect(grouped).not.toContain("highest standalone");
   });
   it("friction dollars hidden (default): conditions and their answers, no friction figure or footnote", () => {
     const hidden = buildResultsText(phase3);
     expect(FRICTION_DOLLARS_VISIBLE).toBe(false);
     expect(hidden).toContain(`${FRICTION_LEDGER_HEADING_NO_DOLLARS}:\n— The Paper Tiger (Entrenched)\n  Decisions get made, then get reopened.\n— State B (Emerging)`);
     expect(hidden).toContain(FRICTION_LEDGER_NOTE_NO_DOLLARS);
-    for (const s of ["$20,000", "$28,000", "$50,000", "$70,000", "$1,000,000", "Friction tax", "friction tax",
+    for (const s of ["$20,000", "$28,000", "$63,900", "$35,400", "$1,000,000", "Friction tax", "friction tax",
                      "How the friction tax", "highest standalone", "Highest standalone", "Sources include",
-                     "Estimates are calculated", "Drives cost through", FRICTION_TAX_LEDGER_STANDALONE_NOTE]) {
+                     "Estimates are calculated", "Drives cost through", "Each row estimates"]) {
       expect(hidden).not.toContain(s);
     }
     // Legal exposure and the rest of the cost comparison are unchanged.
@@ -387,16 +405,13 @@ describe("buildResultsText -- Phase 3 sections", () => {
       ...phase3,
       friction_tax_ledger: [
         { state_id: "a", state_name: "Cond A", risk_label: "Emerging",
-          dollar_exposure: { low: 100400, high: 140560, currency: "USD" }, top_contributing_answers: shared },
+          channels: ["turnover"], top_contributing_answers: shared },
         { state_id: "b", state_name: "Cond B", risk_label: "Entrenched",
-          dollar_exposure: { low: 300499, high: 420699, currency: "USD" }, top_contributing_answers: [...shared].reverse() },
+          channels: ["engagement"], top_contributing_answers: [...shared].reverse() },
       ],
     });
     expect(g).toContain("— Cond A (Emerging), Cond B (Entrenched)\n  Answer one.\n  Answer two.");
     expect(g.split("Answer one.").length - 1).toBe(1);
-    // The ledger's own figures ($100,400 -> $100,000 collides with the legal
-    // fixture, so the other three are checked) never appear.
-    for (const s of ["$141,000", "$300,000", "$421,000"]) expect(g).not.toContain(s);
   });
   it("friction dollars hidden, no priced legal exposure: the cost comparison is omitted entirely", () => {
     const t = buildResultsText({ ...phase3, legal_tail_risk_exposure: null });
@@ -428,13 +443,10 @@ describe("buildResultsText -- Phase 3 sections", () => {
   });
   it("groupLedgerRows never groups rows that have no evidence", () => {
     const groups = groupLedgerRows([
-      { state_id: "a", state_name: "A", risk_label: "Emerging", dollar_exposure: null, top_contributing_answers: [] },
-      { state_id: "b", state_name: "B", risk_label: "Emerging", dollar_exposure: null, top_contributing_answers: [] },
+      { state_id: "a", state_name: "A", risk_label: "Emerging", channels: [], top_contributing_answers: [] },
+      { state_id: "b", state_name: "B", risk_label: "Emerging", channels: [], top_contributing_answers: [] },
     ]);
     expect(groups).toHaveLength(2);
-  });
-  it("ledger note: plain language, no dashes or semicolons", () => {
-    expect(FRICTION_TAX_LEDGER_STANDALONE_NOTE).not.toMatch(/[—–;]|--/);
   });
   it("on Call 2 failure, copies what the screen shows: referral chips over each section's answers", () => {
     const tactical: TacticalSectionResult[] = [{
