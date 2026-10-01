@@ -16,7 +16,7 @@ from engine.main import (
     process_narrative_response,
     generate_narrative_prompt_for_session,
 )
-from engine.friction_tax import get_industry_wage
+from engine.friction_tax import condensed_departure_cost
 
 app = FastAPI()
 
@@ -281,12 +281,7 @@ async def condensed_complete(request: Request):
         result = run_condensed_engine(accumulated_vector, answered_question_count)
 
         industry = intake.get("industry", "") if isinstance(intake, dict) else ""
-        wage = get_industry_wage(industry)
-        result["condensed_financial_range"] = (
-            {"low": round(wage * 0.50, 2), "high": round(wage * 0.75, 2), "currency": "USD"}
-            if wage is not None
-            else {"low": None, "high": None, "currency": "USD"}
-        )
+        result["condensed_departure_cost"] = condensed_departure_cost(industry)
 
         return JSONResponse(content=result)
     except KeyError as e:
