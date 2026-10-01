@@ -439,13 +439,26 @@ check("private_output.resolution_routing is string",
 # was previously asserted None ("CALIBRATION TARGET"); now checks the
 # real computed structure instead.
 fte = priv["friction_tax_estimate"]
-check("private_output.friction_tax_estimate is a calibrated {low, high, currency} dict",
+_fte_base = (fte or {}).get("typical_baseline", {})
+check("private_output.friction_tax_estimate is the two-channel point estimate (no low, high or driving_factors)",
       isinstance(fte, dict)
-      and isinstance(fte.get("low"), (int, float))
-      and isinstance(fte.get("high"), (int, float))
-      and fte.get("low") <= fte.get("high")
-      and isinstance(fte.get("currency"), str),
+      and fte.get("currency") == "USD"
+      and fte.get("excess") is None
+      and "low" not in fte and "high" not in fte and "driving_factors" not in fte
+      and isinstance(_fte_base.get("total", {}).get("percent_of_payroll"), (int, float))
+      and isinstance(_fte_base.get("channels"), list) and len(_fte_base["channels"]) >= 1
+      and all(c.get("channel") in ("engagement", "turnover")
+              and isinstance(c.get("percent_of_payroll"), (int, float))
+              and isinstance(c.get("inputs"), list) and c["inputs"] for c in _fte_base["channels"]),
       f"got {fte!r}")
+check("private_output.friction_receipts is a list of receipts, sibling of friction_tax_estimate",
+      isinstance(priv.get("friction_receipts"), list)
+      and all({"category", "rationale"} <= set(r) for r in priv["friction_receipts"]),
+      f"got {priv.get('friction_receipts')!r}")
+check("private_output.service_cost_comparison carries no inaction_cost fields (R5)",
+      "inaction_cost_low" not in (priv.get("service_cost_comparison") or {})
+      and "inaction_cost_high" not in (priv.get("service_cost_comparison") or {}),
+      f"got {priv.get('service_cost_comparison')!r}")
 if output["output_type"] == "single_state":
     check("single_state: opening_text = state name",
           len(priv["opening_text"]) > 0,
@@ -1047,8 +1060,6 @@ check(
 # ── engine/contract.py's _build_friction_tax_ledger() / assemble_output()'s
 # new answers_log parameter -- friction tax ledger (per-condition risk/
 # dollar/top-contributing-answers, Gemini-cleared across two rounds) ────────
-from engine.friction_tax import compute_friction_tax
-
 ledger_answers_log = [
     {"question_id": "Q01", "option_ids": ["B"]},
     {"question_id": "Q06", "option_ids": ["A", "C"]},
@@ -1099,26 +1110,14 @@ check(
     f"got {ledger_row}, by_state={ledger_out['severity']['by_state']}",
 )
 
-# Cross-check dollar_exposure against a direct compute_friction_tax() call --
-# the ledger must reuse that function's real output for this one state, not
-# a separately-derived number.
-_expected_friction = compute_friction_tax(
-    state_ids=["the_basement_standard"],
-    severity_tier=ledger_risk_label,
-    org_size=250,
-    industry="Professional Services",
-    org_type="Founder-led",
-)
+# the_basement_standard scores turnover 1, productivity 2, decision_quality 2
+# (hardcoded here, not read from the registry), so it switches all three on.
 check(
-    "friction_tax_ledger row: dollar_exposure matches a direct single-state "
-    "compute_friction_tax() call exactly -- confirms real reuse, not an "
-    "independently-derived figure",
-    ledger_row.get("dollar_exposure") == {
-        "low": _expected_friction["low"],
-        "high": _expected_friction["high"],
-        "currency": _expected_friction["currency"],
-    },
-    f"got {ledger_row.get('dollar_exposure')}, expected from direct call: {_expected_friction}",
+    "friction_tax_ledger row: channels are the three the_basement_standard switches on, "
+    "and the row carries no dollar_exposure (Stage 4)",
+    ledger_row.get("channels") == ["engagement", "turnover", "decision_time"]
+    and "dollar_exposure" not in ledger_row,
+    f"got {ledger_row}",
 )
 
 # Q01-B carries negative authority_liability (-0.15), so its liability-only
@@ -1136,18 +1135,18 @@ check(
 
 # Backward compatibility: every pre-existing assemble_output() call site in
 # this file (and calibration_runner.py) never passes answers_log at all --
-# risk_label/dollar_exposure must still populate (they don't depend on
+# risk_label/channels must still populate (they don't depend on
 # answers_log), only top_contributing_answers should fall back to [].
 ledger_out_no_answers = assemble_output(ledger_session)
 no_answers_ledger = ledger_out_no_answers.get("private_output", {}).get("friction_tax_ledger")
 check(
     "friction_tax_ledger: with no answers_log argument at all (every "
     "pre-existing call site's real shape), the row still populates risk_label "
-    "and dollar_exposure, only top_contributing_answers degrades to []",
+    "and channels, only top_contributing_answers degrades to []",
     isinstance(no_answers_ledger, list)
     and len(no_answers_ledger) == 1
     and no_answers_ledger[0].get("risk_label") == ledger_risk_label
-    and no_answers_ledger[0].get("dollar_exposure") == ledger_row.get("dollar_exposure")
+    and no_answers_ledger[0].get("channels") == ledger_row.get("channels")
     and no_answers_ledger[0].get("top_contributing_answers") == [],
     f"got {no_answers_ledger}",
 )
