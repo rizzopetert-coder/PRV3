@@ -104,7 +104,7 @@ export default function CondensedDiagnosticFlow() {
         </h2>
         <p className="text-sm text-gray-500 leading-relaxed mb-8">
           This is a thinner version of the full diagnostic. It names the most prominent pattern
-          and gives you a rough sense of what it costs — the full diagnostic goes further.
+          in your answers. The full diagnostic goes further.
         </p>
         <label className="block mb-6">
           <span className="font-ui text-xs text-gray-500 mb-1 block">Industry</span>
