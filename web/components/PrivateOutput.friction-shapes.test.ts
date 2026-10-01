@@ -12,6 +12,11 @@ import {
 // figure, whether the friction fields arrive in the new shape, the older shape, or
 // are missing. The legal figure still renders in every case.
 vi.mock("next/dynamic", () => ({ default: () => () => null }));
+// Legal is forced visible here, see PrivateOutput.legal.test.ts for the default-hidden tests.
+vi.mock("@/lib/output-text", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/output-text")>()),
+  LEGAL_DOLLARS_VISIBLE: true,
+}));
 
 import PrivateOutput from "./PrivateOutput";
 
