@@ -15,6 +15,7 @@ vi.mock("next/dynamic", () => ({ default: () => () => null }));
 vi.mock("@/lib/output-text", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/output-text")>()),
   FRICTION_DOLLARS_VISIBLE: true,
+  LEGAL_DOLLARS_VISIBLE: true,
 }));
 
 import PrivateOutput from "./PrivateOutput";
