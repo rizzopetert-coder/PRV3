@@ -483,7 +483,7 @@ export interface PrivateOutputPayload {
 // Register, this session), no dimension_summary (ConstellationField
 // excluded from the condensed report, Pete's resolved decision), no
 // friction_tax_estimate (a different mechanic -- get_industry_wage()-based
-// financial_range instead). Built in web/app/api/diagnostic/condensed/
+// departure_cost instead, wage x 0.333). Built in web/app/api/diagnostic/condensed/
 // answer/route.ts from CondensedCompleteResult (web/lib/engine-client.ts),
 // same separation of concerns as PrivateOutputPayload's own route-builds-
 // contract, component-renders-contract pattern.
@@ -509,9 +509,11 @@ export interface CondensedOutputPayload {
   // engine result. 0 in single-state routing (the engine sends only
   // the lead). Optional so older payloads still type-check.
   additional_condition_count?: number;
-  financial_range: {
-    low: number | null;
-    high: number | null;
+  // The cost of one departure, a single value (Stage 5): the industry wage x 0.333.
+  // amount is null for an unrecognized industry. Replaced financial_range, a
+  // 0.50 to 0.75 range. Rendered only behind FRICTION_DOLLARS_VISIBLE.
+  departure_cost: {
+    amount: number | null;
     currency: "USD";
   };
 }
