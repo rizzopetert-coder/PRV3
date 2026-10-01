@@ -10,6 +10,12 @@ import { NEW_ESTIMATE, NEW_RECEIPTS, NEW_LEDGER, FRICTION_DOLLAR_STRINGS } from 
 // brand-specific pieces (orientation drawer, book links, engage CTA) are
 // stubbed out, since they carry no figures.
 vi.mock("next/dynamic", () => ({ default: () => () => null }));
+// Legal is forced visible here so these friction tests keep covering the legal and cost
+// comparison lines. The default-hidden legal behavior is in PrivateOutput.legal.test.ts.
+vi.mock("@/lib/output-text", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/output-text")>()),
+  LEGAL_DOLLARS_VISIBLE: true,
+}));
 
 import PrivateOutput from "./PrivateOutput";
 
