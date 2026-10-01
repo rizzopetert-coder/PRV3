@@ -1,5 +1,5 @@
 import type { CondensedOutputPayload } from "@/lib/types";
-import { formatUsdRange } from "@/lib/output-text";
+import { formatUsdRange, FRICTION_DOLLARS_VISIBLE } from "@/lib/output-text";
 import {
   AXES,
   LIVE_CENTER,
@@ -126,9 +126,14 @@ export default function CondensedOutput({ payload }: CondensedOutputProps) {
 
       <div style={{ height: 0, borderTop: "0.5px solid #e5e7eb" }} />
 
-      {/* Financial benchmark. Null-path: omitted with an explicit unavailable
-          note, never a broken figure, when get_industry_wage() returned None
-          for an unrecognized industry (Decision Register). */}
+      {/* Financial benchmark. Hidden while FRICTION_DOLLARS_VISIBLE is false
+          (R2, friction tax rebuild): the block, its copy and its trailing
+          divider are omitted entirely, no replacement text. When visible, the
+          null-path shows an explicit unavailable note, never a broken figure,
+          when get_industry_wage() returned None for an unrecognized industry
+          (Decision Register). */}
+      {FRICTION_DOLLARS_VISIBLE && (
+      <>
       <div className="py-4">
         <p className="text-[11px] uppercase tracking-wide text-gray-400 mb-2">
           Estimated cost of one departure in this pattern
@@ -148,6 +153,8 @@ export default function CondensedOutput({ payload }: CondensedOutputProps) {
       </div>
 
       <div style={{ height: 0, borderTop: "0.5px solid #e5e7eb" }} />
+      </>
+      )}
 
       {/* Resolution family + CTA. resolution_family is sourced from the lead
           QualifiedState (engine/main.py run_condensed_engine), so it is real
