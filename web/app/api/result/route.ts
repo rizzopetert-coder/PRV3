@@ -180,6 +180,7 @@ export async function POST(request: NextRequest) {
 
     friction_tax_estimate: engineResult.private_output.friction_tax_estimate,
     friction_tax_ledger: engineResult.private_output.friction_tax_ledger,
+    friction_receipts: engineResult.private_output.friction_receipts ?? [],
     legal_tail_risk_exposure: engineResult.private_output.legal_tail_risk_exposure,
 
     // causation_pattern -- new plumbing this build. Confirmed real,
