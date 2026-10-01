@@ -70,3 +70,17 @@ describe("CondensedOutput with friction dollars hidden", () => {
     });
   }
 });
+
+// Legal dollars (LEGAL_DOLLARS_VISIBLE false): the condensed report never rendered legal
+// content, and a payload that happens to carry legal fields must still render none.
+describe("CondensedOutput ignores legal fields in the payload", () => {
+  const html = render({
+    ...base,
+    legal_tail_risk_exposure: { low: 123000, high: 456000, band: "Significant", caveat: "LEGAL-CAVEAT-MARKER" },
+  });
+  it("renders no legal figure, band or caveat", () => {
+    expect(html).not.toContain("123,000");
+    expect(html).not.toContain("LEGAL-CAVEAT-MARKER");
+    expect(html).not.toContain("Legal");
+  });
+});
