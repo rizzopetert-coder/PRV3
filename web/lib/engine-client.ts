@@ -478,9 +478,18 @@ export async function invokeNarrativeProcess(
   return response.json() as Promise<NarrativeProcessResult>;
 }
 
+// The retired 0.50 to 0.75 range (Stage 5). Only the previous deploy's engine still
+// returns it, readers ignore it (lib/condensed-departure-cost.ts).
 export interface CondensedFinancialRange {
   low: number | null;
   high: number | null;
+  currency: "USD";
+}
+
+// The single value that replaced it: industry wage x 0.333, null for an
+// unrecognized industry.
+export interface CondensedDepartureCost {
+  amount: number | null;
   currency: "USD";
 }
 
@@ -501,7 +510,7 @@ export interface CondensedCompletePayload {
 // does not call assemble_output(), so this does not have the full VII.1
 // contract's other fields (private_output, dimension_summary,
 // narrative_modulation, etc.). Matches exactly what that function
-// actually returns, plus condensed_financial_range merged in by the
+// actually returns, plus condensed_departure_cost merged in by the
 // /api/condensed-complete route.
 export interface CondensedCompleteResult {
   identified_states: Array<{
@@ -524,7 +533,10 @@ export interface CondensedCompleteResult {
     synthesis_confidence:         number;
     is_fallback:                  boolean;
   } | null;
-  condensed_financial_range: CondensedFinancialRange;
+  // Stage 5. Optional because the two projects deploy separately, so a result can
+  // come from the previous engine with only the legacy range, or neither.
+  condensed_departure_cost?: CondensedDepartureCost;
+  condensed_financial_range?: CondensedFinancialRange;
 }
 
 export async function invokeCondensedComplete(
