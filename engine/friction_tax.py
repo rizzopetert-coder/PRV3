@@ -430,6 +430,21 @@ def get_industry_wage(industry: str) -> Optional[float]:
     return entry[0] if entry is not None else None
 
 
+def condensed_departure_cost(industry: str) -> dict:
+    """
+    The condensed diagnostic's cost of one departure, a single value: the industry
+    wage (OEWS May 2025, get_industry_wage) x TURNOVER_COST_SHARE (0.333, Work
+    Institute, 2017 Retention Report). Replaces the 0.50 to 0.75 range. amount is
+    None for an unrecognized industry (get_industry_wage returns None), never an
+    exception. Shown only behind FRICTION_DOLLARS_VISIBLE on the web.
+    """
+    wage = get_industry_wage(industry) if isinstance(industry, str) else None
+    return {
+        "amount": round(wage * TURNOVER_COST_SHARE, 2) if wage is not None else None,
+        "currency": "USD",
+    }
+
+
 def resolve_headcount_bucket(headcount) -> Optional[str]:
     """
     Map a precise headcount int (engine/data/intake.py's
