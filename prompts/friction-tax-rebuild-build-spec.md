@@ -1,6 +1,6 @@
 # Friction Tax Rebuild: Build Spec
 
-Status: Gemini-cleared 2026-09-30. Awaiting Pete's go to build. No engine code written. Research and decisions: `prompts/friction-tax-rebuild-source-verification.md` (Sections 1 to 5 and "Decisions (Pete, 2026-09-30)" items 1 to 11). MOB reference: 13b FRICTION TAX REBUILD entry (`tools/_mob.txt:1505`). Every code reference below was read live on 2026-09-30.
+Status: Gemini-cleared 2026-09-30. Awaiting Pete's go to build. No engine code written. Research and decisions: `prompts/friction-tax-rebuild-source-verification.md` (Sections 1 to 5 and "Decisions (Pete, 2026-09-30)" items 1 to 11). MOB reference: 13b FRICTION TAX REBUILD entry (`tools/_mob.txt:1505`). Every code reference below was read live on 2026-09-30. Phase 0 corrections and rulings (Pete, 2026-09-30) are in the addendum at the end of this file and supersede the sections they name.
 
 ## Open questions (Pete), up front
 
@@ -21,14 +21,14 @@ Remaining open:
 | `PAYROLL_BASELINE_GRID` | `:404`, 66 cells | bucket mean x wage | REMOVE. P = headcount x W computed directly |
 | `HEADCOUNT_MIDPOINTS`, `HEADCOUNT_BUCKETS` | `:88`, `:124` | Census SUSB 2022 bucket means | KEEP for Legal only (`:4121`, Cluster 3). Friction no longer uses them |
 | `resolve_headcount_bucket` | `:361`, called at `:1927` (friction), `:4389`, `:4527` (Legal) | int to bucket label, strings and non-numbers return None | KEEP unchanged for Legal. Friction stops calling it. Do not reintroduce string tolerance |
-| `_INDUSTRY_WAGE_DATA` | `:230` (May 2023) | mean wage per engine industry, 11 keys | REPLACE with OEWS May 2025 (Section 3), new citation ids |
-| `get_industry_wage` | `:345`, used only at `api/engine.py:284` | wage accessor | KEEP, returns May 2025 |
+| `_INDUSTRY_WAGE_DATA` | `:230` (May 2023) | mean wage per engine industry, 11 keys | REPLACE with OEWS May 2025 (Section 3), new citation ids. **R1 (addendum): Legal keeps a frozen copy, `_LEGAL_WAGE_DATA_MAY2023`, because the Ohio compensatory formula reads this table directly (`:3973`).** |
+| `get_industry_wage` | `:345`, used only at `api/engine.py:284` | wage accessor | KEEP, returns May 2025. **R2 (addendum): the condensed figure it feeds moves behind `FRICTION_DOLLARS_VISIBLE`.** |
 | `ORG_TYPE_SCALARS` | `:436` | 1.00 x5, Government 1.05 | REMOVE (Decision 11, build step 4) |
-| Web share path | `web/components/DiagnosticFlow.tsx:916`, `web/app/api/share/create/route.ts:93` | sends a numeric string | latent: Path 1 sharing is disabled (DiagnosticFlow.tsx:930). Fix when sharing is enabled. |
+| Web share path | `web/components/DiagnosticFlow.tsx:916`, `web/app/api/share/create/route.ts:93` | sends a numeric string | latent: Path 1 sharing is disabled (DiagnosticFlow.tsx:930). Fix when sharing is enabled. Phase 0 correction (addendum): `share/create` no longer carries any friction field (`2e56044`, `8680886`). |
 | Ledger | `engine/contract.py:405-532`, `dollar_exposure` `:473-481` | single-state dollars | CHANGE: `dollar_exposure` dropped, add `channels` (the channels that state switches on) |
 | Receipts | `engine/contract.py:693-757`, uses `STATE_MULTIPLIERS` at `:719`, channel labels `:588` | narrates grid, org scalar, loading, severity, 1.4x | REWRITE as per-channel inputs with vintages |
 | Payload assembly | `engine/contract.py:1125-1150`, `:1184`, `:1191-1207`, `:1217-1218` | `friction_tax_estimate {low, high, currency, driving_factors}` | CHANGE (Section 6) |
-| Condensed cost of one departure | `api/engine.py:260-294`, `:283-289` (wage x 0.50 to 0.75) | range | REPLACE with wage x 0.333 (P9), single value |
+| Condensed cost of one departure | `api/engine.py:260-294`, `:283-289` (wage x 0.50 to 0.75) | range | REPLACE with wage x 0.333 (P9), single value. **R2 (addendum): the figure also moves behind `FRICTION_DOLLARS_VISIBLE` and the "roughly 50-75%" copy is removed.** |
 | Display switch | `web/lib/output-text.ts:157`, gates `:271`, `:385-389`, `:415`, `:419-423`, `web/components/PrivateOutput.tsx:378`, `:408`, `:437`, `:445`, `:458` | `FRICTION_DOLLARS_VISIBLE = false` | KEEP false until Gemini and Pete clear the rebuild. Flipping it is a public-number change (Tier 4) |
 | Legal exposure | `engine/friction_tax.py:4317`, `:4508` | separate mechanism | KEEP unchanged |
 
@@ -82,14 +82,14 @@ Vintages (every figure):
 | Financial Services | $100,842 | $94,150 | 1.3 Finance and insurance | 15.6% |
 | Technology | $115,030 | $108,110 | 1.3 Information | 15.6% |
 | Manufacturing | $69,131 | $64,440 | 1.4 Manufacturing | 16.8% |
-| Retail & Hospitality | $42,024 | $39,651 | 3.37, Retail trade 2.6 and Accommodation and food services 4.2 weighted by OEWS employment | 40.4% |
-| Nonprofit & Education | $72,765 | $57,770 | 1.64, private educational services 1.4 (3,344,880) and Other services 2.2 standing in for NAICS 813 (1,429,400), weighted by OEWS May 2025 employment | 19.7% |
+| Retail & Hospitality | $42,024 | $39,651 | 3.37, Retail trade 2.6 and Accommodation and food services 4.2 weighted by OEWS employment | 40.44% (R3 (addendum): 3.37 x 12) |
+| Nonprofit & Education | $72,765 | $57,770 | 1.64, private educational services 1.4 (3,344,880) and Other services 2.2 standing in for NAICS 813 (1,429,400), weighted by OEWS May 2025 employment | 19.68% (R3 (addendum): 1.64 x 12) |
 | Government & Public Sector | $80,290 | $74,410 | 0.8 Government | 9.6% |
 | Construction | $72,146 | $67,430 | 1.8 Construction | 21.6% |
 | Transportation & Warehousing | $64,331 | $59,320 | 2.2 Transportation, warehousing, and utilities | 26.4% |
 | Other | $67,977 | $63,446 | 2.2 Total private (Decision 9) | 26.4% |
 
-W (May 2025) is the employment-weighted mean of the 3-digit NAICS all-occupation wages in the mapping committed in the verification doc Section 2b, computed 2026-09-30, not a published BLS sector wage. Ownership (Decision 12), from `nat3d_owner_M2025_dl.xlsx` in the same oesm25in4.zip:
+R3 (addendum): q is stored as the rounded 2-decimal monthly rate shown above, times 12. W and q were verified against primary files on 2026-09-30, see the addendum. W (May 2025) is the employment-weighted mean of the 3-digit NAICS all-occupation wages in the mapping committed in the verification doc Section 2b, computed 2026-09-30, not a published BLS sector wage. Ownership (Decision 12), from `nat3d_owner_M2025_dl.xlsx` in the same oesm25in4.zip:
 - The ownership file publishes split rows only for NAICS 611 and 622. Privately owned (ownership code 5): 611 = 3,344,880 employees at $73,400 (state 2,098,490 at $80,660 and local 8,408,680 at $65,740 excluded), 622 = 5,570,850 at $89,460 (state 445,500 and local 696,410 excluded).
 - Nonprofit & Education = 611 private plus 813 (1,429,400 at $71,280): 4,774,280 employees, $72,765 (was $69,984 blended). Healthcare & Life Sciences = 621, 622 private, 623, 624: 22,889,480 employees, $70,969 (was $71,770 blended).
 - Every other mapped industry is already a private-only row in the standard file, except three that carry a blended or government ownership code with no privately owned row published: 713 and 721 (code 57, inside Other and Retail & Hospitality) and 491 Postal Service (federal, inside Transportation & Warehousing). They are left as published and disclosed. Not substituted.
@@ -123,17 +123,17 @@ New shape (point estimate, Decision 6):
 Engine (Python): `engine/contract.py:1137-1149` (build), `:693-757` (receipts), `:405-532` (ledger, drop `dollar_exposure`, add `channels`), `:1191-1207` (`_cost_parts` and `inaction_cost_*`), `:35` and `:719` (import), `api/engine.py:283-289` (condensed).
 
 Web consumers that change (all read live):
-- `web/lib/types.ts:147-153` (`FrictionTaxEstimate`, removes `low`/`high`), `:178-182` (`FrictionTaxLedgerEntry.dollar_exposure`), `:377`, `:384`, `:520` (payload fields), `:581` (`inaction_cost_*`).
+- `web/lib/types.ts:147-153` (`FrictionTaxEstimate`, removes `low`/`high`), `:178-182` (`FrictionTaxLedgerEntry.dollar_exposure`), `:377`, `:384`, `:520` (payload fields), `:581` (`inaction_cost_*`). Phase 0 correction (addendum): the live lines are :375, :382, :385 and :578-579. R5 (addendum) removes `inaction_cost_*`.
 - `web/lib/engine-client.ts:147-148` (engine response types), `:525` (`condensed_financial_range`).
 - `web/lib/output-renderer.ts`: mark for deletion, not for update. `renderPrivateOutput` (`:113`) and `renderShareableOutput` (`:171`) have no callers (checked 2026-09-30), so the `FrictionTax` type (`:32-39`) and the `friction_tax_estimate` read (`:120`) go with the file.
 - `web/lib/output-text.ts:170-209` (`groupLedgerRows`, `higherEstimate` read `dollar_exposure`), `:386-415` (ledger and receipts lines), `:419-423` (`money(friction.low, friction.high)` in the cost comparison).
 - `web/components/PrivateOutput.tsx:171`, `:384` (`group.dollar_exposure`), `:445` (receipts source moves to `friction_receipts`), `:458`.
 - `web/components/ReportDetails.tsx:72`, `:88-90` (`rangeText(friction.low, friction.high)`).
 - `web/lib/dev-diagnostic-preview.ts:8`, `:43`.
-- `web/lib/diagnostic-completion.ts:197-198`, `web/app/api/result/route.ts:181-182`, `web/app/api/share/create/route.ts:189` (pass-through, type changes only).
+- `web/lib/diagnostic-completion.ts:197-198`, `web/app/api/result/route.ts:181-182`, `web/app/api/share/create/route.ts:189` (pass-through, type changes only). Phase 0 correction (addendum): stale, `share/create` carries no friction field since `2e56044`.
 - `web/components/DiagnosticFixturePicker.tsx:163` (sets null, likely no change).
-- Condensed: `web/app/api/diagnostic/condensed/answer/route.ts:155`, `web/components/CondensedOutput.tsx:130` (range to single value).
-- `inaction_cost_*` (`engine/contract.py:1191-1207`, `web/lib/output-text.ts:419-423`, `web/components/PrivateOutput.tsx:457`): two lines (typical-loss point estimate, tail-risk legal range), not a sum, since one is a point and the other a range (Decision 14).
+- Condensed: `web/app/api/diagnostic/condensed/answer/route.ts:155`, `web/components/CondensedOutput.tsx:130` (range to single value). Phase 0 correction (addendum): :130 is a comment, the render is at about :133-146. R2 (addendum) gates it behind `FRICTION_DOLLARS_VISIBLE` and removes the "roughly 50-75%" copy.
+- `inaction_cost_*` (`engine/contract.py:1191-1207`, `web/lib/output-text.ts:419-423`, `web/components/PrivateOutput.tsx:457`): two lines (typical-loss point estimate, tail-risk legal range), not a sum, since one is a point and the other a range (Decision 14). **R5 (addendum): implemented by removing the fields with no replacement.**
 - **Consumers that must render percent-only at the cap** (`amount` null at N = 1000):
   - `web/components/ReportDetails.tsx:72`, `:88-90` (`rangeText(friction.low, friction.high)` becomes a percent line when `amount` is null).
   - `web/lib/output-text.ts:386-415` (receipts text and ledger lines) and `:419-423` (the friction line in the cost comparison, `money(...)`, becomes "X% of payroll").
@@ -149,13 +149,13 @@ E_bp - E_us = 0.70 - 0.31 = 0.39, no partial-year discount, q = JOLTS monthly x 
 
 | Employees / industry | W | Quit rate (monthly, annual) | Payroll | Engagement | Turnover | Total | Eng % | Turn % | Total % of payroll |
 |---|---:|---|---:|---:|---:|---:|---:|---:|---:|
-| 12 / Retail & Hospitality | $42,024 | 3.37, 40.4% | $504,288 | $35,401 | $28,497 | $63,898 | 7.02% | 5.7% | 12.7% |
+| 12 / Retail & Hospitality | $42,024 | 3.37, 40.44% | $504,288 | $35,401 | $28,522 | $63,923 | 7.02% | 5.7% | 12.7% |
 | 12 / Other | $67,977 | 2.20, 26.4% | $815,724 | $57,264 | $30,119 | $87,383 | 7.02% | 3.7% | 10.7% |
 | 60 / Construction | $72,146 | 1.80, 21.6% | $4,328,760 | $303,879 | $130,771 | $434,650 | 7.02% | 3.0% | 10.0% |
 | 60 / Government & Public Sector | $80,290 | 0.80, 9.6% | $4,817,400 | $338,181 | $64,681 | $402,863 | 7.02% | 1.3% | 8.4% |
 | 175 / Technology | $115,030 | 1.30, 15.6% | $20,130,250 | $1,413,144 | $439,205 | $1,852,349 | 7.02% | 2.2% | 9.2% |
 | 175 / Professional Services | $108,640 | 2.30, 27.6% | $19,012,000 | $1,334,642 | $733,889 | $2,068,531 | 7.02% | 3.9% | 10.9% |
-| 400 / Nonprofit & Education | $72,765 | 1.64, 19.7% | $29,106,000 | $2,043,241 | $800,891 | $2,844,132 | 7.02% | 2.8% | 9.8% |
+| 400 / Nonprofit & Education | $72,765 | 1.64, 19.68% | $29,106,000 | $2,043,241 | $801,127 | $2,844,368 | 7.02% | 2.8% | 9.8% |
 | 400 / Manufacturing | $69,131 | 1.40, 16.8% | $27,652,400 | $1,941,198 | $649,734 | $2,590,933 | 7.02% | 2.3% | 9.4% |
 | 800 / Healthcare & Life Sciences | $70,969 | 2.00, 24.0% | $56,775,200 | $3,985,619 | $1,905,739 | $5,891,358 | 7.02% | 3.4% | 10.4% |
 | 800 / Transportation & Warehousing | $64,331 | 2.20, 26.4% | $51,464,800 | $3,612,829 | $1,900,237 | $5,513,066 | 7.02% | 3.7% | 10.7% |
@@ -188,9 +188,9 @@ The Gallup 18% with the 69% population and the JOLTS rate assume US employers. P
 
 - `tools/test_friction_tax.py` (2,292 lines): remove section 1 (`SEVERITY_SCALAR`, `:165-180`), rewrite the compute sections (2-13, 20-21), remove the grid sections (14-15, `:512-527`) and the `STATE_MULTIPLIERS` sections (17-19), replace with: one hand-computed fixture per channel with each input named, the headcount guard (int and float of at least 2 priced at actual N, and uncalibrated for "", None, "150", True, `float("inf")`, `float("nan")`, 0, negatives and 1, no bucket fallback), channel switch rule against the new `STATE_CRITERIA`, the `paper_shield`-only case, multi-state sets do not stack, severity changes nothing, `excess` is null, every industry has a W and a q, vintage strings present.
 - `engine/data/state_criteria.py` needs a registry test (58 state ids match `engine/data/states.py`) and a legal score assertion equivalent to `engine/friction_tax.py:2172-2176`.
-- **Required: Legal/Compliance outputs byte-identical before and after the refactor.** Before any refactor commit, record a baseline from the unchanged code: `compute_legal_compliance_exposure` and `compute_legal_per_state_breakdown` (`engine/friction_tax.py:4317`, `:4508`) for every one of the 58 states as a single-state input across a fixed grid (integer headcounts 12, 60, 175, 400, 800, 1200, all 11 industries, all 6 org types, a fixed jurisdiction set), plus `private_output.legal_tail_risk_exposure` for each of the 175 calibration profiles (`engine/test_profiles*.py`, run through the `tools/calibration_runner.py` pipeline). Store canonical JSON and its sha256 under `tools/fixtures/`. After the refactor the same calls must produce identical bytes. A single differing byte fails the test and blocks the build.
+- **Required: Legal/Compliance outputs byte-identical before and after the refactor.** Before any refactor commit, record a baseline from the unchanged code: `compute_legal_compliance_exposure` and `compute_legal_per_state_breakdown` (`engine/friction_tax.py:4317`, `:4508`) for every one of the 58 states as a single-state input across a fixed grid (integer headcounts 12, 60, 175, 400, 800, 1200, all 11 industries, all 6 org types, a fixed jurisdiction set), plus `private_output.legal_tail_risk_exposure` for each of the 175 calibration profiles (`engine/test_profiles*.py`, run through the `tools/calibration_runner.py` pipeline). Store canonical JSON and its sha256 under `tools/fixtures/`. After the refactor the same calls must produce identical bytes. A single differing byte fails the test and blocks the build. Phase 0 (addendum): recorded in `6c067fd`, `517dbed`, `fc87f9a`, gzip storage accepted (R4), check with `python tools/capture_legal_baseline.py --check`.
 - `tools/test_contract.py`: `:441` estimate shape, `:1047-1150` ledger (`dollar_exposure` cross-check becomes a `channels` check), `inaction_cost` assertions.
-- Web: `web/lib/output-text.test.ts:294,372` (keep the hidden-flag assertion), `web/components/PrivateOutput.friction.test.ts:33-49`, `web/lib/diagnostic-completion-brand.test.ts:172-190`, plus the server-render test that no friction dollar reaches the report screen (stays as is).
+- Web: `web/lib/output-text.test.ts:294,372` (keep the hidden-flag assertion), `web/components/PrivateOutput.friction.test.ts:33-49`, `web/lib/diagnostic-completion-brand.test.ts:172-190`, plus the server-render test that no friction dollar reaches the report screen (stays as is). Phase 0 correction (addendum), also in scope: `tools/test_phase1_report_data.py:188-191` (changes with R5), and `web/app/api/share/create/route.test.ts` and `web/lib/share-store.test.ts` (keep as strip guards, R6 adds the name guard in Stage 4).
 - Cap tests (Decision 17): N = 1000 returns `percent_of_payroll` on each channel and the total with every `amount` null and no dollar figure in any `driving_factors` text, N = 999 returns percents and amounts, `percent_of_payroll` is present at every N, and the web consumers above render percent-only when `amount` is null.
 - New: framing-rule assertions on any surface showing the figure: the total contains "what organizations like yours typically lose", the engagement line contains the gap-to-best-run wording, and neither contains "normal", "acceptable" or "full engagement".
 - Engagement formula: a hand-computed fixture at 0.39 x 0.18, and a floor test (E_us at or above E_bp returns 0 engagement, never negative).
@@ -215,10 +215,10 @@ Note: the share-path headcount bug (`web/components/DiagnosticFlow.tsx:916`) is 
 1. **Legal baseline.** Record the byte-identical baseline (Section 8) from unchanged code and commit it.
 2. **State criteria refactor.** Create `engine/data/state_criteria.py`, point Legal (`engine/friction_tax.py:2172-2176`, `:4166-4170`) and `engine/contract.py:35`, `:719` at it, then run the byte-identical test.
 3. **Org type list ownership.** Move the "source of truth" note for the org type option list from `ORG_TYPE_SCALARS` to `INTAKE_FIELDS["org_type"]` (`engine/data/intake.py:296`) in `web/components/DiagnosticFlow.tsx:187` and `web/components/SelfSelectIntakeModal.tsx:11`, and add a test that both web lists equal the intake list. Do this before `ORG_TYPE_SCALARS` is removed.
-4. **Wage refresh.** Replace `_INDUSTRY_WAGE_DATA` (`engine/friction_tax.py:230`) with the May 2025 values in Section 3 (privately owned rows where published, Decision 12) and new citation ids. This also changes `get_industry_wage` (`:345`) for the condensed range.
-5. **Two-channel function.** Replace `compute_friction_tax` (`:1877-2016`) and remove the magnitude constants, `SEVERITY_SCALAR`, `PAYROLL_BASELINE_GRID` and `ORG_TYPE_SCALARS`. Apply the headcount guard in Section 2 and state the 1,000 cap on the output and withhold dollars at the cap (Decisions 15 and 17). Update `engine/contract.py` (`:405-532`, `:693-757`, `:1125-1150`, `:1184-1207`) and add `friction_receipts`.
-6. **Condensed.** Replace the range at `api/engine.py:283-289` with wage x 0.333.
-7. **Web types and consumers.** Update every consumer listed in Section 6, keeping `FRICTION_DOLLARS_VISIBLE` false (`web/lib/output-text.ts:157`).
+4. **Wage refresh.** Replace `_INDUSTRY_WAGE_DATA` (`engine/friction_tax.py:230`) with the May 2025 values in Section 3 (privately owned rows where published, Decision 12) and new citation ids. This also changes `get_industry_wage` (`:345`) for the condensed range. **R1 (addendum): first add `_LEGAL_WAGE_DATA_MAY2023` (a copy of the current values) and point the Ohio formula and `tools/test_friction_tax.py:1933` at it, then replace `_INDUSTRY_WAGE_DATA`. `--check` must stay byte-identical. The condensed figure changes here too, see R2.**
+5. **Two-channel function.** Replace `compute_friction_tax` (`:1877-2016`) and remove the magnitude constants, `SEVERITY_SCALAR`, `PAYROLL_BASELINE_GRID` and `ORG_TYPE_SCALARS`. Apply the headcount guard in Section 2 and state the 1,000 cap on the output and withhold dollars at the cap (Decisions 15 and 17). Update `engine/contract.py` (`:405-532`, `:693-757`, `:1125-1150`, `:1184-1207`) and add `friction_receipts`. **Phase 0 (addendum): R5 removes `inaction_cost_*`, R6 adds the share-payload name guard in this stage's commit, and the `engine/friction_tax.py` docstring (54 cells, 9 industries, 57 states) is fixed here.**
+6. **Condensed.** Replace the range at `api/engine.py:283-289` with wage x 0.333. **R2 (addendum): also gate the figure behind `FRICTION_DOLLARS_VISIBLE` and remove the "roughly 50-75%" copy. `/api/condensed-complete` shape change needs a live round-trip.**
+7. **Web types and consumers.** Update every consumer listed in Section 6, keeping `FRICTION_DOLLARS_VISIBLE` false (`web/lib/output-text.ts:157`). **R6 (addendum): the share-payload name guard moved to step 5.**
 8. **Tests.** Section 8, then the 175-profile calibration run (expected no change) and the Legal byte-identical test.
 9. **Production round-trip** on the payload and condensed routes before anything is marked done.
 
@@ -238,3 +238,34 @@ Round 2 follow-up (2026-09-30):
 - Gemini answered from prompt text only, since it could not open the attachments.
 
 Decision 18 confirm (2026-09-30): CONFIRM. Gemini, single question in a fresh thread: measuring against an achievable best-practice level isolates the recoverable loss rather than an ideal. No sources cited.
+
+## Phase 0 corrections and rulings (Pete, 2026-09-30)
+
+This addendum supersedes the sections it names. Existing sections are annotated in place with a pointer here. Phase 0 baseline: `tools/capture_legal_baseline.py` and `tools/fixtures/legal_compliance_baseline.*`, commits `6c067fd`, `517dbed`, `fc87f9a`, pushed 2026-09-30. Check with `python tools/capture_legal_baseline.py --check`.
+
+### Stage numbering
+
+Section 10 steps map to the stages used in Phase 0 reporting: Stage 1 = step 2 (state criteria), Stage 2 = step 3 (org list ownership), Stage 3 = step 4 (wage refresh), Stage 4 = step 5 (two-channel function), Stage 5 = step 6 (condensed), Stage 6 = step 7 (web types and consumers), Stage 7 = step 8 (tests and full verification), Stage 8 = step 9 (production round-trip).
+
+### Rulings
+
+- **R1. Legal keeps a frozen May 2023 wage table.** Add `_LEGAL_WAGE_DATA_MAY2023` to `engine/friction_tax.py`, a copy of the current `_INDUSTRY_WAGE_DATA` values, with a comment explaining that Legal must stay byte-identical to the Phase 0 baseline while friction wages move to May 2025. The Ohio compensatory formula (`engine/friction_tax.py:3973`, `_oh_compensatory_damages_pricing`) and `tools/test_friction_tax.py:1933` read the frozen table. It is added in Stage 3 before `_INDUSTRY_WAGE_DATA` is replaced. Evidence for the need: changing one industry's wage in memory changed 42 of 870 baseline blocks, every one under an Ohio jurisdiction set. Moving Legal to May 2025 wages is a separate future decision, not acted on here. Carry it to the 13b item at closeout.
+- **R2. The condensed figure moves behind `FRICTION_DOLLARS_VISIBLE`.** The "Estimated cost of one departure in this pattern" block in `web/components/CondensedOutput.tsx` (render at about lines 133-146) is gated by the flag in this build, joining Stage 5's scope. The "roughly 50-75%" copy is removed, not reworded, because it contradicts the verified 0.333 figure. When the flag is false the condensed report shows no dollar figure. The existing unavailable note ("A benchmark figure isn't available for the industry provided.") is reused only if it reads correctly for a hidden figure. If it does not, the copy is proposed to Pete and the work stops. The flag stays false throughout the build.
+- **R3. JOLTS rates are stored as the rounded 2-decimal monthly values in Section 3.** The annual q is that monthly value times 12 (Retail & Hospitality 3.37 x 12 = 40.44%, Nonprofit & Education 1.64 x 12 = 19.68%, the rest unchanged). The Section 6b worked figures are recomputed from these values. Old figures, computed from unrounded weighted rates (3.3670 and 1.6395), kept for the record: 12 / Retail & Hospitality turnover $28,497, total $63,898. 400 / Nonprofit & Education turnover $800,891, total $2,844,132. All other rows are unchanged. Fixtures follow the rounded values.
+- **R4. Gzip storage of the canonical JSON baseline is accepted.** The hash is over the uncompressed canonical bytes.
+- **R5. Decision 14 implementation.** Remove `inaction_cost_low` and `inaction_cost_high` from `ServiceCostComparison` and from the payload, with no replacement fields. The two lines read directly from the new `friction_tax_estimate` (typical-loss point estimate) and the existing `legal_tail_risk_exposure` (tail-risk range). Before Stage 4, list every consumer of `inaction_cost_*` across the engine, API, web and tests, and confirm none needs a dedicated field. If one does, stop and report it. `tools/test_phase1_report_data.py:188-191` changes with this.
+- **R6. The share-payload name guard test moves from Stage 6 to Stage 4**, into the same commit that introduces `friction_receipts` and `channels`. It must fail if a share payload, at write (`share/create`) or at read (`getShareRecord`), carries `friction_tax_estimate`, `legal_tail_risk_band`, `friction_receipts` or `channels`. The current read-side strip (`web/lib/share-store.ts:53-62`) names only the first two, so the guard asserts on the returned payload rather than relying on the strip.
+
+### Phase 0 corrections
+
+- `web/lib/types.ts` line drift: `friction_tax_estimate` is at :375, the ledger at :382, `legal_tail_risk_exposure` at :385 and `inaction_cost_*` at :578-579. The spec's :377, :384 and :520 are comments, and :581 is `service_estimate_high`.
+- `web/components/CondensedOutput.tsx:130` is a comment. The render is at about :133-146.
+- `web/app/api/share/create/route.ts:189` is `intake: mapIntake(...)`. `share/create` no longer carries any friction field (`2e56044`, `8680886`), so any "pass-through" wording about it is stale. The shareable payload is a whitelist at write and `getShareRecord` strips two named fields at read.
+- Missing from Section 8: `tools/test_phase1_report_data.py:188-191`, `web/app/api/share/create/route.test.ts`, `web/lib/share-store.test.ts` (keep both as strip guards).
+- The `engine/friction_tax.py` docstring (lines 7-8 and 31) says 54 cells, 9 industries and 57 states. Live is 66, 11 and 58. It is fixed in Stage 4.
+- The BLS OEWS management share (11-0000) is not an engine input (decision 5). It stays in the verification doc as research.
+- The `/api/condensed-complete` response shape change (`condensed_financial_range`, `api/engine.py:285`) is under the live production round-trip rule. No `vercel.json` route and no new FastAPI endpoint is added by this spec.
+
+### W and q primary-source check (Claude Code, 2026-09-30)
+
+The verification doc records the method for W (Section 2b mapping, `nat3d_M2025_dl.xlsx`) but contains no W table and no JOLTS values, so both were checked against primary files this session. W: `oesm25in4.zip` (`nat3d_M2025_dl.xlsx`, and `nat3d_owner_M2025_dl.xlsx` for privately owned rows 611 and 622), all-occupation A_MEAN weighted by TOT_EMP over the Section 2b mapping. All 11 match Section 3 to the dollar, and employment totals match Section 2b. The ownership codes disclosed in Section 3 were confirmed (713 and 721 are code 57, 491 is code 1, government 999000 is code 123). q: BLS JOLTS Table 22, annual average quits rates, 2025 column (read from bls.gov/news.release/jolts.t22.htm, last modified March 13, 2026). The Table 22 footnote defines the annual average as the sum of 12 monthly quits as a percent of the sum of 12 monthly employment, so the value is an average monthly rate and x12 annualizes it. All nine direct rows match. The two blended rows recompute from OEWS employment: Retail & Hospitality 3.367 rounds to 3.37, Nonprofit & Education 1.6395 rounds to 1.64. No Section 3 value changed.
